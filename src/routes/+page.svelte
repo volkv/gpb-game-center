@@ -2,6 +2,7 @@
 	import { currentScreen } from '$lib/stores/navigationStore';
 	import GameCenter from '$lib/components/GameCenter.svelte';
 	import GameContainer from '$lib/components/GameContainer.svelte';
+	import BankHome from '$lib/components/BankHome.svelte';
 	import { slideInOut, reduceMotionTransition } from '$lib/utils/transitions.js';
 	import type { Game } from '$lib/types/Game';
 
@@ -31,7 +32,15 @@
 
 <div class="screen-container">
 	{#key $currentScreen}
-		{#if $currentScreen === 'game-center'}
+		{#if $currentScreen === 'bank-home'}
+			<div
+				class="screen"
+				in:slideRight={{ duration: 400, delay: 50 }}
+				out:slideLeft={{ duration: 300 }}
+			>
+				<BankHome />
+			</div>
+		{:else if $currentScreen === 'game-center'}
 			<div
 				class="screen"
 				in:slideRight={{ duration: 400, delay: 50 }}
@@ -53,7 +62,7 @@
 				in:slideRight={{ duration: 400, delay: 50 }}
 				out:slideLeft={{ duration: 300 }}
 			>
-				<GameCenter on:gameSelected={handleGameSelected} />
+				<BankHome />
 			</div>
 		{/if}
 	{/key}

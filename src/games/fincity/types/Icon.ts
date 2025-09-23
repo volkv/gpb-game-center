@@ -1,0 +1,1 @@
+export type IconName = | 'coin' | 'crystal' | 'energy' | 'experience' | 'building' | 'quest' | 'settings' | 'close' | 'menu' | 'heart' | 'star' | 'shield' | 'hammer' | 'home' | 'check' | 'search' | 'book' | 'crown' | 'level' | 'security' | 'grid' | 'bank' | 'trending-up' | 'gift' | 'achievement' | 'trophy' | 'medal';

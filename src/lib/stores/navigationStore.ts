@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 
-export type Screen = 'game-center' | 'game' | 'loading' | 'error';
+export type Screen = 'bank-home' | 'game-center' | 'game' | 'loading' | 'error';
 
 export interface NavigationState {
 	currentScreen: Screen;
@@ -20,9 +20,9 @@ export interface NavigationOptions {
 
 function createNavigationStore() {
 	const initialState: NavigationState = {
-		currentScreen: 'game-center',
+		currentScreen: 'bank-home',
 		previousScreen: null,
-		history: ['game-center'],
+		history: ['bank-home'],
 		modalOpen: false,
 		modalContent: null,
 		isTransitioning: false,
@@ -202,6 +202,10 @@ export function navigateToGame() {
 
 export function navigateToGameCenter() {
 	navigationStore.navigateTo('game-center', { clearHistory: true });
+}
+
+export function navigateToBankHome() {
+	navigationStore.navigateTo('bank-home', { clearHistory: true });
 }
 
 export function navigateToLoading() {

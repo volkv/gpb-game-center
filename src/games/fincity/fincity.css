@@ -1,0 +1,577 @@
+/* Изолированные стили для игры FinCity */
+
+.fincity-game {
+  /* Локальный импорт Tailwind для игры */
+  --color-primary: #1919EF;
+  --color-secondary: #8D98A4;
+  --color-surface: #DEE1EE;
+  --color-background: #060698;
+  --color-black: #000000;
+
+  /* Семантические цвета */
+  --color-success: #3CFFB9;
+  --color-warning: #FF82BE;
+  --color-error: #DD41DB;
+
+  /* Совместимость с существующим кодом */
+  --color-violet: #1919EF;
+  --color-cumin: #060698;
+  --color-henbane: #8D98A4;
+  --color-lily: #DEE1EE;
+  --color-raspberry: #DD41DB;
+  --color-melissa: #3CFFB9;
+  --color-sakura: #FF82BE;
+  --color-mint: #3CFFB9;
+  --color-warning-orange: #FF82BE;
+  --color-danger-red: #DD41DB;
+  --color-gpb-blue: #1919EF;
+  --color-crystal-purple: #DD41DB;
+
+  /* Градиенты */
+  --gradient-brand: linear-gradient(135deg, #1919EF 0%, #060698 100%);
+
+  /* Игровые цвета для ресурсов */
+  --color-coin-gold: #3CFFB9;
+  --color-crystal-purple: #DD41DB;
+  --color-energy-blue: #1919EF;
+  --color-experience-green: #3CFFB9;
+
+  /* Размеры для игрового UI */
+  --size-building-sm: 4rem;
+  --size-building-md: 6rem;
+  --size-building-lg: 8rem;
+
+  /* Радиусы скругления */
+  --radius: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* Шрифты Газпромбанк Тех */
+  --font-heading: 'HALVAR BREITSCHRIFT', 'Arial Black', sans-serif;
+  --font-body: 'Gazprombank Sans', Inter, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-game: 'Gazprombank Sans', Inter, system-ui, sans-serif;
+
+  /* Анимации */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+
+  /* Модульная сетка для дизайн-системы */
+  --grid-base: 8px;
+  --grid-gutter: 16px;
+  --grid-margin: 24px;
+  --grid-container-max-width: 500px;
+  --grid-container-content-width: 468px;
+
+  /* Max-width scale for cards and containers */
+  --max-w-sm: 24rem;
+  --max-w-md: 28rem;
+  --max-w-lg: 32rem;
+
+  /* Mobile-first брейкпоинты */
+  --breakpoint-mobile: 320px;
+  --breakpoint-mobile-lg: 400px;
+  --breakpoint-container: 500px;
+
+  /* Упрощенная система отступов - 4 размера */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+
+  /* Базовые стили для игры */
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  background: #f9fafb;
+  color: #111827;
+  min-height: 100vh;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.fincity-game h1,
+.fincity-game h2,
+.fincity-game h3,
+.fincity-game h4,
+.fincity-game h5,
+.fincity-game h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.fincity-game h1 { font-size: 1.5rem; line-height: 1.75rem; }
+.fincity-game h2 { font-size: 1.125rem; line-height: 1.375rem; }
+.fincity-game h3 { font-size: 1rem; line-height: 1.5rem; font-weight: 600; }
+.fincity-game h4 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; }
+.fincity-game h5 { font-size: 0.875rem; line-height: 1.25rem; }
+.fincity-game h6 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
+
+.fincity-game p,
+.fincity-game span,
+.fincity-game div,
+.fincity-game label,
+.fincity-game input,
+.fincity-game button {
+  font-family: var(--font-body);
+}
+
+.fincity-game * {
+  box-sizing: border-box;
+}
+
+/* Кастомные компоненты игры */
+.fincity-game .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  font-weight: 500;
+  border-radius: var(--radius-lg);
+  transition: opacity 150ms;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  background: var(--color-violet);
+  border: none;
+  cursor: pointer;
+}
+
+.fincity-game .btn-primary:hover {
+  background: var(--color-cumin);
+  opacity: 0.9;
+}
+
+.fincity-game .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: var(--radius-lg);
+  transition: opacity 150ms;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  background: var(--color-henbane);
+  color: var(--color-black);
+  border: none;
+  cursor: pointer;
+}
+
+.fincity-game .btn-secondary:hover {
+  background: var(--color-lily);
+  opacity: 0.9;
+}
+
+.fincity-game .game-card {
+  background: rgba(222, 225, 238, 0.9);
+  backdrop-filter: blur(4px);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(141, 152, 164, 0.3);
+  overflow: hidden;
+}
+
+.fincity-game .game-card-elevated {
+  background: rgba(222, 225, 238, 0.95);
+  backdrop-filter: blur(4px);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(25, 25, 239, 0.2);
+  overflow: hidden;
+}
+
+.fincity-game .resource-counter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-lg);
+  background: rgba(222, 225, 238, 0.8);
+  backdrop-filter: blur(4px);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  border: 1px solid rgba(141, 152, 164, 0.3);
+  transition: opacity 150ms;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.fincity-game .resource-counter:hover {
+  opacity: 0.9;
+}
+
+.fincity-game .bubble-info {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 0.5rem var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: rgba(222, 225, 238, 0.9);
+  backdrop-filter: blur(4px);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid rgba(141, 152, 164, 0.2);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.fincity-game .bubble-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 0.25rem var(--spacing-sm);
+  border-radius: var(--radius);
+  background: rgba(60, 255, 185, 0.1);
+  color: var(--color-black);
+  border: 1px solid rgba(60, 255, 185, 0.3);
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: opacity 150ms;
+}
+
+.fincity-game .bubble-tag:hover {
+  opacity: 0.8;
+}
+
+.fincity-game .building-slot {
+  width: var(--size-building-md);
+  height: var(--size-building-md);
+  border: 2px dashed rgba(141, 152, 164, 0.5);
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 300ms;
+  backdrop-filter: blur(4px);
+}
+
+.fincity-game .building-slot:hover {
+  border-color: var(--color-violet);
+  background: rgba(25, 25, 239, 0.1);
+  opacity: 0.8;
+}
+
+.fincity-game .building-placed {
+  width: var(--size-building-md);
+  height: var(--size-building-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: opacity 300ms;
+  cursor: pointer;
+  position: relative;
+}
+
+.fincity-game .building-placed:hover {
+  opacity: 0.8;
+}
+
+.fincity-game .building-premium {
+  width: var(--size-building-md);
+  height: var(--size-building-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: opacity 300ms;
+  cursor: pointer;
+  position: relative;
+  border: 1px solid rgba(221, 65, 219, 0.3);
+}
+
+.fincity-game .building-premium:hover {
+  opacity: 0.8;
+}
+
+.fincity-game .building-highlighted {
+  border: 2px solid var(--color-melissa);
+  position: relative;
+}
+
+.fincity-game .building-energy-effect {
+  position: relative;
+  overflow: visible;
+}
+
+.fincity-game .building-energy-effect::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-mint);
+  border-radius: 50%;
+}
+
+/* Компоненты игрового интерфейса */
+.fincity-game .top-bar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  position: relative;
+  z-index: 40;
+}
+
+.fincity-game .top-bar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fincity-game .header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fincity-game .user-greeting-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fincity-game .user-greeting {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.fincity-game .level-info {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.fincity-game .level-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.fincity-game .settings-section {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.fincity-game .resources-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.fincity-game .resource-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(222, 225, 238, 0.5);
+  border-radius: var(--radius);
+  border: 1px solid rgba(141, 152, 164, 0.2);
+  min-width: 0;
+  flex: 1;
+}
+
+.fincity-game .resource-value {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Анимации */
+@keyframes buildingAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes resourceCollect {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2) translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-30px);
+  }
+}
+
+@keyframes modalSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fincity-game .building-appear {
+  animation: buildingAppear var(--duration-normal) ease-out;
+}
+
+.fincity-game .resource-collect {
+  animation: resourceCollect var(--duration-normal) ease-in;
+}
+
+.fincity-game .modal-slide-up {
+  animation: modalSlideUp var(--duration-normal) ease-out;
+}
+
+.fincity-game .toast-fade-in {
+  animation: toastFadeIn var(--duration-fast) ease-out;
+}
+
+/* Мобильные адаптации */
+@media (max-width: 480px) {
+  .fincity-game .top-bar {
+    padding: 0.5rem;
+  }
+
+  .fincity-game .top-bar-content {
+    gap: 0.5rem;
+  }
+
+  .fincity-game .user-greeting {
+    font-size: 1rem;
+  }
+
+  .fincity-game .resources-row {
+    gap: 0.5rem;
+  }
+
+  .fincity-game .resource-item {
+    padding: 0.375rem 0.5rem;
+  }
+
+  .fincity-game .resource-value {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .fincity-game .user-greeting {
+    font-size: 0.875rem;
+  }
+
+  .fincity-game .level-text {
+    font-size: 0.75rem;
+  }
+}
+
+/* Стили для тултипов обучения */
+.fincity-game .tutorial-tooltip {
+  max-height: 80vh;
+  overflow-y: auto;
+  backdrop-filter: blur(8px);
+  animation: tutorialTooltipAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fincity-game .tutorial-tooltip::-webkit-scrollbar {
+  width: 4px;
+}
+
+.fincity-game .tutorial-tooltip::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fincity-game .tutorial-tooltip::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.fincity-game .tutorial-modal {
+  backdrop-filter: blur(4px);
+  animation: tutorialModalAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tutorialTooltipAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes tutorialModalAppear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Мобильные адаптации для тултипов */
+@media (max-width: 480px) {
+  .fincity-game .tutorial-tooltip {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    border-radius: 12px;
+  }
+
+  .fincity-game .tutorial-tooltip h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .fincity-game .tutorial-tooltip p {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .fincity-game .tutorial-tooltip .flex {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .fincity-game .tutorial-tooltip .flex button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .fincity-game .tutorial-tooltip {
+    padding: 1rem !important;
+    font-size: 0.85rem;
+  }
+
+  .fincity-game .tutorial-tooltip h3 {
+    font-size: 1rem !important;
+  }
+
+  .fincity-game .tutorial-tooltip p {
+    font-size: 0.85rem !important;
+  }
+}

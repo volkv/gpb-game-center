@@ -15,25 +15,14 @@ export default defineConfig({
 					'quiz-game': ['./src/games/quiz-shield-ruble/QuizGame.svelte'],
 					'match3-game': ['./src/games/match3-golden-reserve/Match3Demo.svelte'],
 					'crossword-game': ['./src/games/crossword-financial/CrosswordDemo.svelte'],
+					'fincity-game': ['./src/games/fincity/FincityGame.svelte'],
 					'vendor-svelte': ['svelte', 'svelte/store', 'svelte/transition', 'svelte/motion']
-				},
-				assetFileNames: (assetInfo) => {
-					const info = assetInfo.name!.split('.');
-					let extType = info[info.length - 1];
-					if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-						extType = 'img';
-					} else if (/woff|woff2/.test(extType)) {
-						extType = 'fonts';
-					}
-					return `assets/${extType}/[name]-[hash][extname]`;
-				},
-				chunkFileNames: 'assets/js/[name]-[hash].js',
-				entryFileNames: 'assets/js/[name]-[hash].js'
+				}
 			}
 		}
 	},
 	optimizeDeps: {
-		include: ['svelte/store', 'svelte/transition', 'svelte/motion'],
+		include: ['svelte/store', 'svelte/transition', 'svelte/motion', 'pixi.js'],
 		exclude: ['@games/*']
 	},
 	server: {

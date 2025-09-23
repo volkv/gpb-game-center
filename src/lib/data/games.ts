@@ -215,6 +215,63 @@ export const GAMES_DATA: Game[] = [
 		updatedAt: new Date('2024-02-05'),
 		componentPath: '/games/investment-strategy/StrategyGame.svelte',
 		locale: 'ru'
+	},
+
+	{
+		id: GAME_TYPES.FINCITY,
+		name: 'FinCity',
+		description: 'Стройте и развивайте финансовый город. Изучайте банковские продукты через игровой процесс и создавайте процветающую финансовую экосистему.',
+		shortDescription: 'Городской симулятор',
+		category: GAME_CATEGORIES.EDUCATIONAL,
+		status: GAME_STATUS.ACTIVE,
+
+		icon: {
+			url: '/games/fincity/icon.svg',
+			alt: 'Иконка FinCity',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%)',
+		themeColor: 'var(--color-gpb-mint)',
+
+		metrics: {
+			averagePlayTime: 1200,
+			completionRate: 0.82,
+			difficulty: 'medium',
+			maxScore: 5000,
+			averageScore: 3200
+		},
+		estimatedDuration: 20,
+
+		relatedProducts: [
+			{
+				id: 'city-savings',
+				name: 'Накопительный счёт',
+				description: 'Сохраняйте и приумножайте средства',
+				url: '/products/savings',
+				category: 'savings'
+			},
+			{
+				id: 'investment-portfolio',
+				name: 'Инвестиционный портфель',
+				description: 'Индивидуальные инвестиционные решения',
+				url: '/products/investment',
+				category: 'investment'
+			},
+			{
+				id: 'business-banking',
+				name: 'Бизнес-банкинг',
+				description: 'Финансовые решения для бизнеса',
+				url: '/products/business',
+				category: 'business'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-02-10'),
+		updatedAt: new Date('2024-02-10'),
+		componentPath: '/games/fincity/FincityGame.svelte',
+		locale: 'ru'
 	}
 ];
 

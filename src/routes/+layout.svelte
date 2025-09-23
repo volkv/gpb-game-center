@@ -3,6 +3,8 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { onMount } from 'svelte';
 	import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
+	import StatusBar from '$lib/components/StatusBar.svelte';
+	import { currentScreen } from '$lib/stores/navigationStore';
 
 	let { children } = $props();
 	let isLoaded = $state(false);
@@ -70,9 +72,14 @@
 
 <div class="mobile-app" class:loaded={isLoaded}>
 	<div class="mobile-container">
-		<ErrorBoundary>
-			{@render children?.()}
-		</ErrorBoundary>
+		{#if $currentScreen !== 'bank-home'}
+			<StatusBar />
+		{/if}
+		<div class="main-content">
+			<ErrorBoundary>
+				{@render children?.()}
+			</ErrorBoundary>
+		</div>
 	</div>
 </div>
 
@@ -118,18 +125,26 @@
 		height: 100vh;
 		max-height: 1000px;
 		background: white;
-		overflow-y: auto;
+		overflow: hidden;
 		position: relative;
 		border-radius: 0;
 		contain: layout style paint;
-		-webkit-overflow-scrolling: touch;
-		scroll-behavior: smooth;
+		display: flex;
+		flex-direction: column;
 		padding-top: var(--ios-safe-area-top, 0px);
 		padding-bottom: var(--ios-safe-area-bottom, 0px);
 	}
 
+	.main-content {
+		flex: 1;
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		scroll-behavior: smooth;
+		position: relative;
+	}
+
 	@media (prefers-reduced-motion: reduce) {
-		.mobile-container {
+		.main-content {
 			scroll-behavior: auto;
 		}
 

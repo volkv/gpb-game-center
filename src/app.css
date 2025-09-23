@@ -200,6 +200,7 @@
   }
 }
 
+
 @layer utilities {
   .gradient-mint-melissa {
     background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%);
@@ -304,3 +305,303 @@
     }
   }
 }
+
+/* Additional utility classes for FinCity game compatibility */
+@utility gap-xs { gap: 0.25rem; }
+@utility gap-sm { gap: 0.5rem; }
+@utility gap-md { gap: 1rem; }
+@utility gap-lg { gap: 1.5rem; }
+
+@utility px-xs { padding-left: 0.25rem; padding-right: 0.25rem; }
+@utility py-xs { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+@utility p-xs { padding: 0.25rem; }
+
+@utility px-sm { padding-left: 0.5rem; padding-right: 0.5rem; }
+@utility py-sm { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+@utility p-sm { padding: 0.5rem; }
+
+@utility px-md { padding-left: 1rem; padding-right: 1rem; }
+@utility py-md { padding-top: 1rem; padding-bottom: 1rem; }
+@utility p-md { padding: 1rem; }
+
+@utility px-lg { padding-left: 1.5rem; padding-right: 1.5rem; }
+@utility py-lg { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+@utility p-lg { padding: 1.5rem; }
+
+@utility mx-xs { margin-left: 0.25rem; margin-right: 0.25rem; }
+@utility my-xs { margin-top: 0.25rem; margin-bottom: 0.25rem; }
+@utility m-xs { margin: 0.25rem; }
+
+@utility mx-sm { margin-left: 0.5rem; margin-right: 0.5rem; }
+@utility my-sm { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+@utility m-sm { margin: 0.5rem; }
+
+@utility mx-md { margin-left: 1rem; margin-right: 1rem; }
+@utility my-md { margin-top: 1rem; margin-bottom: 1rem; }
+@utility m-md { margin: 1rem; }
+
+@utility mx-lg { margin-left: 1.5rem; margin-right: 1.5rem; }
+@utility my-lg { margin-top: 1.5rem; margin-bottom: 1.5rem; }
+@utility m-lg { margin: 1.5rem; }
+
+@utility mb-xs { margin-bottom: 0.25rem; }
+@utility mb-sm { margin-bottom: 0.5rem; }
+@utility mb-md { margin-bottom: 1rem; }
+@utility mb-lg { margin-bottom: 1.5rem; }
+
+@utility mt-xs { margin-top: 0.25rem; }
+@utility mt-sm { margin-top: 0.5rem; }
+@utility mt-md { margin-top: 1rem; }
+@utility mt-lg { margin-top: 1.5rem; }
+
+@utility pt-sm { padding-top: 0.5rem; }
+@utility pb-sm { padding-bottom: 0.5rem; }
+@utility pt-md { padding-top: 1rem; }
+@utility pb-md { padding-bottom: 1rem; }
+
+@utility space-y-lg {
+  > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+/* FinCity game color utilities */
+@utility bg-violet { background-color: #1919EF; }
+@utility text-violet { color: #1919EF; }
+@utility border-violet { border-color: #1919EF; }
+
+@utility bg-cumin { background-color: #060698; }
+@utility text-cumin { color: #060698; }
+@utility border-cumin { border-color: #060698; }
+
+@utility bg-henbane { background-color: #8D98A4; }
+@utility text-henbane { color: #8D98A4; }
+@utility border-henbane { border-color: #8D98A4; }
+
+@utility bg-lily { background-color: #DEE1EE; }
+@utility text-lily { color: #DEE1EE; }
+@utility border-lily { border-color: #DEE1EE; }
+
+@utility bg-mint { background-color: #3CFFB9; }
+@utility text-mint { color: #3CFFB9; }
+@utility border-mint { border-color: #3CFFB9; }
+
+@utility bg-raspberry { background-color: #DD41DB; }
+@utility text-raspberry { color: #DD41DB; }
+@utility border-raspberry { border-color: #DD41DB; }
+
+@utility bg-melissa { background-color: #3CFFB9; }
+@utility text-melissa { color: #3CFFB9; }
+@utility border-melissa { border-color: #3CFFB9; }
+
+@utility bg-sakura { background-color: #FF82BE; }
+@utility text-sakura { color: #FF82BE; }
+@utility border-sakura { border-color: #FF82BE; }
+
+/* Grid utilities */
+@utility grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* Text utilities for FinCity */
+@utility text-body-xs {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  line-height: 0.875rem;
+  font-weight: 400;
+}
+
+@utility text-body-sm {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 400;
+}
+
+@utility text-body {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+}
+
+@utility text-heading-sm {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 700;
+}
+
+@utility text-heading-md {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+@utility text-heading-lg {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+  font-weight: 700;
+}
+
+@utility text-heading-xl {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+/* Position utilities for FinCity */
+@utility top-xs { top: 0.25rem; }
+@utility top-sm { top: 0.5rem; }
+@utility top-md { top: 1rem; }
+@utility top-lg { top: 1.5rem; }
+
+@utility bottom-xs { bottom: 0.25rem; }
+@utility bottom-sm { bottom: 0.5rem; }
+@utility bottom-md { bottom: 1rem; }
+@utility bottom-lg { bottom: 1.5rem; }
+
+@utility left-xs { left: 0.25rem; }
+@utility left-sm { left: 0.5rem; }
+@utility left-md { left: 1rem; }
+@utility left-lg { left: 1.5rem; }
+
+@utility right-xs { right: 0.25rem; }
+@utility right-sm { right: 0.5rem; }
+@utility right-md { right: 1rem; }
+@utility right-lg { right: 1.5rem; }
+
+/* Space utilities for FinCity */
+@utility space-y-xs {
+  > * + * {
+    margin-top: 0.25rem;
+  }
+}
+
+@utility space-y-sm {
+  > * + * {
+    margin-top: 0.5rem;
+  }
+}
+
+@utility space-y-md {
+  > * + * {
+    margin-top: 1rem;
+  }
+}
+
+/* Color utilities with opacity for FinCity - using different naming */
+@utility bg-lily-5 { background-color: rgba(222, 225, 238, 0.05); }
+@utility bg-lily-10 { background-color: rgba(222, 225, 238, 0.1); }
+@utility bg-lily-20 { background-color: rgba(222, 225, 238, 0.2); }
+@utility bg-lily-30 { background-color: rgba(222, 225, 238, 0.3); }
+@utility bg-lily-50 { background-color: rgba(222, 225, 238, 0.5); }
+
+@utility border-lily-10 { border-color: rgba(222, 225, 238, 0.1); }
+@utility border-lily-20 { border-color: rgba(222, 225, 238, 0.2); }
+@utility border-lily-30 { border-color: rgba(222, 225, 238, 0.3); }
+
+@utility bg-henbane-5 { background-color: rgba(141, 152, 164, 0.05); }
+@utility bg-henbane-10 { background-color: rgba(141, 152, 164, 0.1); }
+@utility bg-henbane-20 { background-color: rgba(141, 152, 164, 0.2); }
+@utility bg-henbane-30 { background-color: rgba(141, 152, 164, 0.3); }
+
+@utility border-henbane-10 { border-color: rgba(141, 152, 164, 0.1); }
+@utility border-henbane-20 { border-color: rgba(141, 152, 164, 0.2); }
+@utility border-henbane-30 { border-color: rgba(141, 152, 164, 0.3); }
+
+@utility text-henbane-30 { color: rgba(141, 152, 164, 0.3); }
+
+@utility bg-violet-5 { background-color: rgba(25, 25, 239, 0.05); }
+@utility bg-violet-10 { background-color: rgba(25, 25, 239, 0.1); }
+@utility bg-violet-20 { background-color: rgba(25, 25, 239, 0.2); }
+@utility bg-violet-30 { background-color: rgba(25, 25, 239, 0.3); }
+
+@utility border-violet-10 { border-color: rgba(25, 25, 239, 0.1); }
+@utility border-violet-20 { border-color: rgba(25, 25, 239, 0.2); }
+@utility border-violet-30 { border-color: rgba(25, 25, 239, 0.3); }
+
+@utility bg-mint-5 { background-color: rgba(60, 255, 185, 0.05); }
+@utility bg-mint-10 { background-color: rgba(60, 255, 185, 0.1); }
+@utility bg-mint-20 { background-color: rgba(60, 255, 185, 0.2); }
+@utility bg-mint-30 { background-color: rgba(60, 255, 185, 0.3); }
+
+@utility border-mint-10 { border-color: rgba(60, 255, 185, 0.1); }
+@utility border-mint-20 { border-color: rgba(60, 255, 185, 0.2); }
+@utility border-mint-30 { border-color: rgba(60, 255, 185, 0.3); }
+
+@utility bg-raspberry-5 { background-color: rgba(221, 65, 219, 0.05); }
+@utility bg-raspberry-10 { background-color: rgba(221, 65, 219, 0.1); }
+@utility bg-raspberry-20 { background-color: rgba(221, 65, 219, 0.2); }
+@utility bg-raspberry-30 { background-color: rgba(221, 65, 219, 0.3); }
+
+@utility border-raspberry-10 { border-color: rgba(221, 65, 219, 0.1); }
+@utility border-raspberry-20 { border-color: rgba(221, 65, 219, 0.2); }
+@utility border-raspberry-30 { border-color: rgba(221, 65, 219, 0.3); }
+
+@utility bg-melissa-5 { background-color: rgba(60, 255, 185, 0.05); }
+@utility bg-melissa-10 { background-color: rgba(60, 255, 185, 0.1); }
+@utility bg-melissa-20 { background-color: rgba(60, 255, 185, 0.2); }
+@utility bg-melissa-30 { background-color: rgba(60, 255, 185, 0.3); }
+
+@utility border-melissa-10 { border-color: rgba(60, 255, 185, 0.1); }
+@utility border-melissa-20 { border-color: rgba(60, 255, 185, 0.2); }
+@utility border-melissa-30 { border-color: rgba(60, 255, 185, 0.3); }
+
+@utility bg-sakura-5 { background-color: rgba(255, 130, 190, 0.05); }
+@utility bg-sakura-10 { background-color: rgba(255, 130, 190, 0.1); }
+@utility bg-sakura-20 { background-color: rgba(255, 130, 190, 0.2); }
+@utility bg-sakura-30 { background-color: rgba(255, 130, 190, 0.3); }
+
+@utility border-sakura-10 { border-color: rgba(255, 130, 190, 0.1); }
+@utility border-sakura-20 { border-color: rgba(255, 130, 190, 0.2); }
+@utility border-sakura-30 { border-color: rgba(255, 130, 190, 0.3); }
+
+/* Additional semantic colors for FinCity */
+@utility bg-warning-orange { background-color: #FF82BE; }
+@utility text-warning-orange { color: #FF82BE; }
+@utility border-warning-orange { border-color: #FF82BE; }
+@utility bg-warning-orange-10 { background-color: rgba(255, 130, 190, 0.1); }
+@utility bg-warning-orange-20 { background-color: rgba(255, 130, 190, 0.2); }
+@utility border-warning-orange-20 { border-color: rgba(255, 130, 190, 0.2); }
+
+@utility bg-danger-red { background-color: #DD41DB; }
+@utility text-danger-red { color: #DD41DB; }
+@utility border-danger-red { border-color: #DD41DB; }
+@utility border-danger-red-20 { border-color: rgba(221, 65, 219, 0.2); }
+
+@utility bg-success-green { background-color: #3CFFB9; }
+@utility text-success-green { color: #3CFFB9; }
+@utility border-success-green { border-color: #3CFFB9; }
+
+/* Crystal purple color (same as raspberry) */
+@utility bg-crystal-purple { background-color: #DD41DB; }
+@utility text-crystal-purple { color: #DD41DB; }
+@utility border-crystal-purple { border-color: #DD41DB; }
+@utility border-crystal-purple-30 { border-color: rgba(221, 65, 219, 0.3); }
+
+/* Coin gold color (same as mint/melissa) */
+@utility bg-coin-gold { background-color: #3CFFB9; }
+@utility text-coin-gold { color: #3CFFB9; }
+@utility border-coin-gold { border-color: #3CFFB9; }
+@utility bg-coin-gold-20 { background-color: rgba(60, 255, 185, 0.2); }
+
+/* GPB blue color (same as violet) */
+@utility bg-gpb-blue { background-color: #1919EF; }
+@utility text-gpb-blue { color: #1919EF; }
+@utility border-gpb-blue { border-color: #1919EF; }
+@utility ring-gpb-blue { --tw-ring-color: #1919EF; }
+
+/* Container and responsive utilities for FinCity */
+@utility max-w-container { max-width: 500px; }
+@utility max-h-90vh { max-height: 90vh; }
+@utility max-w-modal-xl { max-width: 480px; }
+@utility touch-target { min-width: 44px; min-height: 44px; }
+@utility touch-target-sm { min-width: 40px; min-height: 40px; }
+@utility tabular-nums { font-variant-numeric: tabular-nums; }
+@utility font-body-medium { font-weight: 500; }
+@utility font-body-semibold { font-weight: 600; }
+@utility bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+@utility modal-slide-up { animation: modalSlideUp 0.3s ease-out; }
+@utility gap-mobile { gap: 0.5rem; }

@@ -100,7 +100,8 @@ export const GAME_TYPES = {
 	MATCH3_GOLDEN_RESERVE: 'match3-golden-reserve',
 	CROSSWORD_FINANCIAL: 'crossword-financial',
 	DETECTIVE_BANKING: 'detective-banking',
-	INVESTMENT_STRATEGY: 'investment-strategy'
+	INVESTMENT_STRATEGY: 'investment-strategy',
+	FINCITY: 'fincity'
 } as const;
 
 export const GAME_CATEGORIES = {

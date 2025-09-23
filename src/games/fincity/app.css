@@ -1,0 +1,1125 @@
+@import "tailwindcss";
+
+@source "src/**/*.{svelte,ts,js}";
+
+/* Подключение шрифтов Газпромбанк Тех */
+@font-face {
+  font-family: 'HALVAR BREITSCHRIFT';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/halvar/Halvar Breitschrift-Regular-Web.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'HALVAR BREITSCHRIFT';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/halvar/Halvar Breitschrift-Bold-Web.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Gazprombank Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/gazprom/Gazprombank_Sans_Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Gazprombank Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/gazprom/Gazprombank_Sans_Bold.woff2') format('woff2');
+}
+
+/* Дизайн-токены для FinCity */
+@theme {
+  /* Основные цвета Газпромбанк Тех */
+  --color-primary: #1919EF;
+  --color-secondary: #8D98A4;
+  --color-surface: #DEE1EE;
+  --color-background: #060698;
+  --color-black: #000000;
+
+  /* Семантические цвета */
+  --color-success: #3CFFB9;
+  --color-warning: #FF82BE;
+  --color-error: #DD41DB;
+
+  /* Совместимость с существующим кодом */
+  --color-violet: #1919EF;
+  --color-cumin: #060698;
+  --color-henbane: #8D98A4;
+  --color-lily: #DEE1EE;
+  --color-raspberry: #DD41DB;
+  --color-melissa: #3CFFB9;
+  --color-sakura: #FF82BE;
+  --color-mint: #3CFFB9;
+  --color-warning-orange: #FF82BE;
+  --color-danger-red: #DD41DB;
+  --color-gpb-blue: #1919EF;
+  --color-crystal-purple: #DD41DB;
+
+  /* Градиенты (оставлен один для декоративных целей) */
+  --gradient-brand: linear-gradient(135deg, #1919EF 0%, #060698 100%);
+
+
+  /* Игровые цвета для ресурсов */
+  --color-coin-gold: #3CFFB9;
+  --color-crystal-purple: #DD41DB;
+  --color-energy-blue: #1919EF;
+  --color-experience-green: #3CFFB9;
+
+
+  /* Размеры для игрового UI */
+  --size-building-sm: 4rem;
+  --size-building-md: 6rem;
+  --size-building-lg: 8rem;
+
+  /* Радиусы скругления */
+  --radius: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* Шрифты Газпромбанк Тех */
+  --font-heading: 'HALVAR BREITSCHRIFT', 'Arial Black', sans-serif;
+  --font-body: 'Gazprombank Sans', Inter, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Совместимость */
+  --font-game: 'Gazprombank Sans', Inter, system-ui, sans-serif;
+
+  /* Анимации */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+
+  /* Модульная сетка для дизайн-системы */
+  --grid-base: 8px;
+  --grid-gutter: 16px;
+  --grid-margin: 24px;
+  --grid-container-max-width: 500px;
+  --grid-container-content-width: 468px; /* 500px - 32px padding */
+
+  /* Max-width scale for cards and containers */
+  --max-w-sm: 24rem;
+  --max-w-md: 28rem;
+  --max-w-lg: 32rem;
+
+  /* Mobile-first брейкпоинты */
+  --breakpoint-mobile: 320px;
+  --breakpoint-mobile-lg: 400px;
+  --breakpoint-container: 500px;
+
+  /* Упрощенная система отступов - 4 размера */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+
+  /* Ring/focus variables */
+  --tw-ring-offset-width: 0px;
+  --tw-ring-offset-color: #fff;
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+  --tw-ring-offset-shadow: 0 0 #0000;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-shadow: 0 0 #0000;
+  --tw-ring-inset: ;
+
+}
+
+
+/* Кастомные анимации */
+@utility building-appear {
+  animation: buildingAppear var(--duration-slow) ease-out;
+}
+@utility resource-collect {
+  animation: resourceCollect var(--duration-normal) ease-in;
+}
+@utility modal-slide-up {
+  animation: modalSlideUp var(--duration-normal) ease-out;
+}
+@utility toast-fade-in {
+  animation: toastFadeIn var(--duration-fast) ease-out;
+}
+@utility performance-optimized {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+@utility reduce-motion {
+  @media (prefers-reduced-motion: reduce) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Кастомные компоненты */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-6 py-3 text-white font-medium;
+    @apply rounded-[var(--radius-lg)] transition-opacity duration-150;
+    @apply hover:opacity-90 shadow-lg;
+    background: var(--color-violet);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-cumin);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center px-6 py-3 font-medium;
+    @apply rounded-[var(--radius-lg)] transition-opacity duration-150;
+    @apply hover:opacity-90 shadow-md;
+    background: var(--color-henbane);
+    color: var(--color-black);
+  }
+
+  .btn-secondary:hover {
+    background: var(--color-lily);
+  }
+
+  .game-card {
+    @apply bg-lily/90 backdrop-blur-sm rounded-[var(--radius-lg)];
+    @apply shadow-md;
+    @apply border border-henbane/30 overflow-hidden;
+  }
+
+  .game-card-elevated {
+    @apply bg-lily/95 backdrop-blur-sm rounded-[var(--radius-lg)];
+    @apply shadow-lg;
+    @apply border border-violet/20 overflow-hidden;
+  }
+
+  .resource-counter {
+    @apply flex items-center gap-2 px-4 py-2 rounded-[var(--radius-lg)];
+    @apply bg-lily/80 backdrop-blur-sm font-mono font-medium;
+    @apply border border-henbane/30;
+    @apply transition-opacity duration-150 hover:opacity-90;
+    @apply shadow-md;
+  }
+
+  .bubble-info {
+    @apply inline-flex items-center gap-sm px-md py-2 rounded-[var(--radius-lg)];
+    @apply bg-lily/90 backdrop-blur-sm text-sm font-medium;
+    @apply border border-henbane/20;
+    @apply shadow-sm;
+  }
+
+  .bubble-tag {
+    @apply inline-flex items-center gap-xs px-sm py-1 rounded-[var(--radius)];
+    @apply bg-melissa/10 text-black;
+    @apply border border-melissa/30 text-xs font-medium;
+    @apply transition-opacity duration-150 hover:opacity-80;
+  }
+
+  .building-slot {
+    @apply w-[var(--size-building-md)] h-[var(--size-building-md)];
+    @apply border-2 border-dashed border-henbane/50 rounded-[var(--radius-lg)];
+    @apply flex items-center justify-center transition-opacity duration-300;
+    @apply hover:border-violet hover:bg-violet/10;
+    @apply backdrop-blur-sm hover:opacity-80;
+  }
+
+  .building-placed {
+    @apply w-[var(--size-building-md)] h-[var(--size-building-md)];
+    @apply rounded-[var(--radius-lg)] overflow-hidden;
+    @apply transition-opacity duration-300;
+    @apply hover:opacity-80;
+    @apply cursor-pointer relative;
+  }
+
+
+  .building-premium {
+    @apply w-[var(--size-building-md)] h-[var(--size-building-md)];
+    @apply rounded-[var(--radius-lg)] overflow-hidden;
+    @apply transition-opacity duration-300;
+    @apply hover:opacity-80;
+    @apply cursor-pointer relative;
+    @apply ring-1 ring-raspberry/30;
+  }
+
+
+  .building-highlighted {
+    @apply ring-2 ring-melissa;
+    position: relative;
+  }
+
+  .building-energy-effect {
+    position: relative;
+    overflow: visible;
+  }
+
+  .building-energy-effect::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--color-mint);
+    border-radius: 50%;
+  }
+
+  /* Модульная сетка и шаблоны верстки */
+  .layout-container {
+    max-width: var(--grid-container-max-width);
+    margin: 0 auto;
+    padding: 0 var(--grid-margin);
+  }
+
+  .layout-container-compact {
+    max-width: var(--grid-container-content-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+  }
+
+  .layout-mobile-first {
+    width: 100%;
+    max-width: var(--grid-container-max-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-sm);
+  }
+
+  .layout-grid {
+    display: grid;
+    gap: var(--grid-gutter);
+  }
+
+  .layout-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .layout-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+
+  /* Шаблон: текст на плашке */
+  .template-text-on-card {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .template-text-on-card .background-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.3;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .template-text-on-card .content-card {
+    @apply p-8 max-w-lg;
+    @apply bg-lily/95 backdrop-blur-md rounded-[var(--radius-xl)];
+    @apply shadow-xl hover:shadow-2xl transition-all duration-[var(--duration-normal)];
+    @apply border-2 border-violet/20 overflow-hidden;
+    position: relative;
+    z-index: 1;
+  }
+
+}
+
+/* Анимации */
+@keyframes buildingAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05) translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes resourceCollect {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2) translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(-30px);
+  }
+}
+
+@keyframes modalSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes toastFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+/* Базовые стили для приложения */
+@layer base {
+  html {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply m-0 bg-gray-50 text-gray-900 min-h-screen;
+    @apply overflow-x-hidden;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
+
+  h1 { @apply text-lg; }
+  h2 { @apply text-md; }
+  h3 { @apply text-base font-semibold; }
+  h4 { @apply text-sm font-semibold; }
+  h5 { @apply text-sm; }
+  h6 { @apply text-xs font-medium; }
+
+  p, span, div, label, input, button {
+    font-family: var(--font-body);
+  }
+
+  #app {
+    @apply w-full min-h-screen;
+    max-width: 500px;
+    max-height: 1000px;
+    margin: 0 auto;
+  }
+
+  * {
+    @apply box-border;
+  }
+}
+
+/* Дополнительные утилиты для совместимости с Tailwind CSS v4 */
+@utility space-y-4 {
+  > * + * {
+    margin-top: 1rem;
+  }
+}
+
+@utility space-x-4 {
+  > * + * {
+    margin-left: 1rem;
+  }
+}
+
+@utility inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+@utility top-0 { top: 0; }
+@utility left-0 { left: 0; }
+@utility right-0 { right: 0; }
+@utility bottom-0 { bottom: 0; }
+
+@utility bg-white { background-color: rgb(255 255 255); }
+@utility bg-black { background-color: rgb(0 0 0); }
+
+/* Упрощенные типографические утилиты */
+@utility text-semibold { font-weight: 600; }
+@utility text-medium { font-weight: 500; }
+
+/* Упрощенные max-width утилиты */
+@utility max-w-sm { max-width: 24rem !important; }
+@utility max-w-md { max-width: 28rem !important; }
+@utility max-w-lg { max-width: 32rem !important; }
+
+/* Mobile-first container utilities */
+@utility max-w-container { max-width: var(--grid-container-max-width); }
+@utility max-w-container-content { max-width: var(--grid-container-content-width); }
+@utility w-container { width: var(--grid-container-max-width); }
+
+/* Упрощенные размеры modal */
+@utility max-w-modal-sm { max-width: 300px; }
+@utility max-w-modal-md { max-width: 360px; }
+@utility max-w-modal-lg { max-width: 420px; }
+@utility max-w-modal-xl { max-width: 480px; }
+
+/* Mobile spacing утилиты */
+@utility px-mobile { padding-left: var(--spacing-sm); padding-right: var(--spacing-sm); }
+@utility py-mobile { padding-top: var(--spacing-sm); padding-bottom: var(--spacing-sm); }
+@utility px-mobile-md { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
+@utility py-mobile-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+@utility gap-mobile { gap: var(--spacing-sm); }
+@utility gap-mobile-md { gap: var(--spacing-md); }
+
+/* Height utilities */
+@utility max-h-90vh { max-height: 90vh; }
+
+/* Flex utilities */
+@utility flex-1 { flex: 1 1 0%; }
+@utility flex-shrink-0 { flex-shrink: 0; }
+
+/* Width and height utilities */
+@utility w-full { width: 100%; }
+@utility w-6 { width: 1.5rem; }
+@utility h-6 { height: 1.5rem; }
+
+/* Padding utilities */
+@utility p-3 { padding: 0.75rem; }
+@utility p-4 { padding: 1rem; }
+@utility p-6 { padding: 1.5rem; }
+@utility px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+@utility px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+@utility px-4 { padding-left: 1rem; padding-right: 1rem; }
+@utility px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+@utility py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+@utility py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+@utility py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+@utility pb-4 { padding-bottom: 1rem; }
+@utility pt-4 { padding-top: 1rem; }
+@utility pb-6 { padding-bottom: 1.5rem; }
+
+/* Touch-friendly utilities */
+@utility touch-target { min-width: 44px; min-height: 44px; }
+@utility touch-target-sm { min-width: 40px; min-height: 40px; }
+@utility touch-target-lg { min-width: 48px; min-height: 48px; }
+
+/* Modal layout helpers */
+.modal-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4;
+  @apply bg-black bg-opacity-50 backdrop-blur-sm;
+}
+
+.modal-shell {
+  @apply w-full max-w-container max-h-90vh flex flex-col;
+  @apply bg-white rounded-[var(--radius-lg)] border border-gray-200 shadow-2xl;
+  @apply modal-slide-up;
+}
+
+.modal-header {
+  @apply flex-shrink-0 border-b border-gray-200;
+}
+
+.modal-header-content {
+  @apply flex items-center justify-between p-md;
+}
+
+.modal-title {
+  @apply text-xl font-bold text-gray-900;
+}
+
+.modal-close-button {
+  @apply p-2 rounded-full hover:bg-gray-100 transition-colors duration-200;
+}
+
+.modal-tabs {
+  @apply flex gap-1 bg-gray-100 rounded-[var(--radius)] p-1;
+}
+
+.modal-tab-button {
+  @apply flex-1 flex items-center justify-center gap-2 py-2 px-4;
+  @apply text-sm font-medium rounded-[calc(var(--radius)-2px)];
+  @apply transition-all duration-200 text-gray-600;
+}
+
+.modal-tab-button:hover {
+  @apply text-gray-900;
+}
+
+.modal-tab-button.active {
+  @apply bg-white text-gray-900 shadow-sm;
+}
+
+.modal-tab-badge {
+  @apply ml-1 px-2 py-0.5 text-xs font-bold rounded-full;
+  @apply bg-gray-200 text-gray-700;
+}
+
+.modal-tab-button.active .modal-tab-badge {
+  @apply bg-violet text-white;
+}
+
+
+/* Template utilities */
+@utility template-text-on-card {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Утилиты для иконок ресурсов */
+@utility icon-mint { color: var(--color-mint); }
+@utility icon-raspberry { color: var(--color-raspberry); }
+@utility icon-melissa { color: var(--color-melissa); }
+@utility icon-sakura { color: var(--color-sakura); }
+@utility icon-violet { color: var(--color-violet); }
+@utility icon-henbane { color: var(--color-henbane); }
+
+/* Специализированные иконки ресурсов с окраской */
+@utility icon-coin-mint { color: var(--color-mint); }
+@utility icon-crystal-raspberry { color: var(--color-raspberry); }
+@utility icon-energy-violet { color: var(--color-violet); }
+@utility icon-xp-melissa { color: var(--color-melissa); }
+
+@utility py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+
+/* Margin utilities */
+@utility m-0 { margin: 0; }
+@utility ml-3 { margin-left: 0.75rem; }
+@utility ml-4 { margin-left: 1rem; }
+@utility mb-3 { margin-bottom: 0.75rem; }
+@utility mb-4 { margin-bottom: 1rem; }
+@utility mt-4 { margin-top: 1rem; }
+
+/* Layout utilities */
+@utility fixed { position: fixed; }
+@utility relative { position: relative; }
+@utility flex { display: flex; }
+@utility grid { display: grid; }
+@utility inline-flex { display: inline-flex; }
+@utility overflow-hidden { overflow: hidden; }
+@utility overflow-y-auto { overflow-y: auto; }
+@utility overflow-x-hidden { overflow-x: hidden; }
+
+/* Flexbox utilities */
+@utility items-center { align-items: center; }
+@utility items-start { align-items: flex-start; }
+@utility justify-center { justify-content: center; }
+@utility justify-between { justify-content: space-between; }
+@utility justify-end { justify-content: flex-end; }
+@utility flex-col { flex-direction: column; }
+
+/* Grid utilities */
+@utility gap-2 { gap: 0.5rem; }
+@utility gap-3 { gap: 0.75rem; }
+@utility gap-6 { gap: 1.5rem; }
+@utility grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+@utility col-span-full { grid-column: 1 / -1; }
+
+/* Z-index utilities */
+@utility z-50 { z-index: 50; }
+
+/* Background utilities */
+@utility bg-gray-50 { background-color: rgb(249 250 251); }
+@utility bg-gray-100 { background-color: rgb(243 244 246); }
+@utility bg-gray-200 { background-color: rgb(229 231 235); }
+@utility bg-gray-300 { background-color: rgb(209 213 219); }
+@utility bg-gray-600 { background-color: rgb(75 85 99); }
+@utility bg-gray-700 { background-color: rgb(55 65 81); }
+@utility bg-gray-800 { background-color: rgb(31 41 55); }
+@utility bg-gray-900 { background-color: rgb(17 24 39); }
+@utility bg-opacity-50 { --tw-bg-opacity: 0.5; }
+
+/* Text color utilities */
+@utility text-white { color: rgb(255 255 255); }
+@utility text-gray-400 { color: rgb(156 163 175); }
+@utility text-gray-500 { color: rgb(107 114 128); }
+@utility text-gray-600 { color: rgb(75 85 99); }
+@utility text-gray-900 { color: rgb(17 24 39); }
+
+/* Border utilities */
+@utility border { border-width: 1px; }
+@utility border-2 { border-width: 2px; }
+@utility border-b { border-bottom-width: 1px; }
+@utility border-t { border-top-width: 1px; }
+@utility border-gray-200 { border-color: rgb(229 231 235); }
+@utility border-gray-300 { border-color: rgb(209 213 219); }
+@utility border-gray-600 { border-color: rgb(75 85 99); }
+@utility border-gray-700 { border-color: rgb(55 65 81); }
+
+/* Shadow utilities */
+@utility shadow-lg { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+@utility shadow-xl { box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); }
+@utility shadow-2xl { box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
+@utility shadow-sm { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+
+/* Backdrop utilities */
+@utility backdrop-blur-sm { backdrop-filter: blur(4px); }
+
+/* Rounded utilities */
+@utility rounded { border-radius: 0.25rem; }
+@utility rounded-full { border-radius: 9999px; }
+
+/* Font utilities */
+@utility font-medium { font-weight: 500; }
+@utility font-semibold { font-weight: 600; }
+@utility font-bold { font-weight: 700; }
+@utility font-mono { font-family: var(--font-mono); }
+
+/* Transition utilities */
+@utility transition-opacity { transition-property: opacity; transition-timing-function: ease-out; transition-duration: 150ms; }
+@utility transition-colors { transition-property: color, background-color, border-color; transition-timing-function: ease-out; transition-duration: 150ms; }
+@utility duration-300 { transition-duration: 300ms; }
+
+/* Transform utilities */
+@utility transform { transform: translate(var(--tw-translate-x, 0), var(--tw-translate-y, 0)) rotate(var(--tw-rotate, 0)) skewX(var(--tw-skew-x, 0)) skewY(var(--tw-skew-y, 0)) scaleX(var(--tw-scale-x, 1)) scaleY(var(--tw-scale-y, 1)); }
+
+/* Other utilities */
+@utility cursor-pointer { cursor: pointer; }
+@utility cursor-not-allowed { cursor: not-allowed; }
+@utility select-none { user-select: none; }
+@utility outline-0 { outline: 2px solid transparent; outline-offset: 2px; }
+@utility border-0 { border-width: 0px; }
+@utility opacity-60 { opacity: 0.6; }
+
+@utility truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@utility line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+@utility min-w-0 { min-width: 0px; }
+@utility min-h-screen { min-height: 100vh; }
+@utility max-h-modal { max-height: 80vh; }
+@utility text-center { text-align: center; }
+/* Placeholder handled differently in v4 */
+
+/* Custom color utilities for the game */
+@utility bg-gpb-blue { background-color: var(--color-gpb-blue); }
+@utility text-gpb-blue { color: var(--color-gpb-blue); }
+@utility border-gpb-blue { border-color: var(--color-gpb-blue); }
+
+/* Новые утилиты для цветов Газпромбанк Тех */
+@utility bg-violet { background-color: var(--color-violet); }
+@utility text-violet { color: var(--color-violet); }
+@utility border-violet { border-color: var(--color-violet); }
+
+@utility bg-cumin { background-color: var(--color-cumin); }
+@utility text-cumin { color: var(--color-cumin); }
+@utility border-cumin { border-color: var(--color-cumin); }
+
+@utility bg-henbane { background-color: var(--color-henbane); }
+@utility text-henbane { color: var(--color-henbane); }
+@utility border-henbane { border-color: var(--color-henbane); }
+
+@utility bg-lily { background-color: var(--color-lily); }
+@utility text-lily { color: var(--color-lily); }
+@utility border-lily { border-color: var(--color-lily); }
+
+@utility bg-mint { background-color: var(--color-mint); }
+@utility text-mint { color: var(--color-mint); }
+@utility border-mint { border-color: var(--color-mint); }
+
+@utility bg-raspberry { background-color: var(--color-raspberry); }
+@utility text-raspberry { color: var(--color-raspberry); }
+@utility border-raspberry { border-color: var(--color-raspberry); }
+
+@utility bg-melissa { background-color: var(--color-melissa); }
+@utility text-melissa { color: var(--color-melissa); }
+@utility border-melissa { border-color: var(--color-melissa); }
+
+@utility bg-sakura { background-color: var(--color-sakura); }
+@utility text-sakura { color: var(--color-sakura); }
+@utility border-sakura { border-color: var(--color-sakura); }
+
+/* Утилиты градиентов */
+@utility bg-gradient-brand { background: var(--gradient-brand); }
+/* Hyphen opacity variants */
+@utility bg-gpb-blue-5 { background-color: var(--color-gpb-blue); opacity: 0.05; }
+@utility bg-gpb-blue-10 { background-color: var(--color-gpb-blue); opacity: 0.1; }
+@utility border-gpb-blue-50 { border-color: var(--color-gpb-blue); opacity: 0.5; }
+
+@utility text-warning-orange { color: var(--color-warning-orange); }
+@utility bg-warning-orange { background-color: var(--color-warning-orange); }
+@utility border-warning-orange { border-color: var(--color-warning-orange); }
+@utility bg-warning-orange-5 { background-color: var(--color-warning-orange); opacity: 0.05; }
+@utility bg-warning-orange-10 { background-color: var(--color-warning-orange); opacity: 0.1; }
+@utility border-warning-orange-20 { border-color: var(--color-warning-orange); opacity: 0.2; }
+@utility border-warning-orange-30 { border-color: var(--color-warning-orange); opacity: 0.3; }
+
+@utility bg-danger-red { background-color: var(--color-danger-red); }
+@utility border-danger-red { border-color: var(--color-danger-red); }
+@utility border-danger-red-20 { border-color: var(--color-danger-red); opacity: 0.2; }
+
+@utility text-crystal-purple { color: var(--color-crystal-purple); }
+@utility bg-crystal-purple { background-color: var(--color-crystal-purple); }
+@utility border-crystal-purple { border-color: var(--color-crystal-purple); }
+@utility bg-crystal-purple-5 { background-color: var(--color-crystal-purple); opacity: 0.05; }
+@utility bg-crystal-purple-20 { background-color: var(--color-crystal-purple); opacity: 0.2; }
+@utility border-crystal-purple-50 { border-color: var(--color-crystal-purple); opacity: 0.5; }
+
+@utility text-coin-gold { color: var(--color-coin-gold); }
+@utility bg-coin-gold { background-color: var(--color-coin-gold); }
+@utility border-coin-gold { border-color: var(--color-coin-gold); }
+@utility bg-coin-gold-20 { background-color: var(--color-coin-gold); opacity: 0.2; }
+
+@utility text-success-green { color: var(--color-success-green); }
+@utility bg-success-green { background-color: var(--color-success-green); }
+@utility border-success-green { border-color: var(--color-success-green); }
+@utility bg-success-green-5 { background-color: var(--color-success-green); opacity: 0.05; }
+@utility border-success-green-30 { border-color: var(--color-success-green); opacity: 0.3; }
+
+/* Ring color utility */
+@utility ring-gpb-blue-30 { --tw-ring-color: color-mix(in oklab, var(--color-gpb-blue) 30%, transparent); }
+@utility ring-gpb-blue { --tw-ring-color: var(--color-gpb-blue); }
+@utility border-crystal-purple-30 { border-color: color-mix(in oklch, var(--color-crystal-purple) 30%, transparent); }
+/* Background opacity utility */
+@utility bg-opacity-95 { --tw-bg-opacity: 0.95; }
+
+
+
+@utility text-blue-400 { color: rgb(96 165 250); }
+
+
+/* Типографические утилиты Газпромбанк Тех */
+
+/* Утилиты для заголовков (HALVAR BREITSCHRIFT) */
+@utility font-heading { font-family: var(--font-heading); }
+
+/* Новая типографическая система - 4 размера */
+@utility text-lg {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+@utility text-md {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+  font-weight: 700;
+}
+
+@utility text-sm {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+}
+
+@utility text-xs {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 400;
+}
+
+/* Утилиты для основного текста (Gazprombank Sans) */
+@utility font-body { font-family: var(--font-body); }
+
+/* Основной текст - базовый размер */
+@utility text-base {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+}
+
+/* Компонентные классы для типографики */
+
+/* Упрощенная система gap утилит */
+@utility gap-xs { gap: var(--spacing-xs); }
+@utility gap-sm { gap: var(--spacing-sm); }
+@utility gap-md { gap: var(--spacing-md); }
+@utility gap-lg { gap: var(--spacing-lg); }
+
+@utility p-xs { padding: var(--spacing-xs); }
+@utility p-sm { padding: var(--spacing-sm); }
+@utility p-md { padding: var(--spacing-md); }
+@utility p-lg { padding: var(--spacing-lg); }
+
+@utility m-xs { margin: var(--spacing-xs); }
+@utility m-sm { margin: var(--spacing-sm); }
+@utility m-md { margin: var(--spacing-md); }
+@utility m-lg { margin: var(--spacing-lg); }
+
+@utility mb-xs { margin-bottom: var(--spacing-xs); }
+@utility mb-sm { margin-bottom: var(--spacing-sm); }
+@utility mb-md { margin-bottom: var(--spacing-md); }
+@utility mb-lg { margin-bottom: var(--spacing-lg); }
+
+@utility mt-xs { margin-top: var(--spacing-xs); }
+@utility mt-sm { margin-top: var(--spacing-sm); }
+@utility mt-md { margin-top: var(--spacing-md); }
+@utility mt-lg { margin-top: var(--spacing-lg); }
+
+/* Remove nested @utility; use built-in responsive utilities from Tailwind */
+
+/* Стили для тултипов обучения */
+.tutorial-tooltip {
+  max-height: 80vh;
+  overflow-y: auto;
+  backdrop-filter: blur(8px);
+  animation: tutorialTooltipAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tutorial-tooltip::-webkit-scrollbar {
+  width: 4px;
+}
+
+.tutorial-tooltip::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tutorial-tooltip::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+.tutorial-modal {
+  backdrop-filter: blur(4px);
+  animation: tutorialModalAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tutorialTooltipAppear {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Дополнительные mobile-first утилиты для итерации 3 */
+
+/* Spacing утилиты для мобильных устройств */
+@utility px-xs { padding-left: var(--spacing-xs); padding-right: var(--spacing-xs); }
+@utility py-xs { padding-top: var(--spacing-xs); padding-bottom: var(--spacing-xs); }
+@utility px-sm { padding-left: var(--spacing-sm); padding-right: var(--spacing-sm); }
+@utility py-sm { padding-top: var(--spacing-sm); padding-bottom: var(--spacing-sm); }
+@utility px-md { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
+@utility py-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+@utility px-lg { padding-left: var(--spacing-lg); padding-right: var(--spacing-lg); }
+@utility py-lg { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
+
+/* Margin утилиты для мобильных устройств */
+@utility mx-xs { margin-left: var(--spacing-xs); margin-right: var(--spacing-xs); }
+@utility my-xs { margin-top: var(--spacing-xs); margin-bottom: var(--spacing-xs); }
+@utility mx-sm { margin-left: var(--spacing-sm); margin-right: var(--spacing-sm); }
+@utility my-sm { margin-top: var(--spacing-sm); margin-bottom: var(--spacing-sm); }
+@utility mx-md { margin-left: var(--spacing-md); margin-right: var(--spacing-md); }
+@utility my-md { margin-top: var(--spacing-md); margin-bottom: var(--spacing-md); }
+@utility mx-lg { margin-left: var(--spacing-lg); margin-right: var(--spacing-lg); }
+@utility my-lg { margin-top: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+
+/* Grid утилиты для мобильных */
+@utility grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@utility grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@utility grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Scale утилиты */
+@utility scale-90 { transform: scale(0.9); }
+@utility scale-95 { transform: scale(0.95); }
+
+/* Space between утилиты */
+@utility space-x-1 {
+  > * + * {
+    margin-left: 0.25rem;
+  }
+}
+
+@utility space-x-2 {
+  > * + * {
+    margin-left: 0.5rem;
+  }
+}
+
+@utility space-y-1 {
+  > * + * {
+    margin-top: 0.25rem;
+  }
+}
+
+@utility space-y-2 {
+  > * + * {
+    margin-top: 0.5rem;
+  }
+}
+
+/* Высота и ширина для мобильных */
+@utility h-8 { height: 2rem; }
+@utility h-10 { height: 2.5rem; }
+@utility w-8 { width: 2rem; }
+@utility w-10 { width: 2.5rem; }
+
+/* Типографические утилиты для мобильных */
+@utility text-body-xs {
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  line-height: 0.875rem;
+  font-weight: 400;
+}
+
+@utility text-body-sm {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 400;
+}
+
+@utility text-body {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 400;
+}
+
+@utility text-heading-sm {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 700;
+}
+
+@utility text-heading-md {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+@utility text-heading-lg {
+  font-family: var(--font-heading);
+  font-size: 1.125rem;
+  line-height: 1.375rem;
+  font-weight: 700;
+}
+
+@utility text-heading-xl {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+}
+
+/* Weight утилиты */
+@utility font-body-medium { font-weight: 500; }
+@utility font-body-semibold { font-weight: 600; }
+
+/* Mobile container утилиты */
+@utility max-w-mobile { max-width: 320px; }
+@utility max-w-mobile-lg { max-width: 400px; }
+@utility container-mobile {
+  width: 100%;
+  max-width: var(--grid-container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-sm);
+}
+
+/* Responsive утилиты для мобильных - через classes instead of variants */
+@utility mobile-hidden {
+  @media (max-width: 400px) {
+    display: none;
+  }
+}
+
+@utility mobile-block {
+  @media (max-width: 400px) {
+    display: block;
+  }
+}
+
+@utility mobile-flex {
+  @media (max-width: 400px) {
+    display: flex;
+  }
+}
+
+@utility mobile-grid {
+  @media (max-width: 400px) {
+    display: grid;
+  }
+}
+
+@utility mobile-text-xs {
+  @media (max-width: 400px) {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
+
+@utility mobile-px-xs {
+  @media (max-width: 400px) {
+    padding-left: var(--spacing-xs);
+    padding-right: var(--spacing-xs);
+  }
+}
+
+@utility mobile-py-xs {
+  @media (max-width: 400px) {
+    padding-top: var(--spacing-xs);
+    padding-bottom: var(--spacing-xs);
+  }
+}
+
+@keyframes tutorialModalAppear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Мобильные адаптации для тултипов */
+@media (max-width: 480px) {
+  .tutorial-tooltip {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    border-radius: 12px;
+  }
+
+  .tutorial-tooltip h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .tutorial-tooltip p {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+  }
+
+  .tutorial-tooltip .flex {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tutorial-tooltip .flex button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .tutorial-tooltip {
+    padding: 1rem !important;
+    font-size: 0.85rem;
+  }
+
+  .tutorial-tooltip h3 {
+    font-size: 1rem !important;
+  }
+
+  .tutorial-tooltip p {
+    font-size: 0.85rem !important;
+  }
+}

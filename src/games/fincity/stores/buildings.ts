@@ -1,0 +1,337 @@
+import { derived, get } from 'svelte/store';
+import type { Building, BuildingConfig } from '../types/Building';
+import { BuildingType } from '../types/Building';
+import { playerData, spendResources, addResources } from './playerData';
+
+export const buildings = derived(playerData, $playerData => $playerData.buildings);
+
+export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
+  [BuildingType.CENTRAL_BANK]: {
+    type: BuildingType.CENTRAL_BANK,
+    name: 'Центральный банк',
+    description: 'Основа вашего финансового города. Генерирует базовый доход.',
+    basePrice: { coins: 0, crystals: 0 },
+    income: { coins: 10, crystals: 1, interval: 30000 },
+    maxLevel: 5,
+    size: { width: 2, height: 2 },
+    unlockLevel: 1,
+    bankProduct: 'Накопительный счет'
+  },
+  [BuildingType.SECURITY_HQ]: {
+    type: BuildingType.SECURITY_HQ,
+    name: 'Штаб-квартира безопасности',
+    description: 'Защищает ваш город от финансовых угроз.',
+    basePrice: { coins: 500, crystals: 10 },
+    income: { coins: 15, crystals: 2, interval: 45000 },
+    maxLevel: 3,
+    size: { width: 2, height: 2 },
+    unlockLevel: 1,
+    requiresBuilding: BuildingType.CENTRAL_BANK,
+    bankProduct: 'Защита от мошенничества'
+  },
+  [BuildingType.CAPITAL_TOWER]: {
+    type: BuildingType.CAPITAL_TOWER,
+    name: 'Небоскреб "Капитал"',
+    description: 'Высокодоходное здание для опытных инвесторов.',
+    basePrice: { coins: 2000, crystals: 50 },
+    income: { coins: 50, crystals: 5, interval: 60000 },
+    maxLevel: 10,
+    size: { width: 2, height: 3 },
+    unlockLevel: 5,
+    bankProduct: 'Инвестиционное страхование жизни'
+  },
+  [BuildingType.LONGEVITY_PARK]: {
+    type: BuildingType.LONGEVITY_PARK,
+    name: 'Парк долголетия',
+    description: 'Престижный парк для долгосрочного планирования.',
+    basePrice: { coins: 1500, crystals: 30 },
+    income: { coins: 20, crystals: 3, interval: 120000 },
+    maxLevel: 1,
+    size: { width: 4, height: 3 },
+    unlockLevel: 8,
+    bankProduct: 'Долгосрочные сбережения'
+  },
+  [BuildingType.PARTNER_MALL]: {
+    type: BuildingType.PARTNER_MALL,
+    name: 'Торговый центр "Партнер"',
+    description: 'Увеличивает доходы от партнерских программ.',
+    basePrice: { coins: 1000, crystals: 25 },
+    income: { coins: 30, crystals: 4, interval: 90000 },
+    maxLevel: 5,
+    size: { width: 3, height: 3 },
+    unlockLevel: 4,
+    bankProduct: 'Кэшбэк программы'
+  },
+  [BuildingType.RESEARCH_INSTITUTE]: {
+    type: BuildingType.RESEARCH_INSTITUTE,
+    name: 'Научный институт',
+    description: 'Центр финансовой грамотности и обучения.',
+    basePrice: { coins: 800, crystals: 20 },
+    income: { coins: 0, crystals: 0, interval: 0 },
+    maxLevel: 3,
+    size: { width: 2, height: 2 },
+    unlockLevel: 3,
+    bankProduct: 'Финансовая грамотность'
+  }
+};
+
+export const buildingsByType = derived(buildings, $buildings => {
+  return $buildings.reduce((acc, building) => {
+    if (!acc[building.type]) acc[building.type] = [];
+    acc[building.type].push(building);
+    return acc;
+  }, {} as Record<BuildingType, Building[]>);
+});
+
+export const totalBuildings = derived(buildings, $buildings => $buildings.length);
+
+export const hasBuildingOfType = derived(buildings, $buildings => {
+  return (buildingType: BuildingType) => {
+    return $buildings.some(building => building.type === buildingType);
+  };
+});
+
+export const readyToCollect = derived(buildings, $buildings => {
+  const now = Date.now();
+  return $buildings.filter(building => {
+    const config = buildingConfigs[building.type];
+    return building.isActive &&
+           config.income.interval > 0 &&
+           now - building.lastCollected >= config.income.interval;
+  });
+});
+
+export function addBuilding(type: BuildingType, x: number, y: number): boolean {
+  const config = buildingConfigs[type];
+  const canAfford = checkCanAfford(config.basePrice);
+
+  if (!canAfford) return false;
+
+  spendResources(config.basePrice);
+
+  const newBuilding: Building = {
+    id: `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    type,
+    x,
+    y,
+    level: 1,
+    lastCollected: Date.now(),
+    isActive: true
+  };
+
+  playerData.update(data => ({
+    ...data,
+    buildings: [...data.buildings, newBuilding]
+  }));
+
+  return true;
+}
+
+export function removeBuilding(buildingId: string) {
+  playerData.update(data => ({
+    ...data,
+    buildings: data.buildings.filter(b => b.id !== buildingId)
+  }));
+}
+
+export function collectFromBuilding(buildingId: string) {
+  playerData.update(data => ({
+    ...data,
+    buildings: data.buildings.map(building => {
+      if (building.id === buildingId && building.isActive) {
+        const config = buildingConfigs[building.type];
+        const now = Date.now();
+
+        if (now - building.lastCollected >= config.income.interval) {
+          addResources({
+            coins: config.income.coins * building.level,
+            crystals: config.income.crystals * building.level
+          });
+
+          return { ...building, lastCollected: now };
+        }
+      }
+      return building;
+    })
+  }));
+}
+
+export function collectAllReady() {
+  let totalCoins = 0;
+  let totalCrystals = 0;
+
+  playerData.update(data => ({
+    ...data,
+    buildings: data.buildings.map(building => {
+      const config = buildingConfigs[building.type];
+      const now = Date.now();
+
+      if (building.isActive &&
+          config.income.interval > 0 &&
+          now - building.lastCollected >= config.income.interval) {
+
+        totalCoins += config.income.coins * building.level;
+        totalCrystals += config.income.crystals * building.level;
+
+        return { ...building, lastCollected: now };
+      }
+      return building;
+    })
+  }));
+
+  if (totalCoins > 0 || totalCrystals > 0) {
+    addResources({ coins: totalCoins, crystals: totalCrystals });
+  }
+
+  return { coins: totalCoins, crystals: totalCrystals };
+}
+
+export function upgradeBuilding(buildingId: string): boolean {
+  let success = false;
+
+  playerData.update(data => ({
+    ...data,
+    buildings: data.buildings.map(building => {
+      if (building.id === buildingId) {
+        const config = buildingConfigs[building.type];
+        if (building.level < config.maxLevel) {
+          const upgradeCost = {
+            coins: config.basePrice.coins * building.level,
+            crystals: config.basePrice.crystals * building.level
+          };
+
+          if (checkCanAfford(upgradeCost)) {
+            spendResources(upgradeCost);
+            success = true;
+            return { ...building, level: building.level + 1 };
+          }
+        }
+      }
+      return building;
+    })
+  }));
+
+  return success;
+}
+
+function checkCanAfford(cost: { coins: number; crystals: number }): boolean {
+  const data = get(playerData);
+  return data.resources.coins >= cost.coins && data.resources.crystals >= cost.crystals;
+}
+
+export function getUpgradeCost(buildingId: string): { coins: number; crystals: number } | null {
+  const buildingsList = get(buildings);
+  const building = buildingsList.find(b => b.id === buildingId);
+
+  if (!building) return null;
+
+  const config = buildingConfigs[building.type];
+  return {
+    coins: config.basePrice.coins * building.level,
+    crystals: config.basePrice.crystals * building.level
+  };
+}
+
+export function canUpgrade(buildingId: string): boolean {
+  const buildingsList = get(buildings);
+  const building = buildingsList.find(b => b.id === buildingId);
+
+  if (!building || building.isUpgrading) return false;
+
+  const config = buildingConfigs[building.type];
+  if (building.level >= config.maxLevel) return false;
+
+  const cost = getUpgradeCost(buildingId);
+  if (!cost) return false;
+
+  return checkCanAfford(cost);
+}
+
+export function startBuildingUpgrade(buildingId: string): boolean {
+  const buildingsList = get(buildings);
+  const building = buildingsList.find(b => b.id === buildingId);
+
+  if (!building || !canUpgrade(buildingId)) return false;
+
+  const cost = getUpgradeCost(buildingId);
+  if (!cost) return false;
+
+  spendResources(cost);
+
+  const upgradeEndTime = Date.now() + 10000;
+
+  playerData.update(data => ({
+    ...data,
+    buildings: data.buildings.map(b =>
+      b.id === buildingId
+        ? { ...b, isUpgrading: true, upgradeEndTime }
+        : b
+    )
+  }));
+
+  setTimeout(() => {
+    completeBuildingUpgrade(buildingId);
+  }, 10000);
+
+  return true;
+}
+
+export function completeBuildingUpgrade(buildingId: string): void {
+  playerData.update(data => ({
+    ...data,
+    buildings: data.buildings.map(building => {
+      if (building.id === buildingId && building.isUpgrading) {
+        return {
+          ...building,
+          level: building.level + 1,
+          isUpgrading: false,
+          upgradeEndTime: undefined
+        };
+      }
+      return building;
+    })
+  }));
+
+  import('./gameState').then(({ playBuildingUpgradeEffects }) => {
+    playBuildingUpgradeEffects(buildingId);
+  });
+}
+
+export function cancelBuildingUpgrade(buildingId: string): boolean {
+  const buildingsList = get(buildings);
+  const building = buildingsList.find(b => b.id === buildingId);
+
+  if (!building || !building.isUpgrading) return false;
+
+  const cost = getUpgradeCost(buildingId);
+  if (cost) {
+    addResources(cost);
+  }
+
+  playerData.update(data => ({
+    ...data,
+    buildings: data.buildings.map(b =>
+      b.id === buildingId
+        ? { ...b, isUpgrading: false, upgradeEndTime: undefined }
+        : b
+    )
+  }));
+
+  return true;
+}
+
+export function getUpgradeProgress(buildingId: string): number {
+  const buildingsList = get(buildings);
+  const building = buildingsList.find(b => b.id === buildingId);
+
+  if (!building || !building.isUpgrading || !building.upgradeEndTime) {
+    return 0;
+  }
+
+  const now = Date.now();
+  const startTime = building.upgradeEndTime - 10000;
+  const elapsed = now - startTime;
+  const progress = Math.min(elapsed / 10000, 1);
+
+  return Math.max(0, progress);
+}
