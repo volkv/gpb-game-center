@@ -4,7 +4,8 @@
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "vite dev --host",
+		"dev:https": "cross-env HTTPS=true vite --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
@@ -24,7 +25,9 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
+		"cross-env": "^10.0.0",
 		"lucide-svelte": "^0.460.0",
-		"pixi.js": "^8.13.2"
+		"pixi.js": "^8.13.2",
+		"vite-plugin-mkcert": "^1.17.8"
 	}
 }

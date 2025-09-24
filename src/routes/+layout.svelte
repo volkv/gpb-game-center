@@ -6,6 +6,7 @@
 	import StatusBar from '$lib/components/StatusBar.svelte';
 	import { currentScreen } from '$lib/stores/navigationStore';
 	import { telegramStore } from '$lib/stores/telegramStore';
+	import { triggerHapticFeedback } from '$lib/telegram/integration';
 
 	let { children } = $props();
 	let isLoaded = $state(false);
@@ -13,8 +14,20 @@
 	onMount(() => {
 		isLoaded = true;
 
-		// Initialize Telegram store early to ensure user data is available
-		telegramStore.initialize();
+		// Wait for Telegram WebApp SDK to load, then initialize store
+		const maxRetries = 50; // 5 seconds max wait time
+		let retries = 0;
+
+		const initializeTelegram = () => {
+			if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
+				telegramStore.initialize();
+			} else if (retries < maxRetries) {
+				retries++;
+				setTimeout(initializeTelegram, 100);
+			}
+		};
+
+		initializeTelegram();
 
 		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -61,9 +74,16 @@
 			}, 100);
 		}
 
+		const handleGlobalClick = () => {
+			triggerHapticFeedback();
+		};
+
+		document.body.addEventListener('click', handleGlobalClick);
+
 		return () => {
 			window.removeEventListener('orientationchange', handleOrientationChange);
 			window.removeEventListener('resize', handleOrientationChange);
+			document.body.removeEventListener('click', handleGlobalClick);
 		};
 	});
 </script>

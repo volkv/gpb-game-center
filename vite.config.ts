@@ -1,14 +1,14 @@
 import tailwindcss from '@tailwindcss/vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
-	plugins: [tailwindcss(), sveltekit()],
+	plugins: [tailwindcss(), sveltekit(), ...(process.env.HTTPS ? [mkcert()] : [])],
 	build: {
 		target: 'es2020',
-		cssCodeSplit: true,
 		reportCompressedSize: false,
-		chunkSizeWarningLimit: 1000,
+		chunkSizeWarningLimit: 500,
 		rollupOptions: {
 			output: {
 				manualChunks: {
@@ -23,9 +23,11 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		include: ['svelte/store', 'svelte/transition', 'svelte/motion', 'pixi.js'],
-		exclude: ['@games/*']
+		exclude: ['@games/*'],
+		force: true
 	},
 	server: {
+		host: true,
 		fs: {
 			allow: ['..']
 		}

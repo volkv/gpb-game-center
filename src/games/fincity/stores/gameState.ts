@@ -81,17 +81,23 @@ export function setZoom(zoom: number) {
 }
 
 export function initializeGame() {
-  console.log('🎮 [GAME] initializeGame() called');
-  
+  if (import.meta.env.DEV) {
+    console.log('🎮 [GAME] initializeGame() called');
+  }
+
   const $playerData = get(playerData);
-  console.log('📊 [GAME] Current playerData:', {
-    tutorialCompleted: $playerData.tutorialCompleted,
-    buildingsCount: $playerData.buildings.length,
-    cityName: $playerData.cityName
-  });
-  
+  if (import.meta.env.DEV) {
+    console.log('📊 [GAME] Current playerData:', {
+      tutorialCompleted: $playerData.tutorialCompleted,
+      buildingsCount: $playerData.buildings.length,
+      cityName: $playerData.cityName
+    });
+  }
+
   const isFirstTime = !$playerData.tutorialCompleted && $playerData.buildings.length === 0;
-  console.log('🔍 [GAME] initializeGame isFirstTime check:', isFirstTime);
+  if (import.meta.env.DEV) {
+    console.log('🔍 [GAME] initializeGame isFirstTime check:', isFirstTime);
+  }
 
   gameState.update(state => {
     const newState = {
@@ -101,14 +107,16 @@ export function initializeGame() {
       isFirstTime,
       currentScreen: 'main' as GameScreen
     };
-    
-    console.log('🎯 [GAME] Updating gameState:', {
-      isInitialized: newState.isInitialized,
-      isLoading: newState.isLoading,
-      isFirstTime: newState.isFirstTime,
-      currentScreen: newState.currentScreen
-    });
-    
+
+    if (import.meta.env.DEV) {
+      console.log('🎯 [GAME] Updating gameState:', {
+        isInitialized: newState.isInitialized,
+        isLoading: newState.isLoading,
+        isFirstTime: newState.isFirstTime,
+        currentScreen: newState.currentScreen
+      });
+    }
+
     return newState;
   });
 }
@@ -121,11 +129,15 @@ export function setFirstTimeComplete() {
 }
 
 export function checkIfFirstTime() {
-  console.log('🔍 [ONBOARDING] checkIfFirstTime() called - always first time in stateless mode');
+  if (import.meta.env.DEV) {
+    console.log('🔍 [ONBOARDING] checkIfFirstTime() called - always first time in stateless mode');
+  }
 
   const isFirstTime = true;
 
-  console.log('🎯 [ONBOARDING] Final isFirstTime result:', isFirstTime);
+  if (import.meta.env.DEV) {
+    console.log('🎯 [ONBOARDING] Final isFirstTime result:', isFirstTime);
+  }
 
   gameState.update(state => ({
     ...state,
@@ -218,14 +230,16 @@ export function setGameEngine(engine: GameEngine | null) {
 export function playBuildingUpgradeEffects(buildingId: string) {
   const engine = get(gameEngine);
   if (!engine || !engine.buildingManager) {
-    console.warn('GameEngine or BuildingSystem not available for effects');
+    if (import.meta.env.DEV) {
+      console.warn('GameEngine or BuildingSystem not available for effects');
+    }
     return;
   }
 
   const buildingRenderer = engine.buildingManager.getBuildingRenderer();
   if (buildingRenderer) {
     buildingRenderer.playUpgradeEffects(buildingId);
-  } else {
+  } else if (import.meta.env.DEV) {
     console.warn('BuildingRenderer not available for effects');
   }
 }

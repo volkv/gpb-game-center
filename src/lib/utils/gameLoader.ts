@@ -20,7 +20,7 @@ class GameLoaderService {
 	private loadingPromises = new Map<string, Promise<ComponentType>>();
 	private errorCache = new Map<string, GameLoadError>();
 	private maxRetries = 3;
-	private cacheExpiryTime = 30 * 60 * 1000; // 30 минут
+	private cacheExpiryTime = 5 * 60 * 1000; // 5 минут
 
 	async loadGame(game: Game): Promise<ComponentType> {
 		const cacheKey = game.id;
@@ -186,11 +186,20 @@ class GameLoaderService {
 	}
 
 	private estimateMemoryUsage(): number {
-		return this.cache.size * 1024; // Приблизительная оценка в байтах
+		// More accurate memory estimation
+		let totalSize = 0;
+		this.cache.forEach(cached => {
+			// Estimate component size + metadata
+			totalSize += 2048; // Base component size
+		});
+		return totalSize;
 	}
 
 	destroy(): void {
 		this.clearCache();
+		// Clear any pending promises to prevent memory leaks
+		this.loadingPromises.clear();
+		this.errorCache.clear();
 	}
 }
 

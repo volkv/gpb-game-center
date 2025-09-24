@@ -5,14 +5,19 @@
 	import type { Game } from '$lib/types/Game';
 	import type GameCenter from '$lib/components/GameCenter.svelte';
 	import type GameContainer from '$lib/components/GameContainer.svelte';
+	import type RewardsShop from '$lib/components/RewardsShop.svelte';
+	import TabNavigation from '$lib/components/TabNavigation.svelte';
 
 	let selectedGame = $state<Game | null>(null);
 	let GameCenterComponent = $state<typeof GameCenter | null>(null);
 	let GameContainerComponent = $state<typeof GameContainer | null>(null);
+	let RewardsShopComponent = $state<typeof RewardsShop | null>(null);
 	let gameCenterLoadPromise: Promise<void> | null = null;
 	let gameContainerLoadPromise: Promise<void> | null = null;
+	let rewardsShopLoadPromise: Promise<void> | null = null;
 	let isGameCenterLoading = $state(false);
 	let isGameContainerLoading = $state(false);
+	let isRewardsShopLoading = $state(false);
 
 	const slideLeft = reduceMotionTransition(
 		(node, params) => slideInOut(node, { ...params, x: -100 })
@@ -62,6 +67,26 @@
 		await gameContainerLoadPromise;
 	}
 
+	async function ensureRewardsShopLoaded() {
+		if (RewardsShopComponent) return;
+		if (rewardsShopLoadPromise) {
+			await rewardsShopLoadPromise;
+			return;
+		}
+
+		isRewardsShopLoading = true;
+		rewardsShopLoadPromise = import('$lib/components/RewardsShop.svelte')
+			.then((module) => {
+				RewardsShopComponent = module.default;
+			})
+			.finally(() => {
+				isRewardsShopLoading = false;
+				rewardsShopLoadPromise = null;
+			});
+
+		await rewardsShopLoadPromise;
+	}
+
 	$effect(() => {
 		if ($currentScreen === 'game-center') {
 			ensureGameCenterLoaded();
@@ -71,6 +96,12 @@
 	$effect(() => {
 		if ($currentScreen === 'game' && selectedGame) {
 			ensureGameContainerLoaded();
+		}
+	});
+
+	$effect(() => {
+		if ($currentScreen === 'rewards-shop') {
+			ensureRewardsShopLoaded();
 		}
 	});
 
@@ -109,6 +140,21 @@
 					</div>
 				{/if}
 			</div>
+		{:else if $currentScreen === 'rewards-shop'}
+			<div
+				class="screen"
+				in:slideRight={{ duration: 400, delay: 50 }}
+				out:slideLeft={{ duration: 300 }}
+			>
+				{#if RewardsShopComponent}
+					<RewardsShopComponent />
+				{:else}
+					<div class="lazy-fallback" aria-live="polite" aria-busy={isRewardsShopLoading}>
+						<div class="lazy-spinner" aria-hidden="true"></div>
+						<p class="lazy-text">Загружаем магазин подарков…</p>
+					</div>
+				{/if}
+			</div>
 		{:else if $currentScreen === 'game' && selectedGame}
 			<div
 				class="screen"
@@ -138,6 +184,10 @@
 		{/if}
 	{/key}
 </div>
+
+{#if $currentScreen === 'game-center' || $currentScreen === 'rewards-shop'}
+	<TabNavigation />
+{/if}
 
 <style>
 	.screen-container {

@@ -202,30 +202,23 @@ function generateSessionId(): string {
 
 export const gameStore = createGameStore();
 
-export const activeGames = derived(
+export const gameStoreSelectors = derived(
 	gameStore,
-	($gameStore) => $gameStore.games.filter(game => game.status === 'active')
+	($gameStore) => ({
+		activeGames: $gameStore.games.filter(game => game.status === 'active'),
+		comingSoonGames: $gameStore.games.filter(game => game.status === 'coming_soon'),
+		currentGameState: $gameStore.gameState,
+		isGameLoading: $gameStore.loadingState === 'loading',
+		isGameActive: $gameStore.gameState?.status === 'playing'
+	})
 );
 
-export const comingSoonGames = derived(
-	gameStore,
-	($gameStore) => $gameStore.games.filter(game => game.status === 'coming_soon')
-);
-
-export const currentGameState = derived(
-	gameStore,
-	($gameStore) => $gameStore.gameState
-);
-
-export const isGameLoading = derived(
-	gameStore,
-	($gameStore) => $gameStore.loadingState === 'loading'
-);
-
-export const isGameActive = derived(
-	gameStore,
-	($gameStore) => $gameStore.gameState?.status === 'playing'
-);
+// Backward compatibility exports
+export const activeGames = derived(gameStoreSelectors, ($selectors) => $selectors.activeGames);
+export const comingSoonGames = derived(gameStoreSelectors, ($selectors) => $selectors.comingSoonGames);
+export const currentGameState = derived(gameStoreSelectors, ($selectors) => $selectors.currentGameState);
+export const isGameLoading = derived(gameStoreSelectors, ($selectors) => $selectors.isGameLoading);
+export const isGameActive = derived(gameStoreSelectors, ($selectors) => $selectors.isGameActive);
 
 function get<T>(store: { subscribe: (run: (value: T) => void) => () => void }): T {
 	let value: T;

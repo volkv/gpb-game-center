@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 
-export type Screen = 'bank-home' | 'game-center' | 'game' | 'loading' | 'error';
+export type Screen = 'bank-home' | 'game-center' | 'game' | 'rewards-shop' | 'loading' | 'error';
 
 export interface NavigationState {
 	currentScreen: Screen;
@@ -48,23 +48,14 @@ function createNavigationStore() {
 					}
 				}
 
-				const newState: NavigationState = {
+				return {
 					...state,
 					previousScreen: state.currentScreen,
 					currentScreen: screen,
 					history: newHistory,
 					canGoBack: newHistory.length > 1 && !clearHistory,
-					isTransitioning: true
+					isTransitioning: false
 				};
-
-				setTimeout(() => {
-					update(s => ({
-						...s,
-						isTransitioning: false
-					}));
-				}, 300);
-
-				return newState;
 			});
 		},
 
@@ -85,7 +76,7 @@ function createNavigationStore() {
 					currentScreen: previousScreen,
 					history: newHistory,
 					canGoBack: newHistory.length > 1,
-					isTransitioning: true
+					isTransitioning: false
 				};
 			});
 		},
@@ -191,6 +182,11 @@ export const isGameCenterScreen = derived(
 	($nav) => $nav.currentScreen === 'game-center'
 );
 
+export const isRewardsShopScreen = derived(
+	navigationStore,
+	($nav) => $nav.currentScreen === 'rewards-shop'
+);
+
 export const navigationHistory = derived(
 	navigationStore,
 	($nav) => $nav.history
@@ -218,4 +214,8 @@ export function navigateToError() {
 
 export function goBack() {
 	navigationStore.goBack();
+}
+
+export function navigateToRewardsShop() {
+	navigationStore.navigateTo('rewards-shop', { clearHistory: true });
 }

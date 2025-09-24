@@ -150,6 +150,21 @@ export function isTelegramUserAvailable(): boolean {
   return getTelegramUser() !== null;
 }
 
+export function triggerHapticFeedback(): void {
+  if (!isTelegramEnvironment()) {
+    return;
+  }
+
+  const webApp = getTelegramWebApp();
+  if (webApp?.HapticFeedback?.impactOccurred) {
+    try {
+      webApp.HapticFeedback.impactOccurred('heavy');
+    } catch (error) {
+      console.warn('📱 [TELEGRAM] Failed to trigger haptic feedback:', error);
+    }
+  }
+}
+
 export function getTelegramUserInfo() {
   const user = getTelegramUser();
   const webApp = getTelegramWebApp();

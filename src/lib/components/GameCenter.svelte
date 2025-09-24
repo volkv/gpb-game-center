@@ -4,6 +4,7 @@
 	import { gameStore, currentGameState } from '$lib/stores/gameStore.js';
 	import { navigateToGame } from '$lib/stores/navigationStore.js';
 	import { telegramStore } from '$lib/stores/telegramStore.js';
+	import { totalPoints } from '$lib/stores/pointsStore.js';
 	import GameIcon from './GameIcon.svelte';
 	import { getActiveGames, getComingSoonGames } from '$lib/data/games.js';
 	import { staggeredFadeIn, scaleAndSlide } from '$lib/utils/transitions.js';
@@ -21,7 +22,6 @@
 	let comingSoonGames: Game[] = $state([]);
 
 	// Статистика пользователя
-	let totalScore = $derived(15420); // TODO: получать из реального store
 	let totalPlayTime = $derived(247); // в минутах
 	let completedGames = $derived(8);
 
@@ -101,7 +101,7 @@
 								<Star size={20} class="text-gpb-gold neon-glow" />
 								<span class="font-ui-secondary">Всего очков</span>
 							</div>
-							<div class="score-value animate-count-up">{totalScore.toLocaleString()}</div>
+							<div class="score-value animate-count-up">{$totalPoints.toLocaleString()}</div>
 						</div>
 
 						<!-- Play Time -->
@@ -174,7 +174,7 @@
 		padding-left: 1rem;
 		padding-right: 1rem;
 		padding-top: 1.5rem;
-		padding-bottom: 1.5rem;
+		padding-bottom: calc(88px + 1.5rem);
 		background: linear-gradient(135deg, #1919EF 0%, #9B59B6 50%, #DD41DB 100%);
 		color: white;
 		position: relative;
@@ -253,7 +253,7 @@
 			padding-left: 0.75rem;
 			padding-right: 0.75rem;
 			padding-top: 1rem;
-			padding-bottom: 1rem;
+			padding-bottom: calc(88px + 1rem);
 		}
 
 		.stats-grid {

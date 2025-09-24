@@ -215,10 +215,14 @@ export class ResourceManager {
         for (const [name, asset] of Object.entries(loadedAssets)) {
           if (asset instanceof Texture) {
             this.textures.set(name, asset);
-            if (asset.source) {
-              asset.source.autoGenerateMipmaps = false;
-              asset.source.style.mipmapFilter = 'nearest';
-              asset.source.style.scaleMode = 'linear';
+            if (asset.source && asset.source.style) {
+              Object.assign(asset.source, {
+                autoGenerateMipmaps: false
+              });
+              Object.assign(asset.source.style, {
+                mipmapFilter: 'nearest',
+                scaleMode: 'linear'
+              });
             }
           }
         }
@@ -241,10 +245,14 @@ export class ResourceManager {
 
             for (const [frameName, frameTexture] of Object.entries(spritesheet.textures)) {
               this.textures.set(`${name}-${frameName}`, frameTexture);
-              if (frameTexture.source) {
-                frameTexture.source.autoGenerateMipmaps = false;
-                frameTexture.source.style.mipmapFilter = 'nearest';
-                frameTexture.source.style.scaleMode = 'linear';
+              if (frameTexture.source && frameTexture.source.style) {
+                Object.assign(frameTexture.source, {
+                  autoGenerateMipmaps: false
+                });
+                Object.assign(frameTexture.source.style, {
+                  mipmapFilter: 'nearest',
+                  scaleMode: 'linear'
+                });
               }
             }
 
@@ -317,11 +325,17 @@ export class ResourceManager {
       this.unload(name);
     }
 
-    if (typeof window !== 'undefined' && 'gc' in window) {
-      (window as any).gc();
+    if (import.meta.env.DEV && typeof window !== 'undefined' && 'gc' in window) {
+      try {
+        (window as any).gc();
+      } catch {
+        // GC may not be available in all browsers
+      }
     }
 
-    console.log(`Memory optimization completed. Removed ${unusedTextures.length} unused textures.`);
+    if (import.meta.env.DEV) {
+      console.log(`Memory optimization completed. Removed ${unusedTextures.length} unused textures.`);
+    }
   }
 
   private getCacheMetadata(name: string): CachedAssetMetadata | null {
