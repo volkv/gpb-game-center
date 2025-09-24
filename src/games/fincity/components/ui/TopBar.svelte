@@ -1,14 +1,30 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
   import { Icon, Button } from '.';
-  import { resources, userName, level, experienceToNextLevel } from '../../stores/playerData';
+  import { resources, userName, level, experienceToNextLevel, setUserName } from '../../stores/playerData';
   import { openModal } from '../../stores/ui';
   import { showIconTest } from '../../stores/gameState';
+  import { telegramUserName } from '$lib/stores/telegramStore';
 
   interface Props {
     class?: string;
   }
 
   let { class: className = '' }: Props = $props();
+
+  onMount(() => {
+    // Sync telegram user name with player data
+    const unsubscribe = telegramUserName.subscribe((telegramName) => {
+      if (telegramName && telegramName !== 'Клиент' && $userName === 'Клиент') {
+        console.log('🎮 [FINCITY] Syncing telegram name to player data:', telegramName);
+        setUserName(telegramName);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  });
 
   function openSettings() {
     openModal('settings');
@@ -61,15 +77,14 @@
 </header>
 
 <style>
-  @reference "../../../../app.css";
   .top-bar {
-    @apply bg-white border-b border-gray-200;
-    @apply sticky top-0 z-40;
+    @apply background: white border-b border-gray-200;
+    @apply sticky top: 0 z-40;
   }
 
   .top-bar-content {
-    @apply flex flex-col gap-md px-md py-md;
-    @apply max-w-container mx-auto;
+    @apply flex flex-col gap: 1rem px-md py-md;
+    @apply max-width: 1200px mx-auto;
   }
 
   .header-row {

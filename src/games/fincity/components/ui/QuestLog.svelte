@@ -289,11 +289,10 @@
 
 <style>
   /* svelte-ignore css-unused-selector */
-  @reference "../../app.css";
   .quest-header { @apply flex-shrink-0; }
 
   .title-section {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap: 0.75rem;
   }
 
   .quest-tabs { @apply overflow-x-auto; }
@@ -386,7 +385,7 @@
   }
 
   :global(.quest-requirements) {
-    @apply space-y-2 mb-sm;
+    @apply gap: 0.5rem mb-sm;
   }
 
   :global(.requirement-text) { @apply flex items-center gap-sm text-sm text-gray-600; }
@@ -441,7 +440,7 @@
     }
 
     .quest-meta {
-      @apply flex-col items-start space-y-2;
+      @apply flex-col items-start gap: 0.5rem;
     }
 
     .quest-badges {

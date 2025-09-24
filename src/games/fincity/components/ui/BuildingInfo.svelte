@@ -199,17 +199,16 @@
 
 
 <style>
-  @reference "../../../../app.css";
   /* svelte-ignore css-unused-selector */
 
   :global(.product-showcase-modal .modal-content-wrapper) {
-    @apply max-w-container max-h-90vh;
+    @apply max-width: 1200px max-h-90vh;
   }
 
   .product-showcase-header {
     @apply p-md bg-lily;
     @apply border-b border-henbane-20;
-    @apply grid grid-cols-1 gap-md items-center text-center;
+    @apply grid grid-cols-1 gap: 1rem items-center text-center;
   }
 
   .product-visual {
@@ -219,7 +218,7 @@
 
   .product-image {
     @apply w-24 h-24 flex items-center justify-center;
-    @apply bg-white rounded-[var(--radius-xl)];
+    @apply background: white rounded-[var(--radius-xl)];
     @apply shadow-sm border border-henbane-10;
   }
 
@@ -240,7 +239,7 @@
   }
 
   .product-showcase-content {
-    @apply flex-1 overflow-y-auto p-md gap-md;
+    @apply flex-1 overflow-y-auto p-md gap: 1rem;
     @apply bg-lily-50 space-y-6;
   }
 
@@ -251,12 +250,12 @@
   }
 
   .module-title {
-    @apply flex items-center gap-3 text-black mb-4;
+    @apply flex items-center gap: 0.75rem text-black mb-4;
   }
 
   .description {
     @apply text-henbane leading-relaxed;
-    @apply bg-white p-md rounded-[var(--radius)];
+    @apply background: white p-md rounded-[var(--radius)];
     @apply border border-henbane-10;
   }
 
@@ -275,7 +274,7 @@
   }
 
   .note-content {
-    @apply flex items-start gap-4;
+    @apply flex items-start gapadding: 1rem;
   }
 
   .note-title {
@@ -287,7 +286,7 @@
   }
 
   .product-showcase-footer {
-    @apply flex flex-col gap-md p-md;
+    @apply flex flex-col gap: 1rem p-md;
     @apply bg-lily border-t border-henbane-20;
   }
 

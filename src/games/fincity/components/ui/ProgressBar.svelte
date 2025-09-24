@@ -174,10 +174,9 @@
 {/if}
 
 <style>
-  @reference "../../../../app.css";
 
   .progress-container {
-    @apply w-full space-y-2;
+    @apply w-full gap: 0.5rem;
   }
 
   .progress-header {

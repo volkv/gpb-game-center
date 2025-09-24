@@ -67,7 +67,6 @@
 </div>
 
 <style>
-  @reference "../../../../app.css";
   .action-buttons {
     @apply fixed z-30;
     @apply flex flex-col items-center;
@@ -80,8 +79,8 @@
   }
 
   .buttons-container {
-    @apply flex gap-md;
-    @apply bg-white/95 backdrop-blur-md rounded-full px-md py-md;
+    @apply flex gap: 1rem;
+    @apply background: white/95 backdrop-blur-md rounded-full px-md py-md;
     @apply border border-gray-200/50 shadow-lg;
   }
 

@@ -26,9 +26,9 @@
       Назад к игре
     </Button>
   </div>
-  <div class="grid grid-cols-8 gap-4">
+  <div class="grid grid-cols-8 gapadding: 1rem">
     {#each iconNames as iconName}
-      <div class="flex flex-col items-center p-3 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+      <div class="flex flex-col items-center p-3 background: white rounded-lg shadow hover:shadow-md transition-shadow">
         <Icon name={iconName} size="lg" />
         <span class="text-xs mt-2 text-gray-600 text-center leading-tight">{iconName}</span>
       </div>

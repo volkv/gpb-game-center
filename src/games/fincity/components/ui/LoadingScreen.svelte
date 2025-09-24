@@ -127,7 +127,6 @@
 </div>
 
 <style>
-  @reference "../../../../app.css";
   .loading-screen {
     position: fixed;
     top: 0;

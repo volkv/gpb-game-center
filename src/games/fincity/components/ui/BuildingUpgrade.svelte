@@ -292,16 +292,15 @@
 {/if}
 
 <style>
-  @reference "../../../../app.css";
 
   :global(.building-upgrade-modal .modal-content-wrapper) {
-    @apply max-w-lg max-h-90vh;
+    @apply max-width: 32rem max-h-90vh;
   }
 
   .upgrade-header {
     @apply p-md bg-lily;
     @apply border-b border-violet-20;
-    @apply flex items-center gap-md;
+    @apply flex items-center gap: 1rem;
   }
 
   .building-visual {
@@ -310,7 +309,7 @@
 
   .building-icon {
     @apply w-16 h-16 flex items-center justify-center;
-    @apply bg-white rounded-[var(--radius-xl)];
+    @apply background: white rounded-[var(--radius-xl)];
     @apply shadow-sm border border-violet-10;
   }
 
@@ -319,7 +318,7 @@
   }
 
   .building-details {
-    @apply flex-1 space-y-2;
+    @apply flex-1 gap: 0.5rem;
   }
 
   .building-title {
@@ -345,7 +344,7 @@
   }
 
   .stats-title {
-    @apply flex items-center gap-3 text-black;
+    @apply flex items-center gap: 0.75rem text-black;
   }
 
   .stats-grid {
@@ -354,7 +353,7 @@
 
   .stat-item {
     @apply flex items-center gap-2 p-md;
-    @apply bg-white rounded-[var(--radius)];
+    @apply background: white rounded-[var(--radius)];
     @apply border border-henbane-10;
   }
 
@@ -402,11 +401,11 @@
   }
 
   .max-level-content {
-    @apply space-y-2;
+    @apply gap: 0.5rem;
   }
 
   .upgrade-footer {
-    @apply flex gap-md p-md;
+    @apply flex gap: 1rem p-md;
     @apply bg-lily border-t border-violet-20;
   }
 

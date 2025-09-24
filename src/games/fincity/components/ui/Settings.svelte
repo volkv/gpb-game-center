@@ -273,15 +273,14 @@
 
 <style>
   /* svelte-ignore css-unused-selector */
-  @reference "../../app.css";
   .settings-overlay {
-    @apply fixed top-0 left-0 right-0 bottom-0 z-50 flex items-center justify-center p-4;
+    @apply fixed top: 0 left-0 right-0 bottom-0 z-50 flex items-center justify-center padding: 1rem;
     @apply bg-black bg-opacity-50 backdrop-blur-sm;
   }
 
   .settings-panel {
     @apply w-full max-w-modal-xl max-h-90vh flex flex-col;
-    @apply bg-white rounded-[var(--radius-lg)];
+    @apply background: white rounded-[var(--radius-lg)];
     @apply border border-gray-200 shadow-2xl;
     @apply modal-slide-up;
   }
@@ -293,7 +292,7 @@
   }
 
   .title-section {
-    @apply flex items-center gap-3;
+    @apply flex items-center gap: 0.75rem;
   }
 
   .settings-title { @apply text-xl font-bold text-gray-900; }
@@ -334,7 +333,7 @@
 
   .setting-select {
     @apply px-3 py-2 text-sm border border-gray-300 rounded-[var(--radius)];
-    @apply bg-white text-gray-900;
+    @apply background: white text-gray-900;
     @apply focus:ring-2 focus:ring-gpb-blue focus:border-gpb-blue;
   }
 
@@ -404,7 +403,7 @@
 
     .setting-item,
     .action-item {
-      @apply flex-col items-start space-y-2;
+      @apply flex-col items-start gap: 0.5rem;
     }
 
     .setting-control {

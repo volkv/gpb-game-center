@@ -1,9 +1,0 @@
-*ai_update*.md
-update.md
-storage
-vendor
-node_modules
-public/build
-bootstrap/cache
-.idea
-.vscode

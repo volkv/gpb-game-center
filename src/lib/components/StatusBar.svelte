@@ -5,7 +5,7 @@
 	let mounted = false;
 
 	onMount(() => {
-		telegramStore.initialize();
+		// telegramStore is now initialized in layout
 		mounted = true;
 	});
 </script>

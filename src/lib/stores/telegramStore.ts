@@ -48,11 +48,30 @@ function createTelegramStore() {
     subscribe,
 
     initialize: () => {
-      if (!browser) return;
+      if (!browser) {
+        console.log('📱 [TELEGRAM STORE] Skipping initialization - not in browser environment');
+        return;
+      }
+
+      console.log('📱 [TELEGRAM STORE] Starting initialization');
 
       try {
         const isInitialized = initializeTelegramApp();
         const userInfo = getTelegramUserInfo();
+
+        console.log('📱 [TELEGRAM STORE] User info retrieved:', {
+          isInTelegram: userInfo.isInTelegram,
+          hasUser: !!userInfo.user,
+          userName: userInfo.userName,
+          platform: userInfo.platform
+        });
+
+        if (!userInfo.isInTelegram) {
+          console.warn('📱 [TELEGRAM STORE] Not running in Telegram - user name will be default');
+        } else if (!userInfo.user) {
+          console.warn('📱 [TELEGRAM STORE] Running in Telegram but user data not available');
+          console.warn('📱 [TELEGRAM STORE] User name will be default. Check Telegram privacy settings.');
+        }
 
         const savedStats = loadActivityStats();
         const currentDate = new Date().toISOString().split('T')[0];
@@ -82,11 +101,15 @@ function createTelegramStore() {
           totalGamesPlayed: savedStats.totalGamesPlayed,
           lastActiveDate: currentDate
         });
+
+        console.log('📱 [TELEGRAM STORE] Initialization completed successfully');
       } catch (error) {
-        console.warn('Failed to initialize Telegram store:', error);
+        console.error('📱 [TELEGRAM STORE] Failed to initialize:', error);
+        console.error('📱 [TELEGRAM STORE] App will continue with default values');
         update(state => ({
           ...state,
-          isInitialized: false
+          isInitialized: false,
+          userName: 'Клиент'
         }));
       }
     },

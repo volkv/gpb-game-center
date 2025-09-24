@@ -147,10 +147,10 @@
     <div class="achievements-grid">
       {#each filteredAchievements as achievement (achievement.id)}
         <div
-          class="achievement-card border-2 rounded-lg p-4 transition-all duration-200 {rarityColors[achievement.rarity]} {achievement.status === 'unlocked' ? 'opacity-100' : 'opacity-60'}"
+          class="achievement-card border-2 rounded-lg padding: 1rem transition-all duration-200 {rarityColors[achievement.rarity]} {achievement.status === 'unlocked' ? 'opacity-100' : 'opacity-60'}"
         >
-          <div class="flex items-start gap-3">
-            <div class="achievement-icon flex-shrink-0 w-12 h-12 rounded-full bg-white flex items-center justify-center {achievement.status === 'unlocked' ? 'ring-2 ring-purple-500' : ''}">
+          <div class="flex items-start gap: 0.75rem">
+            <div class="achievement-icon flex-shrink-0 w-12 h-12 rounded-full background: white flex items-center justify-center {achievement.status === 'unlocked' ? 'ring-2 ring-purple-500' : ''}">
               <Icon
                 name={(achievement.icon as IconName) || 'achievement'}
                 size="lg"
@@ -195,7 +195,7 @@
               {/if}
 
               {#if achievement.rewards}
-                <div class="flex items-center gap-3 mt-2 pt-2 border-t border-gray-200">
+                <div class="flex items-center gap: 0.75rem mt-2 pt-2 border-t border-gray-200">
                   <span class="text-xs text-gray-500">Награда:</span>
                   <div class="flex items-center gap-2 text-xs">
                     {#if achievement.rewards.coins}
@@ -242,7 +242,7 @@
 
 {#if recentlyUnlocked}
   <div class="achievement-unlock-notification">
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap: 0.75rem">
       <div class="achievement-unlock-icon">
         <Icon name={(recentlyUnlocked.icon as IconName) || 'achievement'} size="lg" class="text-white" />
       </div>
@@ -256,7 +256,6 @@
 {/if}
 
 <style>
-  @reference "../../app.css";
 
   .title-section {
     @apply flex items-center;
@@ -268,7 +267,7 @@
   }
 
   .achievement-tabs {
-    @apply flex p-4 overflow-x-auto;
+    @apply flex padding: 1rem overflow-x-auto;
     gap: 0.5rem;
   }
 
@@ -278,7 +277,7 @@
 
   .tab-button {
     @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors;
-    @apply border border-gray-200 bg-white text-gray-700;
+    @apply border border-gray-200 background: white text-gray-700;
     @apply flex items-center gap-2;
     min-width: max-content;
   }
@@ -296,7 +295,7 @@
   }
 
   .achievements-content {
-    @apply p-4;
+    @apply padding: 1rem;
   }
 
   .achievements-grid {
@@ -320,7 +319,7 @@
   }
 
   .achievement-unlock-notification {
-    @apply fixed top-4 right-4 z-50 bg-white rounded-lg shadow-lg border-2 border-purple-500 p-4 max-w-sm;
+    @apply fixed top: 1rem right-4 z-50 background: white rounded-lg shadow-lg border-2 border-purple-500 padding: 1rem max-w-sm;
   }
 
   .achievement-unlock-icon {

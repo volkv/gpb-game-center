@@ -346,7 +346,6 @@
 </div>
 
 <style>
-  @reference "../../../../app.css";
 
   .game-canvas-wrapper {
     position: relative;

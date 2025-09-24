@@ -5,12 +5,16 @@
 	import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
 	import StatusBar from '$lib/components/StatusBar.svelte';
 	import { currentScreen } from '$lib/stores/navigationStore';
+	import { telegramStore } from '$lib/stores/telegramStore';
 
 	let { children } = $props();
 	let isLoaded = $state(false);
 
 	onMount(() => {
 		isLoaded = true;
+
+		// Initialize Telegram store early to ensure user data is available
+		telegramStore.initialize();
 
 		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 

@@ -170,10 +170,9 @@
 {/if}
 
 <style>
-  @reference "../../../../app.css";
 
   .toast-container {
-    @apply fixed top-4 right-4 z-50 max-w-sm w-full;
+    @apply fixed top: 1rem right-4 z-50 max-w-sm w-full;
     @apply pointer-events-auto;
   }
 
@@ -182,7 +181,7 @@
   }
 
   .toast-header {
-    @apply flex items-start gap-3;
+    @apply flex items-start gap: 0.75rem;
   }
 
   .toast-text {
@@ -238,7 +237,7 @@
     }
 
     .toast-content {
-      @apply space-y-2;
+      @apply gap: 0.5rem;
     }
 
     .toast-header {

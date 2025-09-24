@@ -9,3 +9,14 @@ export type { Achievement } from './Achievement';
 export { AchievementType, AchievementCategory, AchievementStatus } from './Achievement';
 export type * from './Game';
 export type { IconName } from './Icon';
+
+// Game engine types
+export interface InteractionEvent {
+  type: 'click' | 'hover' | 'drag' | 'zoom';
+  position: { x: number; y: number };
+  gridPosition?: { x: number; y: number };
+  target?: string;
+  data?: any;
+}
+
+export type LoadingProgressHandler = (progress: number, stage?: string) => void;

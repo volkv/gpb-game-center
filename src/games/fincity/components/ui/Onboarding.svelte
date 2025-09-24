@@ -121,7 +121,7 @@
     <div class="background-media"></div>
     <div class="content-card">
       <div class="header-section p-lg mb-lg">
-        <div class="flex items-center gap-md mb-md">
+        <div class="flex items-center gap: 1rem mb-md">
           <Icon name="building" size="xl" class="text-mint" />
           <div>
             <h1 class="text-lg text-gray-900">Добро пожаловать в FinCity!</h1>
@@ -139,7 +139,7 @@
           </p>
         </div>
 
-        <div class="space-y-2">
+        <div class="gap: 0.5rem">
           <label for="cityName" class="block text-ui-label text-gray-900">
             Как назовём ваш город?
           </label>
@@ -149,7 +149,7 @@
             value={$playerData.cityName}
             oninput={handleCityNameChange}
             placeholder="Введите название города"
-            class="w-full px-md py-sm border-2 border-gray-300 rounded-[var(--radius-lg)] bg-white text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-[var(--duration-fast)]"
+            class="w-full px-md py-sm border-2 border-gray-300 rounded-[var(--radius-lg)] background: white text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-[var(--duration-fast)]"
             maxlength="20"
           />
         </div>
@@ -181,7 +181,7 @@
           </div>
         </div>
 
-        <div class="flex gap-4 pt-6">
+        <div class="flex gapadding: 1rem pt-6">
           <Button variant="secondary" class="flex-1" onclick={skipTutorial}>
             Пропустить обучение
           </Button>
@@ -195,7 +195,7 @@
 {/if}
 
 {#if $isTutorialActive && currentStep}
-  <div class="onboarding-progress bubble-info fixed top-4 left-1/2 transform -translate-x-1/2 z-40 shadow-xl">
+  <div class="onboarding-progress bubble-info fixed top: 1rem left-1/2 transform -translate-x-1/2 z-40 shadow-xl">
     <div class="flex items-center gap-sm min-w-48">
       <Icon name="book" size="sm" class="text-violet" />
       <div class="flex-1">
@@ -210,7 +210,6 @@
 {/if}
 
 <style>
-  @reference "../../../../app.css";
   .onboarding-welcome {
     position: fixed;
     top: 0;

@@ -48,7 +48,7 @@
   const sizeClasses = {
     sm: 'px-sm py-1 text-xs gap-xs',
     md: 'px-md py-2 text-sm gap-sm',
-    lg: 'px-lg py-3 text-base gap-md'
+    lg: 'px-lg py-3 text-base gap: 1rem'
   };
 
   const interactiveClasses = 'cursor-pointer hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-violet/50';

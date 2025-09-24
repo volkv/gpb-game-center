@@ -108,13 +108,12 @@
 </script>
 
 <style>
-  @reference "../../../../app.css";
 </style>
 
 {#if open}
   <div
     bind:this={overlayElement}
-    class="fixed top-0 left-0 right-0 bottom-0 z-50 flex items-center justify-center p-4 bg-cumin/80 backdrop-blur-md"
+    class="fixed top: 0 left-0 right-0 bottom-0 z-50 flex items-center justify-center padding: 1rem bg-cumin/80 backdrop-blur-md"
     onclick={handleOverlayClick}
     onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOverlayClick(e as unknown as MouseEvent); } }}
     role="dialog"
@@ -161,7 +160,7 @@
       </div>
 
       {#if footer}
-        <div class="flex items-center justify-end gap-3 p-md border-t border-henbane-30">
+        <div class="flex items-center justify-end gap: 0.75rem p-md border-t border-henbane-30">
           {@render footer()}
         </div>
       {/if}
