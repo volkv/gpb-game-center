@@ -107,14 +107,14 @@
   onclose={closeModal}
   title="Достижения"
   size="lg"
-  class="achievement-modal"
+  class="fincity-achievement-showcase-modal"
 >
   {#snippet header()}
-    <div class="title-section">
+    <div class="fincity-achievement-title-section">
       <Icon name="star" size="lg" color="var(--color-crystal-purple)" />
-      <div class="title-details">
+      <div class="fincity-achievement-title-details">
         <h2 class="modal-title">Достижения</h2>
-        <p class="achievement-subtitle text-sm text-gray-600">
+        <p class="fincity-achievement-subtitle text-sm text-gray-600">
           {$achievementStats.totalUnlocked} из {$achievementStats.totalAvailable}
           ({$achievementStats.completionPercentage}%)
         </p>
@@ -122,9 +122,9 @@
     </div>
   {/snippet}
 
-  <div class="achievement-tabs">
+  <div class="fincity-achievement-tabs">
     <button
-      class="tab-button {selectedCategory === 'all' ? 'active' : ''}"
+      class="fincity-tab-button {selectedCategory === 'all' ? 'fincity-active' : ''}"
       onclick={() => handleCategoryChange('all')}
       type="button"
     >
@@ -133,7 +133,7 @@
     </button>
     {#each Object.entries(categoryNames) as [category, name]}
       <button
-        class="tab-button {selectedCategory === category ? 'active' : ''}"
+        class="fincity-tab-button {selectedCategory === category ? 'fincity-active' : ''}"
         onclick={() => handleCategoryChange(category as AchievementCategory)}
         type="button"
       >
@@ -143,14 +143,14 @@
     {/each}
   </div>
 
-  <div class="achievements-content">
-    <div class="achievements-grid">
+  <div class="fincity-achievements-content">
+    <div class="fincity-achievements-grid">
       {#each filteredAchievements as achievement (achievement.id)}
         <div
-          class="achievement-card border-2 rounded-lg padding: 1rem transition-all duration-200 {rarityColors[achievement.rarity]} {achievement.status === 'unlocked' ? 'opacity-100' : 'opacity-60'}"
+          class="fincity-achievement-card border-2 rounded-lg fincity-achievement-padding transition-all duration-200 {rarityColors[achievement.rarity]} {achievement.status === 'unlocked' ? 'opacity-100' : 'opacity-60'}"
         >
-          <div class="flex items-start gap: 0.75rem">
-            <div class="achievement-icon flex-shrink-0 w-12 h-12 rounded-full background: white flex items-center justify-center {achievement.status === 'unlocked' ? 'ring-2 ring-purple-500' : ''}">
+          <div class="fincity-achievement-content-flex">
+            <div class="fincity-achievement-icon {achievement.status === 'unlocked' ? 'fincity-unlocked-ring' : ''}">
               <Icon
                 name={(achievement.icon as IconName) || 'achievement'}
                 size="lg"
@@ -195,7 +195,7 @@
               {/if}
 
               {#if achievement.rewards}
-                <div class="flex items-center gap: 0.75rem mt-2 pt-2 border-t border-gray-200">
+                <div class="fincity-achievement-rewards">
                   <span class="text-xs text-gray-500">Награда:</span>
                   <div class="flex items-center gap-2 text-xs">
                     {#if achievement.rewards.coins}
@@ -241,12 +241,12 @@
 </Modal>
 
 {#if recentlyUnlocked}
-  <div class="achievement-unlock-notification">
-    <div class="flex items-center gap: 0.75rem">
-      <div class="achievement-unlock-icon">
+  <div class="fincity-achievement-unlock-notification">
+    <div class="fincity-achievement-unlock-content">
+      <div class="fincity-achievement-unlock-icon">
         <Icon name={(recentlyUnlocked.icon as IconName) || 'achievement'} size="lg" class="text-white" />
       </div>
-      <div class="flex-1">
+      <div class="fincity-achievement-unlock-details">
         <div class="text-sm font-medium text-purple-600 mb-1">Достижение разблокировано!</div>
         <div class="font-semibold text-gray-900">{recentlyUnlocked.title}</div>
         <div class="text-xs text-gray-600">{recentlyUnlocked.description}</div>
@@ -255,75 +255,3 @@
   </div>
 {/if}
 
-<style>
-
-  .title-section {
-    @apply flex items-center;
-    gap: 0.75rem;
-  }
-
-  .title-details {
-    @apply flex flex-col;
-  }
-
-  .achievement-tabs {
-    @apply flex padding: 1rem overflow-x-auto;
-    gap: 0.5rem;
-  }
-
-  .achievement-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .tab-button {
-    @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors;
-    @apply border border-gray-200 background: white text-gray-700;
-    @apply flex items-center gap-2;
-    min-width: max-content;
-  }
-
-  .tab-button.active {
-    @apply bg-purple-600 text-white border-purple-600;
-  }
-
-  .tab-button:hover:not(.active) {
-    @apply bg-gray-50;
-  }
-
-  .tab-button span {
-    @apply whitespace-nowrap;
-  }
-
-  .achievements-content {
-    @apply padding: 1rem;
-  }
-
-  .achievements-grid {
-    @apply space-y-4;
-  }
-
-  .achievement-card {
-    transition: border-color 0.2s ease;
-  }
-
-  .achievement-card:hover {
-    border-color: #7c3aed;
-  }
-
-  .achievement-progress {
-    height: 4px;
-  }
-
-  .achievement-rarity {
-    font-weight: 500;
-  }
-
-  .achievement-unlock-notification {
-    @apply fixed top: 1rem right-4 z-50 background: white rounded-lg shadow-lg border-2 border-purple-500 padding: 1rem max-w-sm;
-  }
-
-  .achievement-unlock-icon {
-    @apply w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center;
-    border: 2px solid #7c3aed;
-  }
-</style>

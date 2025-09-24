@@ -45,7 +45,7 @@ export class ResourceManager {
     try {
       this.reportProgress(onProgress, 'Проверка кэша...', 0, 0, 0);
 
-      const manifestResponse = await fetch('/src/games/fincity/public/manifest.json');
+      const manifestResponse = await fetch('/games/fincity/manifest.json');
       const manifest: AssetManifest = await manifestResponse.json();
 
       const assetPriority = this.categorizeAssetsByPriority(manifest);

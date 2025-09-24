@@ -100,23 +100,23 @@
   </Bubble>
 
 {:else if variant === 'linear'}
-  <div class="progress-container {className}">
+  <div class="fincity-progress-container {className}">
     {#if showLabel && label}
-      <div class="progress-header">
-        <span class="progress-label text-body font-heading">{label}</span>
+      <div class="fincity-progress-header">
+        <span class="fincity-progress-label text-body font-heading">{label}</span>
         {#if showPercentage}
-          <span class="progress-percentage text-body-sm">{Math.round(percentage)}%</span>
+          <span class="fincity-progress-percentage text-body-sm">{Math.round(percentage)}%</span>
         {/if}
       </div>
     {:else if showPercentage}
-      <div class="progress-header-minimal">
-        <span class="progress-percentage text-body-sm">{Math.round(percentage)}%</span>
+      <div class="fincity-progress-header-minimal">
+        <span class="fincity-progress-percentage text-body-sm">{Math.round(percentage)}%</span>
       </div>
     {/if}
 
-    <div class="progress-track {sizeClasses.linear[size]}">
+    <div class="fincity-progress-track {sizeClasses.linear[size]}">
       <div
-        class="progress-fill {getProgressColor(color).bg} {animated ? 'progress-animated' : ''} {glowing ? getProgressColor(color).glow : ''}"
+        class="fincity-progress-fill {getProgressColor(color).bg} {animated ? 'fincity-progress-animated' : ''} {glowing ? getProgressColor(color).glow : ''}"
         style="width: {percentage}%"
         role="progressbar"
         aria-valuenow={value}
@@ -124,7 +124,7 @@
         aria-valuemax={max}
       >
         {#if glowing}
-          <div class="progress-shimmer"></div>
+          <div class="fincity-progress-shimmer"></div>
         {/if}
       </div>
     </div>
@@ -173,93 +173,3 @@
   </div>
 {/if}
 
-<style>
-
-  .progress-container {
-    @apply w-full gap: 0.5rem;
-  }
-
-  .progress-header {
-    @apply flex justify-between items-center;
-  }
-
-  .progress-header-minimal {
-    @apply flex justify-end;
-  }
-
-  .progress-label {
-    @apply text-black;
-  }
-
-  .progress-percentage {
-    @apply text-henbane;
-  }
-
-  .progress-track {
-    @apply w-full bg-lily-50 rounded-[var(--radius-lg)] overflow-hidden;
-    @apply border border-henbane-20;
-  }
-
-  .progress-fill {
-    @apply h-full transition-all duration-[var(--duration-slow)] ease-out;
-    @apply relative overflow-hidden;
-  }
-
-  .progress-animated {
-    @apply animate-pulse;
-  }
-
-  .progress-shimmer {
-    @apply absolute inset-0 opacity-30;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    background-size: 200% 100%;
-    animation: shimmer 2s ease-in-out infinite;
-  }
-
-  .circular-progress {
-    @apply relative inline-flex items-center justify-center;
-    @apply bg-lily-50 rounded-full;
-    @apply border-2 border-henbane-20;
-  }
-
-  .progress-circle {
-    @apply w-full h-full transform -rotate-90;
-  }
-
-  .progress-track-circle {
-    @apply opacity-30;
-  }
-
-  .progress-fill-circle {
-    @apply transition-all duration-[var(--duration-slow)] ease-out;
-  }
-
-  .progress-circle-animated {
-    animation: progress-rotate 2s linear infinite;
-  }
-
-  .progress-center {
-    @apply absolute inset-0 flex flex-col items-center justify-center space-y-1;
-  }
-
-  .progress-value {
-    @apply leading-none;
-  }
-
-  .progress-label-center {
-    @apply leading-tight px-2;
-  }
-
-  .progress-bubble {
-    @apply transition-all duration-[var(--duration-fast)];
-  }
-
-  @keyframes progress-rotate {
-    from {
-      transform: rotate(-90deg);
-    }
-    to {
-      transform: rotate(270deg);
-    }
-  }
-</style>

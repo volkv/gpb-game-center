@@ -115,20 +115,20 @@
 </script>
 
 {#if isOpen}
-  <div 
-    class="modal-overlay quest-log-overlay {className}" 
+  <div
+    class="fincity-quest-log-overlay {className}"
     onclick={closeModal}
     onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeModal(); } }}
     role="dialog"
     aria-modal="true"
     tabindex="-1"
   >
-    <div class="modal-shell quest-log" onclick={(e) => e.stopPropagation()} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); } }} role="dialog" aria-label="Журнал квестов" tabindex="0">
-      <header class="modal-header quest-header">
-        <div class="modal-header-content header-content">
-          <div class="title-section">
+    <div class="fincity-quest-log" onclick={(e) => e.stopPropagation()} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); } }} role="dialog" aria-label="Журнал квестов" tabindex="0">
+      <header class="fincity-quest-header">
+        <div class="fincity-header-content">
+          <div class="fincity-title-section">
             <Icon name="quest" color="var(--color-crystal-purple)" size="lg" />
-            <h2 class="modal-title quest-title">Журнал квестов</h2>
+            <h2 class="fincity-quest-title">Журнал квестов</h2>
           </div>
 
           <Button variant="ghost" size="sm" onclick={closeModal} class="modal-close-button close-btn">
@@ -136,7 +136,7 @@
           </Button>
         </div>
 
-        <div class="modal-tabs quest-tabs">
+        <div class="fincity-quest-tabs">
           <button
             class="modal-tab-button tab-button {selectedTab === 'active' ? 'active' : ''}"
             onclick={() => selectedTab = 'active'}
@@ -173,9 +173,9 @@
         </div>
       </header>
 
-      <div class="quest-content">
+      <div class="fincity-quest-content">
         {#if questsByTab.length === 0}
-          <div class="no-quests">
+          <div class="fincity-no-quests">
             <Icon name="quest" size="lg" color="var(--color-gray-400)" />
             <h3>Квестов нет</h3>
             <p class="text-gray-500">
@@ -189,16 +189,16 @@
             </p>
           </div>
         {:else}
-          <div class="quest-list">
+          <div class="fincity-quest-list">
             {#each questsByTab() as questTyped (questTyped.id)}
               {@const progress = getQuestProgress(questTyped)}
               {@const isCompleted = questTyped.status === QuestStatus.COMPLETED}
               {@const isLocked = questTyped.status === QuestStatus.LOCKED}
               {@const canStart = questTyped.status === QuestStatus.AVAILABLE}
 
-              <Card class="quest-card {isCompleted ? 'completed' : isLocked ? 'locked' : 'available'}">
-                <div class="quest-card-header">
-                  <div class="quest-icon">
+              <Card class="fincity-quest-card {isCompleted ? 'completed' : isLocked ? 'locked' : 'available'}">
+                <div class="fincity-quest-card-header">
+                  <div class="fincity-quest-icon">
                     <Icon
                       name={getQuestTypeIcon(questTyped.type)}
                       color={getQuestTypeColor(questTyped.type)}
@@ -206,39 +206,39 @@
                     />
                   </div>
 
-                  <div class="quest-info">
-                    <div class="quest-meta">
-                      <h3 class="quest-title-card">{questTyped.title}</h3>
-                      <div class="quest-badges">
+                  <div class="fincity-quest-info">
+                    <div class="fincity-quest-meta">
+                      <h3 class="fincity-quest-title-card">{questTyped.title}</h3>
+                      <div class="fincity-quest-badges">
                         {#if questTyped.isMainQuest}
-                          <span class="quest-badge main">Основной</span>
+                          <span class="fincity-quest-badge main">Основной</span>
                         {/if}
-                        <span class="quest-badge type">{questTyped.type}</span>
+                        <span class="fincity-quest-badge type">{questTyped.type}</span>
                       </div>
                     </div>
 
-                    <p class="quest-description">{questTyped.description}</p>
+                    <p class="fincity-quest-description">{questTyped.description}</p>
                   </div>
 
-                  <div class="quest-status">
+                  <div class="fincity-quest-status">
                     {#if isCompleted}
-                      <div class="status-indicator completed">
+                      <div class="fincity-status-indicator completed">
                         <Icon name="check" color="white" size="sm" />
                       </div>
                     {:else if isLocked}
-                      <div class="status-indicator locked">
+                      <div class="fincity-status-indicator locked">
                         <Icon name="shield" color="var(--color-gray-400)" size="sm" />
                       </div>
                     {:else}
-                      <div class="status-indicator active">
+                      <div class="fincity-status-indicator active">
                         <Icon name="quest" color="white" size="sm" />
                       </div>
                     {/if}
                   </div>
                 </div>
 
-                <div class="quest-requirements">
-                  <div class="requirement-text">
+                <div class="fincity-quest-requirements">
+                  <div class="fincity-requirement-text">
                     <Icon name="building" size="sm" color="var(--color-gray-500)" />
                     <span>{getRequirementText(questTyped)}</span>
                   </div>
@@ -248,15 +248,15 @@
                       value={progress}
                       color={progress === 100 ? 'mint' : 'violet'}
                       showPercentage={true}
-                      class="quest-progress"
+                      class="fincity-quest-progress"
                     />
                   {/if}
                 </div>
 
-                <div class="quest-rewards">
-                  <div class="rewards-section">
+                <div class="fincity-quest-rewards">
+                  <div class="fincity-rewards-section">
                     <Icon name="star" size="sm" color="var(--color-coin-gold)" />
-                    <span class="rewards-text">{formatRewards(questTyped.rewards)}</span>
+                    <span class="fincity-rewards-text">{formatRewards(questTyped.rewards)}</span>
                   </div>
 
                   {#if canStart}
@@ -286,175 +286,3 @@
   </div>
 {/if}
 
-
-<style>
-  /* svelte-ignore css-unused-selector */
-  .quest-header { @apply flex-shrink-0; }
-
-  .title-section {
-    @apply flex items-center gap: 0.75rem;
-  }
-
-  .quest-tabs { @apply overflow-x-auto; }
-
-  .quest-content {
-    @apply flex-1 overflow-y-auto p-md;
-  }
-
-  .no-quests {
-    @apply flex flex-col items-center justify-center py-16;
-    @apply text-center;
-  }
-
-  .no-quests h3 {
-    @apply text-lg font-semibold text-gray-900;
-  }
-
-  .no-quests p {
-    @apply mt-4;
-  }
-
-  .quest-list {
-    @apply space-y-4;
-  }
-
-  :global(.quest-card) {
-    @apply transition-colors duration-200;
-  }
-
-  :global(.quest-card.completed) {
-    @apply bg-melissa/5 border-melissa/30;
-  }
-
-  :global(.quest-card.locked) { @apply opacity-60 bg-gray-50; }
-
-  :global(.quest-card.available) {
-    @apply hover:border-crystal-purple-30;
-  }
-
-  .quest-card-header {
-    @apply flex items-start gap-sm mb-sm;
-  }
-
-  .quest-icon {
-    @apply flex-shrink-0;
-  }
-
-  .quest-info {
-    @apply flex-1 min-w-0;
-  }
-
-  .quest-meta {
-    @apply flex items-start justify-between mb-2;
-  }
-
-  .quest-title-card { @apply font-semibold text-gray-900 truncate mr-4; }
-
-  .quest-badges {
-    @apply flex gap-2 flex-shrink-0;
-  }
-
-  .quest-badge {
-    @apply px-2 py-1 text-xs font-medium rounded;
-  }
-
-  .quest-badge.main {
-    @apply bg-coin-gold-20 text-coin-gold;
-  }
-
-  .quest-badge.type { @apply bg-gray-100 text-gray-600; }
-
-  .quest-description { @apply text-sm text-gray-600 line-clamp-2; }
-
-  .quest-status {
-    @apply flex-shrink-0;
-  }
-
-  .status-indicator {
-    @apply w-8 h-8 rounded-full flex items-center justify-center;
-  }
-
-  .status-indicator.completed {
-    @apply bg-success-green;
-  }
-
-  .status-indicator.locked { @apply bg-gray-300; }
-
-  .status-indicator.active {
-    @apply bg-crystal-purple;
-  }
-
-  :global(.quest-requirements) {
-    @apply gap: 0.5rem mb-sm;
-  }
-
-  :global(.requirement-text) { @apply flex items-center gap-sm text-sm text-gray-600; }
-
-  :global(.quest-progress) {
-    @apply w-full;
-  }
-
-  .quest-rewards {
-    @apply flex items-center justify-between;
-  }
-
-  :global(.rewards-section) {
-    @apply flex items-center gap-sm;
-  }
-
-  :global(.rewards-text) { @apply text-sm font-medium text-gray-700; }
-
-  @media (max-width: 500px) {
-    .quest-log {
-      @apply max-h-screen;
-    }
-
-    .header-content {
-      @apply p-sm;
-    }
-
-    .quest-content {
-      @apply p-sm;
-    }
-
-    .quest-tabs {
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-    
-    .quest-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tab-button {
-      @apply px-3 py-3 text-xs;
-      min-width: max-content;
-    }
-
-    .tab-button span {
-      @apply truncate;
-    }
-
-    .quest-card-header {
-      @apply gap-sm;
-    }
-
-    .quest-meta {
-      @apply flex-col items-start gap: 0.5rem;
-    }
-
-    .quest-badges {
-      @apply self-start;
-    }
-  }
-
-  @media (max-width: 400px) {
-    .tab-button {
-      @apply px-2 py-3;
-    }
-
-    .tab-button span {
-      @apply hidden;
-    }
-  }
-</style>

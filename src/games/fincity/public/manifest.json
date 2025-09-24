@@ -1,0 +1,15 @@
+{
+  "textures": {
+    "building-central-bank": "/games/fincity/public/assets/buildings/B1.png",
+    "building-commercial": "/games/fincity/public/assets/buildings/B2.png"
+  },
+  "sprites": {
+    "ui-icons": "/games/fincity/public/assets/icons"
+  },
+  "atlases": {
+    "terrain-grass": {
+      "image": "/games/fincity/public/assets/terrain/grass.png",
+      "data": "/games/fincity/public/assets/terrain/grass.json"
+    }
+  }
+}

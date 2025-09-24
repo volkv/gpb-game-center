@@ -486,6 +486,1175 @@
   }
 }
 
+/* UI компоненты игры - TopBar */
+.fincity-game .fincity-top-bar {
+  background: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.fincity-game .fincity-top-bar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: var(--spacing-md);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.fincity-game .fincity-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fincity-game .fincity-user-greeting-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.fincity-game .fincity-user-greeting {
+  font-size: 1.125rem;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fincity-game .fincity-level-info {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.fincity-game .fincity-level-text {
+  font-weight: 500;
+}
+
+.fincity-game .fincity-resources-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-xs);
+}
+
+.fincity-game .fincity-resource-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: #f9fafb;
+  border-radius: var(--radius);
+  padding: var(--spacing-sm);
+  min-height: 40px;
+}
+
+.fincity-game .fincity-resource-value {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+}
+
+.fincity-game .fincity-settings-section {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Settings Modal */
+.fincity-game .fincity-settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.fincity-game .fincity-settings-panel {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modalSlideUp var(--duration-normal) ease-out;
+}
+
+.fincity-game .fincity-settings-header {
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.fincity-game .fincity-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md);
+}
+
+.fincity-game .fincity-title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-settings-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.fincity-game .fincity-settings-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.fincity-game .fincity-settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.fincity-game .fincity-settings-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.fincity-game .fincity-setting-item:last-child {
+  border-bottom: none;
+}
+
+.fincity-game .fincity-setting-info {
+  flex: 1;
+}
+
+.fincity-game .fincity-setting-label {
+  display: block;
+  font-weight: 500;
+  color: #111827;
+}
+
+.fincity-game .fincity-setting-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.fincity-game .fincity-setting-control {
+  flex-shrink: 0;
+}
+
+.fincity-game .fincity-setting-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-gpb-blue);
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+}
+
+.fincity-game .fincity-setting-checkbox:focus {
+  outline: 2px solid var(--color-gpb-blue);
+  outline-offset: 2px;
+}
+
+.fincity-game .fincity-setting-select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: var(--radius);
+  background: white;
+  color: #111827;
+}
+
+.fincity-game .fincity-setting-select:focus {
+  outline: 2px solid var(--color-gpb-blue);
+  outline-offset: 2px;
+  border-color: var(--color-gpb-blue);
+}
+
+.fincity-game .fincity-data-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.fincity-game .fincity-action-item:last-child {
+  border-bottom: none;
+}
+
+.fincity-game .fincity-action-item.danger {
+  border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.fincity-game .fincity-action-info {
+  flex: 1;
+}
+
+.fincity-game .fincity-action-title {
+  font-weight: 500;
+  color: #111827;
+}
+
+.fincity-game .fincity-action-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.fincity-game .fincity-action-item.danger .fincity-action-title {
+  color: #dc2626;
+}
+
+.fincity-game .fincity-app-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  font-size: 0.875rem;
+}
+
+.fincity-game .fincity-info-label {
+  color: #6b7280;
+}
+
+.fincity-game .fincity-info-value {
+  font-weight: 500;
+  color: #111827;
+}
+
+.fincity-game .fincity-settings-footer {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: var(--spacing-md);
+}
+
+.fincity-game .fincity-footer-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* Toast Component */
+.fincity-game .fincity-toast-container {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  max-width: 384px;
+  width: 100%;
+  pointer-events: auto;
+}
+
+.fincity-game .fincity-toast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-toast-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-toast-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.fincity-game .fincity-toast-title {
+  line-height: 1.25;
+}
+
+.fincity-game .fincity-toast-message {
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.fincity-game .fincity-toast-close {
+  flex-shrink: 0;
+  padding: 0.25rem;
+  border-radius: var(--radius);
+  transition: all var(--duration-fast);
+  opacity: 0.7;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.fincity-game .fincity-toast-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+  opacity: 1;
+}
+
+.fincity-game .fincity-toast-progress {
+  position: relative;
+  height: 0.25rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.fincity-game .fincity-toast-progress-bar {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 9999px;
+  transition: all linear;
+  width: 100%;
+}
+
+/* QuestLog Modal */
+.fincity-game .fincity-quest-log-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.fincity-game .fincity-quest-log {
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modalSlideUp var(--duration-normal) ease-out;
+}
+
+.fincity-game .fincity-quest-header {
+  flex-shrink: 0;
+}
+
+.fincity-game .fincity-quest-tabs {
+  overflow-x: auto;
+}
+
+.fincity-game .fincity-quest-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+}
+
+.fincity-game .fincity-no-quests {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.fincity-game .fincity-no-quests h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.fincity-game .fincity-no-quests p {
+  margin-top: 1rem;
+}
+
+.fincity-game .fincity-quest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-quest-card {
+  transition: colors 200ms;
+}
+
+.fincity-game .fincity-quest-card.completed {
+  background: rgba(60, 255, 185, 0.05);
+  border: 1px solid rgba(60, 255, 185, 0.3);
+}
+
+.fincity-game .fincity-quest-card.locked {
+  opacity: 0.6;
+  background: #f9fafb;
+}
+
+.fincity-game .fincity-quest-card.available:hover {
+  border: 1px solid rgba(221, 65, 219, 0.3);
+}
+
+.fincity-game .fincity-quest-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.fincity-game .fincity-quest-icon {
+  flex-shrink: 0;
+}
+
+.fincity-game .fincity-quest-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fincity-game .fincity-quest-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.fincity-game .fincity-quest-title-card {
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 1rem;
+}
+
+.fincity-game .fincity-quest-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.fincity-game .fincity-quest-badge {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.25rem;
+}
+
+.fincity-game .fincity-quest-badge.main {
+  background: rgba(60, 255, 185, 0.2);
+  color: var(--color-coin-gold);
+}
+
+.fincity-game .fincity-quest-badge.type {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.fincity-game .fincity-quest-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.fincity-game .fincity-quest-status {
+  flex-shrink: 0;
+}
+
+.fincity-game .fincity-status-indicator {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fincity-game .fincity-status-indicator.completed {
+  background: var(--color-success-green);
+}
+
+.fincity-game .fincity-status-indicator.locked {
+  background: #d1d5db;
+}
+
+.fincity-game .fincity-status-indicator.active {
+  background: var(--color-crystal-purple);
+}
+
+.fincity-game .fincity-quest-requirements {
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.fincity-game .fincity-requirement-text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.fincity-game .fincity-quest-progress {
+  width: 100%;
+}
+
+.fincity-game .fincity-quest-rewards {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fincity-game .fincity-rewards-section {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.fincity-game .fincity-rewards-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* ProgressBar Component */
+.fincity-game .fincity-progress-container {
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.fincity-game .fincity-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fincity-game .fincity-progress-header-minimal {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fincity-game .fincity-progress-label {
+  color: #000000;
+}
+
+.fincity-game .fincity-progress-percentage {
+  color: var(--color-henbane);
+}
+
+.fincity-game .fincity-progress-track {
+  width: 100%;
+  background: rgba(222, 225, 238, 0.5);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(141, 152, 164, 0.2);
+}
+
+.fincity-game .fincity-progress-fill {
+  height: 100%;
+  transition: all 500ms ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.fincity-game .fincity-progress-animated {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.fincity-game .fincity-progress-shimmer {
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* ActionButtons Component */
+.fincity-game .fincity-action-buttons {
+  position: fixed;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 1.5rem;
+  max-width: var(--grid-container-max-width);
+  width: 100%;
+  gap: var(--spacing-sm);
+}
+
+.fincity-game .fincity-buttons-container {
+  display: flex;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-radius: 9999px;
+  padding: var(--spacing-md);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.fincity-game .fincity-build-button {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  transform: translateY(0);
+  transition: all 300ms;
+}
+
+.fincity-game .fincity-build-button:hover {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-0.25rem);
+}
+
+.fincity-game .fincity-build-button:active {
+  transform: translateY(0);
+}
+
+.fincity-game .fincity-quest-button,
+.fincity-game .fincity-achievements-button {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  transform: translateY(0);
+  transition: all 300ms;
+}
+
+.fincity-game .fincity-quest-button:hover,
+.fincity-game .fincity-achievements-button:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-0.25rem);
+}
+
+.fincity-game .fincity-quest-button:active,
+.fincity-game .fincity-achievements-button:active {
+  transform: translateY(0);
+}
+
+.fincity-game .fincity-button-text {
+  font-weight: 600;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.fincity-game .fincity-build-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 130, 190, 0.1);
+  border: 1px solid rgba(255, 130, 190, 0.2);
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  color: var(--color-warning-orange);
+  backdrop-filter: blur(4px);
+}
+
+.fincity-game .fincity-nav-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  min-width: 64px;
+  min-height: 40px;
+}
+
+/* BuildingInfo Component */
+.fincity-game .fincity-product-showcase-header {
+  padding: var(--spacing-md);
+  background: var(--color-lily);
+  border-bottom: 1px solid rgba(141, 152, 164, 0.2);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: center;
+  text-align: center;
+}
+
+.fincity-game .fincity-product-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-product-image {
+  width: 6rem;
+  height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(141, 152, 164, 0.1);
+}
+
+.fincity-game .fincity-product-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-product-title {
+  color: #000000;
+  margin-bottom: 0.5rem;
+}
+
+.fincity-game .fincity-product-subtitle {
+  color: var(--color-henbane);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.fincity-game .fincity-product-showcase-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  gap: 1rem;
+  background: rgba(222, 225, 238, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fincity-game .fincity-description-module,
+.fincity-game .fincity-benefits-module,
+.fincity-game .fincity-conditions-module {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-module-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #000000;
+  margin-bottom: 1rem;
+}
+
+.fincity-game .fincity-description {
+  color: var(--color-henbane);
+  line-height: 1.5;
+  background: white;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  border: 1px solid rgba(141, 152, 164, 0.1);
+}
+
+.fincity-game .fincity-benefits-grid,
+.fincity-game .fincity-conditions-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
+}
+
+.fincity-game .fincity-note-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+.fincity-game .fincity-note-title {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.fincity-game .fincity-note-description {
+  display: block;
+  opacity: 0.9;
+}
+
+.fincity-game .fincity-product-showcase-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: var(--spacing-md);
+  background: var(--color-lily);
+  border-top: 1px solid rgba(141, 152, 164, 0.2);
+}
+
+/* BuildingUpgrade Component */
+.fincity-game .fincity-building-upgrade-modal {
+  max-width: 32rem;
+  max-height: 90vh;
+}
+
+.fincity-game .fincity-upgrade-header {
+  padding: var(--spacing-md);
+  background: var(--color-lily);
+  border-bottom: 1px solid rgba(25, 25, 239, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-upgrade-showcase-header {
+  padding: var(--spacing-md);
+  background: var(--color-lily);
+  border-bottom: 1px solid rgba(141, 152, 164, 0.2);
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: center;
+  text-align: center;
+}
+
+.fincity-game .fincity-upgrade-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-upgrade-image {
+  width: 6rem;
+  height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(141, 152, 164, 0.1);
+}
+
+.fincity-game .fincity-upgrade-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-upgrade-title {
+  color: #000000;
+  margin-bottom: 0.5rem;
+}
+
+.fincity-game .fincity-upgrade-subtitle {
+  color: var(--color-henbane);
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.fincity-game .fincity-upgrade-showcase-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+  gap: 1rem;
+  background: rgba(222, 225, 238, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.fincity-game .fincity-building-level {
+  display: flex;
+  justify-content: center;
+}
+
+.fincity-game .fincity-current-stats,
+.fincity-game .fincity-upgrade-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-max-level-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.fincity-game .fincity-stats-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #000000;
+}
+
+.fincity-game .fincity-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.fincity-game .fincity-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: var(--spacing-md);
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid rgba(141, 152, 164, 0.1);
+}
+
+.fincity-game .fincity-stat-value {
+  font-family: var(--font-heading);
+  color: #000000;
+}
+
+.fincity-game .fincity-stat-label {
+  font-size: 0.75rem;
+  color: var(--color-henbane);
+}
+
+.fincity-game .fincity-upgrade-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fincity-game .fincity-upgrade-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-cost-section,
+.fincity-game .fincity-benefits-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-cost-title,
+.fincity-game .fincity-benefits-title {
+  color: #000000;
+}
+
+.fincity-game .fincity-cost-grid,
+.fincity-game .fincity-benefits-grid {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.fincity-game .fincity-insufficient-funds {
+  opacity: 0.6;
+  background: rgba(255, 130, 190, 0.1);
+  border: 1px solid rgba(255, 130, 190, 0.2);
+}
+
+.fincity-game .fincity-max-level-bubble {
+  padding: 1.5rem;
+}
+
+.fincity-game .fincity-max-level-content {
+  gap: 0.5rem;
+}
+
+.fincity-game .fincity-reason-disabled {
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-sm);
+  text-align: center;
+  background: var(--color-lily);
+}
+
+.fincity-game .fincity-upgrade-showcase-footer {
+  display: flex;
+  gap: 1rem;
+  padding: var(--spacing-md);
+  background: var(--color-lily);
+  border-top: 1px solid rgba(25, 25, 239, 0.2);
+}
+
+/* Achievement Component */
+.fincity-game .fincity-achievement-showcase-modal {
+  max-width: 1200px;
+  max-height: 90vh;
+}
+
+.fincity-game .fincity-achievement-title-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-achievement-title-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.fincity-game .fincity-achievement-tabs {
+  display: flex;
+  padding: 1rem;
+  overflow-x: auto;
+  gap: 0.5rem;
+}
+
+.fincity-game .fincity-achievement-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.fincity-game .fincity-tab-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: colors 150ms;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: white;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: max-content;
+  cursor: pointer;
+}
+
+.fincity-game .fincity-tab-button.fincity-active {
+  background: #7c3aed;
+  color: white;
+  border-color: #7c3aed;
+}
+
+.fincity-game .fincity-tab-button:hover:not(.fincity-active) {
+  background: #f9fafb;
+}
+
+.fincity-game .fincity-tab-button span {
+  white-space: nowrap;
+}
+
+.fincity-game .fincity-achievements-content {
+  padding: 1rem;
+}
+
+.fincity-game .fincity-achievements-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fincity-game .fincity-achievement-card {
+  transition: border-color 0.2s ease;
+}
+
+.fincity-game .fincity-achievement-card:hover {
+  border-color: #7c3aed;
+}
+
+.fincity-game .fincity-achievement-padding {
+  padding: 1rem;
+}
+
+.fincity-game .fincity-achievement-content-flex {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-achievement-icon {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fincity-game .fincity-achievement-icon.fincity-unlocked-ring {
+  box-shadow: 0 0 0 2px #7c3aed;
+}
+
+.fincity-game .fincity-achievement-rewards {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.fincity-game .fincity-achievement-unlock-notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border: 2px solid #7c3aed;
+  padding: 1rem;
+  max-width: 384px;
+}
+
+.fincity-game .fincity-achievement-unlock-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fincity-game .fincity-achievement-unlock-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: #7c3aed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #7c3aed;
+}
+
+.fincity-game .fincity-achievement-unlock-details {
+  flex: 1;
+}
+
 /* Стили для тултипов обучения */
 .fincity-game .tutorial-tooltip {
   max-height: 80vh;

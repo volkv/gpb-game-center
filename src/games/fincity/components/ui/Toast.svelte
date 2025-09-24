@@ -110,7 +110,7 @@
 
 {#if showToast}
   <div
-    class="toast-container"
+    class="fincity-toast-container"
     role="alert"
     aria-live="polite"
     onmouseenter={clearTimer}
@@ -122,23 +122,23 @@
       size="lg"
       class="shadow-2xl backdrop-blur-sm"
     >
-      <div class="toast-content">
-        <div class="toast-header">
+      <div class="fincity-toast-content">
+        <div class="fincity-toast-header">
           <Icon name={config.icon} size="sm" />
 
-          <div class="toast-text">
+          <div class="fincity-toast-text">
             {#if title}
-              <h4 class="toast-title text-body font-heading">
+              <h4 class="fincity-toast-title text-body font-heading">
                 {title}
               </h4>
             {/if}
 
             {#if message}
-              <p class="toast-message text-body-sm">
+              <p class="fincity-toast-message text-body-sm">
                 {message}
               </p>
             {:else if children}
-              <div class="toast-message text-body-sm">
+              <div class="fincity-toast-message text-body-sm">
                 {@render children()}
               </div>
             {/if}
@@ -147,7 +147,7 @@
           {#if dismissible}
             <button
               type="button"
-              class="toast-close"
+              class="fincity-toast-close"
               onclick={handleClose}
               aria-label="Закрыть уведомление"
             >
@@ -157,9 +157,9 @@
         </div>
 
         {#if duration > 0}
-          <div class="toast-progress">
+          <div class="fincity-toast-progress">
             <div
-              class="toast-progress-bar"
+              class="fincity-toast-progress-bar"
               style="animation: toastProgress {duration}ms linear;"
             ></div>
           </div>
@@ -169,101 +169,3 @@
   </div>
 {/if}
 
-<style>
-
-  .toast-container {
-    @apply fixed top: 1rem right-4 z-50 max-w-sm w-full;
-    @apply pointer-events-auto;
-  }
-
-  .toast-content {
-    @apply space-y-3;
-  }
-
-  .toast-header {
-    @apply flex items-start gap: 0.75rem;
-  }
-
-  .toast-text {
-    @apply flex-1 space-y-1;
-  }
-
-  .toast-title {
-    @apply leading-tight;
-  }
-
-  .toast-message {
-    @apply opacity-90 leading-relaxed;
-  }
-
-  .toast-close {
-    @apply flex-shrink-0 p-1 rounded-[var(--radius)] transition-all duration-[var(--duration-fast)];
-    @apply hover:bg-black/10;
-    @apply opacity-70 hover:opacity-100;
-  }
-
-  .toast-progress {
-    @apply relative h-1 bg-black/10 rounded-full overflow-hidden;
-  }
-
-  .toast-progress-bar {
-    @apply h-full bg-black/30 rounded-full;
-    @apply transition-all ease-linear;
-    width: 100%;
-  }
-
-  @keyframes toastProgress {
-    from {
-      width: 100%;
-    }
-    to {
-      width: 0%;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .toast-container {
-      @apply top-2 right-2 left-2 max-w-none;
-    }
-
-    .toast-header {
-      @apply gap-2;
-    }
-  }
-
-  @media (max-width: 400px) {
-    .toast-container {
-      @apply top-1 right-1 left-1;
-    }
-
-    .toast-content {
-      @apply gap: 0.5rem;
-    }
-
-    .toast-header {
-      @apply gap-xs;
-    }
-
-    .toast-title {
-      @apply text-body-sm;
-    }
-
-    .toast-message {
-      @apply text-body-xs;
-    }
-  }
-
-  @media (max-width: 320px) {
-    .toast-container {
-      @apply top-xs right-xs left-xs;
-    }
-
-    .toast-content {
-      @apply space-y-xs;
-    }
-
-    .toast-header {
-      @apply gap-xs;
-    }
-  }
-</style>
