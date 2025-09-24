@@ -1,20 +1,38 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import GameCanvas from './components/ui/GameCanvas.svelte';
 	import ActionButtons from './components/ui/ActionButtons.svelte';
 	import BuildMenu from './components/ui/BuildMenu.svelte';
+	import BuildingUpgrade from './components/ui/BuildingUpgrade.svelte';
+	import BuildingInfo from './components/ui/BuildingInfo.svelte';
 	import QuestLog from './components/ui/QuestLog.svelte';
 	import Achievement from './components/ui/Achievement.svelte';
 	import Settings from './components/ui/Settings.svelte';
 	import Toast from './components/ui/Toast.svelte';
+	import ResourcesBar from './components/ui/ResourcesBar.svelte';
+	import { gameStatusStore } from '$lib/stores/gameStatusStore';
 	import { modal } from './stores/ui';
 	import type { GameEngine } from './components/game/GameEngine';
 
-	const dispatch = createEventDispatcher<{
-		exit: void;
-	}>();
+	interface Props {
+		onexit?: () => void;
+	}
 
-	let gameEngine: GameEngine | null = null;
+	let { onexit }: Props = $props();
+
+	let gameEngine = $state<GameEngine | null>(null);
+
+	onMount(() => {
+		gameStatusStore.show({
+			gameName: 'FinCity',
+			showScore: false,
+			showBackButton: true
+		});
+	});
+
+	onDestroy(() => {
+		gameStatusStore.hide();
+	});
 
 	function handleGameReady(engine: GameEngine) {
 		gameEngine = engine;
@@ -22,17 +40,30 @@
 	}
 
 	function handleExit() {
-		dispatch('exit');
+		gameStatusStore.hide();
+		onexit?.();
 	}
 </script>
 
 <div class="app">
-	<GameCanvas onGameReady={handleGameReady} />
+	<ResourcesBar />
+
+	<div class="game-content">
+		<GameCanvas onGameReady={handleGameReady} />
+	</div>
 
 	<ActionButtons class="game-action-buttons" />
 
 	{#if $modal.isOpen && $modal.type === 'build_menu'}
 		<BuildMenu {gameEngine} />
+	{/if}
+
+	{#if $modal.isOpen && $modal.type === 'building_upgrade'}
+		<BuildingUpgrade />
+	{/if}
+
+	{#if $modal.isOpen && $modal.type === 'building_info'}
+		<BuildingInfo />
 	{/if}
 
 	{#if $modal.isOpen && $modal.type === 'quest_log'}
@@ -61,12 +92,22 @@
 		flex-direction: column;
 	}
 
-	:global(.game-action-buttons) {
+	.game-content {
 		position: absolute;
+		top: 64px; /* Space for StatusBar + ResourcesBar */
+		left: 0;
+		right: 0;
+		bottom: 0;
+		width: 100%;
+		height: calc(100vh - 64px);
+	}
+
+	:global(.game-action-buttons) {
+		position: fixed;
 		bottom: 1rem;
 		left: 50%;
 		transform: translateX(-50%);
-		z-index: 10;
+		z-index: 100;
 		width: auto;
 		max-width: calc(100% - 2rem);
 	}

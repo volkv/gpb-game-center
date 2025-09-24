@@ -1,21 +1,42 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import { scale } from 'svelte/transition';
 	import { spring } from 'svelte/motion';
+	import { createEventDispatcher } from 'svelte';
 	import { LazyImage } from '$lib';
 	import type { Game } from '$lib/types/Game.js';
 	import { GAME_STATUS } from '$lib/utils/constants.js';
+	import { Shield, Gem, BookOpen, GraduationCap, Building, ChevronRight, Star } from 'lucide-svelte';
 
-	export let game: Game;
-	export let animationDelay: number = 0;
+	interface Props {
+		game: Game;
+		animationDelay?: number;
+		onclick?: () => void;
+		onhover?: () => void;
+	}
 
-	const dispatch = createEventDispatcher<{
-		click: { game: Game };
-		hover: { game: Game };
-	}>();
+	let { game, animationDelay = 0, onclick, onhover }: Props = $props();
 
-	$: isActive = game.status === GAME_STATUS.ACTIVE;
-	$: isComingSoon = game.status === GAME_STATUS.COMING_SOON;
+	const dispatch = createEventDispatcher<{ click: { game: Game }; hover: { game: Game } }>();
+
+	let isActive = $derived(game.status === GAME_STATUS.ACTIVE);
+	let isComingSoon = $derived(game.status === GAME_STATUS.COMING_SOON);
+
+	function getGameIcon(category: string) {
+		switch (category) {
+			case 'quiz':
+				return Shield;
+			case 'match3':
+				return Gem;
+			case 'crossword':
+				return BookOpen;
+			case 'educational':
+				return GraduationCap;
+			default:
+				return Building;
+		}
+	}
+
+	let GameIconComponent = $derived(getGameIcon(game.category));
 
 	const springScale = spring(1, {
 		stiffness: 0.3,
@@ -33,7 +54,7 @@
 				springScale.set(1);
 				isPressed = false;
 			}, 150);
-			dispatch('click', { game });
+			onclick?.();
 		}
 	}
 
@@ -41,7 +62,7 @@
 		if (isActive) {
 			isHovered = true;
 			springScale.set(1.02);
-			dispatch('hover', { game });
+			onhover?.();
 		}
 	}
 
@@ -56,253 +77,124 @@
 </script>
 
 <div
-	class="game-icon"
-	class:game-icon-inactive={!isActive}
-	style="--animation-delay: {animationDelay}ms; transform: scale({$springScale})"
+	class="game-card {game.gradient?.includes('mint') ? 'gradient-electric' : game.gradient?.includes('raspberry') ? 'gradient-power' : 'gradient-wealth'}"
+	class:text-white={true}
+	class:game-card-locked={!isActive}
+	class:stagger-item={true}
+	style="--animation-delay: {animationDelay}ms; transform: scale({$springScale}); {game.gradient ? `background: ${game.gradient};` : ''}"
 	role="button"
 	tabindex={isActive ? 0 : -1}
 	aria-label={`${game.name}: ${game.shortDescription}${isComingSoon ? ' - скоро' : ''}`}
-	on:click={handleClick}
-	on:keydown={(e) => e.key === 'Enter' && handleClick()}
-	on:mouseenter={handleMouseEnter}
-	on:mouseleave={handleMouseLeave}
+	onclick={handleClick}
+	onkeydown={(e) => e.key === 'Enter' && handleClick()}
+	onmouseenter={handleMouseEnter}
+	onmouseleave={handleMouseLeave}
 >
-	<div class="game-icon-background" style="background: {game.gradient}">
-		{#if game.image}
-			<div class="game-icon-image-overlay">
-				<LazyImage
-					src={game.image.src}
-					alt={game.image.alt}
-					class="game-background-image"
-					loading="lazy"
-				/>
-			</div>
-		{/if}
+	<!-- Particles background -->
+	<div class="particles-container">
+		<div class="particle" style="left: 20%; top: 15%; animation-delay: 0s;"></div>
+		<div class="particle" style="left: 80%; top: 25%; animation-delay: 1s;"></div>
+		<div class="particle" style="left: 30%; top: 75%; animation-delay: 0.5s;"></div>
+	</div>
 
-		<div class="game-icon-content">
-			<div class="game-icon-symbol" style="color: {game.themeColor}">
-				<svg
-					class="icon"
-					width="40"
-					height="40"
-					viewBox="0 0 40 40"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					{#if game.category === 'quiz'}
-						<g>
-							<path
-								d="M20 4L25 16H35L27.5 23L30 35L20 28L10 35L12.5 23L5 16H15L20 4Z"
-								fill="currentColor"
-								fill-opacity="0.9"
-							/>
-							<circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" stroke-width="2" opacity="0.6" />
-							<path d="M16 18L19 21L24 16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.8" />
-						</g>
-					{:else if game.category === 'match3'}
-						<g>
-							<circle cx="14" cy="14" r="5" fill="currentColor" fill-opacity="0.8" />
-							<circle cx="26" cy="14" r="5" fill="currentColor" fill-opacity="0.9" />
-							<circle cx="20" cy="26" r="5" fill="currentColor" fill-opacity="0.7" />
-							<path d="M14 14L26 14L20 26Z" stroke="currentColor" stroke-width="2" opacity="0.5" />
-							<circle cx="20" cy="8" r="2" fill="currentColor" fill-opacity="0.6" />
-							<circle cx="32" cy="20" r="2" fill="currentColor" fill-opacity="0.6" />
-							<circle cx="8" cy="20" r="2" fill="currentColor" fill-opacity="0.6" />
-						</g>
-					{:else if game.category === 'crossword'}
-						<g>
-							<rect x="8" y="8" width="24" height="24" rx="2" fill="none" stroke="currentColor" stroke-width="2.5" />
-							<line x1="13" y1="13" x2="27" y2="13" stroke="currentColor" stroke-width="2" />
-							<line x1="13" y1="18" x2="22" y2="18" stroke="currentColor" stroke-width="2" />
-							<line x1="16" y1="23" x2="27" y2="23" stroke="currentColor" stroke-width="2" />
-							<line x1="13" y1="27" x2="20" y2="27" stroke="currentColor" stroke-width="2" />
-							<circle cx="13" cy="13" r="1.5" fill="currentColor" />
-							<circle cx="16" cy="18" r="1.5" fill="currentColor" />
-							<circle cx="20" cy="23" r="1.5" fill="currentColor" />
-						</g>
-					{:else if game.category === 'educational'}
-						<g>
-							<path d="M20 6L30 12V28L20 34L10 28V12L20 6Z" fill="currentColor" fill-opacity="0.8" />
-							<circle cx="20" cy="20" r="6" fill="none" stroke="currentColor" stroke-width="2.5" opacity="0.9" />
-							<path d="M17 20L19 22L23 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-							<circle cx="15" cy="12" r="1.5" fill="currentColor" opacity="0.7" />
-							<circle cx="25" cy="12" r="1.5" fill="currentColor" opacity="0.7" />
-						</g>
-					{:else}
-						<rect x="10" y="10" width="20" height="20" rx="4" fill="currentColor" fill-opacity="0.8" />
-					{/if}
-				</svg>
+	<div class="game-card-content">
+		<div class="game-card-header">
+			<div class="game-card-icon neon-glow">
+				{#if GameIconComponent}
+					{@const IconComponent = GameIconComponent}
+					<IconComponent size={32} class="text-white" />
+				{/if}
 			</div>
-			<div class="game-info">
-				<h3 class="game-title font-heading text-base font-semibold text-white mb-1">
-					{game.name}
-				</h3>
-				<p class="game-subtitle font-body text-sm text-white text-opacity-90">
-					{game.shortDescription}
-				</p>
+			{#if isComingSoon}
+				<div class="badge-locked">
+					Скоро
+				</div>
+			{:else if game.name === 'Щит и Рубль'}
+				<div class="badge-hot">
+					HOT
+				</div>
+			{:else}
+				<div class="badge-new">
+					НОВОЕ
+				</div>
+			{/if}
+		</div>
+
+		<div>
+			<h3 class="font-card-title">{game.name}</h3>
+			<p class="font-card-subtitle mb-3">{game.shortDescription}</p>
+
+			<!-- Progress bar based on completion rate -->
+			<div class="progress-bar mb-3">
+				<div class="progress-fill" style="width: {game.metrics.completionRate * 100}%"></div>
+			</div>
+
+			<div class="game-card-footer">
+				<div class="flex items-center gap-1">
+					<Star size={12} class="fill-current text-gpb-gold" />
+					<span>{game.relatedProducts[0]?.name || 'Банковский продукт'}</span>
+				</div>
+				<ChevronRight size={16} class="opacity-60" />
 			</div>
 		</div>
 	</div>
 
-	{#if isComingSoon}
-		<div class="coming-soon-badge">
-			<span class="badge-text font-body text-xs font-medium">Скоро</span>
-		</div>
-	{/if}
-
-	{#if isActive}
-		<div class="active-indicator"></div>
-	{/if}
+	<!-- Decorative elements -->
+	<div class="decoration-orb bg-white/10 w-16 h-16 -top-2 -right-2"></div>
+	<div class="decoration-orb bg-black/10 w-20 h-20 -bottom-4 -left-4"></div>
+	<div class="decoration-shine"></div>
 </div>
 
 <style>
-	.game-icon {
-		position: relative;
-		display: block;
-		width: 100%;
-		min-height: 120px;
+	/* Custom overrides for game cards that use global classes */
+	.game-card {
+		min-height: 160px;
 		min-width: 44px;
-		animation: slideUpBounce 0.6s ease-out;
-		animation-delay: var(--animation-delay, 0ms);
-		animation-fill-mode: both;
 		cursor: pointer;
+		transition: all 300ms ease-out;
 	}
 
-	.game-icon-background {
-		width: 100%;
-		height: 100%;
-		border-radius: 0.75rem;
-		padding: 1.25rem;
-		position: relative;
-		overflow: hidden;
-		transition: all 0.3s ease;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	.game-card:not(.game-card-locked):hover {
+		transform: translateY(-4px) scale(1.05);
+		filter: drop-shadow(0 0 20px rgba(88, 255, 255, 0.4));
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 	}
 
-	.game-icon-background::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		background: white;
-		opacity: 0;
-		transition: opacity 0.2s ease;
+	.game-card:not(.game-card-locked):active {
+		transform: scale(0.95);
+		transition-duration: 75ms;
 	}
 
-	.game-icon:not(.game-icon-inactive) .game-icon-background:hover {
-		box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.2);
+	.game-card-locked {
+		opacity: 0.6;
+		cursor: not-allowed;
+		filter: grayscale(0.5);
 	}
 
-	.game-icon:not(.game-icon-inactive):hover .game-icon-background::before {
-		opacity: 0.1;
+	.game-card-locked:hover {
+		transform: scale(1);
+		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 	}
 
-	.game-icon:not(.game-icon-inactive):active .game-icon-background {
-		box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.15);
-	}
-
-	.game-icon-content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
-		height: 100%;
-		position: relative;
-		z-index: 2;
-	}
-
-	.game-icon-symbol {
-		margin-bottom: 0.75rem;
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-	}
-
-	.icon {
-		width: 40px;
-		height: 40px;
-	}
-
-	.game-info {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-	}
-
-	.game-title {
-		line-height: 1.2;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-	}
-
-	.game-subtitle {
-		line-height: 1.3;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-	}
-
-	.coming-soon-badge {
-		position: absolute;
-		top: -0.375rem;
-		right: -0.375rem;
-		background: var(--color-gpb-mint);
-		border-radius: 1rem;
-		padding: 0.25rem 0.75rem;
-		z-index: 10;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-	}
-
-	.badge-text {
-		color: var(--color-gpb-black);
-		white-space: nowrap;
-	}
-
-	.active-indicator {
-		position: absolute;
-		bottom: 0.375rem;
-		right: 0.375rem;
-		width: 8px;
-		height: 8px;
-		background: var(--color-gpb-mint);
-		border-radius: 50%;
-		z-index: 10;
-		animation: pulse 2s infinite;
-	}
-
-	.game-icon-inactive {
-		pointer-events: none;
-		cursor: default;
-	}
-
-	.game-icon-inactive .game-icon-background {
-		filter: grayscale(1) opacity(0.6);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-	}
-
-	.game-icon-inactive .game-icon-content {
-		opacity: 0.7;
-	}
-
-	@keyframes slideUpBounce {
-		0% {
-			opacity: 0;
-			transform: translateY(20px) scale(0.95);
-		}
-		60% {
-			opacity: 1;
-			transform: translateY(-4px) scale(1.02);
-		}
-		100% {
-			opacity: 1;
-			transform: translateY(0) scale(1);
+	/* Accessibility */
+	@media (prefers-reduced-motion: reduce) {
+		.game-card,
+		.particles-container .particle,
+		.decoration-orb,
+		.decoration-shine {
+			transition: none;
+			animation: none;
 		}
 	}
 
-	@keyframes pulse {
-		0%,
-		100% {
-			opacity: 1;
-			transform: scale(1);
+	/* High contrast */
+	@media (prefers-contrast: high) {
+		.game-card {
+			border: 2px solid white;
 		}
-		50% {
-			opacity: 0.5;
-			transform: scale(1.2);
+
+		.game-card-locked {
+			border: 2px solid #9CA3AF;
 		}
 	}
 </style>

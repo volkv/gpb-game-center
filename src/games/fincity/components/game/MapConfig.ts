@@ -149,3 +149,5 @@ export class MapConfigManager {
 }
 
 export const defaultMapConfig = new MapConfigManager();
+
+export { MapConfigManager as MapConfig };

@@ -28,7 +28,7 @@
 			<button
 				class="story-item {story.isActive ? 'active' : 'skeleton'}"
 				class:gradient={story.isActive}
-				on:click={() => handleStoryClick(story.id)}
+				onclick={() => handleStoryClick(story.id)}
 				disabled={!story.isActive}
 			>
 				{#if story.isActive}

@@ -23,7 +23,7 @@
 		...restProps
 	}: Props = $props();
 
-	let imageElement = $state<HTMLImageElement | undefined>();
+	let imageElement = $state<HTMLDivElement | undefined>();
 	let isLoaded = $state(false);
 	let hasError = $state(false);
 	let isIntersecting = $state(false);
@@ -68,7 +68,7 @@
 	let shouldLoad = $derived(isIntersecting || loading === 'eager');
 </script>
 
-<div class="lazy-image-container {className}" {width} {height} {...restProps}>
+<div class="lazy-image-container {className}" style="width: {width ? width + 'px' : 'auto'}; height: {height ? height + 'px' : 'auto'};" {...restProps}>
 	{#if placeholder && !isLoaded && !hasError}
 		<div
 			class="image-placeholder"

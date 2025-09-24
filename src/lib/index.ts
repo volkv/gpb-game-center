@@ -7,15 +7,17 @@ export { default as GameCenter } from './components/GameCenter.svelte';
 export { default as GameIcon } from './components/GameIcon.svelte';
 export { default as GameContainer } from './components/GameContainer.svelte';
 export { default as GameBase } from './components/GameBase.svelte';
+export { default as GameLayout } from './components/GameLayout.svelte';
 export { default as LazyImage } from './components/LazyImage.svelte';
 export { default as ErrorBoundary } from './components/ErrorBoundary.svelte';
+export { default as Badge } from './components/Badge.svelte';
+export { default as ProgressBar } from './components/ProgressBar.svelte';
+export { default as Counter } from './components/Counter.svelte';
 
 // Типы
 export type {
   Game,
-  GameStatus,
   GameDifficulty,
-  GameCategory,
   GameImage,
   GameProduct,
   GameMetrics

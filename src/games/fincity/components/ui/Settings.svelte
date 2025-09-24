@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Icon, Button, Card } from '.';
+  import { Icon, Button, Card, Modal } from '.';
   import { modal, closeModal } from '../../stores/ui';
   import { settings, updateSettings, gameState } from '../../stores/gameState';
   import { forceSave, clearAllData, resetAllStores } from '../../lib/autoSave';
@@ -84,189 +84,175 @@
   }
 </script>
 
-{#if isOpen}
-  <div
-    class="fincity-settings-overlay {className}"
-    onclick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeModal(); } }}
-    role="dialog"
-    aria-modal="true"
-    tabindex="-1"
-  >
-    <div class="fincity-settings-panel">
-      <header class="fincity-settings-header">
-        <div class="fincity-header-content">
-          <div class="fincity-title-section">
-            <Icon name="settings" color="var(--color-gpb-blue)" size="lg" />
-            <h2 class="fincity-settings-title">Настройки</h2>
+<Modal
+  open={isOpen}
+  title="Настройки игры"
+  onclose={closeModal}
+  size="lg"
+  class={className}
+>
+  {#snippet header()}
+    <div class="modal-title-section flex items-center gap-3">
+      <div class="p-2 rounded-xl bg-white/20 neon-glow">
+        <Icon name="settings" size="lg" />
+      </div>
+      <div>
+        <h2 class="modal-title-game">Настройки</h2>
+        <p class="text-sm opacity-90">Управление игровыми параметрами</p>
+      </div>
+    </div>
+  {/snippet}
+
+  <div class="space-y-6">
+    <Card gradient="electric" decorative={true} class="text-white">
+      {#snippet header()}
+        <h3 class="font-section-title flex items-center gap-3">
+          <Icon name="heart" size="md" class="neon-glow" />
+          Общие настройки
+        </h3>
+      {/snippet}
+
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <div class="flex-1">
+            <label for="sound-enabled" class="font-card-title">Звуковые эффекты</label>
+            <p class="font-ui-secondary opacity-80">Воспроизведение звуков в игре</p>
           </div>
-
-          <Button variant="ghost" size="sm" onclick={closeModal} class="close-btn">
-            <Icon name="close" />
-          </Button>
-        </div>
-      </header>
-
-      <div class="fincity-settings-content">
-        <div class="fincity-settings-section">
-          <Card size="none">
-            {#snippet header()}
-              <h3 class="fincity-section-title">
-                <Icon name="heart" color="var(--color-gpb-blue)" />
-                Общие настройки
-              </h3>
-            {/snippet}
-
-            <div class="fincity-settings-grid">
-              <div class="fincity-setting-item">
-                <div class="fincity-setting-info">
-                  <label for="sound-enabled" class="fincity-setting-label">Звуковые эффекты</label>
-                  <p class="fincity-setting-description">Воспроизведение звуков в игре</p>
-                </div>
-                <div class="fincity-setting-control">
-                  <input
-                    id="sound-enabled"
-                    type="checkbox"
-                    bind:checked={tempSettings.soundEnabled}
-                    class="fincity-setting-checkbox"
-                  />
-                </div>
-              </div>
-
-              <div class="fincity-setting-item">
-                <div class="fincity-setting-info">
-                  <label for="music-enabled" class="fincity-setting-label">Фоновая музыка</label>
-                  <p class="fincity-setting-description">Воспроизведение музыки во время игры</p>
-                </div>
-                <div class="fincity-setting-control">
-                  <input
-                    id="music-enabled"
-                    type="checkbox"
-                    bind:checked={tempSettings.musicEnabled}
-                    class="fincity-setting-checkbox"
-                  />
-                </div>
-              </div>
-
-              <div class="fincity-setting-item">
-                <div class="fincity-setting-info">
-                  <label for="notifications-enabled" class="fincity-setting-label">Push-уведомления</label>
-                  <p class="fincity-setting-description">Уведомления о событиях в игре</p>
-                </div>
-                <div class="fincity-setting-control">
-                  <input
-                    id="notifications-enabled"
-                    type="checkbox"
-                    bind:checked={tempSettings.notificationsEnabled}
-                    class="fincity-setting-checkbox"
-                  />
-                </div>
-              </div>
-
-
-              <div class="fincity-setting-item">
-                <div class="fincity-setting-info">
-                  <label for="language-select" class="fincity-setting-label">Язык интерфейса</label>
-                  <p class="fincity-setting-description">Выберите предпочитаемый язык</p>
-                </div>
-                <div class="fincity-setting-control">
-                  <select id="language-select" bind:value={tempSettings.language} class="fincity-setting-select">
-                    <option value="ru">Русский</option>
-                    <option value="en">English</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </Card>
+          <div>
+            <input
+              id="sound-enabled"
+              type="checkbox"
+              bind:checked={tempSettings.soundEnabled}
+              class="checkbox-game w-5 h-5"
+            />
+          </div>
         </div>
 
-        <div class="fincity-settings-section">
-          <Card size="none">
-            {#snippet header()}
-              <h3 class="fincity-section-title">
-                <Icon name="shield" color="var(--color-success-green)" />
-                Управление данными
-              </h3>
-            {/snippet}
-
-            <div class="fincity-data-actions">
-              <div class="fincity-action-item">
-                <div class="fincity-action-info">
-                  <h4 class="fincity-action-title">Сохранить игру</h4>
-                  <p class="fincity-action-description">Принудительно сохранить текущий прогресс</p>
-                </div>
-                <Button variant="primary" size="sm" onclick={saveGame}>
-                  <Icon name="shield" />
-                  Сохранить
-                </Button>
-              </div>
-
-              <div class="fincity-action-item">
-                <div class="fincity-action-info">
-                  <h4 class="fincity-action-title">Экспорт данных</h4>
-                  <p class="fincity-action-description">Скачать файл с сохранением игры</p>
-                </div>
-                <Button variant="secondary" size="sm" onclick={exportData}>
-                  <Icon name="quest" />
-                  Экспорт
-                </Button>
-              </div>
-
-              <div class="fincity-action-item danger">
-                <div class="fincity-action-info">
-                  <h4 class="fincity-action-title">Сброс данных</h4>
-                  <p class="fincity-action-description">Сбросить все данные игры и перезагрузить страницу</p>
-                </div>
-                <Button variant="danger" size="sm" onclick={confirmClearData}>
-                  <Icon name="close" />
-                  Сбросить
-                </Button>
-              </div>
-            </div>
-          </Card>
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <div class="flex-1">
+            <label for="music-enabled" class="font-card-title">Фоновая музыка</label>
+            <p class="font-ui-secondary opacity-80">Воспроизведение музыки во время игры</p>
+          </div>
+          <div>
+            <input
+              id="music-enabled"
+              type="checkbox"
+              bind:checked={tempSettings.musicEnabled}
+              class="checkbox-game w-5 h-5"
+            />
+          </div>
         </div>
 
-        <div class="fincity-settings-section">
-          <Card size="none">
-            {#snippet header()}
-              <h3 class="fincity-section-title">
-                <Icon name="building" color="var(--color-crystal-purple)" />
-                О приложении
-              </h3>
-            {/snippet}
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <div class="flex-1">
+            <label for="notifications-enabled" class="font-card-title">Push-уведомления</label>
+            <p class="font-ui-secondary opacity-80">Уведомления о событиях в игре</p>
+          </div>
+          <div>
+            <input
+              id="notifications-enabled"
+              type="checkbox"
+              bind:checked={tempSettings.notificationsEnabled}
+              class="checkbox-game w-5 h-5"
+            />
+          </div>
+        </div>
 
-            <div class="fincity-app-info">
-
-              <div class="fincity-info-item">
-                <span class="fincity-info-label">Последнее обновление:</span>
-                <span class="fincity-info-value">{new Date($gameState.lastUpdate).toLocaleString('ru-RU')}</span>
-              </div>
-
-              <div class="fincity-info-item">
-                <span class="fincity-info-label">Платформа:</span>
-                <span class="fincity-info-value">WebView</span>
-              </div>
-            </div>
-          </Card>
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <div class="flex-1">
+            <label for="language-select" class="font-card-title">Язык интерфейса</label>
+            <p class="font-ui-secondary opacity-80">Выберите предпочитаемый язык</p>
+          </div>
+          <div>
+            <select id="language-select" bind:value={tempSettings.language} class="input-game min-w-32">
+              <option value="ru">Русский</option>
+              <option value="en">English</option>
+            </select>
+          </div>
         </div>
       </div>
+    </Card>
 
-      <footer class="fincity-settings-footer">
-        <div class="fincity-footer-buttons">
-          <Button variant="secondary" onclick={resetSettings}>
-            Сбросить
-          </Button>
+    <Card gradient="power" decorative={true} class="text-white">
+      {#snippet header()}
+        <h3 class="font-section-title flex items-center gap-3">
+          <Icon name="shield" size="md" class="neon-glow" />
+          Управление данными
+        </h3>
+      {/snippet}
 
-          <Button variant="ghost" onclick={closeModal}>
-            Отмена
-          </Button>
-
-          <Button variant="primary" onclick={applySettings}>
-            Применить
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <div class="flex-1">
+            <h4 class="font-card-title">Сохранить игру</h4>
+            <p class="font-ui-secondary opacity-80">Принудительно сохранить текущий прогресс</p>
+          </div>
+          <Button variant="secondary" size="sm" onclick={saveGame} class="shrink-0">
+            <Icon name="shield" />
+            Сохранить
           </Button>
         </div>
-      </footer>
-    </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <div class="flex-1">
+            <h4 class="font-card-title">Экспорт данных</h4>
+            <p class="font-ui-secondary opacity-80">Скачать файл с сохранением игры</p>
+          </div>
+          <Button variant="secondary" size="sm" onclick={exportData} class="shrink-0">
+            <Icon name="quest" />
+            Экспорт
+          </Button>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect bg-red-500/20 border border-red-400/30">
+          <div class="flex-1">
+            <h4 class="font-card-title text-red-300">Сброс данных</h4>
+            <p class="font-ui-secondary opacity-80">Сбросить все данные игры и перезагрузить страницу</p>
+          </div>
+          <Button variant="danger" size="sm" onclick={confirmClearData} class="shrink-0">
+            <Icon name="close" />
+            Сбросить
+          </Button>
+        </div>
+      </div>
+    </Card>
+
+    <Card gradient="wealth" decorative={true} class="text-white">
+      {#snippet header()}
+        <h3 class="font-section-title flex items-center gap-3">
+          <Icon name="building" size="md" class="neon-glow" />
+          О приложении
+        </h3>
+      {/snippet}
+
+      <div class="space-y-3">
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <span class="font-ui-primary opacity-80">Последнее обновление:</span>
+          <span class="font-ui-primary font-semibold">{new Date($gameState.lastUpdate).toLocaleString('ru-RU')}</span>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-xl glass-effect">
+          <span class="font-ui-primary opacity-80">Платформа:</span>
+          <span class="font-ui-primary font-semibold">WebView</span>
+        </div>
+      </div>
+    </Card>
   </div>
-{/if}
+
+  {#snippet footer()}
+    <div class="flex items-center gap-3 justify-end">
+      <Button variant="secondary" onclick={resetSettings}>
+        Сбросить
+      </Button>
+
+      <Button variant="ghost" onclick={closeModal}>
+        Отмена
+      </Button>
+
+      <Button variant="primary" onclick={applySettings}>
+        Применить
+      </Button>
+    </div>
+  {/snippet}
+</Modal>
 

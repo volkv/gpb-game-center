@@ -29,7 +29,7 @@
     style = ''
   }: Props = $props();
 
-  let timeoutId: number;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
   const typeConfig = {
     success: {
@@ -45,7 +45,7 @@
       icon: 'close' as const
     },
     info: {
-      variant: 'notification' as const,
+      variant: 'info' as const,
       icon: 'menu' as const
     }
   };

@@ -382,8 +382,9 @@ export class ResourceManager {
     }
 
     for (const [, spritesheet] of this.spritesheets) {
-      if (spritesheet.baseTexture) {
-        spritesheetMemory += spritesheet.baseTexture.width * spritesheet.baseTexture.height * 4;
+      if (spritesheet.textures && Object.keys(spritesheet.textures).length > 0) {
+        const firstTexture = Object.values(spritesheet.textures)[0];
+        spritesheetMemory += firstTexture.width * firstTexture.height * 4;
       }
     }
 

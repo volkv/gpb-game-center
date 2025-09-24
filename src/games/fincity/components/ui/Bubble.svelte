@@ -4,7 +4,7 @@
   interface Props {
     variant?: 'info' | 'tag' | 'success' | 'warning' | 'error';
     size?: 'sm' | 'md' | 'lg';
-    color?: 'violet' | 'mint' | 'raspberry' | 'melissa' | 'sakura' | 'henbane' | 'lily' | 'cumin';
+    color?: 'violet' | 'mint' | 'raspberry' | 'emerald' | 'raspberry-light' | 'henbane' | 'lily' | 'orange';
     tag?: string;
     interactive?: boolean;
     onclick?: () => void;
@@ -24,34 +24,34 @@
     ...restProps
   }: Props = $props();
 
-  const baseClasses = 'inline-flex items-center justify-center font-body rounded-[var(--radius-lg)] transition-all duration-[var(--duration-fast)] backdrop-blur-sm';
+  const baseClasses = 'inline-flex items-center justify-center font-ui-primary rounded-xl transition-all duration-300 ease-out backdrop-blur-sm neon-glow';
 
   const variantClasses = {
-    info: 'bubble-info',
-    tag: 'bubble-tag',
-    success: 'bg-melissa-10 text-black border border-melissa-30',
-    warning: 'bg-sakura-10 text-black border border-sakura-30',
-    error: 'bg-raspberry-10 text-black border border-raspberry-30'
+    info: 'glass-effect bg-gpb-violet/10 text-gpb-violet border border-gpb-violet/30',
+    tag: 'glass-effect bg-gpb-mint/10 text-gpb-mint border border-gpb-mint/30',
+    success: 'glass-effect bg-gpb-emerald/10 text-gpb-emerald border border-gpb-emerald/30',
+    warning: 'glass-effect bg-gpb-orange/10 text-gpb-orange border border-gpb-orange/30',
+    error: 'glass-effect bg-gpb-raspberry/10 text-gpb-raspberry border border-gpb-raspberry/30'
   };
 
   const colorClasses = {
-    violet: 'bg-violet-10 text-violet border border-violet-30',
-    mint: 'bg-mint-10 text-mint border border-mint-30',
-    raspberry: 'bg-raspberry-10 text-raspberry border border-raspberry-30',
-    melissa: 'bg-melissa-10 text-melissa border border-melissa-30',
-    sakura: 'bg-sakura-10 text-sakura border border-sakura-30',
-    henbane: 'bg-henbane-10 text-henbane border border-henbane-30',
-    lily: 'bg-lily text-black border border-lily-30',
-    cumin: 'bg-cumin/10 text-cumin border border-cumin/30'
+    violet: 'glass-effect bg-gpb-violet/10 text-gpb-violet border border-gpb-violet/30',
+    mint: 'glass-effect bg-gpb-mint/10 text-gpb-mint border border-gpb-mint/30',
+    raspberry: 'glass-effect bg-gpb-raspberry/10 text-gpb-raspberry border border-gpb-raspberry/30',
+    emerald: 'glass-effect bg-gpb-emerald/10 text-gpb-emerald border border-gpb-emerald/30',
+    'raspberry-light': 'glass-effect bg-gpb-raspberry-light/10 text-gpb-raspberry-light border border-gpb-raspberry-light/30',
+    henbane: 'glass-effect bg-gpb-gray-200/80 text-gpb-gray-800 border border-gpb-gray-300/50',
+    lily: 'glass-effect bg-gpb-gray-50/90 text-gpb-black border border-gpb-gray-200/50',
+    orange: 'glass-effect bg-gpb-orange/10 text-gpb-orange border border-gpb-orange/30'
   };
 
   const sizeClasses = {
-    sm: 'px-sm py-1 text-xs gap-xs',
-    md: 'px-md py-2 text-sm gap-sm',
-    lg: 'px-lg py-3 text-base gap: 1rem'
+    sm: 'px-2 py-1 text-xs gap-1',
+    md: 'px-3 py-2 text-sm gap-2',
+    lg: 'px-4 py-3 text-base gap-3'
   };
 
-  const interactiveClasses = 'cursor-pointer hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-violet/50';
+  const interactiveClasses = 'cursor-pointer hover-lift active-press focus-game touch-target';
 
   const bubbleClasses = $derived([
     baseClasses,
@@ -69,7 +69,7 @@
     {...restProps}
   >
     {#if tag}
-      <span class="text-xs font-heading uppercase tracking-wider opacity-80">{tag}</span>
+      <span class="font-badge opacity-80">{tag}</span>
     {/if}
     {@render children?.()}
   </button>
@@ -79,7 +79,7 @@
     {...restProps}
   >
     {#if tag}
-      <span class="text-xs font-heading uppercase tracking-wider opacity-80">{tag}</span>
+      <span class="font-badge opacity-80">{tag}</span>
     {/if}
     {@render children?.()}
   </div>

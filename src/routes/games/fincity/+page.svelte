@@ -11,7 +11,7 @@
 
 		if (fincityGame) {
 			await gameStore.loadGame(fincityGame.id);
-			navigateToGame(fincityGame);
+			navigateToGame();
 			goto('/', { replaceState: true });
 		} else {
 			goto('/', { replaceState: true });
@@ -32,7 +32,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%);
+		background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-emerald) 100%);
 	}
 
 	.loading-content {

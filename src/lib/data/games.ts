@@ -16,7 +16,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%)',
+		gradient: 'linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-emerald) 100%)',
 		themeColor: 'var(--color-gpb-mint)',
 
 		metrics: {
@@ -102,7 +102,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-cumin) 100%)',
+		gradient: 'linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-orange) 100%)',
 		themeColor: 'var(--color-gpb-violet)',
 
 		metrics: {
@@ -188,7 +188,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-gpb-raspberry) 0%, var(--color-gpb-sakura) 100%)',
+		gradient: 'linear-gradient(135deg, var(--color-gpb-raspberry) 0%, var(--color-gpb-raspberry-light) 100%)',
 		themeColor: 'var(--color-gpb-raspberry)',
 
 		metrics: {
@@ -231,7 +231,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%)',
+		gradient: 'linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-emerald) 100%)',
 		themeColor: 'var(--color-gpb-mint)',
 
 		metrics: {
@@ -249,7 +249,7 @@ export const GAMES_DATA: Game[] = [
 				name: 'Накопительный счёт',
 				description: 'Сохраняйте и приумножайте средства',
 				url: '/products/savings',
-				category: 'savings'
+				category: 'deposit'
 			},
 			{
 				id: 'investment-portfolio',
@@ -263,7 +263,7 @@ export const GAMES_DATA: Game[] = [
 				name: 'Бизнес-банкинг',
 				description: 'Финансовые решения для бизнеса',
 				url: '/products/business',
-				category: 'business'
+				category: 'service'
 			}
 		],
 

@@ -8,22 +8,23 @@
 	import type { Game } from '$lib/types/Game';
 	import type { ComponentType } from 'svelte';
 
-	export let game: Game;
+	interface Props {
+		game: Game;
+		onexit?: () => void;
+		ongameLoaded?: (event: CustomEvent<{ game: Game; component: ComponentType }>) => void;
+	}
 
-	const dispatch = createEventDispatcher<{
-		exit: void;
-		gameLoaded: { game: Game; component: ComponentType };
-	}>();
+	let { game, onexit, ongameLoaded }: Props = $props();
 
-	let mounted = false;
-	let gameComponent: ComponentType | null = null;
-	let isLoading = true;
-	let loadingError: string | null = null;
-	let canRetry = true;
-	let retryCount = 0;
-	let loadingProgress = 0;
-	let loadingStage = 'Подготовка...';
-	let isOfflineError = false;
+	let mounted = $state(false);
+	let gameComponent = $state<ComponentType | null>(null);
+	let isLoading = $state(true);
+	let loadingError = $state<string | null>(null);
+	let canRetry = $state(true);
+	let retryCount = $state(0);
+	let loadingProgress = $state(0);
+	let loadingStage = $state('Подготовка...');
+	let isOfflineError = $state(false);
 
 	const loadingStages = [
 		'Подготовка...',
@@ -47,7 +48,7 @@
 		isOfflineError = false;
 
 		try {
-			await retryHandler(async () => {
+			const component = await retryHandler(async () => {
 				if (!$isOnline) {
 					throw new NetworkError('Нет подключения к интернету', true);
 				}
@@ -56,12 +57,10 @@
 				await simulateLoadingProgress();
 				return await loadGameComponent(game);
 			});
-
-			const component = await loadGameComponent(game);
 			gameComponent = component;
 			isLoading = false;
 
-			dispatch('gameLoaded', { game, component });
+			ongameLoaded?.(new CustomEvent('gameLoaded', { detail: { game, component } }));
 		} catch (error) {
 			console.error('Failed to load game:', error);
 			isLoading = false;
@@ -95,17 +94,17 @@
 
 	function handleBack() {
 		gameStore.exitGame();
-		dispatch('exit');
+		onexit?.();
 		goBack();
 	}
 
 	function handleGameExit() {
 		gameStore.exitGame();
-		dispatch('exit');
+		onexit?.();
 		navigateToGameCenter();
 	}
 
-	$: loadError = getGameLoadError(game.id);
+	let loadError = $derived(getGameLoadError(game.id));
 </script>
 
 <div class="game-container" class:mounted>
@@ -163,7 +162,7 @@
 
 			<button
 				class="back-button loading-back"
-				on:click={handleBack}
+				onclick={handleBack}
 				aria-label="Вернуться назад"
 			>
 				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,7 +228,10 @@
 		</div>
 	{:else if gameComponent}
 		<div class="game-wrapper">
-			<svelte:component this={gameComponent} on:exit={handleGameExit} />
+			{#if gameComponent}
+				{@const GameComponent = gameComponent}
+				<GameComponent onexit={handleGameExit} />
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -256,7 +258,6 @@
 		align-items: center;
 		justify-content: center;
 		background: linear-gradient(to bottom, #ffffff 0%, var(--color-gpb-lily) 100%);
-		padding: 2rem;
 		position: relative;
 	}
 
@@ -271,7 +272,7 @@
 		flex-direction: column;
 		align-items: center;
 		margin-bottom: 3rem;
-		animation: fadeInUp 0.6s ease-out;
+		animation: fadeIn 0.6s ease-out;
 	}
 
 	.preview-icon {
@@ -302,7 +303,7 @@
 
 	.loading-indicator {
 		margin-bottom: 3rem;
-		animation: fadeInUp 0.6s ease-out 0.2s both;
+		animation: fadeIn 0.6s ease-out 0.2s both;
 	}
 
 	.loading-bar {
@@ -317,7 +318,7 @@
 
 	.loading-fill {
 		height: 100%;
-		background: linear-gradient(90deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%);
+		background: linear-gradient(90deg, var(--color-gpb-mint) 0%, var(--color-gpb-emerald) 100%);
 		border-radius: 4px;
 		transition: width 0.3s ease;
 		position: relative;
@@ -341,7 +342,7 @@
 
 	.loading-skeleton {
 		margin-bottom: 2rem;
-		animation: fadeInUp 0.6s ease-out 0.4s both;
+		animation: fadeIn 0.6s ease-out 0.4s both;
 	}
 
 	.skeleton-header {
@@ -412,13 +413,13 @@
 
 	.loading-spinner-container {
 		margin-top: 1rem;
-		animation: fadeInUp 0.6s ease-out 0.6s both;
+		animation: fadeIn 0.6s ease-out 0.6s both;
 	}
 
 	.back-button {
 		position: absolute;
-		top: 2rem;
-		left: 2rem;
+		top: 1rem;
+		left: 1rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -452,7 +453,6 @@
 		align-items: center;
 		justify-content: center;
 		background: linear-gradient(to bottom, #ffffff 0%, var(--color-gpb-lily) 100%);
-		padding: 2rem;
 		position: relative;
 	}
 
@@ -518,16 +518,6 @@
 		animation: gameSlideIn 0.6s ease-out;
 	}
 
-	@keyframes fadeInUp {
-		0% {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-		100% {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
 
 	@keyframes fadeInLeft {
 		0% {
@@ -586,11 +576,6 @@
 	}
 
 	@media (max-width: 380px) {
-		.loading-screen,
-		.error-screen {
-			padding: 1rem;
-		}
-
 		.back-button {
 			top: 1rem;
 			left: 1rem;

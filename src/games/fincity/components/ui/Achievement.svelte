@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { achievements, achievementStats } from '../../stores/achievements';
   import { modal, closeModal } from '../../stores/ui';
-  import { Button, Icon, ProgressBar, Modal } from './';
+  import { Button, Icon, ProgressBar, Modal, Card } from './';
+  import { Badge } from '$lib';
   import type { Achievement, AchievementCategory } from '../../types/Achievement';
   import type { IconName } from './Icon.svelte';
 
@@ -30,18 +31,18 @@
     education: 'Образование'
   };
 
-  const rarityColors: Record<string, string> = {
-    common: 'border-gray-300 bg-gray-50',
-    rare: 'border-blue-300 bg-blue-50',
-    epic: 'border-purple-300 bg-purple-50',
-    legendary: 'border-yellow-300 bg-yellow-50'
+  const rarityGradients: Record<string, 'electric' | 'power' | 'wealth' | 'mystery' | null> = {
+    common: 'electric',
+    rare: 'power',
+    epic: 'wealth',
+    legendary: 'mystery'
   };
 
-  const rarityBadges: Record<string, string> = {
-    common: 'bg-gray-100 text-gray-700',
-    rare: 'bg-blue-100 text-blue-700',
-    epic: 'bg-purple-100 text-purple-700',
-    legendary: 'bg-yellow-100 text-yellow-700'
+  const rarityVariants: Record<string, 'new' | 'hot' | 'locked' | 'pro' | 'online' | 'offline'> = {
+    common: 'locked',
+    rare: 'new',
+    epic: 'pro',
+    legendary: 'hot'
   };
 
   onMount(() => {
@@ -107,14 +108,15 @@
   onclose={closeModal}
   title="Достижения"
   size="lg"
-  class="fincity-achievement-showcase-modal"
 >
   {#snippet header()}
-    <div class="fincity-achievement-title-section">
-      <Icon name="star" size="lg" color="var(--color-crystal-purple)" />
-      <div class="fincity-achievement-title-details">
-        <h2 class="modal-title">Достижения</h2>
-        <p class="fincity-achievement-subtitle text-sm text-gray-600">
+    <div class="modal-title-section flex items-center gap-3">
+      <div class="p-2 rounded-xl gradient-mystery neon-glow">
+        <Icon name="crown" size="lg" />
+      </div>
+      <div>
+        <h2 class="modal-title-game">Достижения</h2>
+        <p class="text-sm opacity-90">
           {$achievementStats.totalUnlocked} из {$achievementStats.totalAvailable}
           ({$achievementStats.completionPercentage}%)
         </p>
@@ -122,136 +124,178 @@
     </div>
   {/snippet}
 
-  <div class="fincity-achievement-tabs">
-    <button
-      class="fincity-tab-button {selectedCategory === 'all' ? 'fincity-active' : ''}"
-      onclick={() => handleCategoryChange('all')}
-      type="button"
-    >
-      <Icon name="star" size="sm" />
-      <span>Все</span>
-    </button>
-    {#each Object.entries(categoryNames) as [category, name]}
+  <div class="space-y-6">
+    <div class="tab-container">
       <button
-        class="fincity-tab-button {selectedCategory === category ? 'fincity-active' : ''}"
-        onclick={() => handleCategoryChange(category as AchievementCategory)}
+        class="tab-item {selectedCategory === 'all' ? 'tab-item-active' : ''}"
+        onclick={() => handleCategoryChange('all')}
         type="button"
       >
-        <Icon name={(categoryIcons[category as AchievementCategory] as IconName) || 'achievement'} size="sm" />
-        <span>{name}</span>
+        <Icon name="star" size="sm" />
+        <span>Все</span>
+        <Badge variant="new" size="sm" class="ml-2">{$achievementStats.totalAvailable}</Badge>
       </button>
-    {/each}
-  </div>
-
-  <div class="fincity-achievements-content">
-    <div class="fincity-achievements-grid">
-      {#each filteredAchievements as achievement (achievement.id)}
-        <div
-          class="fincity-achievement-card border-2 rounded-lg fincity-achievement-padding transition-all duration-200 {rarityColors[achievement.rarity]} {achievement.status === 'unlocked' ? 'opacity-100' : 'opacity-60'}"
+      {#each Object.entries(categoryNames) as [category, name]}
+        <button
+          class="tab-item {selectedCategory === category ? 'tab-item-active' : ''}"
+          onclick={() => handleCategoryChange(category as AchievementCategory)}
+          type="button"
         >
-          <div class="fincity-achievement-content-flex">
-            <div class="fincity-achievement-icon {achievement.status === 'unlocked' ? 'fincity-unlocked-ring' : ''}">
-              <Icon
-                name={(achievement.icon as IconName) || 'achievement'}
-                size="lg"
-                class={achievement.status === 'unlocked' ? 'text-purple-500' : 'text-gray-400'}
-              />
-            </div>
-
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center gap-2 mb-1">
-                <h3 class="font-semibold text-gray-900 truncate">{achievement.title}</h3>
-                <span class="achievement-rarity text-xs px-2 py-0.5 rounded-full {rarityBadges[achievement.rarity]}">
-                  {getRarityName(achievement.rarity)}
-                </span>
-              </div>
-
-              <p class="text-sm text-gray-600 mb-2">{achievement.description}</p>
-
-              {#if achievement.status === 'unlocked'}
-                <div class="flex items-center gap-2 text-sm text-green-600">
-                  <Icon name="check" size="sm" />
-                  Разблокировано
-                  {#if achievement.unlockDate}
-                    <span class="text-xs text-gray-500">
-                      {new Date(achievement.unlockDate).toLocaleDateString('ru-RU')}
-                    </span>
-                  {/if}
-                </div>
-              {:else if achievement.progress}
-                <div class="space-y-1">
-                  <div class="flex justify-between text-xs text-gray-600">
-                    <span>Прогресс</span>
-                    <span>{achievement.progress}/{achievement.maxProgress}</span>
-                  </div>
-                  <ProgressBar
-                    value={getProgressPercentage(achievement)}
-                    size="sm"
-                    class={'achievement-progress'}
-                  />
-                </div>
-              {:else}
-                <div class="text-sm text-gray-500">Требуется разблокировка</div>
-              {/if}
-
-              {#if achievement.rewards}
-                <div class="fincity-achievement-rewards">
-                  <span class="text-xs text-gray-500">Награда:</span>
-                  <div class="flex items-center gap-2 text-xs">
-                    {#if achievement.rewards.coins}
-                      <div class="flex items-center gap-1">
-                        <Icon name="coin" size="xs" />
-                        {achievement.rewards.coins}
-                      </div>
-                    {/if}
-                    {#if achievement.rewards.crystals}
-                      <div class="flex items-center gap-1">
-                        <Icon name="crystal" size="xs" />
-                        {achievement.rewards.crystals}
-                      </div>
-                    {/if}
-                    {#if achievement.rewards.experience}
-                      <div class="flex items-center gap-1">
-                        <Icon name="star" size="xs" />
-                        {achievement.rewards.experience} опыта
-                      </div>
-                    {/if}
-                    {#if achievement.rewards.title}
-                      <div class="flex items-center gap-1">
-                        <Icon name="crown" size="xs" />
-                        {achievement.rewards.title}
-                      </div>
-                    {/if}
-                  </div>
-                </div>
-              {/if}
-            </div>
-          </div>
-        </div>
+          <Icon name={(categoryIcons[category as AchievementCategory] as IconName) || 'star'} size="sm" />
+          <span>{name}</span>
+        </button>
       {/each}
     </div>
 
     {#if filteredAchievements.length === 0}
-      <div class="text-center py-8 text-gray-500">
-        <Icon name="star" size="xl" class="mx-auto mb-2 opacity-50" />
-        <p>Достижений в этой категории пока нет</p>
+      <Card class="text-center py-12">
+        <div class="flex flex-col items-center gap-4">
+          <div class="p-4 rounded-full bg-gpb-gray-100">
+            <Icon name="crown" size="xl" class="text-gpb-gray-400" />
+          </div>
+          <div>
+            <h3 class="font-card-title text-gpb-gray-700 mb-2">Достижений нет</h3>
+            <p class="font-ui-secondary text-gpb-gray-500">
+              В этой категории достижений пока нет.
+            </p>
+          </div>
+        </div>
+      </Card>
+    {:else}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {#each filteredAchievements as achievement, index (achievement.id)}
+          {@const isUnlocked = achievement.status === 'unlocked'}
+          {@const isLocked = achievement.status === 'locked'}
+          {@const progress = getProgressPercentage(achievement)}
+
+          <Card
+            gradient={isUnlocked ? rarityGradients[achievement.rarity] : null}
+            decorative={isUnlocked}
+            class="stagger-item {isUnlocked ? 'text-white' : ''} {isLocked ? 'opacity-60' : ''}"
+            style="animation-delay: {index * 0.1}s"
+          >
+            <div class="flex items-start gap-4 mb-4">
+              <div class="p-3 rounded-xl {isUnlocked ? 'bg-white/20 neon-glow' : 'bg-gpb-gray-100'}">
+                <Icon
+                  name={(achievement.icon as IconName) || 'crown'}
+                  size="lg"
+                  class={isUnlocked ? 'text-current' : 'text-gpb-gray-400'}
+                />
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <h3 class="font-card-title">{achievement.title}</h3>
+                  <Badge variant={rarityVariants[achievement.rarity]} size="sm">
+                    {getRarityName(achievement.rarity)}
+                  </Badge>
+                </div>
+
+                <p class="font-ui-secondary mb-3 line-clamp-2 {isUnlocked ? 'opacity-90' : 'text-gpb-gray-600'}">
+                  {achievement.description}
+                </p>
+              </div>
+
+              <div class="flex-shrink-0">
+                {#if isUnlocked}
+                  <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                    <Icon name="check" color="white" size="sm" />
+                  </div>
+                {:else if isLocked}
+                  <div class="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
+                    <Icon name="shield" color="white" size="sm" />
+                  </div>
+                {:else}
+                  <div class="w-10 h-10 rounded-full bg-gpb-raspberry flex items-center justify-center pulse-border">
+                    <Icon name="crown" color="white" size="sm" />
+                  </div>
+                {/if}
+              </div>
+            </div>
+
+            {#if achievement.progress && !isUnlocked}
+              <div class="mb-4">
+                <div class="flex items-center gap-2 p-2 rounded-lg {isUnlocked ? 'glass-effect' : 'bg-gpb-gray-50'} mb-2">
+                  <Icon name="building" size="sm" class={isUnlocked ? 'text-current opacity-80' : 'text-gpb-gray-500'} />
+                  <span class="font-ui-primary {isUnlocked ? 'opacity-90' : 'text-gpb-gray-700'} text-sm">
+                    Прогресс: {achievement.progress}/{achievement.maxProgress}
+                  </span>
+                </div>
+                <ProgressBar
+                  value={progress}
+                  color={progress === 100 ? 'emerald' : 'violet'}
+                  showPercentage={true}
+                  animated={true}
+                />
+              </div>
+            {/if}
+
+            {#if isUnlocked && achievement.unlockDate}
+              <div class="flex items-center gap-2 p-2 rounded-lg glass-effect mb-4">
+                <Icon name="check" size="sm" class="text-green-400" />
+                <span class="font-ui-primary opacity-90 text-sm">
+                  Разблокировано {new Date(achievement.unlockDate).toLocaleDateString('ru-RU')}
+                </span>
+              </div>
+            {/if}
+
+            {#if achievement.rewards}
+              <div class="flex items-center justify-between pt-4 border-t {isUnlocked ? 'border-white/20' : 'border-gpb-gray-200'}">
+                <div class="flex items-center gap-2">
+                  <Icon name="star" size="sm" class="text-gpb-gold neon-glow" />
+                  <span class="font-ui-primary font-semibold text-sm">
+                    Награда:
+                  </span>
+                </div>
+                <div class="flex items-center gap-3 text-sm">
+                  {#if achievement.rewards.coins}
+                    <div class="flex items-center gap-1">
+                      <Icon name="coin" size="sm" class="text-gpb-gold" />
+                      <span class="font-ui-primary font-semibold">{achievement.rewards.coins}</span>
+                    </div>
+                  {/if}
+                  {#if achievement.rewards.crystals}
+                    <div class="flex items-center gap-1">
+                      <Icon name="crystal" size="sm" class="text-gpb-violet" />
+                      <span class="font-ui-primary font-semibold">{achievement.rewards.crystals}</span>
+                    </div>
+                  {/if}
+                  {#if achievement.rewards.experience}
+                    <div class="flex items-center gap-1">
+                      <Icon name="star" size="sm" class="text-gpb-gold" />
+                      <span class="font-ui-primary font-semibold">{achievement.rewards.experience} опыта</span>
+                    </div>
+                  {/if}
+                  {#if achievement.rewards.title}
+                    <div class="flex items-center gap-1">
+                      <Icon name="crown" size="sm" class="text-gpb-violet" />
+                      <span class="font-ui-primary font-semibold text-xs">{achievement.rewards.title}</span>
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            {/if}
+          </Card>
+        {/each}
       </div>
     {/if}
   </div>
 </Modal>
 
 {#if recentlyUnlocked}
-  <div class="fincity-achievement-unlock-notification">
-    <div class="fincity-achievement-unlock-content">
-      <div class="fincity-achievement-unlock-icon">
-        <Icon name={(recentlyUnlocked.icon as IconName) || 'achievement'} size="lg" class="text-white" />
+  <div class="fixed top-4 right-4 z-50 transform transition-all duration-500 ease-out animate-bounce-in">
+    <Card gradient="wealth" decorative={true} particles={true} class="text-white max-w-sm shadow-2xl">
+      <div class="flex items-start gap-3">
+        <div class="p-2 rounded-xl bg-white/20 neon-glow">
+          <Icon name={(recentlyUnlocked.icon as IconName) || 'crown'} size="lg" class="text-current" />
+        </div>
+        <div class="flex-1">
+          <div class="font-card-title text-gpb-gold mb-1">🎉 Достижение разблокировано!</div>
+          <h4 class="font-section-title mb-1">{recentlyUnlocked.title}</h4>
+          <p class="font-ui-secondary opacity-90 text-sm">{recentlyUnlocked.description}</p>
+        </div>
       </div>
-      <div class="fincity-achievement-unlock-details">
-        <div class="text-sm font-medium text-purple-600 mb-1">Достижение разблокировано!</div>
-        <div class="font-semibold text-gray-900">{recentlyUnlocked.title}</div>
-        <div class="text-xs text-gray-600">{recentlyUnlocked.description}</div>
-      </div>
-    </div>
+    </Card>
   </div>
 {/if}
 

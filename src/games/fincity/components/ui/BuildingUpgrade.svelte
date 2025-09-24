@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Icon, Button, Modal, Bubble, ProgressBar } from '.';
+  import { Button, ProgressBar } from '.';
+  import { Badge } from '$lib';
   import { modal, closeModal } from '../../stores/ui';
   import {
     buildingConfigs,
@@ -12,6 +13,7 @@
   import { resources } from '../../stores/playerData';
   import { showToast } from '../../stores/ui';
   import { onMount, onDestroy } from 'svelte';
+  import { Building, Coins, Gem, TrendingUp, Star, CheckCircle } from 'lucide-svelte';
 
   interface Props {
     class?: string;
@@ -42,7 +44,7 @@
   const isUpgrading = $derived(building?.isUpgrading || false);
 
   let upgradeProgress = $state(0);
-  let progressInterval: number;
+  let progressInterval: ReturnType<typeof setInterval>;
 
   const currentIncome = $derived({
     coins: building && config ? config.income.coins * building.level : 0,
@@ -135,159 +137,177 @@
 </script>
 
 {#if isOpen && building && config}
-  <Modal open={isOpen} onclose={closeModal} class="fincity-building-upgrade-modal {className}">
-    <div class="fincity-upgrade-header">
-      <div class="fincity-upgrade-visual">
-        <div class="fincity-upgrade-image">
-          <Icon name="building" size="2xl" color="var(--color-violet)" />
-        </div>
-        <div class="fincity-building-level">
-          <Bubble color="violet" size="sm">
-            Уровень {building.level}
-          </Bubble>
-        </div>
+  <div class="modal-overlay-game">
+    <div class="modal-game">
+      <!-- Декоративные элементы -->
+      <div class="particles-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
       </div>
 
-      <div class="fincity-upgrade-details">
-        <h1 class="fincity-upgrade-title text-lg">{config.name}</h1>
-        <p class="fincity-upgrade-subtitle text-body">{config.description}</p>
-      </div>
-    </div>
+      <div class="modal-header-game gradient-power text-white">
+        <div class="decoration-orb bg-gpb-gold w-6 h-6 -top-2 -right-2"></div>
+        <div class="decoration-shine"></div>
 
-    <div class="fincity-upgrade-showcase-content">
-      <!-- Текущее состояние -->
-      <div class="fincity-current-stats">
-        <h2 class="fincity-stats-title text-heading-md">
-          <Icon name="book" size="sm" color="var(--color-violet)" />
-          Текущее состояние
-        </h2>
-
-        <div class="fincity-stats-grid">
-          <div class="fincity-stat-item">
-            <Icon name="coin" size="sm" color="var(--color-mint)" />
-            <span class="fincity-stat-value">{currentIncome.coins}</span>
-            <span class="fincity-stat-label">монет в час</span>
-          </div>
-
-          <div class="fincity-stat-item">
-            <Icon name="crystal" size="sm" color="var(--color-raspberry)" />
-            <span class="fincity-stat-value">{currentIncome.crystals}</span>
-            <span class="fincity-stat-label">кристаллов в час</span>
-          </div>
+        <div class="game-card-icon neon-glow mb-4">
+          <Building size={48} class="text-white neon-glow" />
         </div>
+
+        <Badge variant="pro" size="sm" class="mb-2">
+          Уровень {building.level}
+        </Badge>
+
+        <h1 class="modal-title-game">{config.name}</h1>
+        <p class="opacity-90 text-center">{config.description}</p>
       </div>
 
-      {#if !isMaxLevel}
-        <!-- Прокачка -->
-        <div class="fincity-upgrade-section">
-          <h2 class="fincity-stats-title text-heading-md">
-            <Icon name="trending-up" size="sm" color="var(--color-melissa)" />
-            Прокачка до уровня {building.level + 1}
+      <div class="modal-content-game space-y-6">
+        <!-- Текущее состояние -->
+        <div class="game-card gradient-wealth text-white p-4">
+          <h2 class="font-section-title flex items-center gap-2 mb-4">
+            <Star size={20} class="neon-glow" />
+            Текущее состояние
           </h2>
 
-          {#if isUpgrading}
-            <!-- Прогресс прокачки -->
-            <div class="fincity-upgrade-progress">
-              <div class="fincity-progress-info">
-                <span class="text-body font-heading">Прокачка в процессе...</span>
-                <span class="text-body-sm">{Math.round(upgradeProgress * 100)}%</span>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="mini-stat">
+              <div class="mini-stat-icon">
+                <Coins size={16} class="text-gpb-gold neon-glow" />
               </div>
-              <ProgressBar
-                value={upgradeProgress * 100}
-                max={100}
-                variant="linear"
-                color="melissa"
-                animated={true}
-                glowing={true}
-                size="lg"
-              />
+              <div class="mini-stat-value">{currentIncome.coins}</div>
+              <div class="mini-stat-label">монет в час</div>
             </div>
-          {:else}
-            <!-- Стоимость и улучшения -->
-            <div class="fincity-upgrade-info">
-              <div class="fincity-cost-section">
-                <h3 class="fincity-cost-title text-body font-heading">Стоимость:</h3>
-                <div class="fincity-cost-grid">
-                  <Bubble
-                    color="mint"
-                    size="sm"
-                    class={!canAffordUpgrade && upgradeCost?.coins ? 'fincity-insufficient-funds' : ''}
-                  >
-                    <Icon name="coin" size="xs" />
-                    {upgradeCost?.coins || 0}
-                  </Bubble>
 
-                  <Bubble
-                    color="raspberry"
-                    size="sm"
-                    class={!canAffordUpgrade && upgradeCost?.crystals ? 'fincity-insufficient-funds' : ''}
-                  >
-                    <Icon name="crystal" size="xs" />
-                    {upgradeCost?.crystals || 0}
-                  </Bubble>
+            <div class="mini-stat">
+              <div class="mini-stat-icon">
+                <Gem size={16} class="text-gpb-raspberry neon-glow" />
+              </div>
+              <div class="mini-stat-value">{currentIncome.crystals}</div>
+              <div class="mini-stat-label">кристаллов в час</div>
+            </div>
+          </div>
+        </div>
+
+        {#if !isMaxLevel}
+          <!-- Прокачка -->
+          <div class="game-card gradient-electric text-white p-4">
+            <h2 class="font-section-title flex items-center gap-2 mb-4">
+              <TrendingUp size={20} class="neon-glow" />
+              Прокачка до уровня {building.level + 1}
+            </h2>
+
+            {#if isUpgrading}
+              <!-- Прогресс прокачки -->
+              <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="font-ui-primary">Прокачка в процессе...</span>
+                  <span class="font-ui-secondary">{Math.round(upgradeProgress * 100)}%</span>
+                </div>
+                <ProgressBar
+                  value={upgradeProgress * 100}
+                  max={100}
+                  variant="linear"
+                  color="emerald"
+                  animated={true}
+                  glowing={true}
+                  size="lg"
+                />
+              </div>
+            {:else}
+              <!-- Стоимость и улучшения -->
+              <div class="space-y-4">
+                <div>
+                  <h3 class="font-card-title mb-3">Стоимость:</h3>
+                  <div class="flex gap-2">
+                    <Badge
+                      variant={canAffordUpgrade || !upgradeCost?.coins ? 'new' : 'locked'}
+                      size="sm"
+                    >
+                      <Coins size={12} />
+                      {upgradeCost?.coins || 0}
+                    </Badge>
+
+                    <Badge
+                      variant={canAffordUpgrade || !upgradeCost?.crystals ? 'hot' : 'locked'}
+                      size="sm"
+                    >
+                      <Gem size={12} />
+                      {upgradeCost?.crystals || 0}
+                    </Badge>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 class="font-card-title mb-3">Улучшения:</h3>
+                  <div class="space-y-2">
+                    <Badge variant="new" size="sm" class="w-full justify-start">
+                      <TrendingUp size={12} />
+                      +{incomeIncrease.coins} монет в час
+                    </Badge>
+
+                    <Badge variant="new" size="sm" class="w-full justify-start">
+                      <TrendingUp size={12} />
+                      +{incomeIncrease.crystals} кристаллов в час
+                    </Badge>
+                  </div>
                 </div>
               </div>
-
-              <div class="fincity-benefits-section">
-                <h3 class="fincity-benefits-title text-body font-heading">Улучшения:</h3>
-                <div class="fincity-benefits-grid">
-                  <Bubble variant="success" size="sm">
-                    <Icon name="trending-up" size="xs" />
-                    +{incomeIncrease.coins} монет в час
-                  </Bubble>
-
-                  <Bubble variant="success" size="sm">
-                    <Icon name="trending-up" size="xs" />
-                    +{incomeIncrease.crystals} кристаллов в час
-                  </Bubble>
-                </div>
+            {/if}
+          </div>
+        {:else}
+          <!-- Максимальный уровень -->
+          <div class="glass-effect p-4 rounded-xl border border-white/20 bg-gpb-gold/10">
+            <div class="flex items-start gap-3">
+              <div class="p-2 rounded-full bg-gpb-gold/20">
+                <Star size={16} class="text-gpb-gold neon-glow" />
+              </div>
+              <div>
+                <span class="font-badge block text-gpb-gold">Максимальный уровень достигнут!</span>
+                <span class="font-ui-secondary text-sm opacity-80">
+                  Это здание нельзя улучшить дальше
+                </span>
               </div>
             </div>
-          {/if}
-        </div>
-      {:else}
-        <!-- Максимальный уровень -->
-        <div class="fincity-max-level-section">
-          <Bubble variant="notification" class="fincity-max-level-bubble">
-            <Icon name="star" size="sm" color="var(--color-mint)" />
-            <div class="fincity-max-level-content">
-              <span class="text-body font-heading">Максимальный уровень достигнут!</span>
-              <span class="text-body-sm">Это здание нельзя улучшить дальше</span>
-            </div>
-          </Bubble>
-        </div>
-      {/if}
-    </div>
-
-    <div class="fincity-upgrade-showcase-footer">
-      <Button variant="tertiary" onclick={closeModal} class="fincity-close-button">
-        Закрыть
-      </Button>
-
-      {#if !isMaxLevel}
-        <Button
-          variant="primary"
-          onclick={handleUpgrade}
-          disabled={!canUpgradeBuilding}
-          class="fincity-upgrade-button"
-        >
-          <Icon name={isUpgrading ? 'check' : 'star'} size="sm" />
-          {#if isUpgrading}
-            Прокачивается...
-          {:else}
-            Прокачать
-          {/if}
-        </Button>
-      {/if}
-    </div>
-
-    {#if !canUpgradeBuilding && !isMaxLevel}
-      <div class="fincity-reason-disabled">
-        <span class="text-body-sm text-warning-orange">
-          {getReasonDisabled()}
-        </span>
+          </div>
+        {/if}
       </div>
-    {/if}
-  </Modal>
+
+      <div class="modal-footer-game">
+        <Button
+          variant="secondary"
+          onclick={closeModal}
+          class="btn-game-secondary flex-1"
+        >
+          Закрыть
+        </Button>
+
+        {#if !isMaxLevel}
+          <Button
+            variant="primary"
+            onclick={handleUpgrade}
+            disabled={!canUpgradeBuilding}
+            class="btn-game-primary flex-1 hover-lift active-press {!canUpgradeBuilding ? 'opacity-60' : ''}"
+          >
+            {#if isUpgrading}
+              <CheckCircle size={16} class="neon-glow" />
+              Прокачивается...
+            {:else}
+              <Star size={16} class="neon-glow" />
+              Прокачать
+            {/if}
+          </Button>
+        {/if}
+      </div>
+
+      {#if !canUpgradeBuilding && !isMaxLevel}
+        <div class="px-6 pb-4 text-center">
+          <span class="font-ui-secondary text-sm text-gpb-raspberry">
+            {getReasonDisabled()}
+          </span>
+        </div>
+      {/if}
+    </div>
+  </div>
 {/if}
 

@@ -78,8 +78,8 @@
 
   function getBuildingSpritePath(buildingType: BuildingType): string | null {
     const spriteMap: Record<BuildingType, string> = {
-      [BuildingType.CENTRAL_BANK]: '/src/games/fincity/assets/buildings/B1.png',
-      [BuildingType.SECURITY_HQ]: '/src/games/fincity/assets/buildings/B2.png',
+      [BuildingType.CENTRAL_BANK]: '/games/fincity/assets/buildings/B1.png',
+      [BuildingType.SECURITY_HQ]: '/games/fincity/assets/buildings/B2.png',
       [BuildingType.CAPITAL_TOWER]: '',
       [BuildingType.LONGEVITY_PARK]: '',
       [BuildingType.PARTNER_MALL]: '',
@@ -225,7 +225,7 @@
           <div class="price-list">
             {#if config.basePrice.coins > 0}
               <Bubble
-                color={$resources.coins >= config.basePrice.coins ? 'mint' : 'sakura'}
+                color={$resources.coins >= config.basePrice.coins ? 'mint' : 'raspberry-light'}
                 size="sm"
                 class="price-bubble"
               >
@@ -236,7 +236,7 @@
 
             {#if config.basePrice.crystals > 0}
               <Bubble
-                color={$resources.crystals >= config.basePrice.crystals ? 'raspberry' : 'sakura'}
+                color={$resources.crystals >= config.basePrice.crystals ? 'raspberry' : 'raspberry-light'}
                 size="sm"
                 class="price-bubble"
               >
@@ -253,7 +253,6 @@
             size="sm"
             onclick={() => showProductInfo(type as BuildingType)}
             class="info-button"
-            aria-label={`Подробнее о здании ${config.name}`}
           >
             <Icon name="book" size="sm" />
           </Button>

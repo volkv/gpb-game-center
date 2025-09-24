@@ -2,7 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import type { GameState } from '../types/GameState';
 import { GameScreen, GameMode } from '../types/GameState';
 import { playerData } from './playerData';
-import type { GameEngine } from '../game/GameEngine';
+import type { GameEngine } from '../components/game/GameEngine';
 
 const initialGameState: GameState = {
   version: '1.0.0',

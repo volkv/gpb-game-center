@@ -92,11 +92,11 @@
       {#if totalAssets > 0}
         <div class="progress-details">
           <div class="assets-counter">
-            <Icon name="package" size="xs" color="var(--color-violet)" />
+            <Icon name="building" size="xs" color="var(--color-violet)" />
             <span class="counter-text">{assetsLoaded} / {totalAssets} ресурсов</span>
           </div>
           <div class="memory-indicator">
-            <Icon name="cpu" size="xs" color="var(--color-mint)" />
+            <Icon name="grid" size="xs" color="var(--color-mint)" />
             <span class="memory-text">~{memoryUsage.toFixed(1)} МБ</span>
           </div>
         </div>
@@ -246,8 +246,8 @@
   }
 
   .stage-dot.completed {
-    border-color: var(--color-melissa);
-    background: var(--color-melissa);
+    border-color: var(--color-gpb-emerald);
+    background: var(--color-gpb-emerald);
     color: white;
   }
 

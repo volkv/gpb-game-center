@@ -1,30 +1,60 @@
 @import 'tailwindcss';
 
 @theme {
+  /* Основные цвета Газпромбанка */
   --color-gpb-black: #000000;
   --color-gpb-violet: #1919EF;
+  --color-gpb-violet-dark: #0F0FCC;
+  --color-gpb-violet-light: #4444F2;
+
+  /* RGB варианты для прозрачности */
+  --color-gpb-black-rgb: 0, 0, 0;
+  --color-gpb-violet-rgb: 25, 25, 239;
+
+  /* Яркие акценты для игр */
   --color-gpb-mint: #58FFFF;
+  --color-gpb-mint-dark: #2BEDED;
+  --color-gpb-mint-light: #85FFFF;
+
   --color-gpb-raspberry: #DD41DB;
-  --color-gpb-melissa: #3CFFB9;
-  --color-gpb-sakura: #FF82BE;
-  --color-gpb-cumin: #060698;
-  --color-gpb-iris: #6088E4;
-  --color-gpb-viola: #BDCEFA;
-  --color-gpb-henbane: #8D98A4;
-  --color-gpb-lily: #DEE1EE;
+  --color-gpb-raspberry-dark: #C428C6;
+  --color-gpb-raspberry-light: #E668E4;
 
-  --font-heading: 'Halvar Breitschrift', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-body: 'Gazprombank Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Дополнительные игровые цвета */
+  --color-gpb-gold: #FFD700;
+  --color-gpb-emerald: #50C878;
+  --color-gpb-orange: #FF8C42;
+  --color-gpb-purple: #9B59B6;
 
-  --radius-base: 0.75rem;
+  /* Нейтральные цвета */
+  --color-gpb-gray-50: #F9FAFB;
+  --color-gpb-gray-100: #F3F4F6;
+  --color-gpb-gray-200: #E5E7EB;
+  --color-gpb-gray-300: #D1D5DB;
+  --color-gpb-gray-400: #9CA3AF;
+  --color-gpb-gray-500: #6B7280;
+  --color-gpb-gray-600: #4B5563;
+  --color-gpb-gray-700: #374151;
+  --color-gpb-gray-800: #1F2937;
+  --color-gpb-gray-900: #111827;
+
+  /* Состояния */
+  --color-gpb-success: #10B981;
+  --color-gpb-warning: #F59E0B;
+  --color-gpb-error: #EF4444;
+  --color-gpb-info: #3B82F6;
+
+  /* Шрифты */
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Радиусы */
+  --radius: 0.625rem;
   --radius-lg: 1rem;
   --radius-xl: 1.5rem;
 
-  --breakpoint-xs: 20rem;
-  --breakpoint-sm: 24rem;
-  --breakpoint-md: 28rem;
-  --breakpoint-lg: 32rem;
-  --breakpoint-xl: 36rem;
+  /* Брейкпоинты */
+  --breakpoint-3xl: 120rem;
 }
 
 @layer base {
@@ -32,6 +62,10 @@
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-gpb-gray-50 text-gpb-gray-900;
   }
 
   .font-heading {
@@ -47,185 +81,559 @@
 }
 
 @layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-gpb-violet text-white font-body font-medium text-sm;
-    @apply rounded-xl transition-all duration-200 ease-out;
-    @apply relative overflow-hidden cursor-pointer;
-    @apply focus:outline-none focus:ring-2 focus:ring-gpb-violet/50;
-    will-change: transform, box-shadow;
+  /* === ЭНЕРГЕТИЧЕСКИЕ ГРАДИЕНТЫ === */
+  .gradient-electric {
+    background: linear-gradient(135deg, #1919EF 0%, #58FFFF 100%);
   }
 
-  .btn-primary::before {
-    content: '';
-    @apply absolute inset-0 bg-white opacity-0 transition-opacity duration-200;
-    border-radius: inherit;
+  .gradient-power {
+    background: linear-gradient(135deg, #DD41DB 0%, #FF8C42 100%);
   }
 
-  .btn-primary:hover {
-    @apply shadow-lg;
-    transform: translateY(-1px);
+  .gradient-wealth {
+    background: linear-gradient(135deg, #FFD700 0%, #50C878 100%);
   }
 
-  .btn-primary:hover::before {
-    @apply opacity-10;
+  .gradient-mystery {
+    background: linear-gradient(135deg, #9B59B6 0%, #1919EF 100%);
   }
 
-  .btn-primary:active {
-    transform: translateY(0) scale(0.98);
-    @apply shadow-md;
+  /* Фоновые градиенты для секций */
+  .gradient-header {
+    background: linear-gradient(135deg, #1919EF 0%, #9B59B6 50%, #DD41DB 100%);
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-transparent border-2 border-gpb-violet text-gpb-violet font-body font-medium text-sm;
-    @apply rounded-xl transition-all duration-200 ease-out;
-    @apply relative overflow-hidden cursor-pointer;
-    @apply focus:outline-none focus:ring-2 focus:ring-gpb-violet/50;
-    will-change: transform, background-color, color;
+  .gradient-card-mint {
+    background: linear-gradient(135deg, #58FFFF 0%, #2BEDED 100%);
   }
 
-  .btn-secondary::before {
-    content: '';
-    @apply absolute inset-0 bg-gpb-violet opacity-0 transition-opacity duration-200;
-    border-radius: inherit;
+  .gradient-card-raspberry {
+    background: linear-gradient(135deg, #DD41DB 0%, #C428C6 100%);
   }
 
-  .btn-secondary:hover {
-    @apply shadow-lg;
-    transform: translateY(-1px);
+  .gradient-card-gold {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
   }
 
-  .btn-secondary:hover::before {
+  /* Радиальные градиенты для особых эффектов */
+  .gradient-radial-glow {
+    background: radial-gradient(circle at center, rgba(88,255,255,0.3) 0%, transparent 70%);
+  }
+
+  .gradient-conic-rainbow {
+    background: conic-gradient(from 0deg, #1919EF, #DD41DB, #58FFFF, #FFD700, #1919EF);
+  }
+
+  /* === СПЕЦИАЛЬНЫЕ ЭФФЕКТЫ === */
+  /* Стеклянный эффект */
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+    backdrop-filter: blur(12px) saturate(180%);
+  }
+
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-md border border-white/10;
+  }
+
+  /* Неоновое свечение */
+  .neon-glow {
+    filter: drop-shadow(0 0 10px currentColor) drop-shadow(0 0 20px currentColor);
+  }
+
+  .neon-text {
+    text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 40px currentColor;
+  }
+
+  /* Металлический эффект */
+  .metallic {
+    background: linear-gradient(145deg, #e6e6e6, #ffffff);
+    box-shadow:
+      inset 8px 8px 16px #d9d9d9,
+      inset -8px -8px 16px #ffffff;
+  }
+
+  /* Декоративные элементы */
+  .decoration-orb {
+    @apply absolute rounded-full blur-xl opacity-30 animate-pulse;
+  }
+
+  .decoration-shine {
+    @apply absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent;
+    @apply opacity-0 transition-opacity duration-300;
+  }
+
+  .decoration-shine:hover {
     @apply opacity-100;
   }
 
-  .btn-secondary:hover {
+  /* === ИГРОВАЯ ТИПОГРАФИКА === */
+  .font-game-title {
+    @apply font-black text-4xl md:text-5xl tracking-tight;
     @apply text-white;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
   }
 
-  .btn-secondary:active {
-    transform: translateY(0) scale(0.98);
+  .font-section-title {
+    @apply font-bold text-2xl md:text-3xl text-gpb-gray-900;
+    @apply mb-4 tracking-tight;
   }
 
-  .btn-accent {
-    @apply inline-flex items-center justify-center px-6 py-3 text-gpb-black font-body font-medium text-sm;
-    @apply rounded-xl transition-all duration-200 ease-out;
-    @apply relative overflow-hidden cursor-pointer;
-    @apply focus:outline-none focus:ring-2 focus:ring-gpb-mint/50;
-    background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%);
-    will-change: transform, box-shadow;
+  .font-card-title {
+    @apply font-bold text-xl text-current;
+    @apply mb-1 tracking-tight leading-tight;
   }
 
-  .btn-accent::before {
+  .font-card-subtitle {
+    @apply text-sm opacity-90 font-medium;
+  }
+
+  .font-score {
+    @apply font-black text-3xl md:text-4xl;
+    @apply tabular-nums tracking-tight;
+  }
+
+  .font-badge {
+    @apply text-xs font-bold uppercase tracking-wider;
+  }
+
+  .font-ui-primary {
+    @apply text-base font-medium leading-relaxed;
+  }
+
+  .font-ui-secondary {
+    @apply text-sm font-normal text-gpb-gray-600;
+  }
+
+  .font-ui-caption {
+    @apply text-xs font-medium text-gpb-gray-500 tracking-wide;
+  }
+
+  .font-button {
+    @apply font-semibold text-base tracking-wide;
+  }
+
+  .font-nav {
+    @apply text-xs font-medium tracking-wider uppercase;
+  }
+
+  /* === ИГРОВЫЕ КАРТОЧКИ === */
+  .game-card {
+    @apply relative overflow-hidden rounded-2xl shadow-lg;
+    @apply transition-all duration-300 ease-out;
+    @apply hover:scale-105 hover:shadow-xl cursor-pointer;
+    min-height: 160px;
+  }
+
+  .game-card::before {
     content: '';
-    @apply absolute inset-0 bg-white opacity-0 transition-opacity duration-200;
-    border-radius: inherit;
+    @apply absolute top-2 right-2 w-16 h-16 bg-white/10 rounded-full blur-xl;
   }
 
-  .btn-accent:hover {
-    @apply shadow-lg;
-    transform: translateY(-1px);
-    background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%);
+  .game-card::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-20 h-20 bg-black/10 rounded-full blur-lg;
+    transform: translate(1rem, 1rem);
   }
 
-  .btn-accent:hover::before {
-    @apply opacity-15;
+  .game-card-content {
+    @apply relative p-4 h-full flex flex-col justify-between z-10;
   }
 
-  .btn-accent:active {
-    transform: translateY(0) scale(0.98);
+  .game-card-header {
+    @apply flex justify-between items-start mb-4;
   }
 
-  .card {
-    @apply bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100;
-    @apply transition-all duration-300 ease-out;
-    will-change: transform, box-shadow;
+  .game-card-icon {
+    @apply p-2 rounded-xl bg-black/10 backdrop-blur-sm border border-white/30;
   }
 
-  .card:hover {
-    @apply shadow-xl;
-    transform: translateY(-2px);
+  .game-card-footer {
+    @apply flex items-center justify-between text-xs opacity-80;
   }
 
-  .card-gradient {
-    background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-cumin) 100%);
-    @apply text-white;
-    @apply transition-all duration-300 ease-out;
-    will-change: transform, box-shadow;
+  .game-card-locked {
+    @apply opacity-60 cursor-not-allowed;
+    @apply hover:scale-100 hover:shadow-lg;
   }
 
-  .card-gradient:hover {
-    @apply shadow-2xl;
-    transform: translateY(-3px);
-    background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-cumin) 100%);
+  /* === СЧЕТЧИКИ И СТАТИСТИКА === */
+  .score-display {
+    @apply text-center p-6 rounded-2xl;
+    background: linear-gradient(135deg, #1919EF 0%, #9B59B6 100%);
+    @apply text-white shadow-xl relative overflow-hidden;
   }
 
-  .game-icon {
-    @apply relative rounded-2xl overflow-hidden cursor-pointer;
-    @apply transition-all duration-300 ease-out;
-    will-change: transform, box-shadow;
+  .score-value {
+    @apply font-black text-3xl md:text-4xl;
+    @apply tabular-nums tracking-tight animate-pulse;
+    @apply bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent;
   }
 
-  .game-icon:hover {
-    transform: translateY(-3px) scale(1.02);
-    @apply shadow-2xl;
+  .score-label {
+    @apply text-sm font-normal text-gpb-gray-600 opacity-90 mt-2;
   }
 
-  .game-icon:active {
-    transform: translateY(-1px) scale(0.98);
-    @apply shadow-lg;
+  .mini-stat {
+    @apply bg-white/10 backdrop-blur-sm rounded-xl p-4;
+    @apply text-white text-center;
   }
 
-  .game-icon-inactive {
-    @apply pointer-events-none;
-    filter: grayscale(1) opacity(0.6);
-    will-change: auto;
+  .mini-stat-value {
+    @apply text-2xl font-bold mb-1 tabular-nums;
   }
 
-  .btn-sm {
-    @apply px-4 py-2 text-xs;
+  .mini-stat-label {
+    @apply text-sm opacity-80;
   }
 
-  .btn-md {
-    @apply px-6 py-3 text-sm;
+  .mini-stat-icon {
+    @apply mb-2 opacity-80;
   }
 
-  .btn-lg {
-    @apply px-8 py-4 text-base;
+  /* === ПРОГРЕСС-БАРЫ === */
+  .progress-bar {
+    @apply w-full h-2 bg-black/20 rounded-full overflow-hidden;
   }
 
-  .container-app {
-    @apply max-w-sm mx-auto px-4;
-    width: 100%;
-    max-width: 500px;
+  .progress-fill {
+    @apply h-full bg-white/80 rounded-full transition-all duration-1000 ease-out;
+    @apply relative overflow-hidden;
+  }
+
+  .progress-fill::after {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent;
+    animation: shimmer 2s linear infinite;
+  }
+
+  .circular-progress {
+    @apply relative w-16 h-16 rounded-full;
+    background: conic-gradient(from 0deg, #1919EF var(--progress, 0%), #ffffff20 var(--progress, 0%));
+  }
+
+  .circular-progress::before {
+    content: '';
+    @apply absolute inset-2 rounded-full bg-current;
+  }
+
+  .level-indicator {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full;
+    @apply bg-gradient-to-r from-gpb-gold to-orange-400 text-white;
+    @apply text-xs font-bold uppercase tracking-wider shadow-lg;
+  }
+
+  /* === БЕЙДЖИ И ЛЕЙБЛЫ === */
+  .badge-new {
+    @apply bg-gpb-gold text-black text-xs font-bold px-2 py-1 rounded-full;
+    @apply animate-pulse shadow-lg;
+  }
+
+  .badge-locked {
+    @apply bg-gpb-gray-600 text-white text-xs font-bold px-2 py-1 rounded-full;
+    @apply flex items-center gap-1;
+  }
+
+  .badge-hot {
+    @apply bg-gradient-to-r from-red-500 to-orange-500 text-white;
+    @apply text-xs font-bold px-2 py-1 rounded-full;
+    @apply animate-bounce;
+  }
+
+  .badge-pro {
+    @apply bg-gradient-to-r from-gpb-violet to-gpb-raspberry text-white;
+    @apply text-xs font-bold px-2 py-1 rounded-full;
+  }
+
+  .status-online {
+    @apply w-3 h-3 bg-green-400 rounded-full animate-pulse;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+  }
+
+  .status-offline {
+    @apply w-3 h-3 bg-gpb-gray-400 rounded-full;
+  }
+
+  .category-tag {
+    @apply inline-block px-3 py-1 text-xs font-medium rounded-full;
+    @apply bg-gpb-mint/20 text-gpb-mint border border-gpb-mint/30;
+  }
+
+  .category-quiz { @apply bg-blue-100 text-blue-800 border-blue-200; }
+  .category-puzzle { @apply bg-purple-100 text-purple-800 border-purple-200; }
+  .category-strategy { @apply bg-green-100 text-green-800 border-green-200; }
+
+  /* === ИНТЕРАКТИВНЫЕ ЭЛЕМЕНТЫ === */
+  /* Основная игровая кнопка */
+  .btn-game-primary {
+    @apply px-6 py-3 rounded-xl font-semibold text-base tracking-wide;
+    background: linear-gradient(135deg, #1919EF 0%, #58FFFF 100%);
+    @apply text-white shadow-lg;
+    @apply hover:scale-105 hover:shadow-xl active:scale-95;
+    @apply transition-all duration-200;
+    @apply focus:outline-none focus:ring-4 focus:ring-gpb-violet/30;
+    @apply relative overflow-hidden;
+  }
+
+  .btn-game-primary::before {
+    content: '';
+    @apply absolute inset-0 bg-white/20 opacity-0 rounded-xl;
+    @apply transition-opacity duration-200;
+  }
+
+  .btn-game-primary:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Вторичная кнопка */
+  .btn-game-secondary {
+    @apply px-6 py-3 rounded-xl font-semibold text-base tracking-wide;
+    @apply bg-transparent border-2 border-gpb-violet text-gpb-violet;
+    @apply hover:bg-gpb-violet hover:text-white hover:scale-105;
+    @apply active:scale-95 transition-all duration-200;
+  }
+
+  /* Кнопка с иконкой */
+  .btn-icon {
+    @apply flex items-center justify-center gap-2;
+    @apply p-3 rounded-full aspect-square;
+    @apply bg-white/20 backdrop-blur-sm text-current;
+    @apply hover:bg-white/30 hover:scale-110;
+    @apply transition-all duration-200;
+  }
+
+  /* Размеры кнопок */
+  .btn-sm { @apply px-4 py-2 text-sm; }
+  .btn-md { @apply px-6 py-3 text-base; }
+  .btn-lg { @apply px-8 py-4 text-lg; }
+  .btn-xl { @apply px-10 py-5 text-xl; }
+
+  /* === ФОРМЫ И ИНПУТЫ === */
+  .input-game {
+    @apply w-full px-4 py-3 rounded-xl;
+    @apply bg-white/90 backdrop-blur-sm border-2 border-transparent;
+    @apply text-gpb-gray-800 placeholder-gpb-gray-500;
+    @apply focus:bg-white focus:border-gpb-violet focus:outline-none;
+    @apply focus:ring-4 focus:ring-gpb-violet/20;
+    @apply transition-all duration-200;
+  }
+
+  .input-game:focus {
+    @apply shadow-lg scale-[1.02];
+  }
+
+  .checkbox-game {
+    @apply w-6 h-6 rounded-lg border-2 border-gpb-violet;
+    @apply bg-transparent checked:bg-gpb-violet;
+    @apply focus:ring-4 focus:ring-gpb-violet/20;
+    @apply transition-all duration-200;
+  }
+
+  .radio-game {
+    @apply w-6 h-6 rounded-full border-2 border-gpb-violet;
+    @apply bg-transparent checked:bg-gpb-violet;
+    @apply focus:ring-4 focus:ring-gpb-violet/20;
+    @apply transition-all duration-200;
+  }
+
+  .slider-game {
+    @apply w-full h-2 bg-gpb-gray-200 rounded-full appearance-none cursor-pointer;
+  }
+
+  .slider-game::-webkit-slider-thumb {
+    @apply appearance-none w-6 h-6 bg-gpb-violet rounded-full cursor-pointer;
+    @apply shadow-lg hover:scale-110 transition-transform;
+  }
+
+  /* === НАВИГАЦИЯ === */
+  .bottom-nav {
+    @apply flex items-center justify-around;
+    @apply px-4 py-2 bg-white/95 backdrop-blur-md;
+    @apply border-t border-gpb-gray-200/50;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center justify-center;
+    @apply py-2 px-3 rounded-lg;
+    @apply text-gpb-gray-500 transition-all duration-200;
+    @apply hover:text-gpb-violet hover:bg-gpb-violet/5;
+    @apply focus:outline-none focus:text-gpb-violet;
+  }
+
+  .nav-item-active {
+    @apply text-gpb-violet bg-gpb-violet/10;
+  }
+
+  .nav-icon {
+    @apply w-6 h-6 mb-1 transition-transform duration-200;
+  }
+
+  .nav-item:hover .nav-icon {
+    @apply scale-110;
+  }
+
+  .nav-label {
+    @apply text-xs font-medium tracking-wider uppercase;
+  }
+
+  /* Табы */
+  .tab-container {
+    @apply flex bg-gpb-gray-100 rounded-xl p-1;
+  }
+
+  .tab-item {
+    @apply flex-1 py-2 px-4 rounded-lg text-center;
+    @apply text-sm font-medium text-gpb-gray-600;
+    @apply transition-all duration-200 cursor-pointer;
+  }
+
+  .tab-item-active {
+    @apply bg-white text-gpb-violet shadow-sm;
+  }
+
+  .tab-item:hover:not(.tab-item-active) {
+    @apply text-gpb-gray-800 bg-gpb-gray-50;
+  }
+
+  /* === МОДАЛЬНЫЕ ОКНА === */
+  .modal-overlay-game {
+    @apply fixed inset-0 z-50 flex items-center justify-center;
+    @apply bg-black/60 backdrop-blur-sm p-4;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  .modal-game {
+    @apply w-full max-w-sm bg-white rounded-2xl shadow-2xl;
+    @apply transform overflow-hidden;
+    animation: slideUp 0.4s ease-out;
+  }
+
+  .modal-header-game {
+    background: linear-gradient(135deg, #1919EF 0%, #9B59B6 50%, #DD41DB 100%);
+    @apply text-white p-6 text-center relative;
+  }
+
+  .modal-header-game::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-white/10 to-transparent;
+  }
+
+  .modal-title-game {
+    @apply font-bold text-2xl md:text-3xl text-current mb-4 tracking-tight relative z-10;
+  }
+
+  .modal-content-game {
+    @apply p-6 text-center;
+  }
+
+  .modal-footer-game {
+    @apply flex gap-3 p-6 pt-0;
+  }
+
+  /* Toast уведомления */
+  .toast-container {
+    @apply fixed top-4 right-4 z-60 space-y-2;
+  }
+
+  .toast {
+    @apply px-4 py-3 rounded-xl shadow-lg;
+    @apply bg-white border-l-4 border-gpb-violet;
+    animation: slide-in-right 0.3s ease-out;
+  }
+
+  .toast-success {
+    @apply border-green-500 bg-green-50 text-green-800;
+  }
+
+  .toast-error {
+    @apply border-red-500 bg-red-50 text-red-800;
+  }
+
+  .toast-info {
+    @apply border-blue-500 bg-blue-50 text-blue-800;
+  }
+
+  /* === МАКЕТНАЯ СИСТЕМА === */
+  .game-container {
+    @apply  mx-auto ;
+
+    @apply bg-gradient-to-br from-gpb-gray-50 to-gpb-gray-100;
+  }
+
+  .section-container {
+    @apply mb-8;
+  }
+
+  .content-padding {
+    @apply px-4 py-6;
+  }
+
+  .game-grid {
+    @apply grid gap-4;
+  }
+
+  .game-grid-1 { @apply grid-cols-1; }
+  .game-grid-2 { @apply grid-cols-2; }
+  .game-grid-3 { @apply grid-cols-3; }
+
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4;
+  }
+
+  .responsive-list {
+    @apply space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4;
+  }
+
+  /* Отступы */
+  .spacing-xs { @apply p-2; }
+  .spacing-sm { @apply p-3; }
+  .spacing-md { @apply p-4; }
+  .spacing-lg { @apply p-6; }
+  .spacing-xl { @apply p-8; }
+
+  .section-spacing { @apply mb-8; }
+  .section-spacing-sm { @apply mb-6; }
+  .section-spacing-lg { @apply mb-12; }
+
+  .fixed-bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-50;
+    @apply bg-white border-t border-gpb-gray-200 px-4 py-2;
+  }
+
+  .floating-action-button {
+    @apply fixed bottom-20 right-4 z-40;
+    @apply p-4 rounded-full shadow-lg;
+    background: linear-gradient(135deg, #1919EF 0%, #58FFFF 100%);
+    @apply text-white hover:scale-110 active:scale-95 transition-transform duration-200;
   }
 }
 
-
 @layer utilities {
-  .gradient-mint-melissa {
-    background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%);
+  /* === АНИМАЦИИ === */
+  /* Hover эффекты для интерактивных элементов */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+    @apply hover:scale-105 hover:-translate-y-1 hover:shadow-xl;
   }
 
-  .gradient-mint-violet {
-    background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-violet) 100%);
+  .hover-glow {
+    @apply transition-all duration-300;
+    @apply hover:shadow-2xl;
   }
 
-  .gradient-raspberry-sakura {
-    background: linear-gradient(135deg, var(--color-gpb-raspberry) 0%, var(--color-gpb-sakura) 100%);
+  .hover-glow:hover {
+    filter: drop-shadow(0 0 20px rgba(88, 255, 255, 0.4));
   }
 
-  .gradient-raspberry-violet {
-    background: linear-gradient(135deg, var(--color-gpb-raspberry) 0%, var(--color-gpb-violet) 100%);
+  /* Активные состояния */
+  .active-press {
+    @apply active:scale-95 active:duration-75;
   }
 
-  .gradient-violet-cumin {
-    background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-cumin) 100%);
+  .active-bounce {
+    @apply active:animate-bounce;
   }
 
-  .gradient-black-cumin {
-    background: linear-gradient(135deg, var(--color-gpb-black) 0%, var(--color-gpb-cumin) 100%);
-  }
-
+  /* Базовые анимации */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-out;
   }
@@ -238,6 +646,55 @@
     animation: bounceIn 0.5s ease-out;
   }
 
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+
+
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .animate-count-up {
+    animation: count-up 0.5s ease-out;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out;
+  }
+
+  /* Переходы состояний */
+  .loading-enter {
+    @apply opacity-0 translate-y-4 scale-95;
+  }
+
+  .loading-enter-active {
+    @apply opacity-100 translate-y-0 scale-100;
+    @apply transition-all duration-500 ease-out;
+  }
+
+  .screen-transition-enter {
+    @apply opacity-0 translate-x-full;
+  }
+
+  .screen-transition-enter-active {
+    @apply opacity-100 translate-x-0;
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .screen-transition-exit {
+    @apply opacity-100 translate-x-0;
+  }
+
+  .screen-transition-exit-active {
+    @apply opacity-0 -translate-x-full;
+    @apply transition-all duration-300 ease-in;
+  }
+
+
+
+  /* Keyframes */
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -255,353 +712,290 @@
     100% { transform: scale(1); opacity: 1; }
   }
 
-  /* Performance optimizations */
-  @media (prefers-reduced-motion: reduce) {
-    .btn-primary,
-    .btn-secondary,
-    .btn-accent,
-    .card,
-    .card-gradient,
-    .game-icon {
-      will-change: auto;
-      transition-duration: 0.1s;
-    }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
 
-    .btn-primary:hover,
-    .btn-secondary:hover,
-    .btn-accent:hover,
-    .card:hover,
-    .card-gradient:hover,
-    .game-icon:hover {
-      transform: none;
-    }
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
 
-    .btn-primary:active,
-    .btn-secondary:active,
-    .btn-accent:active,
-    .game-icon:active {
-      transform: scale(0.98);
+  @keyframes pulse-glow {
+    0%, 100% {
+      filter: drop-shadow(0 0 5px currentColor);
     }
-
-    .animate-fade-in,
-    .animate-slide-up,
-    .animate-bounce-in {
-      animation-duration: 0.1s;
+    50% {
+      filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 40px currentColor);
     }
   }
 
-  /* Enhanced focus states for accessibility */
+  @keyframes count-up {
+    from {
+      transform: scale(1.2);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* === СПЕЦИАЛЬНЫЕ ЭФФЕКТЫ === */
+  /* Частицы в фоне */
+  .particles-container {
+    @apply absolute inset-0 overflow-hidden pointer-events-none;
+  }
+
+  .particle {
+    @apply absolute w-2 h-2 bg-white/30 rounded-full;
+    animation: float-particle 4s ease-in-out infinite;
+  }
+
+  @keyframes float-particle {
+    0%, 100% {
+      transform: translateY(0px) translateX(0px) scale(0.8);
+      opacity: 0.3;
+    }
+    33% {
+      transform: translateY(-20px) translateX(10px) scale(1);
+      opacity: 0.8;
+    }
+    66% {
+      transform: translateY(-10px) translateX(-5px) scale(0.9);
+      opacity: 0.5;
+    }
+  }
+
+  .particle:nth-child(odd) {
+    animation-delay: 0.5s;
+    animation-duration: 6s;
+  }
+
+  .particle:nth-child(even) {
+    animation-delay: 1.5s;
+    animation-duration: 5s;
+  }
+
+  /* Звездочки и искры */
+  .sparkle {
+    @apply absolute pointer-events-none;
+  }
+
+  .sparkle::before,
+  .sparkle::after {
+    content: '';
+    @apply absolute w-1 h-1 bg-white rounded-full;
+    animation: sparkle 1.5s ease-in-out infinite;
+  }
+
+  .sparkle::before {
+    @apply -top-2 -left-2;
+  }
+
+  .sparkle::after {
+    @apply -bottom-2 -right-2;
+    animation-delay: 0.7s;
+  }
+
+  @keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Конфетти эффект */
+  .confetti-container {
+    @apply fixed inset-0 pointer-events-none z-40;
+  }
+
+  .confetti {
+    @apply absolute w-2 h-2 opacity-90;
+    animation: confetti-fall 3s ease-out forwards;
+  }
+
+  .confetti-1 { @apply bg-gpb-gold; }
+  .confetti-2 { @apply bg-gpb-mint; }
+  .confetti-3 { @apply bg-gpb-raspberry; }
+  .confetti-4 { @apply bg-gpb-violet; }
+
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-100vh) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  /* Ripple эффект при клике */
+  .ripple {
+    @apply absolute pointer-events-none;
+    @apply w-0 h-0 rounded-full bg-white/50;
+    animation: ripple 0.6s ease-out;
+  }
+
+  @keyframes ripple {
+    to {
+      width: 100px;
+      height: 100px;
+      margin: -50px 0 0 -50px;
+      opacity: 0;
+    }
+  }
+
+  /* Пульсирующий border */
+  .pulse-border {
+    @apply relative;
+  }
+
+  .pulse-border::before {
+    content: '';
+    @apply absolute -inset-1 rounded-2xl opacity-75 blur-sm;
+    @apply bg-gradient-to-r from-gpb-violet via-gpb-raspberry to-gpb-mint;
+    animation: pulse-border 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse-border {
+    0% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.02); }
+  }
+}
+
+/* === АДАПТИВНОСТЬ И ACCESSIBILITY === */
+@layer utilities {
+  /* Фокус для клавиатурной навигации */
+  .focus-game {
+    @apply focus:outline-none focus:ring-4 focus:ring-gpb-violet/30;
+    @apply focus:ring-offset-2 focus:ring-offset-white;
+  }
+
+  .focus-high-contrast {
+    @apply focus:bg-gpb-violet focus:text-white;
+    @apply focus:border-transparent;
+  }
+
+  /* Высокий контраст для текста */
+  .high-contrast-text {
+    @apply text-gpb-gray-900;
+    text-shadow: 0 0 2px rgba(255,255,255,0.8);
+  }
+
+  .high-contrast-bg {
+    @apply bg-white/95 backdrop-blur-sm;
+  }
+
+  /* Размеры touch targets (минимум 44px) */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    @apply flex items-center justify-center;
+  }
+
+  /* Скрытый текст для скрин-ридеров */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Skip to content ссылка */
+  .skip-to-content {
+    @apply absolute -top-10 left-4 z-50 bg-gpb-violet text-white px-4 py-2 rounded;
+    @apply focus:top-4 transition-all duration-200;
+  }
+
+  /* Респект к пользовательским настройкам движения */
+  @media (prefers-reduced-motion: reduce) {
+    .respect-motion-preference {
+      @apply transition-none;
+      animation: none !important;
+    }
+
+    .respect-motion-preference * {
+      @apply transition-none;
+      animation: none !important;
+    }
+
+    /* Упрощенные hover эффекты */
+    .game-card:hover,
+    .btn-game-primary:hover,
+    .btn-game-secondary:hover {
+      transform: none !important;
+    }
+
+    /* Сохраняем только активные состояния */
+    .btn-game-primary:active,
+    .btn-game-secondary:active {
+      transform: scale(0.98) !important;
+    }
+  }
+
+  /* Enhanced focus states для accessibility */
   @media (prefers-reduced-motion: no-preference) {
-    .btn-primary:focus-visible,
-    .btn-secondary:focus-visible,
-    .btn-accent:focus-visible {
+    .btn-game-primary:focus-visible,
+    .btn-game-secondary:focus-visible {
       @apply ring-4;
       transform: translateY(-1px);
     }
 
-    .game-icon:focus-visible {
+    .game-card:focus-visible {
       @apply ring-4 ring-gpb-violet/50;
       transform: translateY(-2px) scale(1.01);
     }
   }
 }
 
-/* Additional utility classes for FinCity game compatibility */
-@utility gap-xs { gap: 0.25rem; }
-@utility gap-sm { gap: 0.5rem; }
-@utility gap-md { gap: 1rem; }
-@utility gap-lg { gap: 1.5rem; }
+/* === DARK MODE SUPPORT === */
+.dark {
+  --color-gpb-bg-primary: #0F0F0F;
+  --color-gpb-bg-secondary: #1F1F1F;
+  --color-gpb-text-primary: #FFFFFF;
+  --color-gpb-text-secondary: #B0B0B0;
+  --color-gpb-border-color: #333333;
+}
 
-@utility px-xs { padding-left: 0.25rem; padding-right: 0.25rem; }
-@utility py-xs { padding-top: 0.25rem; padding-bottom: 0.25rem; }
-@utility p-xs { padding: 0.25rem; }
+.dark .game-card {
+  @apply bg-gpb-gray-800/50 border-gpb-gray-700/50;
+}
 
-@utility px-sm { padding-left: 0.5rem; padding-right: 0.5rem; }
-@utility py-sm { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-@utility p-sm { padding: 0.5rem; }
+.dark .glass-effect {
+  @apply bg-white/5 border-white/10;
+}
 
-@utility px-md { padding-left: 1rem; padding-right: 1rem; }
-@utility py-md { padding-top: 1rem; padding-bottom: 1rem; }
-@utility p-md { padding: 1rem; }
+.dark .input-game {
+  @apply bg-gpb-gray-800/80 border-gpb-gray-600 text-white;
+  @apply focus:bg-gpb-gray-800 focus:border-gpb-violet;
+}
 
-@utility px-lg { padding-left: 1.5rem; padding-right: 1.5rem; }
-@utility py-lg { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-@utility p-lg { padding: 1.5rem; }
+.dark .modal-game {
+  @apply bg-gpb-gray-800 text-white;
+}
 
-@utility mx-xs { margin-left: 0.25rem; margin-right: 0.25rem; }
-@utility my-xs { margin-top: 0.25rem; margin-bottom: 0.25rem; }
-@utility m-xs { margin: 0.25rem; }
-
-@utility mx-sm { margin-left: 0.5rem; margin-right: 0.5rem; }
-@utility my-sm { margin-top: 0.5rem; margin-bottom: 0.5rem; }
-@utility m-sm { margin: 0.5rem; }
-
-@utility mx-md { margin-left: 1rem; margin-right: 1rem; }
-@utility my-md { margin-top: 1rem; margin-bottom: 1rem; }
-@utility m-md { margin: 1rem; }
-
-@utility mx-lg { margin-left: 1.5rem; margin-right: 1.5rem; }
-@utility my-lg { margin-top: 1.5rem; margin-bottom: 1.5rem; }
-@utility m-lg { margin: 1.5rem; }
-
-@utility mb-xs { margin-bottom: 0.25rem; }
-@utility mb-sm { margin-bottom: 0.5rem; }
-@utility mb-md { margin-bottom: 1rem; }
-@utility mb-lg { margin-bottom: 1.5rem; }
-
-@utility mt-xs { margin-top: 0.25rem; }
-@utility mt-sm { margin-top: 0.5rem; }
-@utility mt-md { margin-top: 1rem; }
-@utility mt-lg { margin-top: 1.5rem; }
-
-@utility pt-sm { padding-top: 0.5rem; }
-@utility pb-sm { padding-bottom: 0.5rem; }
-@utility pt-md { padding-top: 1rem; }
-@utility pb-md { padding-bottom: 1rem; }
-
-@utility space-y-lg {
-  > * + * {
-    margin-top: 1.5rem;
+/* Автоматическое переключение */
+@media (prefers-color-scheme: dark) {
+  .auto-dark {
+    color-scheme: dark;
   }
 }
 
-/* FinCity game color utilities */
-@utility bg-violet { background-color: #1919EF; }
-@utility text-violet { color: #1919EF; }
-@utility border-violet { border-color: #1919EF; }
-
-@utility bg-cumin { background-color: #060698; }
-@utility text-cumin { color: #060698; }
-@utility border-cumin { border-color: #060698; }
-
-@utility bg-henbane { background-color: #8D98A4; }
-@utility text-henbane { color: #8D98A4; }
-@utility border-henbane { border-color: #8D98A4; }
-
-@utility bg-lily { background-color: #DEE1EE; }
-@utility text-lily { color: #DEE1EE; }
-@utility border-lily { border-color: #DEE1EE; }
-
-@utility bg-mint { background-color: #3CFFB9; }
-@utility text-mint { color: #3CFFB9; }
-@utility border-mint { border-color: #3CFFB9; }
-
-@utility bg-raspberry { background-color: #DD41DB; }
-@utility text-raspberry { color: #DD41DB; }
-@utility border-raspberry { border-color: #DD41DB; }
-
-@utility bg-melissa { background-color: #3CFFB9; }
-@utility text-melissa { color: #3CFFB9; }
-@utility border-melissa { border-color: #3CFFB9; }
-
-@utility bg-sakura { background-color: #FF82BE; }
-@utility text-sakura { color: #FF82BE; }
-@utility border-sakura { border-color: #FF82BE; }
-
-/* Grid utilities */
-@utility grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-
-/* Text utilities for FinCity */
-@utility text-body-xs {
-  font-family: var(--font-body);
-  font-size: 0.625rem;
-  line-height: 0.875rem;
-  font-weight: 400;
-}
-
-@utility text-body-sm {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  line-height: 1rem;
-  font-weight: 400;
-}
-
-@utility text-body {
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 400;
-}
-
-@utility text-heading-sm {
-  font-family: var(--font-heading);
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  font-weight: 700;
-}
-
-@utility text-heading-md {
-  font-family: var(--font-heading);
-  font-size: 1rem;
-  line-height: 1.5rem;
-  font-weight: 700;
-}
-
-@utility text-heading-lg {
-  font-family: var(--font-heading);
-  font-size: 1.125rem;
-  line-height: 1.375rem;
-  font-weight: 700;
-}
-
-@utility text-heading-xl {
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  line-height: 1.5rem;
-  font-weight: 700;
-}
-
-/* Position utilities for FinCity */
-@utility top-xs { top: 0.25rem; }
-@utility top-sm { top: 0.5rem; }
-@utility top-md { top: 1rem; }
-@utility top-lg { top: 1.5rem; }
-
-@utility bottom-xs { bottom: 0.25rem; }
-@utility bottom-sm { bottom: 0.5rem; }
-@utility bottom-md { bottom: 1rem; }
-@utility bottom-lg { bottom: 1.5rem; }
-
-@utility left-xs { left: 0.25rem; }
-@utility left-sm { left: 0.5rem; }
-@utility left-md { left: 1rem; }
-@utility left-lg { left: 1.5rem; }
-
-@utility right-xs { right: 0.25rem; }
-@utility right-sm { right: 0.5rem; }
-@utility right-md { right: 1rem; }
-@utility right-lg { right: 1.5rem; }
-
-/* Space utilities for FinCity */
-@utility space-y-xs {
-  > * + * {
-    margin-top: 0.25rem;
-  }
-}
-
-@utility space-y-sm {
-  > * + * {
-    margin-top: 0.5rem;
-  }
-}
-
-@utility space-y-md {
-  > * + * {
-    margin-top: 1rem;
-  }
-}
-
-/* Color utilities with opacity for FinCity - using different naming */
-@utility bg-lily-5 { background-color: rgba(222, 225, 238, 0.05); }
-@utility bg-lily-10 { background-color: rgba(222, 225, 238, 0.1); }
-@utility bg-lily-20 { background-color: rgba(222, 225, 238, 0.2); }
-@utility bg-lily-30 { background-color: rgba(222, 225, 238, 0.3); }
-@utility bg-lily-50 { background-color: rgba(222, 225, 238, 0.5); }
-
-@utility border-lily-10 { border-color: rgba(222, 225, 238, 0.1); }
-@utility border-lily-20 { border-color: rgba(222, 225, 238, 0.2); }
-@utility border-lily-30 { border-color: rgba(222, 225, 238, 0.3); }
-
-@utility bg-henbane-5 { background-color: rgba(141, 152, 164, 0.05); }
-@utility bg-henbane-10 { background-color: rgba(141, 152, 164, 0.1); }
-@utility bg-henbane-20 { background-color: rgba(141, 152, 164, 0.2); }
-@utility bg-henbane-30 { background-color: rgba(141, 152, 164, 0.3); }
-
-@utility border-henbane-10 { border-color: rgba(141, 152, 164, 0.1); }
-@utility border-henbane-20 { border-color: rgba(141, 152, 164, 0.2); }
-@utility border-henbane-30 { border-color: rgba(141, 152, 164, 0.3); }
-
-@utility text-henbane-30 { color: rgba(141, 152, 164, 0.3); }
-
-@utility bg-violet-5 { background-color: rgba(25, 25, 239, 0.05); }
-@utility bg-violet-10 { background-color: rgba(25, 25, 239, 0.1); }
-@utility bg-violet-20 { background-color: rgba(25, 25, 239, 0.2); }
-@utility bg-violet-30 { background-color: rgba(25, 25, 239, 0.3); }
-
-@utility border-violet-10 { border-color: rgba(25, 25, 239, 0.1); }
-@utility border-violet-20 { border-color: rgba(25, 25, 239, 0.2); }
-@utility border-violet-30 { border-color: rgba(25, 25, 239, 0.3); }
-
-@utility bg-mint-5 { background-color: rgba(60, 255, 185, 0.05); }
-@utility bg-mint-10 { background-color: rgba(60, 255, 185, 0.1); }
-@utility bg-mint-20 { background-color: rgba(60, 255, 185, 0.2); }
-@utility bg-mint-30 { background-color: rgba(60, 255, 185, 0.3); }
-
-@utility border-mint-10 { border-color: rgba(60, 255, 185, 0.1); }
-@utility border-mint-20 { border-color: rgba(60, 255, 185, 0.2); }
-@utility border-mint-30 { border-color: rgba(60, 255, 185, 0.3); }
-
-@utility bg-raspberry-5 { background-color: rgba(221, 65, 219, 0.05); }
-@utility bg-raspberry-10 { background-color: rgba(221, 65, 219, 0.1); }
-@utility bg-raspberry-20 { background-color: rgba(221, 65, 219, 0.2); }
-@utility bg-raspberry-30 { background-color: rgba(221, 65, 219, 0.3); }
-
-@utility border-raspberry-10 { border-color: rgba(221, 65, 219, 0.1); }
-@utility border-raspberry-20 { border-color: rgba(221, 65, 219, 0.2); }
-@utility border-raspberry-30 { border-color: rgba(221, 65, 219, 0.3); }
-
-@utility bg-melissa-5 { background-color: rgba(60, 255, 185, 0.05); }
-@utility bg-melissa-10 { background-color: rgba(60, 255, 185, 0.1); }
-@utility bg-melissa-20 { background-color: rgba(60, 255, 185, 0.2); }
-@utility bg-melissa-30 { background-color: rgba(60, 255, 185, 0.3); }
-
-@utility border-melissa-10 { border-color: rgba(60, 255, 185, 0.1); }
-@utility border-melissa-20 { border-color: rgba(60, 255, 185, 0.2); }
-@utility border-melissa-30 { border-color: rgba(60, 255, 185, 0.3); }
-
-@utility bg-sakura-5 { background-color: rgba(255, 130, 190, 0.05); }
-@utility bg-sakura-10 { background-color: rgba(255, 130, 190, 0.1); }
-@utility bg-sakura-20 { background-color: rgba(255, 130, 190, 0.2); }
-@utility bg-sakura-30 { background-color: rgba(255, 130, 190, 0.3); }
-
-@utility border-sakura-10 { border-color: rgba(255, 130, 190, 0.1); }
-@utility border-sakura-20 { border-color: rgba(255, 130, 190, 0.2); }
-@utility border-sakura-30 { border-color: rgba(255, 130, 190, 0.3); }
-
-/* Additional semantic colors for FinCity */
-@utility bg-warning-orange { background-color: #FF82BE; }
-@utility text-warning-orange { color: #FF82BE; }
-@utility border-warning-orange { border-color: #FF82BE; }
-@utility bg-warning-orange-10 { background-color: rgba(255, 130, 190, 0.1); }
-@utility bg-warning-orange-20 { background-color: rgba(255, 130, 190, 0.2); }
-@utility border-warning-orange-20 { border-color: rgba(255, 130, 190, 0.2); }
-
-@utility bg-danger-red { background-color: #DD41DB; }
-@utility text-danger-red { color: #DD41DB; }
-@utility border-danger-red { border-color: #DD41DB; }
-@utility border-danger-red-20 { border-color: rgba(221, 65, 219, 0.2); }
-
-@utility bg-success-green { background-color: #3CFFB9; }
-@utility text-success-green { color: #3CFFB9; }
-@utility border-success-green { border-color: #3CFFB9; }
-
-/* Crystal purple color (same as raspberry) */
-@utility bg-crystal-purple { background-color: #DD41DB; }
-@utility text-crystal-purple { color: #DD41DB; }
-@utility border-crystal-purple { border-color: #DD41DB; }
-@utility border-crystal-purple-30 { border-color: rgba(221, 65, 219, 0.3); }
-
-/* Coin gold color (same as mint/melissa) */
-@utility bg-coin-gold { background-color: #3CFFB9; }
-@utility text-coin-gold { color: #3CFFB9; }
-@utility border-coin-gold { border-color: #3CFFB9; }
-@utility bg-coin-gold-20 { background-color: rgba(60, 255, 185, 0.2); }
-
-/* GPB blue color (same as violet) */
-@utility bg-gpb-blue { background-color: #1919EF; }
-@utility text-gpb-blue { color: #1919EF; }
-@utility border-gpb-blue { border-color: #1919EF; }
-@utility ring-gpb-blue { --tw-ring-color: #1919EF; }
-
-/* Container and responsive utilities for FinCity */
-@utility max-w-container { max-width: 500px; }
-@utility max-h-90vh { max-height: 90vh; }
-@utility max-w-modal-xl { max-width: 480px; }
-@utility touch-target { min-width: 44px; min-height: 44px; }
-@utility touch-target-sm { min-width: 40px; min-height: 40px; }
-@utility tabular-nums { font-variant-numeric: tabular-nums; }
-@utility font-body-medium { font-weight: 500; }
-@utility font-body-semibold { font-weight: 600; }
-@utility bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
-@utility modal-slide-up { animation: modalSlideUp 0.3s ease-out; }
-@utility gap-mobile { gap: 0.5rem; }

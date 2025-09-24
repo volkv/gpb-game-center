@@ -1,6 +1,7 @@
 <script lang="ts">
   import { fade, scale } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
+  import { X } from 'lucide-svelte';
 
   interface Props {
     open?: boolean;
@@ -71,48 +72,44 @@
   <!-- svelte-ignore a11y_click_events_have_key_events -->
   <dialog
     bind:this={dialog}
-    class="fixed inset-0 z-50 flex items-end justify-center p-4 bg-transparent backdrop:bg-black backdrop:bg-opacity-50"
+    class="modal-overlay-game"
     onclick={handleBackdropClick}
     {...restProps}
-    transition:fade={{ duration: 200 }}
+    transition:fade={{ duration: 300 }}
   >
     <div
       role="dialog"
       aria-modal="true"
       tabindex="-1"
-      class={`w-full ${sizeClass} bg-white rounded-2xl shadow-xl transform transition-transform duration-300 ${className}`}
-      transition:scale={{ duration: 300, easing: quintOut, start: 0.9 }}
+      class={`modal-game ${sizeClass} ${className}`}
+      transition:scale={{ duration: 400, easing: quintOut, start: 0.9 }}
       onclick={(e) => e.stopPropagation()}
     >
       {#if title || showClose}
-        <div class="flex items-center justify-between p-6 pb-4 border-b border-gray-100">
+        <div class="modal-header-game">
           {#if title}
-            <h2 class="font-heading text-h4 text-gpb-black">{title}</h2>
-          {:else}
-            <div></div>
+            <h2 class="modal-title-game">{title}</h2>
           {/if}
 
           {#if showClose}
             <button
               type="button"
-              class="w-8 h-8 flex items-center justify-center rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+              class="btn-icon touch-target focus-game absolute top-4 right-4 z-20"
               onclick={handleClose}
               aria-label="Закрыть модальное окно"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
+              <X size={20} />
             </button>
           {/if}
         </div>
       {/if}
 
-      <div class="p-6 font-body text-body text-gray-700">
+      <div class="modal-content-game">
         {@render children?.()}
       </div>
 
       {#if footer}
-        <div class="flex justify-end space-x-3 p-6 pt-4 border-t border-gray-100">
+        <div class="modal-footer-game">
           {@render footer?.()}
         </div>
       {/if}

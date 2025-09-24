@@ -98,9 +98,11 @@
 		-moz-user-select: none;
 		-ms-user-select: none;
 		user-select: none;
-		position: fixed;
+		margin: 0;
+		padding: 0;
 		width: 100%;
-		height: 100%;
+		min-height: 100vh;
+		overflow: hidden;
 	}
 
 	:global(.animations-ready) {
@@ -109,7 +111,7 @@
 
 	.mobile-app {
 		min-height: 100vh;
-		background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-cumin) 100%);
+		background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry) 100%);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -126,10 +128,9 @@
 	.mobile-container {
 		width: 100%;
 		max-width: 500px;
-		height: 100vh;
+		height: min(100vh, 1000px);
 		max-height: 1000px;
 		background: white;
-		overflow: hidden;
 		position: relative;
 		border-radius: 0;
 		contain: layout style paint;
@@ -141,7 +142,7 @@
 
 	.main-content {
 		flex: 1;
-		overflow-y: auto;
+		overflow: visible;
 		-webkit-overflow-scrolling: touch;
 		scroll-behavior: smooth;
 		position: relative;

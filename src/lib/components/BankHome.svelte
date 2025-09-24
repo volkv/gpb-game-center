@@ -44,15 +44,13 @@
 
 <style>
 	.bank-home {
-		height: 100vh;
+		min-height: 100%;
 		background: rgb(248, 248, 248);
-		overflow: hidden;
 	}
 
 	.content {
 		background: white;
-		height: 100vh;
-		overflow-y: auto;
+		min-height: 100%;
 	}
 
 	.greeting {

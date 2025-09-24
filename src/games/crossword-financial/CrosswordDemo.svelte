@@ -1,15 +1,18 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
-	import { Button } from '$lib';
+	import { onMount } from 'svelte';
+	import { Button, GameLayout } from '$lib';
+	import { ChevronLeft, CheckCircle, Trophy } from 'lucide-svelte';
 
-	const dispatch = createEventDispatcher<{
-		exit: void;
-	}>();
+	interface Props {
+		onexit?: () => void;
+	}
 
-	let mounted = false;
-	let currentInput = '';
-	let showResult = false;
-	let showDefinition = false;
+	let { onexit }: Props = $props();
+
+	let mounted = $state(false);
+	let currentInput = $state('');
+	let showResult = $state(false);
+	let showDefinition = $state(false);
 
 	const targetWord = 'ВКЛАД';
 	const wordLength = 5;
@@ -21,8 +24,8 @@
 		{ word: 'ПРОЦЕНТ', definition: 'Доходность вложений' }
 	];
 
-	let inputLetters = Array(wordLength).fill('');
-	let currentLetterIndex = 0;
+	let inputLetters = $state(Array(wordLength).fill(''));
+	let currentLetterIndex = $state(0);
 
 	onMount(() => {
 		mounted = true;
@@ -69,10 +72,6 @@
 		}
 	}
 
-	function handleExit() {
-		dispatch('exit');
-	}
-
 	function getLetterStatus(wordIndex: number, letterIndex: number, letter: string) {
 		if (wordIndex < completedWords.length) {
 			return 'correct';
@@ -92,25 +91,12 @@
 
 <svelte:window on:keydown={handleKeyPress} />
 
-<div class="crossword-game">
-	<header class="game-header">
-		<button
-			class="back-button"
-			on:click={handleExit}
-			aria-label="Вернуться в игровой центр"
-		>
-			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-			</svg>
-		</button>
-
-		<div class="game-title">
-			<h1 class="font-heading text-h4 text-gpb-black">Финансовый Кроссворд</h1>
-			<p class="font-body text-body-sm text-gray-600">Интеллектуальная игра</p>
-		</div>
-	</header>
-
-	<div class="game-container" class:mounted>
+<GameLayout
+	gameName="Финансовый Кроссворд"
+	customBackground="linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-mint) 100%)"
+	showScore={true}
+>
+	<div class="crossword-content" class:mounted>
 		<div class="game-info">
 			<p class="instruction font-body text-body text-gray-700">
 				Введите финансовый термин из 5 букв
@@ -144,8 +130,8 @@
 						class:correct={showResult && letter === targetWord[letterIndex]}
 						class:winning-cell={showResult}
 						style="--animation-delay: {(completedWords.length * 200) + letterIndex * 100}ms"
-						on:click={() => handleLetterClick(letterIndex)}
-						on:keydown={(e) => e.key === 'Enter' && handleLetterClick(letterIndex)}
+						onclick={() => handleLetterClick(letterIndex)}
+						onkeydown={(e) => e.key === 'Enter' && handleLetterClick(letterIndex)}
 						role="button"
 						tabindex="0"
 					>
@@ -164,7 +150,7 @@
 					<h3 class="font-heading text-h4 text-gpb-black">
 						{targetWord}
 					</h3>
-					<div class="success-icon">✅</div>
+					<CheckCircle class="text-green-500 neon-glow" size={24} />
 				</div>
 
 				<p class="definition-text font-body text-body text-gray-700">
@@ -202,7 +188,7 @@
 			</div>
 		{:else}
 			<div class="victory-message">
-				<div class="victory-icon">🎉</div>
+				<Trophy class="text-gpb-gold neon-glow animate-pulse" size={48} />
 				<h2 class="victory-text font-heading text-h3 text-gpb-black">
 					Отлично!
 				</h2>
@@ -218,75 +204,16 @@
 			</p>
 		</div>
 	</div>
-</div>
+</GameLayout>
 
 <style>
-	.crossword-game {
-		min-height: 100vh;
-		background: linear-gradient(135deg,
-			var(--color-gpb-violet) 0%,
-			var(--color-gpb-cumin) 100%);
-		padding: 1rem;
-		position: relative;
-	}
-
-	.crossword-game::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Crect x='0' y='0' width='20' height='20'/%3E%3Crect x='20' y='20' width='20' height='20'/%3E%3C/g%3E%3C/svg%3E");
-		opacity: 0.5;
-	}
-
-	.game-header {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		margin-bottom: 1.5rem;
-		position: relative;
-		z-index: 2;
-	}
-
-	.back-button {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 40px;
-		height: 40px;
-		border-radius: 12px;
-		background: rgba(255, 255, 255, 0.2);
-		color: white;
-		border: none;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		backdrop-filter: blur(10px);
-	}
-
-	.back-button:hover {
-		background: rgba(255, 255, 255, 0.3);
-		transform: translateX(-2px);
-	}
-
-	.game-title h1,
-	.game-title p {
-		color: white;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-	}
-
-	.game-container {
-		max-width: 400px;
-		margin: 0 auto;
+	.crossword-content {
 		opacity: 0;
 		transform: translateY(20px);
 		transition: all 0.6s ease-out;
-		position: relative;
-		z-index: 2;
 	}
 
-	.game-container.mounted {
+	.crossword-content.mounted {
 		opacity: 1;
 		transform: translateY(0);
 	}
@@ -294,8 +221,8 @@
 	.game-info {
 		text-align: center;
 		margin-bottom: 2rem;
-		background: rgba(255, 255, 255, 0.15);
-		backdrop-filter: blur(10px);
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(12px) saturate(180%);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 12px;
 		padding: 1rem;
@@ -364,7 +291,7 @@
 
 	.letter-cell.correct {
 		background: var(--color-gpb-mint);
-		border-color: var(--color-gpb-melissa);
+		border-color: var(--color-gpb-emerald);
 		color: var(--color-gpb-black);
 		font-weight: 700;
 	}
@@ -402,10 +329,6 @@
 		margin-bottom: 1rem;
 	}
 
-	.success-icon {
-		font-size: 1.5rem;
-		animation: bounce 0.6s ease-out;
-	}
 
 	.definition-text {
 		line-height: 1.5;
@@ -473,11 +396,6 @@
 		animation: victoryAppear 0.8s ease-out;
 	}
 
-	.victory-icon {
-		font-size: 3rem;
-		margin-bottom: 1rem;
-		animation: celebrate 1s ease-out;
-	}
 
 	.victory-text {
 		color: white;

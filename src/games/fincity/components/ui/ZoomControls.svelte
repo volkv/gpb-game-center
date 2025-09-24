@@ -102,7 +102,7 @@
   }
 
   @media (max-width: 640px) {
-    .zoom-controls {э
+    .zoom-controls {
       bottom: 0.75rem;
       right: 0.75rem;
       gap: 0.375rem;

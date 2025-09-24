@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { Icon, Button, Modal, Bubble } from '.';
+  import { Button, Modal, ProgressBar } from '.';
+  import { Badge } from '$lib';
   import { modal, closeModal } from '../../stores/ui';
   import { getProductByBuildingType } from '../../lib/ProductCatalog';
   import { productIntegration } from '../../lib/ProductIntegration';
   import { trackProductLearning } from '../../stores/quests';
   import { BuildingType } from '../../types/Building';
-  import type { IconName } from '../../types/Icon';
+  import { Building, Shield, TrendingUp, CheckCircle, Star, Book } from 'lucide-svelte';
 
   interface Props {
     class?: string;
@@ -54,13 +55,13 @@
   function getDifficultyVariant(difficulty: string) {
     switch (difficulty) {
       case 'beginner':
-        return 'success';
+        return 'new';
       case 'intermediate':
-        return 'warning';
+        return 'hot';
       case 'advanced':
-        return 'error';
+        return 'pro';
       default:
-        return 'info';
+        return 'online';
     }
   }
 
@@ -80,46 +81,59 @@
   function getCategoryIcon(category: string) {
     switch (category) {
       case 'savings':
-        return 'bank';
+        return Building;
       case 'investment':
-        return 'trending-up';
+        return TrendingUp;
       case 'protection':
-        return 'shield';
+        return Shield;
       case 'services':
-        return 'gift';
+        return Star;
       case 'education':
-        return 'book';
+        return Book;
       default:
-        return 'building';
+        return Building;
     }
   }
 </script>
 
 {#if isOpen && product}
-  <Modal class="fincity-product-showcase-modal {className}">
-    <div class="fincity-product-showcase-header">
-      <div class="fincity-product-visual">
-        <div class="fincity-product-image">
-          <Icon
-            name={(product.iconName || getCategoryIcon(product.category)) as IconName}
-            size="3xl"
-            color="var(--color-violet)"
-          />
-        </div>
-        <Bubble
-          variant={getDifficultyVariant(product.difficulty)}
-          tag="Уровень"
-          size="sm"
-          class="fincity-difficulty-bubble"
-        >
-          {getDifficultyText(product.difficulty)}
-        </Bubble>
+  <div class="modal-overlay-game">
+    <div class="modal-game">
+      <!-- Декоративные элементы -->
+      <div class="particles-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
       </div>
 
-      <div class="fincity-product-details">
-        <h1 class="fincity-product-title text-heading-xl">{product.title}</h1>
-        <p class="fincity-product-subtitle text-body-lg">{product.subtitle}</p>
-        <Bubble color="violet" size="sm" class="fincity-category-badge">
+      <div class="modal-header-game gradient-electric text-white">
+        <div class="decoration-orb bg-gpb-mint w-6 h-6 -top-2 -right-2"></div>
+        <div class="decoration-shine"></div>
+
+        <div class="game-card-icon neon-glow mb-4">
+          {#if product.category}
+            {@const IconComponent = getCategoryIcon(product.category)}
+            <IconComponent
+              size={48}
+              class="text-white neon-glow"
+            />
+          {:else}
+            <Building size={48} class="text-white neon-glow" />
+          {/if}
+        </div>
+
+        <Badge
+          variant={getDifficultyVariant(product.difficulty)}
+          size="sm"
+          class="mb-2"
+        >
+          {getDifficultyText(product.difficulty)}
+        </Badge>
+
+        <h1 class="modal-title-game">{product.title}</h1>
+        <p class="opacity-90 text-center">{product.subtitle}</p>
+
+        <Badge variant="pro" size="sm" class="mt-2">
           {product.category === 'savings'
             ? 'Накопления'
             : product.category === 'investment'
@@ -131,69 +145,90 @@
                   : product.category === 'education'
                     ? 'Обучение'
                     : 'Продукт'}
-        </Bubble>
-      </div>
-    </div>
-
-    <div class="fincity-product-showcase-content">
-      <div class="fincity-description-module">
-        <h2 class="fincity-module-title text-heading-md">О продукте</h2>
-        <p class="fincity-description text-body">{product.detailedDescription}</p>
+        </Badge>
       </div>
 
-      {#if product.benefits.length > 0}
-        <div class="fincity-benefits-module">
-          <h2 class="fincity-module-title text-heading-md">
-            <Icon name="check" size="sm" color="var(--color-melissa)" />
-            Преимущества
+      <div class="modal-content-game space-y-6">
+        <!-- Описание продукта -->
+        <div class="game-card gradient-wealth text-white p-4">
+          <h2 class="font-section-title flex items-center gap-2 mb-3">
+            <Book size={20} class="neon-glow" />
+            О продукте
           </h2>
-          <div class="fincity-benefits-grid">
-            {#each product.benefits as benefit}
-              <Bubble variant="success" size="sm" class="fincity-benefit-bubble">
-                <Icon name="check" size="xs" color="var(--color-melissa)" />
-                {benefit}
-              </Bubble>
-            {/each}
+          <p class="font-ui-primary opacity-90">{product.detailedDescription}</p>
+        </div>
+
+        {#if product.benefits.length > 0}
+          <!-- Преимущества -->
+          <div class="game-card gradient-power text-white p-4">
+            <h2 class="font-section-title flex items-center gap-2 mb-4">
+              <CheckCircle size={20} class="neon-glow" />
+              Преимущества
+            </h2>
+            <div class="grid gap-2">
+              {#each product.benefits as benefit}
+                <Badge variant="new" size="sm" class="justify-start">
+                  <CheckCircle size={12} />
+                  {benefit}
+                </Badge>
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        {#if product.conditions.length > 0}
+          <!-- Условия -->
+          <div class="game-card gradient-mystery text-white p-4">
+            <h2 class="font-section-title flex items-center gap-2 mb-4">
+              <Star size={20} class="neon-glow" />
+              Условия
+            </h2>
+            <div class="grid gap-2">
+              {#each product.conditions as condition}
+                <Badge variant="pro" size="sm" class="justify-start">
+                  <Star size={12} />
+                  {condition}
+                </Badge>
+              {/each}
+            </div>
+          </div>
+        {/if}
+
+        <!-- Образовательная заметка -->
+        <div class="glass-effect p-4 rounded-xl border border-white/20 bg-gpb-mint/10">
+          <div class="flex items-start gap-3">
+            <div class="p-2 rounded-full bg-gpb-mint/20">
+              <Star size={16} class="text-gpb-mint neon-glow" />
+            </div>
+            <div>
+              <span class="font-badge block text-gpb-mint">Финансовая грамотность</span>
+              <span class="font-ui-secondary text-sm opacity-80">
+                Изучите материалы о продукте в разделе "Квесты" для лучшего понимания
+              </span>
+            </div>
           </div>
         </div>
-      {/if}
+      </div>
 
-      {#if product.conditions.length > 0}
-        <div class="fincity-conditions-module">
-          <h2 class="fincity-module-title text-heading-md">
-            <Icon name="book" size="sm" color="var(--color-violet)" />
-            Условия
-          </h2>
-          <div class="fincity-conditions-grid">
-            {#each product.conditions as condition}
-              <Bubble color="violet" size="sm" class="fincity-condition-bubble">
-                <Icon name="book" size="xs" color="var(--color-violet)" />
-                {condition}
-              </Bubble>
-            {/each}
-          </div>
-        </div>
-      {/if}
+      <div class="modal-footer-game">
+        <Button
+          variant="secondary"
+          onclick={closeModal}
+          class="btn-game-secondary flex-1"
+        >
+          Закрыть
+        </Button>
 
-      <Bubble variant="notification" class="fincity-education-note">
-        <Icon name="star" size="sm" color="var(--color-mint)" />
-        <div class="fincity-note-content">
-          <span class="fincity-note-title text-body font-heading">Финансовая грамотность</span>
-          <span class="fincity-note-description text-body-sm">
-            Изучите материалы о продукте в разделе "Квесты" для лучшего понимания
-          </span>
-        </div>
-      </Bubble>
+        <Button
+          variant="primary"
+          onclick={handleLearnMore}
+          class="btn-game-primary flex-1 hover-lift active-press"
+        >
+          <TrendingUp size={16} class="neon-glow" />
+          {product.ctaText}
+        </Button>
+      </div>
     </div>
-
-    <div class="fincity-product-showcase-footer">
-      <Button variant="tertiary" onclick={closeModal} class="fincity-close-button">Закрыть</Button>
-
-      <Button variant="primary" onclick={handleLearnMore} class="fincity-cta-button">
-        <Icon name="trending-up" size="sm" />
-        {product.ctaText}
-      </Button>
-    </div>
-  </Modal>
+  </div>
 {/if}
 

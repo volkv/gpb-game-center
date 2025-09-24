@@ -164,15 +164,15 @@
                 <div class="text-ui-caption text-gray-600">Каждое здание - банковский продукт</div>
               </div>
             </div>
-            <div class="bubble-info bg-melissa-20 border-melissa-30">
-              <Icon name="quest" class="text-melissa" />
+            <div class="bubble-info bg-gpb-emerald/20 border-gpb-emerald/30">
+              <Icon name="quest" class="text-gpb-emerald" />
               <div>
                 <div class="text-ui-label text-gray-900">Обучающие квесты</div>
                 <div class="text-ui-caption text-gray-600">Изучайте финансы играя</div>
               </div>
             </div>
-            <div class="bubble-info bg-sakura-20 border-sakura-30">
-              <Icon name="crystal" class="text-sakura" />
+            <div class="bubble-info bg-gpb-raspberry-light/20 border-gpb-raspberry-light/30">
+              <Icon name="crystal" class="text-gpb-raspberry-light" />
               <div>
                 <div class="text-ui-label text-gray-900">Система наград</div>
                 <div class="text-ui-caption text-gray-600">Получайте достижения и бонусы</div>
@@ -256,7 +256,7 @@
     right: 0;
     bottom: 0;
     z-index: -1;
-    background: linear-gradient(135deg, var(--color-violet) 0%, var(--color-sakura) 100%);
+    background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry-light) 100%);
   }
 
   .onboarding-progress {

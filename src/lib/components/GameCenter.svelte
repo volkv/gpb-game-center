@@ -1,23 +1,29 @@
 <script lang="ts">
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { gameStore } from '$lib/stores/gameStore.js';
+	import { gameStore, currentGameState } from '$lib/stores/gameStore.js';
 	import { navigateToGame } from '$lib/stores/navigationStore.js';
+	import { telegramStore } from '$lib/stores/telegramStore.js';
 	import GameIcon from './GameIcon.svelte';
 	import { getActiveGames, getComingSoonGames } from '$lib/data/games.js';
 	import { staggeredFadeIn, scaleAndSlide } from '$lib/utils/transitions.js';
+	import { Star, Clock, Trophy } from 'lucide-svelte';
 	import type { Game } from '$lib/types/Game.js';
 
-	const dispatch = createEventDispatcher<{
-		gameSelected: { game: Game };
-	}>();
+	const dispatch = createEventDispatcher<{ gameSelected: { game: Game } }>();
 
-	let mounted = false;
-	let showContent = false;
-	let showActiveSection = false;
-	let showComingSoonSection = false;
-	let activeGames: Game[] = [];
-	let comingSoonGames: Game[] = [];
+	let mounted = $state(false);
+	let showContent = $state(false);
+	let showStatsSection = $state(false);
+	let showActiveSection = $state(false);
+	let showComingSoonSection = $state(false);
+	let activeGames: Game[] = $state([]);
+	let comingSoonGames: Game[] = $state([]);
+
+	// Статистика пользователя
+	let totalScore = $derived(15420); // TODO: получать из реального store
+	let totalPlayTime = $derived(247); // в минутах
+	let completedGames = $derived(8);
 
 	onMount(async () => {
 		const allActiveGames = getActiveGames();
@@ -35,56 +41,101 @@
 		}, 100);
 
 		setTimeout(() => {
+			showStatsSection = true;
+		}, 200);
+
+		setTimeout(() => {
 			showActiveSection = true;
-		}, 300);
+		}, 400);
 
 		setTimeout(() => {
 			showComingSoonSection = true;
-		}, 500);
+		}, 600);
 	});
 
-	function handleGameClick(event: CustomEvent<{ game: Game }>) {
-		const { game } = event.detail;
-
-		if (game.status === 'active') {
-			dispatch('gameSelected', { game });
-			navigateToGame();
-		}
+	function handleGameClick(game: Game) {
+		dispatch('gameSelected', { game });
+		navigateToGame();
 	}
 
-	function handleGameHover(event: CustomEvent<{ game: Game }>) {
-		const { game } = event.detail;
+	function handleGameHover() {
 		// Game hover analytics could be added here
 	}
 </script>
 
-<main class="game-center">
+<main class="game-container">
+	<!-- Decorative background elements -->
+	<div class="particles-container">
+		<div class="particle" style="left: 15%; top: 20%; animation-delay: 0s;"></div>
+		<div class="particle" style="left: 85%; top: 35%; animation-delay: 1.5s;"></div>
+		<div class="particle" style="left: 25%; top: 70%; animation-delay: 0.8s;"></div>
+		<div class="particle" style="left: 75%; top: 80%; animation-delay: 2.2s;"></div>
+	</div>
+
+
 	{#if mounted}
-	<header class="header" in:fade={{ duration: 600 }}>
-		<h1 class="title font-heading text-h1 text-gpb-black" id="main-title">
-			Игровой Центр
-		</h1>
-		<p class="subtitle font-body text-body text-gray-600" aria-describedby="main-title">
-			Газпромбанка
-		</p>
-	</header>
+		<header class="header" in:fade={{ duration: 600 }}>
+			<div class="decoration-orb bg-gpb-mint w-24 h-24 -top-8 -right-8"></div>
+			<div class="decoration-orb bg-gpb-raspberry w-16 h-16 -bottom-4 -left-4"></div>
+			<h1 class="font-game-title" id="main-title">
+				Игровой Центр
+			</h1>
+			<p class="subtitle font-ui-secondary" aria-describedby="main-title">
+				Газпромбанка
+			</p>
+		</header>
 	{/if}
 
 	{#if showContent}
 		<div class="content" in:scaleAndSlide={{ delay: 200, duration: 500, y: 20 }}>
+
+			<!-- Statistics Section -->
+			{#if showStatsSection}
+				<section class="stats-section section-spacing stagger-item"
+					style="--animation-delay: 100ms;">
+					<div class="stats-grid">
+						<!-- Total Score -->
+						<div class="score-display" style="animation-delay: 0.1s;">
+							<div class="decoration-shine"></div>
+							<div class="flex items-center gap-2 mb-2">
+								<Star size={20} class="text-gpb-gold neon-glow" />
+								<span class="font-ui-secondary">Всего очков</span>
+							</div>
+							<div class="score-value animate-count-up">{totalScore.toLocaleString()}</div>
+						</div>
+
+						<!-- Play Time -->
+						<div class="mini-stat" style="animation-delay: 0.2s;">
+							<Clock size={20} class="mini-stat-icon text-gpb-mint neon-glow" />
+							<div class="mini-stat-value">{totalPlayTime}</div>
+							<div class="mini-stat-label">Минут в игре</div>
+						</div>
+
+						<!-- Completed Games -->
+						<div class="mini-stat" style="animation-delay: 0.3s;">
+							<Trophy size={20} class="mini-stat-icon text-gpb-emerald neon-glow" />
+							<div class="mini-stat-value">{completedGames}</div>
+							<div class="mini-stat-label">Игр пройдено</div>
+						</div>
+					</div>
+				</section>
+			{/if}
+
+			<!-- Active Games Section -->
 			{#if showActiveSection}
-				<section class="games-section" in:staggeredFadeIn={{ delay: 100, duration: 400 }}>
-					<h2 class="section-title font-heading text-h3 text-gpb-black mb-4">
+				<section class="games-section section-spacing stagger-item"
+					style="--animation-delay: 200ms;">
+					<h2 class="font-section-title">
 						Сейчас в игре
 					</h2>
 					<div class="games-grid">
 						{#each activeGames as game, index}
-							<div in:staggeredFadeIn={{ delay: index * 150, duration: 600 }}>
+							<div class="stagger-item" style="--animation-delay: {300 + index * 100}ms;">
 								<GameIcon
 									{game}
 									animationDelay={0}
-									on:click={handleGameClick}
-									on:hover={handleGameHover}
+									onclick={() => handleGameClick(game)}
+									onhover={handleGameHover}
 								/>
 							</div>
 						{/each}
@@ -92,19 +143,22 @@
 				</section>
 			{/if}
 
+			<!-- Coming Soon Section -->
 			{#if showComingSoonSection}
-				<section class="coming-soon-section" in:staggeredFadeIn={{ delay: 200, duration: 400 }}>
-					<h2 class="section-title font-heading text-h3 text-gpb-black mb-4">
+				<section class="coming-soon-section section-spacing stagger-item"
+					style="--animation-delay: 400ms;">
+					<h2 class="font-section-title">
 						Скоро в Центре
 					</h2>
 					<div class="coming-soon-grid">
 						{#each comingSoonGames as game, index}
-							<div in:staggeredFadeIn={{ delay: (index + activeGames.length) * 150, duration: 600 }}>
+							<div class="stagger-item"
+								style="--animation-delay: {500 + (index + activeGames.length) * 100}ms;">
 								<GameIcon
 									{game}
 									animationDelay={0}
-									on:click={handleGameClick}
-									on:hover={handleGameHover}
+									onclick={() => handleGameClick(game)}
+									onhover={handleGameHover}
 								/>
 							</div>
 						{/each}
@@ -116,58 +170,69 @@
 </main>
 
 <style>
-	.game-center {
-		min-height: 100vh;
-		padding: 2rem 1.5rem;
-		background: linear-gradient(to bottom, #ffffff 0%, var(--color-gpb-lily) 100%);
-		will-change: transform;
+	.game-container {
+		padding-left: 1rem;
+		padding-right: 1rem;
+		padding-top: 1.5rem;
+		padding-bottom: 1.5rem;
+		background: linear-gradient(135deg, #1919EF 0%, #9B59B6 50%, #DD41DB 100%);
+		color: white;
+		position: relative;
+		min-height: 100%;
 	}
 
 	.header {
 		text-align: center;
-		margin-bottom: 3rem;
+		margin-bottom: 2rem;
 		padding-top: 1rem;
-	}
-
-	.title {
-		font-size: 2rem;
-		font-weight: 600;
-		margin-bottom: 0.5rem;
-		background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry) 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-		line-height: 1.2;
+		position: relative;
 	}
 
 	.subtitle {
+		color: rgba(255, 255, 255, 0.9);
 		font-size: 1.125rem;
-		color: var(--color-gpb-henbane);
 		font-weight: 500;
+		margin-top: 0.5rem;
+		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 	}
 
 	.content {
-		max-width: 420px;
-		margin: 0 auto;
-		will-change: transform, opacity;
+		max-width: 28rem;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
-	.games-section {
-		margin-bottom: 3rem;
-		will-change: transform, opacity;
+	.stats-section {
+		margin-bottom: 2rem;
 	}
 
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1rem;
+	}
+
+	/* Single large score display */
+	.stats-grid > .score-display {
+		grid-column: span 3;
+		text-align: center;
+		padding: 1.5rem;
+		border-radius: 1rem;
+		background: linear-gradient(135deg, #FFD700 0%, #50C878 100%);
+		color: white;
+		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+		position: relative;
+		overflow: hidden;
+	}
+
+	/* Two mini stats side by side */
+	.stats-grid > .mini-stat {
+		text-align: center;
+	}
+
+	.games-section,
 	.coming-soon-section {
-		will-change: transform, opacity;
-	}
-
-	.section-title {
-		font-size: 1.375rem;
-		font-weight: 600;
-		color: var(--color-gpb-black);
-		margin-bottom: 1.25rem;
-		line-height: 1.3;
-		letter-spacing: -0.01em;
+		margin-bottom: 2rem;
 	}
 
 	.games-grid {
@@ -178,45 +243,26 @@
 
 	.coming-soon-grid {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(2, 1fr);
 		gap: 1rem;
 	}
 
-	.games-grid > div,
-	.coming-soon-grid > div {
-		will-change: transform, opacity;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.game-center,
-		.content,
-		.games-section,
-		.coming-soon-section,
-		.games-grid > div,
-		.coming-soon-grid > div {
-			will-change: auto;
-		}
-	}
-
+	/* Responsive design */
 	@media (max-width: 380px) {
-		.game-center {
-			padding: 1.5rem 1rem;
+		.game-container {
+			padding-left: 0.75rem;
+			padding-right: 0.75rem;
+			padding-top: 1rem;
+			padding-bottom: 1rem;
 		}
 
-		.header {
-			margin-bottom: 2.5rem;
+		.stats-grid {
+			grid-template-columns: 1fr;
+			gap: 0.75rem;
 		}
 
-		.title {
-			font-size: 1.75rem;
-		}
-
-		.subtitle {
-			font-size: 1rem;
-		}
-
-		.section-title {
-			font-size: 1.25rem;
+		.stats-grid > .score-display {
+			grid-column: span 1;
 		}
 
 		.coming-soon-grid {
@@ -231,15 +277,46 @@
 
 	@media (min-width: 440px) {
 		.content {
-			max-width: 440px;
+			max-width: 32rem;
+		}
+
+		.stats-grid {
+			gap: 1.5rem;
 		}
 
 		.games-grid {
-			gap: 1.25rem;
+			gap: 1.5rem;
 		}
 
 		.coming-soon-grid {
-			gap: 1.25rem;
+			gap: 1.5rem;
+		}
+	}
+
+	/* Accessibility and animation controls */
+	@media (prefers-reduced-motion: reduce) {
+		.game-container,
+		.content,
+		.stats-section,
+		.games-section,
+		.coming-soon-section,
+		.stats-grid > *,
+		.games-grid > *,
+		.coming-soon-grid > * {
+			transition: none;
+			animation: none;
+		}
+	}
+
+	/* High contrast support */
+	@media (prefers-contrast: high) {
+		.game-container {
+			background-color: #000000;
+			border: 2px solid white;
+		}
+
+		.subtitle {
+			color: white;
 		}
 	}
 </style>

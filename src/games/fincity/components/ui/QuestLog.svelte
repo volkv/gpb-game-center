@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { Icon, Button, Card, ProgressBar } from '.';
+  import { Icon, Button, Card, ProgressBar, Modal } from '.';
+  import { Badge } from '$lib';
   import { modal, closeModal } from '../../stores/ui';
   import { activeQuests, completedQuests, mainQuests, sideQuests, startQuest, completeQuest } from '../../stores/quests';
   import { level } from '../../stores/playerData';
@@ -114,71 +115,72 @@
   }
 </script>
 
-{#if isOpen}
-  <div
-    class="fincity-quest-log-overlay {className}"
-    onclick={closeModal}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeModal(); } }}
-    role="dialog"
-    aria-modal="true"
-    tabindex="-1"
-  >
-    <div class="fincity-quest-log" onclick={(e) => e.stopPropagation()} onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.stopPropagation(); } }} role="dialog" aria-label="Журнал квестов" tabindex="0">
-      <header class="fincity-quest-header">
-        <div class="fincity-header-content">
-          <div class="fincity-title-section">
-            <Icon name="quest" color="var(--color-crystal-purple)" size="lg" />
-            <h2 class="fincity-quest-title">Журнал квестов</h2>
+<Modal
+  open={isOpen}
+  title="Журнал квестов"
+  onclose={closeModal}
+  size="lg"
+  class={className}
+>
+  {#snippet header()}
+    <div class="modal-title-section flex items-center gap-3">
+      <div class="p-2 rounded-xl gradient-mystery neon-glow">
+        <Icon name="quest" size="lg" />
+      </div>
+      <div>
+        <h2 class="modal-title-game">Журнал квестов</h2>
+        <p class="text-sm opacity-90">Активные задания и достижения</p>
+      </div>
+    </div>
+
+  {/snippet}
+
+  <div class="space-y-6">
+    <div class="tab-container">
+      <button
+        class="tab-item {selectedTab === 'active' ? 'tab-item-active' : ''}"
+        onclick={() => selectedTab = 'active'}
+      >
+        <Icon name="quest" size="sm" />
+        <span>Активные</span>
+        <Badge variant="new" size="sm" class="ml-2">{$activeQuests.length}</Badge>
+      </button>
+
+      <button
+        class="tab-item {selectedTab === 'main' ? 'tab-item-active' : ''}"
+        onclick={() => selectedTab = 'main'}
+      >
+        <Icon name="star" size="sm" />
+        <span>Основные</span>
+      </button>
+
+      <button
+        class="tab-item {selectedTab === 'side' ? 'tab-item-active' : ''}"
+        onclick={() => selectedTab = 'side'}
+      >
+        <Icon name="building" size="sm" />
+        <span>Дополнительные</span>
+      </button>
+
+      <button
+        class="tab-item {selectedTab === 'completed' ? 'tab-item-active' : ''}"
+        onclick={() => selectedTab = 'completed'}
+      >
+        <Icon name="check" size="sm" />
+        <span>Завершенные</span>
+        <Badge variant="pro" size="sm" class="ml-2">{$completedQuests.length}</Badge>
+      </button>
+    </div>
+
+    {#if questsByTab.length === 0}
+      <Card class="text-center py-12">
+        <div class="flex flex-col items-center gap-4">
+          <div class="p-4 rounded-full bg-gpb-gray-100">
+            <Icon name="quest" size="xl" class="text-gpb-gray-400" />
           </div>
-
-          <Button variant="ghost" size="sm" onclick={closeModal} class="modal-close-button close-btn">
-            <Icon name="close" />
-          </Button>
-        </div>
-
-        <div class="fincity-quest-tabs">
-          <button
-            class="modal-tab-button tab-button {selectedTab === 'active' ? 'active' : ''}"
-            onclick={() => selectedTab = 'active'}
-          >
-            <Icon name="quest" size="sm" />
-            <span>Активные</span>
-            <div class="modal-tab-badge tab-badge">{$activeQuests.length}</div>
-          </button>
-
-          <button
-            class="modal-tab-button tab-button {selectedTab === 'main' ? 'active' : ''}"
-            onclick={() => selectedTab = 'main'}
-          >
-            <Icon name="star" size="sm" />
-            <span>Основные</span>
-          </button>
-
-          <button
-            class="modal-tab-button tab-button {selectedTab === 'side' ? 'active' : ''}"
-            onclick={() => selectedTab = 'side'}
-          >
-            <Icon name="building" size="sm" />
-            <span>Дополнительные</span>
-          </button>
-
-          <button
-            class="modal-tab-button tab-button {selectedTab === 'completed' ? 'active' : ''}"
-            onclick={() => selectedTab = 'completed'}
-          >
-            <Icon name="check" size="sm" />
-            <span>Завершенные</span>
-            <div class="modal-tab-badge tab-badge">{$completedQuests.length}</div>
-          </button>
-        </div>
-      </header>
-
-      <div class="fincity-quest-content">
-        {#if questsByTab.length === 0}
-          <div class="fincity-no-quests">
-            <Icon name="quest" size="lg" color="var(--color-gray-400)" />
-            <h3>Квестов нет</h3>
-            <p class="text-gray-500">
+          <div>
+            <h3 class="font-card-title text-gpb-gray-700 mb-2">Квестов нет</h3>
+            <p class="font-ui-secondary text-gpb-gray-500">
               {#if selectedTab === 'active'}
                 Все активные квесты завершены!
               {:else if selectedTab === 'completed'}
@@ -188,101 +190,108 @@
               {/if}
             </p>
           </div>
-        {:else}
-          <div class="fincity-quest-list">
-            {#each questsByTab() as questTyped (questTyped.id)}
-              {@const progress = getQuestProgress(questTyped)}
-              {@const isCompleted = questTyped.status === QuestStatus.COMPLETED}
-              {@const isLocked = questTyped.status === QuestStatus.LOCKED}
-              {@const canStart = questTyped.status === QuestStatus.AVAILABLE}
+        </div>
+      </Card>
+    {:else}
+      <div class="space-y-4">
+        {#each questsByTab() as questTyped, index (questTyped.id)}
+          {@const progress = getQuestProgress(questTyped)}
+          {@const isCompleted = questTyped.status === QuestStatus.COMPLETED}
+          {@const isLocked = questTyped.status === QuestStatus.LOCKED}
+          {@const canStart = questTyped.status === QuestStatus.AVAILABLE}
 
-              <Card class="fincity-quest-card {isCompleted ? 'completed' : isLocked ? 'locked' : 'available'}">
-                <div class="fincity-quest-card-header">
-                  <div class="fincity-quest-icon">
-                    <Icon
-                      name={getQuestTypeIcon(questTyped.type)}
-                      color={getQuestTypeColor(questTyped.type)}
-                      size="lg"
-                    />
-                  </div>
+          <Card
+            gradient={isCompleted ? 'wealth' : isLocked ? null : 'electric'}
+            decorative={!isLocked}
+            class="stagger-item text-white {isCompleted ? '' : isLocked ? 'opacity-60' : ''}"
+            style="animation-delay: {index * 0.1}s"
+          >
+            <div class="flex items-start gap-4 mb-4">
+              <div class="p-3 rounded-xl bg-white/20 neon-glow">
+                <Icon
+                  name={getQuestTypeIcon(questTyped.type)}
+                  size="lg"
+                  class="text-current"
+                />
+              </div>
 
-                  <div class="fincity-quest-info">
-                    <div class="fincity-quest-meta">
-                      <h3 class="fincity-quest-title-card">{questTyped.title}</h3>
-                      <div class="fincity-quest-badges">
-                        {#if questTyped.isMainQuest}
-                          <span class="fincity-quest-badge main">Основной</span>
-                        {/if}
-                        <span class="fincity-quest-badge type">{questTyped.type}</span>
-                      </div>
-                    </div>
-
-                    <p class="fincity-quest-description">{questTyped.description}</p>
-                  </div>
-
-                  <div class="fincity-quest-status">
-                    {#if isCompleted}
-                      <div class="fincity-status-indicator completed">
-                        <Icon name="check" color="white" size="sm" />
-                      </div>
-                    {:else if isLocked}
-                      <div class="fincity-status-indicator locked">
-                        <Icon name="shield" color="var(--color-gray-400)" size="sm" />
-                      </div>
-                    {:else}
-                      <div class="fincity-status-indicator active">
-                        <Icon name="quest" color="white" size="sm" />
-                      </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-2">
+                  <h3 class="font-card-title">{questTyped.title}</h3>
+                  <div class="flex gap-2">
+                    {#if questTyped.isMainQuest}
+                      <Badge variant="hot" size="sm">Основной</Badge>
                     {/if}
+                    <Badge variant="new" size="sm">{questTyped.type}</Badge>
                   </div>
                 </div>
 
-                <div class="fincity-quest-requirements">
-                  <div class="fincity-requirement-text">
-                    <Icon name="building" size="sm" color="var(--color-gray-500)" />
-                    <span>{getRequirementText(questTyped)}</span>
+                <p class="font-ui-secondary opacity-90 mb-3 line-clamp-2">{questTyped.description}</p>
+              </div>
+
+              <div class="flex-shrink-0">
+                {#if isCompleted}
+                  <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                    <Icon name="check" color="white" size="sm" />
                   </div>
-
-                  {#if !isCompleted && !isLocked}
-                    <ProgressBar
-                      value={progress}
-                      color={progress === 100 ? 'mint' : 'violet'}
-                      showPercentage={true}
-                      class="fincity-quest-progress"
-                    />
-                  {/if}
-                </div>
-
-                <div class="fincity-quest-rewards">
-                  <div class="fincity-rewards-section">
-                    <Icon name="star" size="sm" color="var(--color-coin-gold)" />
-                    <span class="fincity-rewards-text">{formatRewards(questTyped.rewards)}</span>
+                {:else if isLocked}
+                  <div class="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
+                    <Icon name="shield" color="white" size="sm" />
                   </div>
+                {:else}
+                  <div class="w-10 h-10 rounded-full bg-gpb-raspberry flex items-center justify-center pulse-border">
+                    <Icon name="quest" color="white" size="sm" />
+                  </div>
+                {/if}
+              </div>
+            </div>
 
-                  {#if canStart}
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onclick={() => handleStartQuest(questTyped)}
-                    >
-                      Начать
-                    </Button>
-                  {:else if questTyped.status === QuestStatus.IN_PROGRESS && progress === 100}
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onclick={() => completeQuest(questTyped.id)}
-                    >
-                      Завершить
-                    </Button>
-                  {/if}
-                </div>
-              </Card>
-            {/each}
-          </div>
-        {/if}
+            <div class="space-y-3">
+              <div class="flex items-center gap-2 p-2 rounded-lg glass-effect">
+                <Icon name="building" size="sm" class="text-current opacity-80" />
+                <span class="font-ui-primary opacity-90">{getRequirementText(questTyped)}</span>
+              </div>
+
+              {#if !isCompleted && !isLocked}
+                <ProgressBar
+                  value={progress}
+                  color={progress === 100 ? 'emerald' : 'violet'}
+                  showPercentage={true}
+                  animated={true}
+                />
+              {/if}
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-white/20">
+              <div class="flex items-center gap-2">
+                <Icon name="star" size="sm" class="text-gpb-gold neon-glow" />
+                <span class="font-ui-primary font-semibold">{formatRewards(questTyped.rewards)}</span>
+              </div>
+
+              {#if canStart}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onclick={() => handleStartQuest(questTyped)}
+                  class="hover-lift"
+                >
+                  Начать
+                </Button>
+              {:else if questTyped.status === QuestStatus.IN_PROGRESS && progress === 100}
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onclick={() => completeQuest(questTyped.id)}
+                  class="hover-lift animate-pulse-glow"
+                >
+                  Завершить
+                </Button>
+              {/if}
+            </div>
+          </Card>
+        {/each}
       </div>
-    </div>
+    {/if}
   </div>
-{/if}
+</Modal>
 

@@ -1,14 +1,13 @@
 <script lang="ts">
   import Bubble from './Bubble.svelte';
-  import Icon from './Icon.svelte';
-  import type { IconName } from '../../types/Icon';
+  import { Coins, Gem, Battery, Star } from 'lucide-svelte';
 
   interface Props {
     value?: number;
     max?: number;
     variant?: 'linear' | 'circular' | 'bubble';
     size?: 'sm' | 'md' | 'lg';
-    color?: 'violet' | 'mint' | 'raspberry' | 'melissa' | 'sakura' | 'henbane' | 'primary';
+    color?: 'violet' | 'mint' | 'raspberry' | 'emerald' | 'raspberry-light' | 'henbane' | 'primary';
     showLabel?: boolean;
     showPercentage?: boolean;
     label?: string;
@@ -52,13 +51,17 @@
   };
 
   const progressColors = {
-    violet: { bg: 'bg-violet', stroke: 'stroke-violet', glow: 'glow-violet' },
-    mint: { bg: 'bg-mint', stroke: 'stroke-mint', glow: 'glow-mint' },
-    raspberry: { bg: 'bg-raspberry', stroke: 'stroke-raspberry', glow: 'glow-violet' },
-    melissa: { bg: 'bg-melissa', stroke: 'stroke-melissa', glow: 'glow-mint' },
-    sakura: { bg: 'bg-sakura', stroke: 'stroke-sakura', glow: 'glow-violet' },
-    henbane: { bg: 'bg-henbane', stroke: 'stroke-henbane', glow: '' },
-    primary: { bg: 'bg-violet', stroke: 'stroke-violet', glow: 'glow-violet' }
+    violet: { bg: 'bg-gpb-violet', stroke: 'stroke-gpb-violet', glow: 'neon-glow' },
+    mint: { bg: 'bg-gpb-mint', stroke: 'stroke-gpb-mint', glow: 'neon-glow' },
+    raspberry: { bg: 'bg-gpb-raspberry', stroke: 'stroke-gpb-raspberry', glow: 'neon-glow' },
+    emerald: { bg: 'bg-gpb-emerald', stroke: 'stroke-gpb-emerald', glow: 'neon-glow' },
+    'raspberry-light': { bg: 'bg-gpb-raspberry-light', stroke: 'stroke-gpb-raspberry-light', glow: 'neon-glow' },
+    henbane: { bg: 'bg-gpb-gray-600', stroke: 'stroke-gpb-gray-600', glow: '' },
+    primary: { bg: 'bg-gpb-violet', stroke: 'stroke-gpb-violet', glow: 'neon-glow' },
+    electric: { bg: 'gradient-electric', stroke: 'stroke-gpb-violet', glow: 'neon-glow' },
+    power: { bg: 'gradient-power', stroke: 'stroke-gpb-raspberry', glow: 'neon-glow' },
+    wealth: { bg: 'gradient-wealth', stroke: 'stroke-gpb-gold', glow: 'neon-glow' },
+    mystery: { bg: 'gradient-mystery', stroke: 'stroke-gpb-purple', glow: 'neon-glow' }
   };
 
   const getProgressColor = (colorKey: string) => {
@@ -66,17 +69,17 @@
   };
 
   const resourceIcons = {
-    coins: 'coin' as IconName,
-    crystals: 'crystal' as IconName,
-    energy: 'energy' as IconName,
-    experience: 'experience' as IconName
+    coins: Coins,
+    crystals: Gem,
+    energy: Battery,
+    experience: Star
   };
 
   const resourceColors = {
-    coins: 'mint',
+    coins: 'emerald',
     crystals: 'raspberry',
     energy: 'violet',
-    experience: 'melissa'
+    experience: 'mint'
   } as const;
 </script>
 
@@ -87,7 +90,8 @@
     class="progress-bubble {glowing ? 'animate-glow-violet' : ''} {className}"
   >
     {#if resource && resourceIcons[resource]}
-      <Icon name={resourceIcons[resource]} size="sm" />
+      {@const IconComponent = resourceIcons[resource]}
+      <IconComponent size={16} class="neon-glow" />
     {/if}
     <span class="text-body-sm font-heading">
       {value.toLocaleString()}
@@ -100,23 +104,23 @@
   </Bubble>
 
 {:else if variant === 'linear'}
-  <div class="fincity-progress-container {className}">
+  <div class="progress-bar-container {className}">
     {#if showLabel && label}
-      <div class="fincity-progress-header">
-        <span class="fincity-progress-label text-body font-heading">{label}</span>
+      <div class="progress-header flex justify-between items-center mb-2">
+        <span class="font-ui-primary">{label}</span>
         {#if showPercentage}
-          <span class="fincity-progress-percentage text-body-sm">{Math.round(percentage)}%</span>
+          <span class="font-ui-secondary text-sm">{Math.round(percentage)}%</span>
         {/if}
       </div>
     {:else if showPercentage}
-      <div class="fincity-progress-header-minimal">
-        <span class="fincity-progress-percentage text-body-sm">{Math.round(percentage)}%</span>
+      <div class="progress-header-minimal flex justify-end mb-2">
+        <span class="font-ui-secondary text-sm">{Math.round(percentage)}%</span>
       </div>
     {/if}
 
-    <div class="fincity-progress-track {sizeClasses.linear[size]}">
+    <div class="progress-bar {sizeClasses.linear[size]} bg-black/20 rounded-full overflow-hidden">
       <div
-        class="fincity-progress-fill {getProgressColor(color).bg} {animated ? 'fincity-progress-animated' : ''} {glowing ? getProgressColor(color).glow : ''}"
+        class="progress-fill h-full {getProgressColor(color).bg} rounded-full transition-all duration-1000 ease-out relative overflow-hidden {animated ? 'animate-pulse' : ''} {glowing ? getProgressColor(color).glow : ''}"
         style="width: {percentage}%"
         role="progressbar"
         aria-valuenow={value}
@@ -124,7 +128,7 @@
         aria-valuemax={max}
       >
         {#if glowing}
-          <div class="fincity-progress-shimmer"></div>
+          <div class="progress-shimmer absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
         {/if}
       </div>
     </div>
@@ -156,16 +160,17 @@
       />
     </svg>
 
-    <div class="progress-center">
+    <div class="progress-center absolute inset-0 flex items-center justify-center flex-col">
       {#if resource && resourceIcons[resource]}
-        <Icon name={resourceIcons[resource]} size="sm" color="var(--color-{resourceColors[resource]})" />
+        {@const IconComponent = resourceIcons[resource]}
+        <IconComponent size={20} class="text-gpb-violet neon-glow mb-1" />
       {/if}
       {#if showPercentage}
-        <span class="progress-value text-body font-heading text-black">
+        <span class="font-score text-lg text-black">
           {Math.round(percentage)}%
         </span>
       {:else if showLabel && label}
-        <span class="progress-label-center text-body-xs font-heading text-center text-black">
+        <span class="font-ui-secondary text-xs text-center text-black">
           {label}
         </span>
       {/if}

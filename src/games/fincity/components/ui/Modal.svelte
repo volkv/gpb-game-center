@@ -1,6 +1,8 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-
+  import { fade, scale } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
+  import { X } from 'lucide-svelte';
   import type { Snippet } from 'svelte';
 
   interface Props {
@@ -31,9 +33,9 @@
   let overlayElement = $state<HTMLDivElement>();
 
   const sizeClasses = {
-    sm: 'max-w-modal-sm',
-    md: 'max-w-modal-md',
-    lg: 'max-w-modal-lg'
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-lg'
   };
 
   function handleKeydown(event: KeyboardEvent) {
@@ -113,28 +115,33 @@
 {#if open}
   <div
     bind:this={overlayElement}
-    class="fixed top: 0 left-0 right-0 bottom-0 z-50 flex items-center justify-center padding: 1rem bg-cumin/80 backdrop-blur-md"
+    class="modal-overlay-game"
     onclick={handleOverlayClick}
     onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOverlayClick(e as unknown as MouseEvent); } }}
     role="dialog"
     aria-modal="true"
     tabindex="-1"
+    transition:fade={{ duration: 300 }}
   >
     <div
       bind:this={modalElement}
       use:trapFocus
-      class="relative w-full {sizeClasses[size]} bg-lily/95 backdrop-blur-md rounded-[var(--radius-lg)] shadow-xl modal-slide-up max-h-modal overflow-hidden flex flex-col border border-henbane-30 {className}"
+      class="modal-game {sizeClasses[size]} {className}"
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
+      tabindex="-1"
+      transition:scale={{ duration: 400, easing: quintOut, start: 0.9 }}
+      onclick={(e) => e.stopPropagation()}
+      onkeydown={() => {}}
     >
       {#if title || header}
-        <div class="flex items-center justify-between p-md border-b border-henbane-30">
-          <div class="flex-1">
+        <div class="modal-header-game">
+          <div class="relative z-10">
             {#if header}
               {@render header()}
             {:else if title}
-              <h2 id="modal-title" class="text-md text-black">
+              <h2 id="modal-title" class="modal-title-game">
                 {title}
               </h2>
             {/if}
@@ -143,24 +150,22 @@
           {#if !persistent}
             <button
               type="button"
-              class="ml-4 text-henbane hover:text-black transition-colors duration-[var(--duration-fast)]"
+              class="btn-icon touch-target focus-game absolute top-4 right-4 z-20"
               onclick={onclose}
-              aria-label="Закрыть"
+              aria-label="Закрыть модальное окно"
             >
-              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X size={20} />
             </button>
           {/if}
         </div>
       {/if}
 
-      <div class="flex-1 p-md overflow-y-auto">
+      <div class="modal-content-game">
         {@render children?.()}
       </div>
 
       {#if footer}
-        <div class="flex items-center justify-end gap: 0.75rem p-md border-t border-henbane-30">
+        <div class="modal-footer-game">
           {@render footer()}
         </div>
       {/if}

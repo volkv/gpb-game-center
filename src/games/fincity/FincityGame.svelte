@@ -1,18 +1,20 @@
 <script lang="ts">
-	import { createEventDispatcher, onMount, onDestroy } from 'svelte';
-	import { Button } from '$lib';
+	import { onMount, onDestroy } from 'svelte';
+	import { Button, GameLayout } from '$lib';
 	import { telegramStore } from '$lib/stores/telegramStore';
 
-	const dispatch = createEventDispatcher<{
-		exit: void;
-	}>();
+	interface Props {
+		onexit?: () => void;
+	}
 
-	let mounted = false;
-	let gameLoaded = false;
-	let loadingProgress = 0;
-	let FincityApp: any = null;
-	let gameInstance: any = null;
-	let cleanupFunctions: (() => void)[] = [];
+	let { onexit }: Props = $props();
+
+	let mounted = $state(false);
+	let gameLoaded = $state(false);
+	let loadingProgress = $state(0);
+	let FincityApp: any = $state(null);
+	let gameInstance: any = $state(null);
+	let cleanupFunctions: (() => void)[] = $state([]);
 
 	onMount(async () => {
 		mounted = true;
@@ -30,7 +32,6 @@
 
 	async function loadFinCityGame() {
 		try {
-			await import('./fincity.css');
 			const { default: App } = await import('./App.svelte');
 			FincityApp = App;
 			gameLoaded = true;
@@ -85,18 +86,18 @@
 
 	function handleExit() {
 		performCleanup();
-		dispatch('exit');
+		onexit?.();
 	}
 
 	function handleGameExit() {
 		performCleanup();
-		dispatch('exit');
+		onexit?.();
 	}
 </script>
 
 <div class="fincity-wrapper">
 	{#if !gameLoaded}
-		<div class="loading-screen">
+		<GameLayout gameName="FinCity" background="gradient-wealth" showScore={false} showBackButton={true}>
 			<div class="loading-content">
 				<div class="game-preview">
 					<div class="preview-icon">
@@ -111,31 +112,14 @@
 				<div class="loading-bar">
 					<div class="loading-fill"></div>
 				</div>
-
-				<button
-					class="back-button"
-					on:click={handleExit}
-					aria-label="Вернуться назад"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-					</svg>
-				</button>
 			</div>
-		</div>
+		</GameLayout>
 	{:else if FincityApp}
 		<div class="game-container fincity-game" class:mounted>
-			<button
-				class="exit-button"
-				on:click={handleExit}
-				aria-label="Выйти из игры"
-			>
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-				</svg>
-			</button>
-
-			<svelte:component this={FincityApp} on:exit={handleGameExit} />
+			{#if FincityApp}
+				{@const GameApp = FincityApp}
+				<GameApp onexit={handleGameExit} />
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -148,21 +132,15 @@
 		overflow: hidden;
 	}
 
-	.loading-screen {
-		min-height: 100vh;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		background: linear-gradient(135deg, var(--color-gpb-mint) 0%, var(--color-gpb-melissa) 100%);
-		padding: 2rem;
-		position: relative;
-	}
-
 	.loading-content {
 		max-width: 400px;
 		width: 100%;
 		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		min-height: 60vh;
 	}
 
 	.game-preview {
@@ -170,7 +148,7 @@
 		flex-direction: column;
 		align-items: center;
 		margin-bottom: 3rem;
-		animation: fadeInUp 0.6s ease-out;
+		animation: fadeIn 0.6s ease-out;
 	}
 
 	.preview-icon {
@@ -205,34 +183,10 @@
 		animation: loadingProgress 2s ease-in-out infinite;
 	}
 
-	.back-button {
-		position: absolute;
-		top: 2rem;
-		left: 2rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 44px;
-		height: 44px;
-		border-radius: 12px;
-		background: rgba(255, 255, 255, 0.2);
-		color: white;
-		border: none;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		backdrop-filter: blur(10px);
-		border: 1px solid rgba(255, 255, 255, 0.3);
-		z-index: 10;
-	}
-
-	.back-button:hover {
-		background: rgba(255, 255, 255, 0.3);
-		transform: translateX(-2px);
-	}
 
 	.game-container {
 		width: 100%;
-		height: 100vh;
+		height: calc(100vh - 64px);
 		position: relative;
 		opacity: 0;
 		transform: translateY(20px);
@@ -244,29 +198,6 @@
 		transform: translateY(0);
 	}
 
-	.exit-button {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 44px;
-		height: 44px;
-		border-radius: 12px;
-		background: rgba(0, 0, 0, 0.5);
-		color: white;
-		border: none;
-		cursor: pointer;
-		transition: all 0.2s ease;
-		backdrop-filter: blur(10px);
-		z-index: 1000;
-	}
-
-	.exit-button:hover {
-		background: rgba(0, 0, 0, 0.7);
-		transform: scale(1.05);
-	}
 
 	:global(.fincity-wrapper .app) {
 		width: 100%;
@@ -274,16 +205,6 @@
 		overflow: hidden;
 	}
 
-	@keyframes fadeInUp {
-		0% {
-			opacity: 0;
-			transform: translateY(20px);
-		}
-		100% {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
 
 	@keyframes loadingProgress {
 		0% {
@@ -298,24 +219,6 @@
 	}
 
 	@media (max-width: 380px) {
-		.loading-screen,
-		.back-button {
-			padding: 1rem;
-		}
-
-		.back-button {
-			top: 1rem;
-			left: 1rem;
-			width: 40px;
-			height: 40px;
-		}
-
-		.exit-button {
-			top: 0.5rem;
-			right: 0.5rem;
-			width: 40px;
-			height: 40px;
-		}
 
 		.preview-icon {
 			width: 64px;

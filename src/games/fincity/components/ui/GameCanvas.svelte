@@ -2,7 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { GameEngine, type GameEngineConfig } from '../game/GameEngine';
   import { ZoomControls } from '.';
-  import type { InteractionEvent, LoadingProgressHandler } from '../types';
+  import type { InteractionEvent, LoadingProgressHandler } from '../../types/Game';
   import type { LoadingStageInfo } from '../game/ResourceManager';
 
   interface Props {
@@ -22,7 +22,7 @@
 
   let canvasElement: globalThis.HTMLCanvasElement;
   let containerElement: HTMLDivElement;
-  let gameEngine: GameEngine | null = null;
+  let gameEngine = $state<GameEngine | null>(null);
   let isLoading = $state(true);
   let loadingProgress = $state(0);
   let loadingStageInfo = $state<LoadingStageInfo | undefined>(undefined);
