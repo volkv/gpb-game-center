@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Button, GameLayout } from '$lib';
-	import { ChevronLeft, CheckCircle, Trophy, XCircle } from 'lucide-svelte';
+	import { CheckCircle, Trophy, XCircle } from 'lucide-svelte';
 
 	interface Props {
 		onexit?: () => void;
@@ -29,8 +29,8 @@
 	];
 
 	let currentWordData = $state(financialWords[Math.floor(Math.random() * financialWords.length)]);
-	let targetWord = $state(currentWordData.word);
-	const wordLength = targetWord.length;
+	const targetWord = $derived(currentWordData.word);
+	const wordLength = $derived(targetWord.length);
 	const maxAttempts = 5;
 
 	// State
@@ -204,7 +204,6 @@
 	function resetGame() {
 		// Выбираем новое случайное слово
 		currentWordData = financialWords[Math.floor(Math.random() * financialWords.length)];
-		targetWord = currentWordData.word;
 
 		gameState = 'playing';
 		showResult = false;
@@ -330,7 +329,7 @@
 
 		{#if gameState === 'playing'}
 			<div class="virtual-keyboard">
-				{#each keyboardLayout as row, rowIndex}
+				{#each keyboardLayout as row}
 					<div class="keyboard-row">
 						{#each row as key}
 							<button
@@ -390,11 +389,6 @@
 		padding: 0.75rem;
 	}
 
-	.instruction {
-		color: white;
-		margin-bottom: 0.5rem;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-	}
 
 	.hint {
 		color: rgba(255, 255, 255, 0.9);
@@ -546,42 +540,10 @@
 		margin-top: 1rem;
 	}
 
-	.play-again-button {
-		flex: 1;
-	}
 
-	.game-stats {
-		display: flex;
-		justify-content: center;
-		gap: 1.5rem;
-		margin-bottom: 1rem;
-	}
 
-	.stat-item {
-		text-align: center;
-		background: rgba(255, 255, 255, 0.15);
-		backdrop-filter: blur(10px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 12px;
-		padding: 0.75rem 1rem;
-	}
 
-	.stat-label {
-		display: block;
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.8);
-		margin-bottom: 0.25rem;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-	}
 
-	.stat-value {
-		display: block;
-		font-family: var(--font-heading);
-		font-size: 1.125rem;
-		font-weight: 600;
-		color: white;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-	}
 
 	.victory-message,
 	.defeat-message {
@@ -785,13 +747,7 @@
 			font-size: clamp(0.875rem, 2vw, 1rem);
 		}
 
-		.game-stats {
-			gap: 1rem;
-		}
 
-		.stat-item {
-			padding: 0.5rem 0.75rem;
-		}
 
 		.keyboard-key {
 			min-width: 28px;
