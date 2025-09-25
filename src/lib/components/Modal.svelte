@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { fade, scale } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
+  import { fade } from 'svelte/transition';
   import { X } from 'lucide-svelte';
 
   interface Props {
@@ -9,7 +8,8 @@
     showClose?: boolean;
     closeOnBackdrop?: boolean;
     closeOnEscape?: boolean;
-    size?: 'sm' | 'md' | 'lg' | 'full';
+    size?: 'sm' | 'md' | 'lg';
+    success?: boolean;
     children?: any;
     footer?: any;
     onClose?: () => void;
@@ -23,25 +23,23 @@
     closeOnBackdrop = true,
     closeOnEscape = true,
     size = 'md',
+    success = false,
     children,
     footer,
     onClose,
-    class: className = '',
-    ...restProps
+    class: className = ''
   }: Props = $props();
-
-  let dialog: HTMLDialogElement = $state()!
 
   const sizeClasses = {
     sm: 'max-w-sm',
     md: 'max-w-md',
-    lg: 'max-w-lg',
-    full: 'max-w-full mx-4'
+    lg: 'max-w-lg'
   };
 
   const sizeClass = sizeClasses[size];
 
   function handleClose() {
+    if (success) return;
     onClose?.();
   }
 
@@ -56,47 +54,31 @@
       handleClose();
     }
   }
-
-  $effect(() => {
-    if (open) {
-      dialog?.showModal();
-    } else {
-      dialog?.close();
-    }
-  });
 </script>
 
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
-  <!-- svelte-ignore a11y_click_events_have_key_events -->
-  <dialog
-    bind:this={dialog}
-    class="modal-overlay-game"
+  <div
+    class="modal-backdrop"
+    transition:fade={{ duration: 200 }}
     onclick={handleBackdropClick}
-    {...restProps}
-    transition:fade={{ duration: 300 }}
+    onkeydown={(e) => e.key === 'Escape' && handleClose()}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={title ? "modal-title" : undefined}
+    tabindex="-1"
   >
-    <div
-      role="dialog"
-      aria-modal="true"
-      tabindex="-1"
-      class={`modal-game ${sizeClass} ${className}`}
-      transition:scale={{ duration: 400, easing: quintOut, start: 0.9 }}
-      onclick={(e) => e.stopPropagation()}
-    >
+    <div class={`modal-content ${sizeClass} ${className}`} class:success>
       {#if title || showClose}
-        <div class="modal-header-game">
-          {#if title}
-            <h2 class="modal-title-game">{title}</h2>
-          {/if}
-
+        <div class="modal-header">
           {#if showClose}
             <button
               type="button"
-              class="btn-icon touch-target focus-game absolute top-4 right-4 z-20"
+              class="close-button"
               onclick={handleClose}
-              aria-label="Закрыть модальное окно"
+              disabled={success}
+              aria-label="Закрыть"
             >
               <X size={20} />
             </button>
@@ -104,15 +86,140 @@
         </div>
       {/if}
 
-      <div class="modal-content-game">
+      <div class="modal-body">
+        {#if title && !success}
+          <h2 id="modal-title" class="modal-title">{title}</h2>
+        {/if}
         {@render children?.()}
       </div>
 
       {#if footer}
-        <div class="modal-footer-game">
+        <div class="modal-footer">
           {@render footer?.()}
         </div>
       {/if}
     </div>
-  </dialog>
+  </div>
 {/if}
+
+<style>
+  .modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 1.5rem;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    position: relative;
+    transform: scale(0.95);
+    animation: modalEnter 0.2s ease-out forwards;
+  }
+
+  .modal-content.success {
+    background: linear-gradient(135deg, var(--color-gpb-emerald) 0%, #45b369 100%);
+    color: white;
+  }
+
+  @keyframes modalEnter {
+    to {
+      transform: scale(1);
+    }
+  }
+
+  .modal-content.max-w-sm {
+    max-width: 400px;
+  }
+
+  .modal-content.max-w-md {
+    max-width: 500px;
+  }
+
+  .modal-content.max-w-lg {
+    max-width: 600px;
+  }
+
+  .modal-header {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--color-gpb-gray-600);
+    transition: all 0.2s ease;
+  }
+
+  .close-button:hover {
+    background: var(--color-gpb-gray-100);
+    color: var(--color-gpb-gray-800);
+  }
+
+  .close-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .modal-body {
+    padding: 0 1.5rem 1.5rem;
+  }
+
+  .modal-title {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-gpb-black);
+    margin: 0 0 1rem;
+    line-height: 1.2;
+  }
+
+  .modal-footer {
+    padding: 1.5rem;
+    border-top: 1px solid var(--color-gpb-gray-200);
+    display: flex;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .modal-backdrop {
+      padding: 0.5rem;
+    }
+
+    .modal-content {
+      border-radius: 1rem;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .modal-content {
+      animation: none;
+      transform: scale(1);
+    }
+  }
+</style>

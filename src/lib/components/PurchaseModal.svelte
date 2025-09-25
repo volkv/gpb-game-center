@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { X, Star, CheckCircle } from 'lucide-svelte';
+	import { Star, CheckCircle } from 'lucide-svelte';
 	import { pointsStore } from '$lib/stores/pointsStore';
 	import type { Reward } from '$lib/types/Points';
+	import Modal from './Modal.svelte';
 
 	let {
 		isOpen = $bindable(false),
@@ -51,170 +51,84 @@
 		isOpen = false;
 	}
 
-	function handleBackdropClick(event: MouseEvent) {
-		if (event.target === event.currentTarget) {
-			handleCancel();
-		}
+	function handleClose() {
+		handleCancel();
 	}
 </script>
 
-{#if isOpen && reward}
-	<div
-		class="modal-backdrop"
-		transition:fade={{ duration: 200 }}
-		onclick={handleBackdropClick}
-		onkeydown={(e) => e.key === 'Escape' && handleCancel()}
-		role="dialog"
-		aria-modal="true"
-		aria-labelledby="modal-title"
-		tabindex="-1"
-	>
-		<div class="modal-content" class:success={isSuccess}>
-			{#if !isSuccess}
-				<div class="modal-header">
-					<button
-						type="button"
-						class="close-button"
-						onclick={handleCancel}
-						disabled={isProcessing}
-						aria-label="Закрыть"
-					>
-						<X size={20} />
-					</button>
+<Modal
+	open={isOpen && reward !== null}
+	success={isSuccess}
+	showClose={!isSuccess}
+	closeOnBackdrop={!isProcessing && !isSuccess}
+	closeOnEscape={!isProcessing && !isSuccess}
+	onClose={handleClose}
+	size="sm"
+>
+	{#snippet children()}
+		{#if !isSuccess && reward}
+			<div class="reward-preview">
+				<div class="reward-icon">
+					<span class="icon-emoji">{reward.icon}</span>
 				</div>
+				<h2 class="reward-title">{reward.title}</h2>
+				<p class="reward-partner">{reward.partner}</p>
+				<p class="reward-description">{reward.description}</p>
+			</div>
 
-				<div class="modal-body">
-					<div class="reward-preview">
-						<div class="reward-icon">
-							<span class="icon-emoji">{reward.icon}</span>
-						</div>
-						<h2 id="modal-title" class="reward-title">{reward.title}</h2>
-						<p class="reward-partner">{reward.partner}</p>
-						<p class="reward-description">{reward.description}</p>
-					</div>
-
-					<div class="cost-section">
-						<div class="cost-display">
-							<Star size={20} class="cost-icon" />
-							<span class="cost-value">{reward.cost.toLocaleString()}</span>
-							<span class="cost-label">баллов</span>
-						</div>
-						<p class="cost-note">
-							После покупки у вас останется {($pointsStore.totalPoints - reward.cost).toLocaleString()} баллов
-						</p>
-					</div>
-
-					{#if reward.terms}
-						<div class="terms-section">
-							<h3 class="terms-title">Условия использования</h3>
-							<p class="terms-text">{reward.terms}</p>
-						</div>
-					{/if}
+			<div class="cost-section">
+				<div class="cost-display">
+					<Star size={20} class="cost-icon" />
+					<span class="cost-value">{reward.cost.toLocaleString()}</span>
+					<span class="cost-label">баллов</span>
 				</div>
+				<p class="cost-note">
+					После покупки у вас останется {($pointsStore.totalPoints - reward.cost).toLocaleString()} баллов
+				</p>
+			</div>
 
-				<div class="modal-footer">
-					<button
-						type="button"
-						class="btn-secondary"
-						onclick={handleCancel}
-						disabled={isProcessing}
-					>
-						Отмена
-					</button>
-					<button
-						type="button"
-						class="btn-primary"
-						onclick={handleConfirm}
-						disabled={isProcessing}
-					>
-						{isProcessing ? 'Покупаем...' : 'Купить приз'}
-					</button>
-				</div>
-			{:else}
-				<div class="success-content">
-					<div class="success-icon">
-						<CheckCircle size={48} />
-					</div>
-					<h2 class="success-title">Приз получен!</h2>
-					<p class="success-message">
-						{reward.title} был добавлен в ваши призы
-					</p>
+			{#if reward.terms}
+				<div class="terms-section">
+					<h3 class="terms-title">Условия использования</h3>
+					<p class="terms-text">{reward.terms}</p>
 				</div>
 			{/if}
-		</div>
-	</div>
-{/if}
+		{:else if isSuccess && reward}
+			<div class="success-content">
+				<div class="success-icon">
+					<CheckCircle size={48} />
+				</div>
+				<h2 class="success-title">Приз получен!</h2>
+				<p class="success-message">
+					{reward.title} был добавлен в ваши призы
+				</p>
+			</div>
+		{/if}
+	{/snippet}
+
+	{#snippet footer()}
+		{#if !isSuccess}
+			<button
+				type="button"
+				class="btn-secondary"
+				onclick={handleCancel}
+				disabled={isProcessing}
+			>
+				Отмена
+			</button>
+			<button
+				type="button"
+				class="btn-primary"
+				onclick={handleConfirm}
+				disabled={isProcessing}
+			>
+				{isProcessing ? 'Покупаем...' : 'Купить приз'}
+			</button>
+		{/if}
+	{/snippet}
+</Modal>
 
 <style>
-	.modal-backdrop {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 1000;
-		padding: 1rem;
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
-	}
-
-	.modal-content {
-		background: white;
-		border-radius: 1.5rem;
-		max-width: 400px;
-		width: 100%;
-		max-height: 90vh;
-		overflow-y: auto;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-		position: relative;
-		transform: scale(0.95);
-		animation: modalEnter 0.2s ease-out forwards;
-	}
-
-	.modal-content.success {
-		background: linear-gradient(135deg, var(--color-gpb-emerald) 0%, #45b369 100%);
-		color: white;
-	}
-
-	@keyframes modalEnter {
-		to {
-			transform: scale(1);
-		}
-	}
-
-	.modal-header {
-		padding: 1.5rem 1.5rem 0;
-		display: flex;
-		justify-content: flex-end;
-	}
-
-	.close-button {
-		background: none;
-		border: none;
-		padding: 0.5rem;
-		border-radius: 50%;
-		cursor: pointer;
-		color: var(--color-gpb-gray-600);
-		transition: all 0.2s ease;
-	}
-
-	.close-button:hover {
-		background: var(--color-gpb-gray-100);
-		color: var(--color-gpb-gray-800);
-	}
-
-	.close-button:disabled {
-		opacity: 0.5;
-		cursor: not-allowed;
-	}
-
-	.modal-body {
-		padding: 0 1.5rem 1.5rem;
-	}
 
 	.reward-preview {
 		text-align: center;
@@ -324,13 +238,6 @@
 		margin: 0;
 	}
 
-	.modal-footer {
-		padding: 1.5rem;
-		border-top: 1px solid var(--color-gpb-gray-200);
-		display: flex;
-		gap: 1rem;
-	}
-
 	.btn-secondary,
 	.btn-primary {
 		flex: 1;
@@ -417,20 +324,6 @@
 	}
 
 	@media (max-width: 480px) {
-		.modal-backdrop {
-			padding: 0.5rem;
-		}
-
-		.modal-content {
-			border-radius: 1rem;
-		}
-
-		.modal-header,
-		.modal-body,
-		.modal-footer {
-			padding: 1rem;
-		}
-
 		.reward-icon {
 			width: 4rem;
 			height: 4rem;
@@ -450,11 +343,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.modal-content {
-			animation: none;
-			transform: scale(1);
-		}
-
 		.success-icon,
 		.success-title,
 		.success-message {

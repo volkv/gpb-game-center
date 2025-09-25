@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Star, Clock, ExternalLink, CheckCircle, Award, X } from 'lucide-svelte';
-	import { fade } from 'svelte/transition';
+	import { Star, Clock, ExternalLink, CheckCircle, Award } from 'lucide-svelte';
 	import { tasksStore } from '$lib/stores/tasksStore';
 	import Button from './Button.svelte';
+	import Modal from './Modal.svelte';
 	import type { Task } from '$lib/types/Tasks';
 
 	interface Props {
@@ -42,12 +42,6 @@
 		onClose?.();
 	}
 
-	function handleBackdropClick(event: MouseEvent) {
-		if (event.target === event.currentTarget) {
-			handleClose();
-		}
-	}
-
 	function getDifficultyColor(difficulty: string): string {
 		switch (difficulty) {
 			case 'easy':
@@ -75,115 +69,84 @@
 	}
 </script>
 
-{#if isOpen && task}
-	<div
-		class="modal-backdrop"
-		transition:fade={{ duration: 200 }}
-		onclick={handleBackdropClick}
-		onkeydown={(e) => e.key === 'Escape' && handleClose()}
-		role="dialog"
-		aria-modal="true"
-		aria-labelledby="modal-title"
-		tabindex="-1"
-	>
-		<div class="modal-content" class:success={showCompletionAnimation}>
-			{#if !showCompletionAnimation}
-				<div class="modal-header">
-					<button
-						type="button"
-						class="close-button"
-						onclick={handleClose}
-						aria-label="Закрыть"
-					>
-						<X size={20} />
-					</button>
-				</div>
-
-				<div class="modal-body">
-					<div class="task-modal-content">
-			<div class="task-header">
-				<div class="task-icon-large">{task.icon}</div>
-				<div class="task-info">
-					<h2 class="task-title">{task.title}</h2>
-					<div class="task-badges">
-						<span class="difficulty-badge {getDifficultyColor(task.difficulty)}">
-							{getDifficultyText(task.difficulty)}
-						</span>
-						<div class="reward-badge">
-							<Star size={14} />
-							<span>+{task.reward.toLocaleString()} баллов</span>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div class="task-body">
-				<div class="section">
-					<h3 class="section-title">Описание</h3>
-					<p class="task-description">{task.fullDescription}</p>
-				</div>
-
-				{#if task.productName && task.productUrl}
-					<div class="section">
-						<h3 class="section-title">Продукт</h3>
-						<div class="product-card">
-							<div class="product-info">
-								<ExternalLink size={16} class="text-gpb-violet" />
-								<span class="product-name">{task.productName}</span>
+<Modal
+	open={isOpen && task !== null}
+	success={showCompletionAnimation}
+	showClose={!showCompletionAnimation}
+	closeOnBackdrop={!showCompletionAnimation}
+	closeOnEscape={!showCompletionAnimation}
+	onClose={handleClose}
+	size="md"
+>
+	{#snippet children()}
+		{#if !showCompletionAnimation && task}
+			<div class="task-modal-content">
+				<div class="task-header">
+					<div class="task-icon-large">{task.icon}</div>
+					<div class="task-info">
+						<h2 class="task-title">{task.title}</h2>
+						<div class="task-badges">
+							<span class="difficulty-badge {getDifficultyColor(task.difficulty)}">
+								{getDifficultyText(task.difficulty)}
+							</span>
+							<div class="reward-badge">
+								<Star size={14} />
+								<span>+{task.reward.toLocaleString()} баллов</span>
 							</div>
-							<Button
-								variant="secondary"
-								size="sm"
-								onclick={handleOpenProduct}
-							>
-								Открыть
-							</Button>
 						</div>
 					</div>
-				{/if}
-
-				<div class="section">
-					<h3 class="section-title">Требования для выполнения</h3>
-					<ul class="requirements-list">
-						{#each task.requirements as requirement}
-							<li class="requirement-item">
-								<CheckCircle size={16} class="text-green-500" />
-								<span>{requirement}</span>
-							</li>
-						{/each}
-					</ul>
 				</div>
 
-				<div class="task-meta-info">
-					<div class="meta-item">
-						<Clock size={16} class="text-gpb-gray-500" />
-						<span>Примерное время: {task.estimatedTime}</span>
+				<div class="task-body">
+					<div class="section">
+						<h3 class="section-title">Описание</h3>
+						<p class="task-description">{task.fullDescription}</p>
 					</div>
-					<div class="meta-item">
-						<Award size={16} class="text-gpb-gold" />
-						<span>Награда: +{task.reward.toLocaleString()} баллов</span>
+
+					{#if task.productName && task.productUrl}
+						<div class="section">
+							<h3 class="section-title">Продукт</h3>
+							<div class="product-card">
+								<div class="product-info">
+									<ExternalLink size={16} class="text-gpb-violet" />
+									<span class="product-name">{task.productName}</span>
+								</div>
+								<Button
+									variant="secondary"
+									size="sm"
+									onclick={handleOpenProduct}
+								>
+									Открыть
+								</Button>
+							</div>
+						</div>
+					{/if}
+
+					<div class="section">
+						<h3 class="section-title">Требования для выполнения</h3>
+						<ul class="requirements-list">
+							{#each task.requirements as requirement}
+								<li class="requirement-item">
+									<CheckCircle size={16} class="text-green-500" />
+									<span>{requirement}</span>
+								</li>
+							{/each}
+						</ul>
+					</div>
+
+					<div class="task-meta-info">
+						<div class="meta-item">
+							<Clock size={16} class="text-gpb-gray-500" />
+							<span>Примерное время: {task.estimatedTime}</span>
+						</div>
+						<div class="meta-item">
+							<Award size={16} class="text-gpb-gold" />
+							<span>Награда: +{task.reward.toLocaleString()} баллов</span>
+						</div>
 					</div>
 				</div>
-			</div>
 
-				{#if task.status === 'available'}
-					<div class="modal-footer">
-						<button
-							type="button"
-							class="btn-secondary"
-							onclick={handleClose}
-						>
-							Отмена
-						</button>
-						<button
-							type="button"
-							class="btn-primary"
-							onclick={handleCompleteTask}
-						>
-							Я выполнил все условия
-						</button>
-					</div>
-				{:else if task.status === 'completed'}
+				{#if task.status === 'completed'}
 					<div class="completion-notice">
 						<CheckCircle size={24} class="text-green-500" />
 						<div>
@@ -192,87 +155,41 @@
 						</div>
 					</div>
 				{/if}
+			</div>
+		{:else if showCompletionAnimation}
+			<div class="success-content">
+				<div class="success-icon">
+					<Award size={48} />
 				</div>
-			{:else}
-				<div class="success-content">
-					<div class="success-icon">
-						<Award size={48} />
-					</div>
-					<h2 class="success-title">Задание выполнено!</h2>
-					<p class="success-message">
-						Поздравляем! Вы получили {earnedPoints.toLocaleString()} баллов
-					</p>
-				</div>
-			{/if}
-		</div>
-	</div>
-{/if}
+				<h2 class="success-title">Задание выполнено!</h2>
+				<p class="success-message">
+					Поздравляем! Вы получили {earnedPoints.toLocaleString()} баллов
+				</p>
+			</div>
+		{/if}
+	{/snippet}
+
+	{#snippet footer()}
+		{#if !showCompletionAnimation && task?.status === 'available'}
+			<button
+				type="button"
+				class="btn-secondary"
+				onclick={handleClose}
+			>
+				Отмена
+			</button>
+			<button
+				type="button"
+				class="btn-primary"
+				onclick={handleCompleteTask}
+			>
+				Я выполнил все условия
+			</button>
+		{/if}
+	{/snippet}
+</Modal>
 
 <style>
-	.modal-backdrop {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background: rgba(0, 0, 0, 0.5);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 1000;
-		padding: 1rem;
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
-	}
-
-	.modal-content {
-		background: white;
-		border-radius: 1.5rem;
-		max-width: 500px;
-		width: 100%;
-		max-height: 90vh;
-		overflow-y: auto;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-		position: relative;
-		transform: scale(0.95);
-		animation: modalEnter 0.2s ease-out forwards;
-	}
-
-	.modal-content.success {
-		background: linear-gradient(135deg, var(--color-gpb-emerald) 0%, #45b369 100%);
-		color: white;
-	}
-
-	@keyframes modalEnter {
-		to {
-			transform: scale(1);
-		}
-	}
-
-	.modal-header {
-		padding: 1.5rem 1.5rem 0;
-		display: flex;
-		justify-content: flex-end;
-	}
-
-	.close-button {
-		background: none;
-		border: none;
-		padding: 0.5rem;
-		border-radius: 50%;
-		cursor: pointer;
-		color: var(--color-gpb-gray-600);
-		transition: all 0.2s ease;
-	}
-
-	.close-button:hover {
-		background: var(--color-gpb-gray-100);
-		color: var(--color-gpb-gray-800);
-	}
-
-	.modal-body {
-		padding: 0 1.5rem 1.5rem;
-	}
 
 	.task-modal-content {
 		display: flex;
@@ -428,13 +345,6 @@
 		color: rgb(75, 85, 99);
 	}
 
-	.modal-footer {
-		padding: 1.5rem;
-		border-top: 1px solid var(--color-gpb-gray-200);
-		display: flex;
-		gap: 1rem;
-	}
-
 	.btn-secondary,
 	.btn-primary {
 		flex: 1;
@@ -544,20 +454,6 @@
 	}
 
 	@media (max-width: 480px) {
-		.modal-backdrop {
-			padding: 0.5rem;
-		}
-
-		.modal-content {
-			border-radius: 1rem;
-		}
-
-		.modal-header,
-		.modal-body,
-		.modal-footer {
-			padding: 1rem;
-		}
-
 		.task-icon-large {
 			width: 4rem;
 			height: 4rem;
@@ -584,11 +480,6 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.modal-content {
-			animation: none;
-			transform: scale(1);
-		}
-
 		.success-icon,
 		.success-title,
 		.success-message {
