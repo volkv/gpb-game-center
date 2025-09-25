@@ -48,9 +48,9 @@
 	.game-layout {
 		min-height: 100vh;
 		position: relative;
-		overflow-x: hidden;
+		overflow: hidden;
 		color: white;
-		padding-top: 64px;
+		padding-top: 16px;
 	}
 
 	.game-layout::before {

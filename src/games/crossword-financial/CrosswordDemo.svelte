@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Button, GameLayout } from '$lib';
-	import { ChevronLeft, CheckCircle, Trophy } from 'lucide-svelte';
+	import { ChevronLeft, CheckCircle, Trophy, XCircle } from 'lucide-svelte';
 
 	interface Props {
 		onexit?: () => void;
@@ -9,83 +9,217 @@
 
 	let { onexit }: Props = $props();
 
+	// Types
+	type LetterStatus = 'empty' | 'filled' | 'correct' | 'present' | 'absent';
+	type GameState = 'playing' | 'won' | 'lost';
+
+	interface Attempt {
+		letters: string[];
+		statuses: LetterStatus[];
+		submitted: boolean;
+	}
+
+	// Game constants
+	const financialWords = [
+		{ word: 'ВКЛАД', hint: 'Место, где деньги приносят проценты', definition: 'денежные средства, размещенные в банке на определенный срок под проценты. Надежный способ защитить сбережения от инфляции и получить стабильный доход.' },
+		{ word: 'КРЕДИТ', hint: 'Заемные средства под проценты', definition: 'денежные средства, предоставляемые банком в долг на определенный срок под проценты. Позволяет получить нужную сумму сейчас с обязательством вернуть с процентами.' },
+		{ word: 'КАРТА', hint: 'Пластиковый платежный инструмент', definition: 'банковский платежный инструмент для безналичных расчетов. Обеспечивает удобство и безопасность платежей.' },
+		{ word: 'РУБЛЬ', hint: 'Национальная валюта России', definition: 'официальная денежная единица Российской Федерации. Основа российской финансовой системы.' },
+		{ word: 'ДОХОД', hint: 'Прибыль от инвестиций или работы', definition: 'денежные средства, получаемые от различных источников: работы, инвестиций, бизнеса.' }
+	];
+
+	let currentWordData = $state(financialWords[Math.floor(Math.random() * financialWords.length)]);
+	let targetWord = $state(currentWordData.word);
+	const wordLength = targetWord.length;
+	const maxAttempts = 5;
+
+	// State
 	let mounted = $state(false);
-	let currentInput = $state('');
+	let gameState = $state<GameState>('playing');
 	let showResult = $state(false);
 	let showDefinition = $state(false);
 
-	const targetWord = 'ВКЛАД';
-	const wordLength = 5;
+	let attempts = $state<Attempt[]>(Array(maxAttempts).fill(null).map(() => ({
+		letters: Array(wordLength).fill(''),
+		statuses: Array(wordLength).fill('empty'),
+		submitted: false
+	})));
 
-	const completedWords = [
-		{ word: 'БАНК', definition: 'Финансовая организация' },
-		{ word: 'КАРТА', definition: 'Платежный инструмент' },
-		{ word: 'КРЕДИТ', definition: 'Заемные средства' },
-		{ word: 'ПРОЦЕНТ', definition: 'Доходность вложений' }
+	let currentAttemptIndex = $state(0);
+	let currentLetterIndex = $state(0);
+
+	// Экранная клавиатура
+	const keyboardLayout = [
+		['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З'],
+		['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж'],
+		['ENTER', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '⌫']
 	];
 
-	let inputLetters = $state(Array(wordLength).fill(''));
-	let currentLetterIndex = $state(0);
+	let keyStatuses = $state<Record<string, LetterStatus>>({});
 
 	onMount(() => {
 		mounted = true;
 	});
 
 	function handleKeyPress(event: KeyboardEvent) {
-		if (showResult) return;
+		if (gameState !== 'playing') return;
 
 		const key = event.key.toUpperCase();
+		const currentAttempt = attempts[currentAttemptIndex];
 
 		if (key === 'BACKSPACE') {
 			if (currentLetterIndex > 0) {
 				currentLetterIndex--;
-				inputLetters[currentLetterIndex] = '';
-				inputLetters = [...inputLetters];
+				currentAttempt.letters[currentLetterIndex] = '';
+				currentAttempt.statuses[currentLetterIndex] = 'empty';
+				attempts = [...attempts];
 			}
-		} else if (key.match(/[А-Я]/)) {
-			if (currentLetterIndex < wordLength) {
-				inputLetters[currentLetterIndex] = key;
-				inputLetters = [...inputLetters];
-				currentLetterIndex++;
-
-				if (currentLetterIndex === wordLength) {
-					checkWord();
-				}
+		} else if (key === 'ENTER') {
+			if (currentLetterIndex === wordLength) {
+				submitAttempt();
 			}
-		} else if (key === 'ENTER' && currentLetterIndex === wordLength) {
-			checkWord();
+		} else if (key.match(/[А-Я]/) && currentLetterIndex < wordLength) {
+			currentAttempt.letters[currentLetterIndex] = key;
+			currentAttempt.statuses[currentLetterIndex] = 'filled';
+			currentLetterIndex++;
+			attempts = [...attempts];
 		}
 	}
 
-	function handleLetterClick(index: number) {
-		if (showResult) return;
-		currentLetterIndex = index;
+	function handleLetterClick(attemptIndex: number, letterIndex: number) {
+		if (gameState !== 'playing' || attemptIndex !== currentAttemptIndex) return;
+		currentLetterIndex = letterIndex;
 	}
 
-	function checkWord() {
-		const enteredWord = inputLetters.join('');
-		if (enteredWord === targetWord) {
+	function submitAttempt() {
+		if (!canSubmitAttempt()) return;
+
+		const currentAttempt = attempts[currentAttemptIndex];
+		const guessWord = currentAttempt.letters.join('');
+
+		// Проверка каждой буквы
+		const statuses = checkWordLetters(guessWord, targetWord);
+		currentAttempt.statuses = statuses;
+		currentAttempt.submitted = true;
+
+		// Обновляем статусы клавиш на клавиатуре
+		updateKeyboardStatuses(guessWord, statuses);
+
+		// Проверка победы
+		if (guessWord === targetWord) {
+			gameState = 'won';
 			showResult = true;
 			setTimeout(() => {
 				showDefinition = true;
-			}, 1000);
+			}, 1500);
+		} else if (currentAttemptIndex === maxAttempts - 1) {
+			// Последняя попытка
+			gameState = 'lost';
+			showResult = true;
+		} else {
+			// Переход к следующей попытке
+			currentAttemptIndex++;
+			currentLetterIndex = 0;
+		}
+
+		attempts = [...attempts];
+	}
+
+	function checkWordLetters(guess: string, target: string): LetterStatus[] {
+		const result: LetterStatus[] = Array(wordLength).fill('absent');
+		const targetChars = target.split('');
+		const guessChars = guess.split('');
+
+		// Первый проход: помечаем точные совпадения (зеленые)
+		for (let i = 0; i < wordLength; i++) {
+			if (guessChars[i] === targetChars[i]) {
+				result[i] = 'correct';
+				targetChars[i] = '*'; // Помечаем как использованную
+			}
+		}
+
+		// Второй проход: помечаем буквы не на своем месте (желтые)
+		for (let i = 0; i < wordLength; i++) {
+			if (result[i] === 'absent') {
+				const targetIndex = targetChars.indexOf(guessChars[i]);
+				if (targetIndex !== -1) {
+					result[i] = 'present';
+					targetChars[targetIndex] = '*'; // Помечаем как использованную
+				}
+			}
+		}
+
+		return result;
+	}
+
+	function canSubmitAttempt(): boolean {
+		const currentAttempt = attempts[currentAttemptIndex];
+		return currentAttempt.letters.every(letter => letter !== '') &&
+			   gameState === 'playing' &&
+			   currentAttemptIndex < maxAttempts;
+	}
+
+	function updateKeyboardStatuses(guessWord: string, statuses: LetterStatus[]) {
+		for (let i = 0; i < guessWord.length; i++) {
+			const letter = guessWord[i];
+			const status = statuses[i];
+
+			// Обновляем статус только если он лучше текущего
+			// correct > present > absent > empty
+			const currentStatus = keyStatuses[letter];
+			if (!currentStatus ||
+				(status === 'correct') ||
+				(status === 'present' && currentStatus !== 'correct') ||
+				(status === 'absent' && currentStatus !== 'correct' && currentStatus !== 'present')) {
+				keyStatuses[letter] = status;
+			}
+		}
+		keyStatuses = {...keyStatuses}; // Trigger reactivity
+	}
+
+	function handleKeyboardClick(key: string) {
+		if (gameState !== 'playing') return;
+
+		if (key === 'ENTER') {
+			if (currentLetterIndex === wordLength) {
+				submitAttempt();
+			}
+		} else if (key === '⌫') {
+			if (currentLetterIndex > 0) {
+				currentLetterIndex--;
+				const currentAttempt = attempts[currentAttemptIndex];
+				currentAttempt.letters[currentLetterIndex] = '';
+				currentAttempt.statuses[currentLetterIndex] = 'empty';
+				attempts = [...attempts];
+			}
+		} else if (currentLetterIndex < wordLength) {
+			const currentAttempt = attempts[currentAttemptIndex];
+			currentAttempt.letters[currentLetterIndex] = key;
+			currentAttempt.statuses[currentLetterIndex] = 'filled';
+			currentLetterIndex++;
+			attempts = [...attempts];
 		}
 	}
 
-	function getLetterStatus(wordIndex: number, letterIndex: number, letter: string) {
-		if (wordIndex < completedWords.length) {
-			return 'correct';
-		}
+	function resetGame() {
+		// Выбираем новое случайное слово
+		currentWordData = financialWords[Math.floor(Math.random() * financialWords.length)];
+		targetWord = currentWordData.word;
 
-		if (!showResult) {
-			return 'empty';
-		}
+		gameState = 'playing';
+		showResult = false;
+		showDefinition = false;
+		currentAttemptIndex = 0;
+		currentLetterIndex = 0;
 
-		const targetLetter = targetWord[letterIndex];
-		if (letter === targetLetter) {
-			return 'correct';
-		}
-		return 'empty';
+		// Сбрасываем статусы клавиш
+		keyStatuses = {};
+
+		attempts = Array(maxAttempts).fill(null).map(() => ({
+			letters: Array(wordLength).fill(''),
+			statuses: Array(wordLength).fill('empty'),
+			submitted: false
+		}));
 	}
 </script>
 
@@ -98,50 +232,43 @@
 >
 	<div class="crossword-content" class:mounted>
 		<div class="game-info">
-			<p class="instruction font-body text-body text-gray-700">
-				Введите финансовый термин из 5 букв
-			</p>
 			<p class="hint font-body text-body-sm text-gray-600">
-				💡 Место, где деньги приносят проценты
+				💡 {currentWordData.hint}
 			</p>
 		</div>
 
-		<div class="words-grid">
-			{#each completedWords as wordData, wordIndex}
-				<div class="word-row completed">
-					{#each wordData.word.split('') as letter, letterIndex}
+		<div class="words-grid" style="--word-length: {wordLength}">
+			{#each attempts as attempt, attemptIndex}
+				<div class="word-row"
+					 class:current={attemptIndex === currentAttemptIndex && gameState === 'playing'}
+					 class:submitted={attempt.submitted}
+					 class:winning={gameState === 'won' && attemptIndex === currentAttemptIndex}>
+					{#each attempt.letters as letter, letterIndex}
 						<div
 							class="letter-cell"
-							class:correct={true}
-							style="--animation-delay: {wordIndex * 200 + letterIndex * 50}ms"
+							class:filled={attempt.statuses[letterIndex] === 'filled'}
+							class:active={attemptIndex === currentAttemptIndex &&
+										 letterIndex === currentLetterIndex &&
+										 gameState === 'playing'}
+							class:correct={attempt.statuses[letterIndex] === 'correct'}
+							class:present={attempt.statuses[letterIndex] === 'present'}
+							class:absent={attempt.statuses[letterIndex] === 'absent'}
+							style="--animation-delay: {attemptIndex * 100 + letterIndex * 50}ms"
+							onclick={() => handleLetterClick(attemptIndex, letterIndex)}
+							onkeydown={(e) => e.key === 'Enter' && handleLetterClick(attemptIndex, letterIndex)}
+							role="button"
+							tabindex="0"
 						>
 							{letter}
+							{#if attemptIndex === currentAttemptIndex &&
+								 letterIndex === currentLetterIndex &&
+								 gameState === 'playing'}
+								<div class="cursor"></div>
+							{/if}
 						</div>
 					{/each}
 				</div>
 			{/each}
-
-			<div class="word-row current" class:winning={showResult}>
-				{#each inputLetters as letter, letterIndex}
-					<div
-						class="letter-cell"
-						class:filled={letter !== ''}
-						class:active={currentLetterIndex === letterIndex && !showResult}
-						class:correct={showResult && letter === targetWord[letterIndex]}
-						class:winning-cell={showResult}
-						style="--animation-delay: {(completedWords.length * 200) + letterIndex * 100}ms"
-						onclick={() => handleLetterClick(letterIndex)}
-						onkeydown={(e) => e.key === 'Enter' && handleLetterClick(letterIndex)}
-						role="button"
-						tabindex="0"
-					>
-						{letter}
-						{#if currentLetterIndex === letterIndex && !showResult}
-							<div class="cursor"></div>
-						{/if}
-					</div>
-				{/each}
-			</div>
 		</div>
 
 		{#if showResult && showDefinition}
@@ -154,8 +281,7 @@
 				</div>
 
 				<p class="definition-text font-body text-body text-gray-700">
-					<strong>ВКЛАД</strong> — денежные средства, размещенные в банке на определенный срок под проценты.
-					Надежный способ защитить сбережения от инфляции и получить стабильный доход.
+					<strong>{targetWord}</strong> — {currentWordData.definition}
 				</p>
 
 				<div class="product-info">
@@ -168,39 +294,75 @@
 						<li>• Пополнение и частичное снятие</li>
 					</ul>
 
-					<Button variant="secondary" size="sm" disabled class="product-button">
-						Узнать о вкладах
-					</Button>
+					<div class="action-buttons">
+						<Button variant="secondary" size="sm" disabled class="product-button">
+							Узнать о вкладах
+						</Button>
+						<Button variant="primary" size="sm" onclick={resetGame} class="play-again-button">
+							🎯 Играть снова
+						</Button>
+					</div>
 				</div>
 			</div>
 		{/if}
 
-		{#if !showResult}
-			<div class="game-stats">
-				<div class="stat-item">
-					<span class="stat-label">Прогресс</span>
-					<span class="stat-value">{completedWords.length + 1}/5</span>
-				</div>
-				<div class="stat-item">
-					<span class="stat-label">Очки</span>
-					<span class="stat-value">480</span>
-				</div>
-			</div>
-		{:else}
+		{#if gameState === 'won'}
 			<div class="victory-message">
 				<Trophy class="text-gpb-gold neon-glow animate-pulse" size={48} />
 				<h2 class="victory-text font-heading text-h3 text-gpb-black">
 					Отлично!
 				</h2>
 				<p class="victory-subtitle font-body text-body text-gray-600">
-					Вы успешно разгадали финансовый термин
+					Слово угадано за {currentAttemptIndex + 1} попыт{currentAttemptIndex === 0 ? 'ку' : currentAttemptIndex < 4 ? 'ки' : 'ок'}
 				</p>
+			</div>
+		{:else if gameState === 'lost'}
+			<div class="defeat-message">
+				<XCircle class="text-red-500 neon-glow animate-pulse" size={48} />
+				<h2 class="defeat-text font-heading text-h3 text-gpb-black">
+					Не получилось
+				</h2>
+				<p class="defeat-subtitle font-body text-body text-gray-600">
+					Загаданное слово: <strong>{targetWord}</strong>
+				</p>
+			</div>
+		{/if}
+
+		{#if gameState === 'playing'}
+			<div class="virtual-keyboard">
+				{#each keyboardLayout as row, rowIndex}
+					<div class="keyboard-row">
+						{#each row as key}
+							<button
+								class="keyboard-key"
+								class:keyboard-key-wide={key === 'ENTER' || key === '⌫'}
+								class:keyboard-key-correct={keyStatuses[key] === 'correct'}
+								class:keyboard-key-present={keyStatuses[key] === 'present'}
+								class:keyboard-key-absent={keyStatuses[key] === 'absent'}
+								onclick={() => handleKeyboardClick(key)}
+								disabled={gameState !== 'playing'}
+							>
+								{#if key === 'ENTER'}
+									ВВОД
+								{:else if key === '⌫'}
+									⌫
+								{:else}
+									{key}
+								{/if}
+							</button>
+						{/each}
+					</div>
+				{/each}
 			</div>
 		{/if}
 
 		<div class="keyboard-hint">
 			<p class="font-body text-caption text-gray-500">
-				Используйте клавиатуру для ввода букв
+				{#if gameState === 'playing'}
+					Используйте клавиатуру или кнопки на экране
+				{:else}
+					Игра завершена
+				{/if}
 			</p>
 		</div>
 	</div>
@@ -220,12 +382,12 @@
 
 	.game-info {
 		text-align: center;
-		margin-bottom: 2rem;
+		margin-bottom: 1rem;
 		background: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(12px) saturate(180%);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 12px;
-		padding: 1rem;
+		padding: 0.75rem;
 	}
 
 	.instruction {
@@ -242,8 +404,8 @@
 	.words-grid {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
-		margin-bottom: 2rem;
+		gap: 0.375rem;
+		margin-bottom: 1rem;
 	}
 
 	.word-row {
@@ -252,13 +414,30 @@
 		gap: 0.25rem;
 	}
 
+	.word-row.submitted {
+		pointer-events: none;
+	}
+
+	.word-row.submitted .letter-cell {
+		animation: flipReveal 0.6s ease-in-out;
+		animation-fill-mode: both;
+	}
+
+	.word-row.submitted .letter-cell:nth-child(1) { animation-delay: 0ms; }
+	.word-row.submitted .letter-cell:nth-child(2) { animation-delay: 100ms; }
+	.word-row.submitted .letter-cell:nth-child(3) { animation-delay: 200ms; }
+	.word-row.submitted .letter-cell:nth-child(4) { animation-delay: 300ms; }
+	.word-row.submitted .letter-cell:nth-child(5) { animation-delay: 400ms; }
+
 	.word-row.winning {
 		animation: wordWin 1s ease-out;
 	}
 
 	.letter-cell {
-		width: 48px;
-		height: 48px;
+		width: calc(min(48px, (100vw - 4rem) / var(--word-length) - 0.25rem));
+		height: calc(min(48px, (100vw - 4rem) / var(--word-length) - 0.25rem));
+		max-width: 60px;
+		max-height: 60px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -266,7 +445,7 @@
 		border: 2px solid rgba(255, 255, 255, 0.3);
 		border-radius: 8px;
 		font-family: var(--font-heading);
-		font-size: 1.25rem;
+		font-size: clamp(1rem, 2.5vw, 1.25rem);
 		font-weight: 600;
 		color: var(--color-gpb-black);
 		cursor: pointer;
@@ -290,16 +469,25 @@
 	}
 
 	.letter-cell.correct {
-		background: var(--color-gpb-mint);
+		background: var(--color-gpb-emerald);
 		border-color: var(--color-gpb-emerald);
-		color: var(--color-gpb-black);
+		color: white;
 		font-weight: 700;
 	}
 
-	.letter-cell.winning-cell {
-		animation: letterWin 0.6s ease-out;
-		animation-delay: calc(var(--animation-delay) / 4);
+	.letter-cell.present {
+		background: var(--color-gpb-gold);
+		border-color: var(--color-gpb-gold);
+		color: black;
+		font-weight: 600;
 	}
+
+	.letter-cell.absent {
+		background: var(--color-gpb-gray-600);
+		border-color: var(--color-gpb-gray-600);
+		color: white;
+	}
+
 
 	.cursor {
 		position: absolute;
@@ -352,11 +540,21 @@
 		margin-bottom: 0.25rem;
 	}
 
+	.action-buttons {
+		display: flex;
+		gap: 0.75rem;
+		margin-top: 1rem;
+	}
+
+	.play-again-button {
+		flex: 1;
+	}
+
 	.game-stats {
 		display: flex;
 		justify-content: center;
-		gap: 2rem;
-		margin-bottom: 1.5rem;
+		gap: 1.5rem;
+		margin-bottom: 1rem;
 	}
 
 	.stat-item {
@@ -385,7 +583,8 @@
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 	}
 
-	.victory-message {
+	.victory-message,
+	.defeat-message {
 		text-align: center;
 		margin-bottom: 2rem;
 		background: rgba(255, 255, 255, 0.15);
@@ -397,15 +596,87 @@
 	}
 
 
-	.victory-text {
+	.victory-text,
+	.defeat-text {
 		color: white;
 		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 		margin-bottom: 0.5rem;
 	}
 
-	.victory-subtitle {
+	.victory-subtitle,
+	.defeat-subtitle {
 		color: rgba(255, 255, 255, 0.9);
 		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	}
+
+	.virtual-keyboard {
+		margin: 1rem 0 0.5rem 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+
+	.keyboard-row {
+		display: flex;
+		justify-content: center;
+		gap: 0.25rem;
+	}
+
+	.keyboard-key {
+		min-width: 30px;
+		height: 42px;
+		padding: 0 5px;
+		background: rgba(255, 255, 255, 0.9);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		border-radius: 5px;
+		font-family: var(--font-heading);
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: var(--color-gpb-black);
+		cursor: pointer;
+		transition: all 0.2s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.keyboard-key:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 1);
+		border-color: var(--color-gpb-violet);
+		transform: translateY(-1px);
+	}
+
+	.keyboard-key:active:not(:disabled) {
+		transform: translateY(0);
+		background: rgba(255, 255, 255, 0.8);
+	}
+
+	.keyboard-key:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
+	.keyboard-key-wide {
+		min-width: 44px;
+		font-size: 0.7rem;
+	}
+
+	.keyboard-key-correct {
+		background: var(--color-gpb-emerald);
+		border-color: var(--color-gpb-emerald);
+		color: white;
+	}
+
+	.keyboard-key-present {
+		background: var(--color-gpb-gold);
+		border-color: var(--color-gpb-gold);
+		color: black;
+	}
+
+	.keyboard-key-absent {
+		background: var(--color-gpb-gray-600);
+		border-color: var(--color-gpb-gray-600);
+		color: white;
 	}
 
 	.keyboard-hint {
@@ -428,6 +699,18 @@
 		100% {
 			opacity: 1;
 			transform: scale(1) rotateY(0deg);
+		}
+	}
+
+	@keyframes flipReveal {
+		0% {
+			transform: scaleY(1);
+		}
+		50% {
+			transform: scaleY(0.1);
+		}
+		100% {
+			transform: scaleY(1);
 		}
 	}
 
@@ -497,9 +780,9 @@
 
 	@media (max-width: 380px) {
 		.letter-cell {
-			width: 40px;
-			height: 40px;
-			font-size: 1rem;
+			width: calc(min(40px, (100vw - 3rem) / var(--word-length) - 0.25rem));
+			height: calc(min(40px, (100vw - 3rem) / var(--word-length) - 0.25rem));
+			font-size: clamp(0.875rem, 2vw, 1rem);
 		}
 
 		.game-stats {
@@ -508,6 +791,26 @@
 
 		.stat-item {
 			padding: 0.5rem 0.75rem;
+		}
+
+		.keyboard-key {
+			min-width: 28px;
+			height: 42px;
+			font-size: 0.75rem;
+		}
+
+		.keyboard-key-wide {
+			min-width: 42px;
+			font-size: 0.65rem;
+		}
+
+		.virtual-keyboard {
+			margin: 1.5rem 0 0.75rem 0;
+			gap: 0.375rem;
+		}
+
+		.keyboard-row {
+			gap: 0.2rem;
 		}
 	}
 </style>

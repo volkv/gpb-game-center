@@ -184,7 +184,6 @@
 	@media (min-width: 501px) {
 		.mobile-container {
 			border-radius: 1.5rem;
-			height: 1000px;
 			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 		}
 	}
