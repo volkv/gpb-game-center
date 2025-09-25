@@ -82,8 +82,16 @@
 
 @layer components {
   /* === ЭНЕРГЕТИЧЕСКИЕ ГРАДИЕНТЫ === */
-  .gradient-electric {
-    background: linear-gradient(135deg, #1919EF 0%, #58FFFF 100%);
+  .gradient-cyber {
+    background: linear-gradient(135deg, #0F0FCC 0%, #50C878 100%);
+  }
+
+  .gradient-neon {
+    background: linear-gradient(135deg, #9B59B6 0%, #2BEDED 100%);
+  }
+
+  .gradient-deep {
+    background: linear-gradient(135deg, #000000 0%, #1919EF 100%);
   }
 
   .gradient-power {

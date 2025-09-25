@@ -77,7 +77,7 @@
 </script>
 
 <div
-	class="game-card {game.gradient?.includes('mint') ? 'gradient-electric' : game.gradient?.includes('raspberry') ? 'gradient-power' : 'gradient-wealth'}"
+	class="game-card {game.gradient?.includes('mint') ? 'gradient-cyber' : game.gradient?.includes('raspberry') ? 'gradient-power' : 'gradient-wealth'}"
 	class:text-white={true}
 	class:game-card-locked={!isActive}
 	class:stagger-item={true}

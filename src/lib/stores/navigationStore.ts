@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store';
 
-export type Screen = 'bank-home' | 'game-center' | 'game' | 'rewards-shop' | 'loading' | 'error';
+export type Screen = 'bank-home' | 'game-center' | 'game' | 'rewards-shop' | 'tasks' | 'loading' | 'error';
 
 export interface NavigationState {
 	currentScreen: Screen;
@@ -187,6 +187,11 @@ export const isRewardsShopScreen = derived(
 	($nav) => $nav.currentScreen === 'rewards-shop'
 );
 
+export const isTasksScreen = derived(
+	navigationStore,
+	($nav) => $nav.currentScreen === 'tasks'
+);
+
 export const navigationHistory = derived(
 	navigationStore,
 	($nav) => $nav.history
@@ -218,4 +223,8 @@ export function goBack() {
 
 export function navigateToRewardsShop() {
 	navigationStore.navigateTo('rewards-shop', { clearHistory: true });
+}
+
+export function navigateToTasks() {
+	navigationStore.navigateTo('tasks', { clearHistory: true });
 }

@@ -6,18 +6,22 @@
 	import type GameCenter from '$lib/components/GameCenter.svelte';
 	import type GameContainer from '$lib/components/GameContainer.svelte';
 	import type RewardsShop from '$lib/components/RewardsShop.svelte';
+	import type Tasks from '$lib/components/Tasks.svelte';
 	import TabNavigation from '$lib/components/TabNavigation.svelte';
 
 	let selectedGame = $state<Game | null>(null);
 	let GameCenterComponent = $state<typeof GameCenter | null>(null);
 	let GameContainerComponent = $state<typeof GameContainer | null>(null);
 	let RewardsShopComponent = $state<typeof RewardsShop | null>(null);
+	let TasksComponent = $state<typeof Tasks | null>(null);
 	let gameCenterLoadPromise: Promise<void> | null = null;
 	let gameContainerLoadPromise: Promise<void> | null = null;
 	let rewardsShopLoadPromise: Promise<void> | null = null;
+	let tasksLoadPromise: Promise<void> | null = null;
 	let isGameCenterLoading = $state(false);
 	let isGameContainerLoading = $state(false);
 	let isRewardsShopLoading = $state(false);
+	let isTasksLoading = $state(false);
 
 	const slideLeft = reduceMotionTransition(
 		(node, params) => slideInOut(node, { ...params, x: -100 })
@@ -87,6 +91,26 @@
 		await rewardsShopLoadPromise;
 	}
 
+	async function ensureTasksLoaded() {
+		if (TasksComponent) return;
+		if (tasksLoadPromise) {
+			await tasksLoadPromise;
+			return;
+		}
+
+		isTasksLoading = true;
+		tasksLoadPromise = import('$lib/components/Tasks.svelte')
+			.then((module) => {
+				TasksComponent = module.default;
+			})
+			.finally(() => {
+				isTasksLoading = false;
+				tasksLoadPromise = null;
+			});
+
+		await tasksLoadPromise;
+	}
+
 	$effect(() => {
 		if ($currentScreen === 'game-center') {
 			ensureGameCenterLoaded();
@@ -102,6 +126,12 @@
 	$effect(() => {
 		if ($currentScreen === 'rewards-shop') {
 			ensureRewardsShopLoaded();
+		}
+	});
+
+	$effect(() => {
+		if ($currentScreen === 'tasks') {
+			ensureTasksLoaded();
 		}
 	});
 
@@ -137,6 +167,21 @@
 					<div class="lazy-fallback" aria-live="polite" aria-busy={isGameCenterLoading}>
 						<div class="lazy-spinner" aria-hidden="true"></div>
 						<p class="lazy-text">Загружаем игровой центр…</p>
+					</div>
+				{/if}
+			</div>
+		{:else if $currentScreen === 'tasks'}
+			<div
+				class="screen"
+				in:slideRight={{ duration: 400, delay: 50 }}
+				out:slideLeft={{ duration: 300 }}
+			>
+				{#if TasksComponent}
+					<TasksComponent />
+				{:else}
+					<div class="lazy-fallback" aria-live="polite" aria-busy={isTasksLoading}>
+						<div class="lazy-spinner" aria-hidden="true"></div>
+						<p class="lazy-text">Загружаем задания…</p>
 					</div>
 				{/if}
 			</div>
@@ -185,7 +230,7 @@
 	{/key}
 </div>
 
-{#if $currentScreen === 'game-center' || $currentScreen === 'rewards-shop'}
+{#if $currentScreen === 'game-center' || $currentScreen === 'tasks' || $currentScreen === 'rewards-shop'}
 	<TabNavigation />
 {/if}
 

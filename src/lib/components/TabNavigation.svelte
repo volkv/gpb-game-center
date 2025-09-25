@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { Gamepad2, Gift } from 'lucide-svelte';
+	import { Gamepad2, Gift, CheckSquare } from 'lucide-svelte';
 	import {
 		currentScreen,
 		isGameCenterScreen,
 		isRewardsShopScreen,
+		isTasksScreen,
 		navigateToGameCenter,
-		navigateToRewardsShop
+		navigateToRewardsShop,
+		navigateToTasks
 	} from '$lib/stores/navigationStore';
 
 	const tabs = [
@@ -14,6 +16,12 @@
 			label: 'Игровой центр',
 			icon: Gamepad2,
 			action: navigateToGameCenter
+		},
+		{
+			id: 'tasks',
+			label: 'Задания',
+			icon: CheckSquare,
+			action: navigateToTasks
 		},
 		{
 			id: 'rewards-shop',
@@ -26,6 +34,8 @@
 	function isTabActive(tabId: string): boolean {
 		if (tabId === 'game-center') {
 			return $isGameCenterScreen;
+		} else if (tabId === 'tasks') {
+			return $isTasksScreen;
 		} else if (tabId === 'rewards-shop') {
 			return $isRewardsShopScreen;
 		}
