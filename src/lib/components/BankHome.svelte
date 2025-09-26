@@ -29,7 +29,7 @@
 			</div>
 		</div>
 		<div class="cards-grid" role="group" aria-label="Скелетные карточки продуктов">
-			<SkeletonCard width="100%" height="124px" hasIcon={true} hasText={true} textLines={3} />
+			<SkeletonCard width="100%" height="124px" hasIcon={true} hasText={true} textLines={2} />
 			<SkeletonCard width="100%" height="124px" hasIcon={true} hasText={true} textLines={2} />
 		</div>
 		<div class="bank-card surface-muted" aria-hidden="true">

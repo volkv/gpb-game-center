@@ -33,9 +33,9 @@
   let overlayElement = $state<HTMLDivElement>();
 
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg'
+    sm: 'modal-game--sm',
+    md: 'modal-game--md',
+    lg: 'modal-game--lg'
   };
 
   function handleKeydown(event: KeyboardEvent) {
@@ -110,6 +110,148 @@
 </script>
 
 <style>
+	.modal-overlay-game {
+		position: fixed;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: clamp(1rem, 3vw, 2.75rem);
+		background: color-mix(in srgb, var(--color-neutral-900) 74%, transparent 26%);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		z-index: 110;
+		overflow-y: auto;
+	}
+
+	.modal-game {
+		position: relative;
+		width: min(680px, 100%);
+		max-height: calc(100vh - clamp(2.5rem, 6vh, 4.5rem));
+		display: flex;
+		flex-direction: column;
+		border-radius: calc(var(--radius-xl) + 4px);
+		border: 1px solid var(--color-border-muted);
+		background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
+		box-shadow: var(--shadow-hard);
+		overflow: hidden;
+	}
+
+	.modal-game--sm {
+		width: min(420px, 100%);
+	}
+
+	.modal-game--md {
+		width: min(560px, 100%);
+	}
+
+	.modal-game--lg {
+		width: min(760px, 100%);
+	}
+
+	.modal-header-game {
+		position: relative;
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: clamp(0.75rem, 1.5vw, 1.25rem);
+		padding: clamp(1.1rem, 1.8vw, 1.6rem) clamp(1.25rem, 2vw, 1.8rem);
+		border-bottom: 1px solid var(--color-border-subtle);
+		background-color: color-mix(in srgb, var(--color-neutral-50) 68%, white 32%);
+	}
+
+	.modal-title-game {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+		font-weight: 700;
+		letter-spacing: -0.015em;
+		color: var(--color-fg-primary);
+	}
+
+	.modal-content-game {
+		flex: 1;
+		overflow-y: auto;
+		padding: clamp(1.1rem, 2vw, 1.75rem);
+		display: flex;
+		flex-direction: column;
+		gap: clamp(0.85rem, 1.5vw, 1.25rem);
+		background-color: color-mix(in srgb, var(--color-surface-card) 92%, white 8%);
+	}
+
+	.modal-footer-game {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		padding: clamp(1rem, 1.6vw, 1.35rem);
+		border-top: 1px solid var(--color-border-subtle);
+		background-color: color-mix(in srgb, var(--color-neutral-50) 72%, white 28%);
+	}
+
+	.modal-footer-game :global(.btn-game-secondary),
+	.modal-footer-game :global(.btn-game-primary) {
+		flex: 1 1 auto;
+	}
+
+	.btn-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid transparent;
+		background: color-mix(in srgb, var(--color-neutral-50) 80%, white 20%);
+		color: var(--color-fg-primary);
+		cursor: pointer;
+		transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+	}
+
+	.btn-icon:hover {
+		background: color-mix(in srgb, var(--color-neutral-50) 65%, white 35%);
+		transform: translateY(-1px);
+	}
+
+	.btn-icon:focus-visible,
+	.focus-game {
+		outline: none;
+		box-shadow: var(--shadow-focus);
+	}
+
+	.touch-target {
+		min-width: 44px;
+		min-height: 44px;
+	}
+
+	@media (max-width: 768px) {
+		.modal-overlay-game {
+			padding: clamp(0.75rem, 4vw, 1.5rem);
+		}
+
+		.modal-game {
+			width: 100%;
+			max-height: calc(100vh - clamp(1.5rem, 6vw, 2.5rem));
+		}
+
+		.modal-header-game {
+			padding: 1rem 1.25rem;
+		}
+
+		.modal-footer-game {
+			flex-direction: column;
+		}
+
+		.modal-footer-game :global(button) {
+			width: 100%;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.modal-overlay-game,
+		.btn-icon {
+			transition: none;
+		}
+	}
 </style>
 
 {#if open}

@@ -23,8 +23,8 @@
   const availableBuildings = $derived(
     Object.entries(buildingConfigs).filter(([, config]) => {
       const matchesSearch = config.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          config.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          config.bankProduct.toLowerCase().includes(searchTerm.toLowerCase());
+        config.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        config.bankProduct.toLowerCase().includes(searchTerm.toLowerCase());
 
       const levelUnlocked = $level >= config.unlockLevel;
       const requiredBuildingExists = !config.requiresBuilding || $hasBuildingOfType(config.requiresBuilding);
@@ -38,8 +38,8 @@
 
   function canAfford(price: { coins?: number; crystals?: number; energy?: number }) {
     return (!price.coins || $resources.coins >= price.coins) &&
-           (!price.crystals || $resources.crystals >= price.crystals) &&
-           (!price.energy || $resources.energy >= price.energy);
+      (!price.crystals || $resources.crystals >= price.crystals) &&
+      (!price.energy || $resources.energy >= price.energy);
   }
 
   function selectBuilding(type: BuildingType) {
@@ -89,10 +89,7 @@
   }
 
   function showProductInfo(type: BuildingType) {
-    console.log('Opening building info modal for:', type);
-    // Открываем модалку с информацией о здании напрямую без закрытия текущей
     openModal('building_info', { buildingType: type });
-    console.log('Modal opened, current modal state should be building_info');
   }
 </script>
 
@@ -104,43 +101,51 @@
   class="build-menu-modal {className}"
 >
   {#snippet header()}
-    <div class="title-section">
-      <Icon name="hammer" color="var(--color-gpb-blue)" size="lg" />
-      <h2 class="modal-title">Меню строительства</h2>
+    <div class="build-menu__header">
+      <div class="build-menu__header-icon">
+        <Icon name="hammer" size="22" />
+      </div>
+      <div class="build-menu__heading">
+        <h2 class="modal-title-game">Меню строительства</h2>
+        <p class="build-menu__subtitle">Подберите здание для развития FinCity</p>
+      </div>
     </div>
   {/snippet}
 
-  <div class="search-controls">
-    <div class="search-bar">
-      <Icon name="search" size="sm" color="var(--color-gray-400)" />
+  <div class="build-menu__filters">
+    <div class="build-menu__search">
+      <Icon name="search" size="18" class="build-menu__search-icon" />
       <input
         type="text"
         placeholder="Поиск зданий..."
         bind:value={searchTerm}
-        class="search-input"
+        class="build-menu__search-input"
       />
       {#if searchTerm}
-        <button onclick={clearSearch} class="clear-search">
-          <Icon name="close" size="sm" />
+        <button type="button" onclick={clearSearch} class="build-menu__clear-search" aria-label="Очистить поиск">
+          <Icon name="close" size="16" />
         </button>
       {/if}
     </div>
 
-    <div class="category-tabs">
+    <div class="build-menu__segments" role="tablist" aria-label="Фильтр зданий">
       <button
-        class="tab-button {selectedCategory === 'all' ? 'active' : ''}"
+        type="button"
+        class="build-menu__segment {selectedCategory === 'all' ? 'is-active' : ''}"
         onclick={() => selectedCategory = 'all'}
       >
         Все
       </button>
       <button
-        class="tab-button {selectedCategory === 'unlocked' ? 'active' : ''}"
+        type="button"
+        class="build-menu__segment {selectedCategory === 'unlocked' ? 'is-active' : ''}"
         onclick={() => selectedCategory = 'unlocked'}
       >
         Доступные
       </button>
       <button
-        class="tab-button {selectedCategory === 'locked' ? 'active' : ''}"
+        type="button"
+        class="build-menu__segment {selectedCategory === 'locked' ? 'is-active' : ''}"
         onclick={() => selectedCategory = 'locked'}
       >
         Заблокированные
@@ -150,316 +155,509 @@
 
   <div class="buildings-grid">
     {#each availableBuildings as [type, config] (type)}
-    {@const levelUnlocked = $level >= config.unlockLevel}
-    {@const requiredBuildingExists = !config.requiresBuilding || $hasBuildingOfType(config.requiresBuilding)}
-    {@const isUnlocked = levelUnlocked && requiredBuildingExists}
-    {@const affordable = canAfford(config.basePrice)}
-    {@const spritePath = getBuildingSpritePath(type as BuildingType)}
+      {@const levelUnlocked = $level >= config.unlockLevel}
+      {@const requiredBuildingExists = !config.requiresBuilding || $hasBuildingOfType(config.requiresBuilding)}
+      {@const isUnlocked = levelUnlocked && requiredBuildingExists}
+      {@const affordable = canAfford(config.basePrice)}
+      {@const spritePath = getBuildingSpritePath(type as BuildingType)}
 
-    <Card
-      variant={!isUnlocked ? 'default' : affordable ? 'elevated' : 'default'}
-      size="none"
-      padding="sm"
-      class="building-card {!isUnlocked ? 'locked' : !affordable ? 'expensive' : 'available'}"
-      clickable={false}
-    >
-      <div class="card-body">
-        <div class="card-visual">
-          <div class="building-render">
-            {#if spritePath}
-              <img
-                src={spritePath}
-                alt={config.name}
-                class="building-sprite {!isUnlocked ? 'locked' : ''}"
-              />
-            {:else}
-              <Icon name="building" size="lg" color={isUnlocked ? 'var(--color-violet)' : 'var(--color-henbane)'} />
-            {/if}
-          </div>
-
-          {#if !isUnlocked}
-            <Bubble variant="info" size="sm" class="lock-badge">
-              <Icon name="shield" size="xs" />
-              Уровень {config.unlockLevel}
-            </Bubble>
-          {/if}
-        </div>
-
-        <div class="card-details">
-          <div class="card-header">
-            <h3 class="card-title">{config.name}</h3>
-            <Bubble color="violet" size="sm" class="category-pill">
-              {config.bankProduct}
-            </Bubble>
-          </div>
-
-          <p class="card-description">{config.description}</p>
-
-          <div class="card-stats">
-            <Bubble variant="info" size="sm" class="stat-bubble">
-              <Icon name="building" size="xs" color="var(--color-violet)" />
-              {config.size.width}×{config.size.height}
-            </Bubble>
-
-            {#if config.income.interval > 0}
-              {#if config.income.coins > 0}
-                <Bubble color="mint" size="sm" class="stat-bubble">
-                  <Icon name="coin" size="xs" color="var(--color-mint)" />
-                  +{config.income.coins}
-                </Bubble>
+      <Card
+        variant={!isUnlocked ? 'default' : affordable ? 'elevated' : 'default'}
+        size="none"
+        padding="none"
+        class="building-card {!isUnlocked ? 'is-locked' : !affordable ? 'is-expensive' : 'is-available'}"
+        clickable={false}
+      >
+        <div class="building-card__body">
+          <div class="building-card__visual">
+            <div class="building-card__render">
+              {#if spritePath}
+                <img
+                  src={spritePath}
+                  alt={config.name}
+                  class="building-card__sprite {!isUnlocked ? 'is-locked' : ''}"
+                />
+              {:else}
+                <Icon name="building" size={28} class="building-card__placeholder-icon" />
               {/if}
-              {#if config.income.crystals > 0}
-                <Bubble color="raspberry" size="sm" class="stat-bubble">
-                  <Icon name="crystal" size="xs" color="var(--color-raspberry)" />
-                  +{config.income.crystals}
-                </Bubble>
-              {/if}
-            {/if}
-          </div>
-        </div>
-      </div>
+            </div>
 
-      <div class="card-footer">
-        <div class="card-price">
-          <span class="price-label">Стоимость:</span>
-          <div class="price-list">
-            {#if config.basePrice.coins > 0}
-              <Bubble
-                color={$resources.coins >= config.basePrice.coins ? 'mint' : 'raspberry-light'}
-                size="sm"
-                class="price-bubble"
-              >
-                <Icon name="coin" size="xs" color="var(--color-mint)" />
-                {config.basePrice.coins.toLocaleString()}
-              </Bubble>
-            {/if}
-
-            {#if config.basePrice.crystals > 0}
-              <Bubble
-                color={$resources.crystals >= config.basePrice.crystals ? 'raspberry' : 'raspberry-light'}
-                size="sm"
-                class="price-bubble"
-              >
-                <Icon name="crystal" size="xs" color="var(--color-raspberry)" />
-                {config.basePrice.crystals.toLocaleString()}
+            {#if !isUnlocked}
+              <Bubble variant="info" size="sm" class="building-card__lock">
+                <Icon name="shield" size="xs" />
+                Уровень {config.unlockLevel}
               </Bubble>
             {/if}
           </div>
+
+          <div class="building-card__details">
+            <div class="building-card__header">
+              <h3 class="building-card__title">{config.name}</h3>
+              <Bubble color="violet" size="sm" class="building-card__category">
+                {config.bankProduct}
+              </Bubble>
+            </div>
+
+            <p class="building-card__description">{config.description}</p>
+
+            <div class="building-card__stats">
+              <Bubble variant="info" size="sm" class="building-card__stat">
+                <Icon name="building" size="xs" />
+                {config.size.width}×{config.size.height}
+              </Bubble>
+
+              {#if config.income.interval > 0}
+                {#if config.income.coins > 0}
+                  <Bubble color="mint" size="sm" class="building-card__stat">
+                    <Icon name="coin" size="xs" />
+                    +{config.income.coins}
+                  </Bubble>
+                {/if}
+                {#if config.income.crystals > 0}
+                  <Bubble color="raspberry" size="sm" class="building-card__stat">
+                    <Icon name="crystal" size="xs" />
+                    +{config.income.crystals}
+                  </Bubble>
+                {/if}
+              {/if}
+            </div>
+          </div>
         </div>
 
-        <div class="card-actions">
-          <Button
-            variant="ghost"
-            size="sm"
-            onclick={() => showProductInfo(type as BuildingType)}
-            class="info-button"
-          >
-            <Icon name="book" size="sm" />
-          </Button>
+        <div class="building-card__footer">
+          <div class="building-card__price">
+            <span class="building-card__price-label">Стоимость</span>
+            <div class="building-card__price-list">
+              {#if config.basePrice.coins > 0}
+                <Bubble
+                  color={$resources.coins >= config.basePrice.coins ? 'mint' : 'raspberry-light'}
+                  size="sm"
+                  class="building-card__price-chip"
+                >
+                  <Icon name="coin" size="xs" />
+                  {config.basePrice.coins.toLocaleString('ru-RU')}
+                </Bubble>
+              {/if}
 
-          {#if !isUnlocked}
-            <Bubble variant="warning" size="sm" class="status-badge">
-              <Icon name="shield" size="xs" />
-              Заблокировано
-            </Bubble>
-          {:else if !affordable}
-            <Bubble variant="error" size="sm" class="status-badge">
-              <Icon name="coin" size="xs" />
-              Не хватает
-            </Bubble>
-          {:else}
+              {#if config.basePrice.crystals > 0}
+                <Bubble
+                  color={$resources.crystals >= config.basePrice.crystals ? 'raspberry' : 'raspberry-light'}
+                  size="sm"
+                  class="building-card__price-chip"
+                >
+                  <Icon name="crystal" size="xs" />
+                  {config.basePrice.crystals.toLocaleString('ru-RU')}
+                </Bubble>
+              {/if}
+            </div>
+          </div>
+
+          <div class="building-card__actions">
             <Button
-              variant="primary"
+              variant="ghost"
               size="sm"
-              onclick={() => selectBuilding(type as BuildingType)}
-              class="build-button"
+              onclick={() => showProductInfo(type as BuildingType)}
+              class="building-card__info"
+              aria-label="Подробнее о продукте"
             >
-              <Icon name="hammer" size="sm" />
-              Построить
+              <Icon name="book" size="sm" />
             </Button>
-          {/if}
+
+            {#if !isUnlocked}
+              <Bubble variant="warning" size="sm" class="building-card__status">
+                <Icon name="shield" size="xs" />
+                Заблокировано
+              </Bubble>
+            {:else if !affordable}
+              <Bubble variant="error" size="sm" class="building-card__status">
+                <Icon name="coin" size="xs" />
+                Не хватает
+              </Bubble>
+            {:else}
+              <Button
+                variant="primary"
+                size="sm"
+                onclick={() => selectBuilding(type as BuildingType)}
+                class="building-card__cta"
+              >
+                <Icon name="hammer" size="sm" />
+                Построить
+              </Button>
+            {/if}
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
     {/each}
 
     {#if availableBuildings.length === 0}
-      <div class="no-results">
-        <Icon name="search" size="lg" color="var(--color-gray-400)" />
-        <p>Здания не найдены</p>
-        <p class="text-sm text-gray-500">Попробуйте изменить поисковый запрос</p>
+      <div class="build-menu__empty">
+        <Icon name="search" size="26" class="build-menu__empty-icon" />
+        <p class="build-menu__empty-title">Здания не найдены</p>
+        <p class="build-menu__empty-text">Попробуйте изменить фильтры или поисковый запрос</p>
       </div>
     {/if}
   </div>
 </Modal>
 
 <style>
-  .title-section {
+  .build-menu__header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.85rem;
   }
 
-  .search-controls {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .search-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background-color: #f9fafb;
-    border-radius: 0.5rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid #e5e7eb;
-  }
-
-  .search-input {
-    flex: 1;
-    background: transparent;
-    border: 0;
-    outline: 0;
-    margin-left: 0.75rem;
-    color: #111827;
-  }
-
-  .search-input::placeholder {
-    color: #6b7280;
-  }
-
-  .clear-search {
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s;
-  }
-
-  .clear-search:hover {
-    background-color: #e5e7eb;
-  }
-
-  .category-tabs {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .tab-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 0.5rem;
-    transition: all 0.2s;
-    border: 1px solid #e5e7eb;
-    background-color: white;
-    color: #374151;
-    cursor: pointer;
-  }
-
-  .tab-button.active {
-    background-color: #2563eb;
-    color: white;
-    border-color: #2563eb;
-  }
-
-  .tab-button:hover:not(.active) {
-    background-color: #f9fafb;
-  }
-
-  .buildings-grid {
-    padding: 1rem;
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr;
-  }
-
-  :global(.building-card) {
-    transition: transform 0.2s;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  :global(.building-card.locked) {
-    opacity: 0.75;
-    cursor: not-allowed;
-  }
-
-  :global(.building-card.expensive) {
-    border: 1px solid #fecaca;
-    background-color: #fef2f2;
-  }
-
-  :global(.building-card.available:hover) {
-    transform: translateY(-2px);
-  }
-
-  :global(.card-body) {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  :global(.card-visual) {
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  :global(.building-render) {
-    width: 4rem;
-    height: 4rem;
+  .build-menu__header-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #f3f4f6;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-lg);
+    background: var(--layer-brand-050);
+    border: 1px solid var(--layer-brand-150);
+    color: var(--color-brand-600);
   }
 
-  @media (min-width: 768px) {
-    :global(.building-render) {
-      width: 5rem;
-      height: 5rem;
-    }
+  .build-menu__heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
   }
 
-  :global(.building-sprite) {
+  .build-menu__subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-fg-muted);
+  }
+
+  .build-menu__filters {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .build-menu__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-neutral-50) 82%, white 18%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .build-menu__search-icon {
+    color: var(--color-brand-600);
+  }
+
+  .build-menu__search-input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    font-size: 0.95rem;
+    color: var(--color-fg-primary);
+    outline: none;
+  }
+
+  .build-menu__search-input::placeholder {
+    color: var(--color-fg-muted);
+  }
+
+  .build-menu__clear-search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    background: color-mix(in srgb, var(--color-neutral-50) 60%, white 40%);
+    color: var(--color-fg-muted);
+    cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease;
+  }
+
+  .build-menu__clear-search:hover {
+    background: color-mix(in srgb, var(--color-neutral-50) 40%, white 60%);
+    color: var(--color-fg-primary);
+  }
+
+  .build-menu__segments {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.1rem;
+    scrollbar-width: none;
+  }
+
+  .build-menu__segments::-webkit-scrollbar {
+    display: none;
+  }
+
+  .build-menu__segment {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 1.1rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-neutral-50) 78%, white 22%);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-fg-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+  }
+
+  .build-menu__segment.is-active {
+    background: linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-brand-400) 100%);
+    border-color: transparent;
+    color: var(--color-fg-inverse);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .buildings-grid {
+    display: grid;
+    gap: clamp(0.9rem, 1.6vw, 1.3rem);
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+
+  .building-card {
+    padding: 1.1rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  }
+
+  .building-card.is-available:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--layer-brand-150);
+  }
+
+  .building-card.is-expensive {
+    border-color: rgba(209, 60, 106, 0.25);
+    background: color-mix(in srgb, rgba(209, 60, 106, 0.08) 30%, var(--color-surface-card) 70%);
+  }
+
+  .building-card.is-locked {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  .building-card__body {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .building-card__visual {
+    position: relative;
+    flex-shrink: 0;
+    width: 96px;
+  }
+
+  .building-card__render {
+    width: 100%;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-neutral-50) 84%, white 16%);
+    overflow: hidden;
+  }
+
+  .building-card__sprite {
     width: 100%;
     height: 100%;
     object-fit: contain;
   }
 
-  :global(.building-sprite.locked) {
-    opacity: 0.6;
+  .building-card__sprite.is-locked {
+    opacity: 0.55;
     filter: grayscale(1);
   }
 
-  :global(.lock-badge) {
-    position: absolute;
-    top: -0.5rem;
-    right: -0.5rem;
+  .building-card__placeholder-icon {
+    color: var(--color-brand-400);
   }
 
-  .no-results {
+  .building-card__lock {
+    position: absolute;
+    top: -0.4rem;
+    right: -0.4rem;
+  }
+
+  .building-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .building-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .building-card__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 640;
+    letter-spacing: -0.01em;
+    color: var(--color-fg-primary);
+  }
+
+  .building-card__category {
+    white-space: nowrap;
+  }
+
+  .building-card__description {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--color-fg-secondary);
+  }
+
+  .building-card__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .building-card__stat :global(svg) {
+    color: inherit;
+  }
+
+  .building-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .building-card__price {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .building-card__price-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+  }
+
+  .building-card__price-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .building-card__price-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 600;
+  }
+
+  .building-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .building-card__info {
+    border-radius: var(--radius-lg) !important;
+  }
+
+  .building-card__status {
+    white-space: nowrap;
+  }
+
+  .building-card__cta {
+    white-space: nowrap;
+    padding-inline: 1rem !important;
+  }
+
+  .build-menu__empty {
     grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3rem 0;
+    padding: 3rem 1rem;
     text-align: center;
-    color: #6b7280;
+    color: var(--color-fg-muted);
+    gap: 0.75rem;
   }
 
-  @media (max-width: 640px) {
-    .search-controls {
-      padding: 0.75rem;
+  .build-menu__empty-icon {
+    color: var(--color-brand-500);
+  }
+
+  .build-menu__empty-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
+  }
+
+  .build-menu__empty-text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-fg-muted);
+  }
+
+  @media (max-width: 768px) {
+    .buildings-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     }
 
-    .buildings-grid {
-      padding: 0.75rem;
-      gap: 0.75rem;
+    .building-card__body {
+      flex-direction: column;
+    }
+
+    .building-card__visual {
+      width: 100%;
+    }
+
+    .building-card__render {
+      height: 140px;
+    }
+
+    .building-card__actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .building-card__price {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .building-card,
+    .build-menu__segment,
+    .building-card__cta {
+      transition: none;
     }
   }
 </style>

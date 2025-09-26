@@ -1,8 +1,40 @@
+@font-face {
+  font-family: 'Halvar Breitschrift';
+  src: url('/fonts/halvar/Halvar Breitschrift-Regular-Web.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Halvar Breitschrift';
+  src: url('/fonts/halvar/Halvar Breitschrift-Bold-Web.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gazprombank Sans';
+  src: url('/fonts/gazprom/Gazprombank_Sans_Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gazprombank Sans';
+  src: url('/fonts/gazprom/Gazprombank_Sans_Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: 'Inter', 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
-  --font-display: 'Inter', 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  --font-sans: 'Gazprombank Sans', 'SF Pro Text', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Halvar Breitschrift', 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', ui-monospace, monospace;
   --font-body: var(--font-sans);
   --font-heading: var(--font-display);

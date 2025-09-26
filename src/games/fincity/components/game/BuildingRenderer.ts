@@ -284,7 +284,7 @@ export class BuildingRenderer {
 
   private createBuildingLabel(name: string, isPreview: boolean = false): Text {
     const style = new TextStyle({
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'Gazprombank Sans, sans-serif',
       fontSize: isPreview ? 14 : 12,
       fontWeight: 'bold',
       fill: isPreview ? 0xffffff : 0x333333,

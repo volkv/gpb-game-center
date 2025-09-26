@@ -1,236 +1,246 @@
 <script lang="ts">
 	import { Coins, Gem, Battery, Star } from 'lucide-svelte';
-	import { resources, experienceToNextLevel } from '../../stores/playerData';
+	import { resources, experienceToNextLevel, level } from '../../stores/playerData';
 
 	interface Props {
 		class?: string;
 	}
 
 	let { class: className = '' }: Props = $props();
+
+	const energyPercent = $derived(
+		$resources.maxEnergy
+			? Math.min(100, Math.round(($resources.energy / $resources.maxEnergy) * 100))
+			: 0
+	);
+
+	const experiencePercent = $derived(
+		$experienceToNextLevel
+			? Math.min(100, Math.round(($resources.experience / $experienceToNextLevel) * 100))
+			: 0
+	);
+
+	const experienceRemaining = $derived(
+		Math.max(0, ($experienceToNextLevel || 0) - $resources.experience)
+	);
 </script>
 
 <div class="resources-bar {className}">
-	<div class="resources-container">
-		<!-- Coins -->
-		<div class="resource-item mini-stat">
-			<div class="resource-icon-container">
-				<Coins size={16} class="resource-icon text-gpb-gold neon-glow" />
-			</div>
-			<div class="resource-details">
-				<span class="resource-value font-score">{$resources.coins.toLocaleString()}</span>
-				<span class="resource-label font-ui-caption">Монеты</span>
-			</div>
+	<div class="resources-bar__container">
+		<div class="resources-bar__level">
+			<span class="resources-bar__chip">Ур {$level}</span>
+			<span class="resources-bar__hint">До {$level + 1}: {experienceRemaining.toLocaleString('ru-RU')} XP</span>
 		</div>
 
-		<!-- Crystals -->
-		<div class="resource-item mini-stat">
-			<div class="resource-icon-container">
-				<Gem size={16} class="resource-icon text-gpb-raspberry neon-glow" />
+		<div class="resources-bar__scroller" role="list">
+			<div class="resources-bar__item" data-variant="coins" role="listitem">
+				<Coins size={16} />
+				<span class="resources-bar__value">{$resources.coins.toLocaleString('ru-RU')}</span>
 			</div>
-			<div class="resource-details">
-				<span class="resource-value font-score">{$resources.crystals.toLocaleString()}</span>
-				<span class="resource-label font-ui-caption">Кристаллы</span>
-			</div>
-		</div>
 
-		<!-- Energy -->
-		<div class="resource-item mini-stat">
-			<div class="resource-icon-container">
-				<Battery size={16} class="resource-icon text-gpb-violet neon-glow" />
+			<div class="resources-bar__item" data-variant="crystals" role="listitem">
+				<Gem size={16} />
+				<span class="resources-bar__value">{$resources.crystals.toLocaleString('ru-RU')}</span>
 			</div>
-			<div class="resource-details">
-				<span class="resource-value font-score">{$resources.energy}/{$resources.maxEnergy}</span>
-				<span class="resource-label font-ui-caption">Энергия</span>
-			</div>
-		</div>
 
-		<!-- Experience -->
-		<div class="resource-item mini-stat">
-			<div class="resource-icon-container">
-				<Star size={16} class="resource-icon text-gpb-emerald neon-glow" />
+			<div class="resources-bar__item resources-bar__item--meter" data-variant="energy" role="listitem">
+				<Battery size={16} />
+				<div class="resources-bar__meter">
+					<span class="resources-bar__label">Энергия</span>
+					<span class="resources-bar__track">
+						<span class="resources-bar__fill" style={`width: ${energyPercent}%`}></span>
+					</span>
+				</div>
+				<span class="resources-bar__meta">{energyPercent}%</span>
 			</div>
-			<div class="resource-details">
-				<span class="resource-value font-score">{$resources.experience}/{$experienceToNextLevel}</span>
-				<span class="resource-label font-ui-caption">Опыт</span>
+
+			<div class="resources-bar__item resources-bar__item--meter" data-variant="xp" role="listitem">
+				<Star size={16} />
+				<div class="resources-bar__meter">
+					<span class="resources-bar__label">Опыт</span>
+					<span class="resources-bar__track">
+						<span class="resources-bar__fill" style={`width: ${experiencePercent}%`}></span>
+					</span>
+				</div>
+				<span class="resources-bar__meta">{experiencePercent}%</span>
 			</div>
 		</div>
 	</div>
-
-	<!-- Decorative elements -->
-	<div class="particles-container">
-		<div class="particle"></div>
-		<div class="particle"></div>
-		<div class="particle"></div>
-	</div>
-	<div class="decoration-orb bg-gpb-mint w-6 h-6 -top-1 -right-1"></div>
-	<div class="decoration-orb bg-gpb-gold w-4 h-4 -bottom-1 -left-1"></div>
 </div>
 
 <style>
 	.resources-bar {
-		position: absolute;
-		left: 0;
-		right: 0;
-		z-index: 40;
-		background: linear-gradient(135deg, rgba(25, 25, 239, 0.9) 0%, rgba(88, 255, 255, 0.9) 100%);
-		backdrop-filter: blur(12px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		overflow: hidden;
-		padding: 0.75rem 1rem;
-		margin-bottom: 1rem;
-	}
-
-	.resources-container {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-		gap: 0.75rem;
-		max-width: 28rem;
-		margin: 0 auto;
-		position: relative;
-		z-index: 10;
-	}
-
-	.resource-item {
+		width: 100%;
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.25rem;
-		padding: 0.5rem;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 0.75rem;
-		transition: all 0.3s ease-out;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.resource-item:hover {
-		transform: translateY(-2px);
-		background: rgba(255, 255, 255, 0.15);
-		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-	}
-
-	.resource-icon-container {
-		display: flex;
-		align-items: center;
 		justify-content: center;
-		width: 28px;
-		height: 28px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		backdrop-filter: blur(8px);
-		transition: all 0.3s ease-out;
+		pointer-events: none;
 	}
 
-	.resource-item:hover .resource-icon-container {
-		transform: scale(1.1);
-		background: rgba(255, 255, 255, 0.2);
+	.resources-bar__container {
+		pointer-events: auto;
+		width: min(840px, 100%);
+		display: flex;
+		align-items: center;
+		gap: clamp(0.75rem, 1.6vw, 1.5rem);
+		padding: 0.65rem 0.85rem;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-muted);
+		background: color-mix(in srgb, var(--color-surface-card) 92%, white 8%);
+		box-shadow: var(--shadow-soft);
 	}
 
-	.resource-icon {
-		flex-shrink: 0;
-		filter: drop-shadow(0 0 8px currentColor);
+	.resources-bar__level {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		white-space: nowrap;
 	}
 
-	.resource-details {
+	.resources-bar__chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.3rem 0.8rem;
+		border-radius: var(--radius-full);
+		background: var(--layer-brand-150);
+		color: var(--color-brand-700);
+		font-size: 0.72rem;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.resources-bar__hint {
+		font-size: 0.78rem;
+		color: var(--color-fg-muted);
+	}
+
+	.resources-bar__scroller {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		overflow-x: auto;
+		scrollbar-width: none;
+	}
+
+	.resources-bar__scroller::-webkit-scrollbar {
+		display: none;
+	}
+
+	.resources-bar__item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		padding: 0.45rem 0.75rem;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-neutral-50) 80%, white 20%);
+		color: var(--color-fg-primary);
+		font-size: 0.85rem;
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	.resources-bar__item--meter {
+		gap: 0.6rem;
+	}
+
+	.resources-bar__value {
+		font-family: var(--font-display);
+		letter-spacing: -0.01em;
+	}
+
+	.resources-bar__meter {
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		gap: 0.125rem;
-		text-align: center;
-		min-width: 0;
+		gap: 0.25rem;
 	}
 
-	.resource-value {
-		color: white;
-		font-size: 0.875rem;
-		font-weight: 700;
-		line-height: 1;
-		white-space: nowrap;
-		text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-		letter-spacing: -0.025em;
-	}
-
-	.resource-label {
-		color: rgba(255, 255, 255, 0.8);
-		font-size: 0.625rem;
-		font-weight: 500;
+	.resources-bar__label {
+		font-size: 0.6rem;
+		letter-spacing: 0.12em;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		line-height: 1;
+		color: var(--color-fg-muted);
 	}
 
-	.particles-container {
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
+	.resources-bar__track {
+		position: relative;
+		width: 120px;
+		height: 6px;
+		border-radius: var(--radius-full);
+		background: var(--color-neutral-100);
 		overflow: hidden;
 	}
 
-	.particle {
-		position: absolute;
-		width: 2px;
-		height: 2px;
-		background: rgba(255, 255, 255, 0.4);
-		border-radius: 50%;
-		animation: float-particle 4s ease-in-out infinite;
+	.resources-bar__fill {
+		display: block;
+		height: 100%;
+		border-radius: inherit;
+		background: linear-gradient(90deg, var(--color-brand-500) 0%, var(--color-accent-400) 100%);
+		transition: width 200ms ease-out;
 	}
 
-	.particle:nth-child(1) {
-		top: 20%;
-		left: 10%;
-		animation-delay: 0s;
-		animation-duration: 5s;
+	.resources-bar__item[data-variant='coins'] {
+		border-color: rgba(226, 165, 58, 0.32);
+		background: rgba(226, 165, 58, 0.15);
+		color: var(--color-gpb-gold);
 	}
 
-	.particle:nth-child(2) {
-		top: 60%;
-		left: 70%;
-		animation-delay: 1s;
-		animation-duration: 6s;
+	.resources-bar__item[data-variant='crystals'] {
+		border-color: rgba(31, 196, 217, 0.32);
+		background: rgba(31, 196, 217, 0.16);
+		color: var(--color-accent-600);
 	}
 
-	.particle:nth-child(3) {
-		top: 40%;
-		left: 90%;
-		animation-delay: 2s;
-		animation-duration: 4s;
+	.resources-bar__item[data-variant='energy'] {
+		border-color: rgba(25, 25, 239, 0.28);
+		background: rgba(25, 25, 239, 0.12);
 	}
 
-	@keyframes float-particle {
-		0%, 100% {
-			transform: translateY(0px) translateX(0px) scale(0.8);
-			opacity: 0.4;
+	.resources-bar__item[data-variant='xp'] {
+		border-color: rgba(68, 80, 255, 0.28);
+		background: rgba(68, 80, 255, 0.12);
+	}
+
+	.resources-bar__item[data-variant='energy'] .resources-bar__fill {
+		background: linear-gradient(90deg, var(--color-brand-500) 0%, var(--color-accent-400) 100%);
+	}
+
+	.resources-bar__item[data-variant='xp'] .resources-bar__fill {
+		background: linear-gradient(90deg, var(--color-accent-500) 0%, var(--color-brand-400) 100%);
+	}
+
+	.resources-bar__meta {
+		font-family: var(--font-display);
+		font-size: 0.85rem;
+		color: var(--color-fg-primary);
+	}
+
+	@media (max-width: 768px) {
+		.resources-bar__container {
+			gap: 0.75rem;
+			padding: 0.55rem 0.75rem;
 		}
-		33% {
-			transform: translateY(-8px) translateX(4px) scale(1);
-			opacity: 0.8;
+
+		.resources-bar__track {
+			width: 88px;
 		}
-		66% {
-			transform: translateY(-4px) translateX(-2px) scale(0.9);
-			opacity: 0.6;
+	}
+
+	@media (max-width: 520px) {
+		.resources-bar__hint {
+			display: none;
+		}
+
+		.resources-bar__container {
+			padding-inline: 0.6rem;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.resource-item, .resource-icon-container, .particle {
+		.resources-bar__fill {
 			transition: none;
-			animation: none;
-		}
-	}
-
-	@media (max-width: 380px) {
-		.resources-container {
-			grid-template-columns: repeat(2, 1fr);
-			gap: 0.5rem;
-		}
-
-		.resource-value {
-			font-size: 0.75rem;
-		}
-
-		.resource-label {
-			font-size: 0.5rem;
 		}
 	}
 </style>

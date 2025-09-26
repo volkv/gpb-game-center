@@ -346,151 +346,181 @@
 </div>
 
 <style>
+	.game-canvas-wrapper {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: stretch;
+	}
 
-  .game-canvas-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
+	.game-canvas-container {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		border-radius: inherit;
+		border: 1px solid var(--color-border-subtle);
+		background:
+			radial-gradient(120% 120% at 50% 20%, rgba(68, 80, 255, 0.14) 0%, rgba(31, 196, 217, 0.12) 40%, rgba(255, 255, 255, 0.92) 100%);
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+		overflow: hidden;
+		touch-action: manipulation;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
 
-  .game-canvas-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: var(--color-gpb-blue);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
+	.game-canvas-container::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background-image: linear-gradient(90deg, rgba(68, 80, 255, 0.05) 1px, transparent 0), linear-gradient(0deg, rgba(68, 80, 255, 0.05) 1px, transparent 0);
+		background-size: 48px 48px;
+		opacity: 0.45;
+		pointer-events: none;
+	}
 
-  .game-canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border-radius: var(--radius-lg);
-    cursor: grab;
-    pointer-events: auto;
-  }
+	.game-canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border-radius: inherit;
+		cursor: grab;
+		pointer-events: auto;
+	}
 
-  .game-canvas:active {
-    cursor: grabbing;
-  }
+	.game-canvas:active {
+		cursor: grabbing;
+	}
 
-  .game-canvas.hidden {
-    display: none;
-  }
+	.game-canvas.hidden {
+		display: none;
+	}
 
-  .loading-overlay,
-  .error-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(16, 24, 32, 0.9);
-    backdrop-filter: blur(8px);
-    z-index: 10;
-  }
+	.loading-overlay,
+	.error-overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: color-mix(in srgb, var(--color-neutral-900) 78%, transparent 22%);
+		backdrop-filter: blur(18px);
+		-webkit-backdrop-filter: blur(18px);
+		z-index: 10;
+	}
 
-  .loading-content,
-  .error-content {
-    text-align: center;
-    color: white;
-    padding: 2rem;
-  }
+	.loading-content,
+	.error-content {
+		text-align: center;
+		color: var(--color-fg-inverse);
+		padding: 2rem;
+		max-width: 320px;
+	}
 
-  .loading-spinner {
-    width: 3rem;
-    height: 3rem;
-    border: 3px solid rgba(255, 255, 255, 0.2);
-    border-top: 3px solid var(--color-gpb-blue);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-  }
+	.loading-spinner {
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		border: 3px solid rgba(255, 255, 255, 0.22);
+		border-top-color: var(--color-brand-500);
+		animation: spin 1s linear infinite;
+		margin: 0 auto 1rem;
+	}
 
-  .loading-text {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
+	.loading-text {
+		font-size: 1.1rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		margin-bottom: 1rem;
+	}
 
-  .loading-progress {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
+	.loading-progress {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.45rem;
+	}
 
-  .progress-bar {
-    width: 12rem;
-    height: 0.5rem;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 0.25rem;
-    overflow: hidden;
-  }
+	.progress-bar {
+		width: 14rem;
+		height: 0.55rem;
+		border-radius: var(--radius-full);
+		background: rgba(255, 255, 255, 0.24);
+		overflow: hidden;
+	}
 
-  .progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-gpb-blue), var(--color-gpb-light));
-    border-radius: 0.25rem;
-    transition: width 0.3s ease;
-  }
+	.progress-fill {
+		height: 100%;
+		border-radius: inherit;
+		background: linear-gradient(90deg, var(--color-brand-500) 0%, var(--color-accent-400) 100%);
+		transition: width 220ms ease-out;
+	}
 
-  .progress-text {
-    font-size: 0.875rem;
-    opacity: 0.8;
-  }
+	.progress-text {
+		font-size: 0.85rem;
+		opacity: 0.85;
+	}
 
-  .error-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
+	.error-icon {
+		font-size: 2.5rem;
+		margin-bottom: 0.75rem;
+	}
 
-  .error-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-  }
+	.error-title {
+		font-size: 1.35rem;
+		font-weight: 700;
+		margin-bottom: 0.35rem;
+	}
 
-  .error-message {
-    font-size: 1rem;
-    opacity: 0.8;
-    margin-bottom: 1.5rem;
-  }
+	.error-message {
+		font-size: 0.95rem;
+		opacity: 0.85;
+		margin-bottom: 1.25rem;
+	}
 
-  .error-retry {
-    padding: 0.75rem 1.5rem;
-    background: var(--color-gpb-blue);
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
+	.error-retry {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1.4rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid transparent;
+		background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
+		color: var(--color-fg-inverse);
+		font-weight: 600;
+		cursor: pointer;
+		transition: transform 160ms ease, box-shadow 160ms ease;
+	}
 
-  .error-retry:hover {
-    background: var(--color-gpb-light);
-  }
+	.error-retry:hover {
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-soft);
+	}
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
 
-  @media (max-width: 640px) {
-    :global(.game-zoom-controls) {
-      bottom: 1rem !important;
-      right: 1rem !important;
-    }
-  }
+	@media (max-width: 640px) {
+		:global(.game-zoom-controls) {
+			bottom: 1rem !important;
+			right: 1rem !important;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.loading-spinner {
+			animation: none;
+		}
+
+		.progress-fill {
+			transition: none;
+		}
+	}
 </style>

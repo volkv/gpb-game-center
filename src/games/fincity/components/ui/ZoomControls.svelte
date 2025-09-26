@@ -1,136 +1,123 @@
 <script lang="ts">
-  import { Button } from '.';
+	import { Button } from '.';
 
-  interface Props {
-    onZoomIn: () => void;
-    onZoomOut: () => void;
-    canZoomIn: boolean;
-    canZoomOut: boolean;
-    class?: string;
-  }
+	interface Props {
+		onZoomIn: () => void;
+		onZoomOut: () => void;
+		canZoomIn: boolean;
+		canZoomOut: boolean;
+		class?: string;
+	}
 
-  let {
-    onZoomIn,
-    onZoomOut,
-    canZoomIn,
-    canZoomOut,
-    class: className = ''
-  }: Props = $props();
+	let {
+		onZoomIn,
+		onZoomOut,
+		canZoomIn,
+		canZoomOut,
+		class: className = ''
+	}: Props = $props();
 </script>
 
 <div class="zoom-controls {className}">
-  <Button
-    variant="secondary"
-    size="lg"
-    onclick={onZoomIn}
-    disabled={!canZoomIn}
-    class="zoom-button zoom-in"
-  >
-    <span class="zoom-icon">+</span>
-  </Button>
+	<Button
+		variant="secondary"
+		size="lg"
+		onclick={onZoomIn}
+		disabled={!canZoomIn}
+		class="zoom-controls__button"
+	>
+		<span class="zoom-controls__icon">+</span>
+	</Button>
 
-  <Button
-    variant="secondary"
-    size="lg"
-    onclick={onZoomOut}
-    disabled={!canZoomOut}
-    class="zoom-button zoom-out"
-  >
-    <span class="zoom-icon">−</span>
-  </Button>
+	<Button
+		variant="secondary"
+		size="lg"
+		onclick={onZoomOut}
+		disabled={!canZoomOut}
+		class="zoom-controls__button"
+	>
+		<span class="zoom-controls__icon">−</span>
+	</Button>
 </div>
 
 <style>
+	.zoom-controls {
+		position: absolute;
+		z-index: 50;
+	bottom: calc(200px + clamp(0.85rem, 2vw, 1.5rem));
+		right: clamp(0.85rem, 2vw, 1.5rem);
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+		padding: 0.35rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-muted);
+		background: color-mix(in srgb, var(--color-surface-card) 92%, white 8%);
+		box-shadow: var(--shadow-soft);
+		pointer-events: auto;
+	}
 
-  .zoom-controls {
-    position: absolute;
-    z-index: 50;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    pointer-events: auto;
-  }
+	.zoom-controls__button {
+		min-width: 0 !important;
+		width: 2.75rem !important;
+		height: 2.75rem !important;
+		padding: 0 !important;
+		border-radius: var(--radius-lg) !important;
+		border: 1px solid var(--color-border-subtle) !important;
+		background: color-mix(in srgb, var(--color-neutral-50) 90%, white 10%) !important;
+		color: var(--color-brand-600) !important;
+		font-family: var(--font-display) !important;
+		font-weight: 600 !important;
+		transition: transform 160ms ease, box-shadow 160ms ease !important;
+	}
 
-  :global(.zoom-button) {
-    min-width: 0;
-    width: 3rem;
-    height: 3rem;
-    padding: 0;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(229, 231, 235, 0.5);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transform: scale(1);
-    transition: all 300ms;
-    border-radius: 0.5rem;
-  }
+	.zoom-controls__button:hover {
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-soft);
+	}
 
-  :global(.zoom-button:hover) {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    transform: scale(1.1);
-  }
+	.zoom-controls__button:active {
+		transform: translateY(0);
+	}
 
-  :global(.zoom-button:active) {
-    transform: scale(0.95);
-  }
+	.zoom-controls__button:focus-visible {
+		box-shadow: var(--shadow-focus);
+	}
 
-  :global(.zoom-button:disabled) {
-    opacity: 0.4;
-    cursor: not-allowed;
-    transform: scale(1);
-  }
+	.zoom-controls__button[disabled] {
+		opacity: 0.45;
+		transform: none;
+		box-shadow: none;
+		color: var(--color-fg-muted) !important;
+		cursor: not-allowed;
+	}
 
-  :global(.zoom-button:disabled:hover) {
-    transform: scale(1);
-  }
+	.zoom-controls__icon {
+		font-size: 1.15rem;
+		font-weight: 700;
+		line-height: 1;
+	}
 
-  .zoom-icon {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: rgb(55, 65, 81);
-    line-height: 1;
-  }
+	@media (max-width: 640px) {
+		.zoom-controls {
+			gap: 0.3rem;
+			padding: 0.3rem;
+			bottom: calc(180px + 1rem);
+		}
 
-  :global(.zoom-button:hover) .zoom-icon {
-    color: rgb(17, 24, 39);
-  }
+		.zoom-controls__button {
+			width: 2.4rem !important;
+			height: 2.4rem !important;
+		}
 
-  :global(.zoom-button:disabled) .zoom-icon {
-    color: rgb(156, 163, 175);
-  }
+		.zoom-controls__icon {
+			font-size: 1.05rem;
+		}
+	}
 
-  @media (max-width: 640px) {
-    .zoom-controls {
-      bottom: 0.75rem;
-      right: 0.75rem;
-      gap: 0.375rem;
-    }
-
-    :global(.zoom-button) {
-      width: 2.5rem;
-      height: 2.5rem;
-    }
-
-    .zoom-icon {
-      font-size: 1.125rem;
-    }
-  }
-
-  @media (max-width: 400px) {
-    .zoom-controls {
-      bottom: 0.5rem;
-      right: 0.5rem;
-    }
-
-    :global(.zoom-button) {
-      width: 2.25rem;
-      height: 2.25rem;
-    }
-
-    .zoom-icon {
-      font-size: 1rem;
-    }
-  }
+	@media (prefers-reduced-motion: reduce) {
+		.zoom-controls__button {
+			transition: none !important;
+		}
+	}
 </style>

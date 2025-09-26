@@ -29,9 +29,7 @@
   class={classes}
   {...restProps}
 >
-  {#if decorative}
-    <div class="decoration-shine"></div>
-  {/if}
+
 
   <div class="game-card-content">
     {@render children?.()}

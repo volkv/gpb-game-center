@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Modal, ProgressBar } from '.';
+  import { Button, Modal } from '.';
   import { Badge } from '$lib';
   import { modal, closeModal } from '../../stores/ui';
   import { getProductByBuildingType } from '../../lib/ProductCatalog';
@@ -17,20 +17,6 @@
   const isOpen = $derived($modal.type === 'building_info' && $modal.isOpen);
   const buildingType = $derived($modal.data?.buildingType as BuildingType | undefined);
   const product = $derived(buildingType ? getProductByBuildingType(buildingType) : null);
-
-  $effect(() => {
-    console.log('BuildingInfo state:', {
-      isOpen,
-      buildingType,
-      hasProduct: !!product,
-      modalType: $modal.type,
-      modalIsOpen: $modal.isOpen,
-      modalData: $modal.data
-    });
-    if ($modal.type === 'building_info' && $modal.isOpen) {
-      console.log('BuildingInfo should be visible now!');
-    }
-  });
 
   function handleLearnMore() {
     if (product) {
@@ -97,43 +83,25 @@
 </script>
 
 {#if isOpen && product}
-  <div class="modal-overlay-game">
-    <div class="modal-game">
-      <!-- Декоративные элементы -->
-      <div class="particles-container">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-      </div>
-
-      <div class="modal-header-game gradient-electric text-white">
-        <div class="decoration-orb bg-gpb-mint w-6 h-6 -top-2 -right-2"></div>
-        <div class="decoration-shine"></div>
-
-        <div class="game-card-icon neon-glow mb-4">
-          {#if product.category}
-            {@const IconComponent = getCategoryIcon(product.category)}
-            <IconComponent
-              size={48}
-              class="text-white neon-glow"
-            />
-          {:else}
-            <Building size={48} class="text-white neon-glow" />
-          {/if}
+  <Modal
+    open={isOpen}
+    onclose={closeModal}
+    size="lg"
+    class="building-info-modal {className}"
+  >
+    {#snippet header()}
+      <div class="building-info__header">
+        <div class="building-info__icon">
+          <svelte:component this={getCategoryIcon(product.category)} size={28} />
         </div>
-
-        <Badge
-          variant={getDifficultyVariant(product.difficulty)}
-          size="sm"
-          class="mb-2"
-        >
-          {getDifficultyText(product.difficulty)}
-        </Badge>
-
-        <h1 class="modal-title-game">{product.title}</h1>
-        <p class="opacity-90 text-center">{product.subtitle}</p>
-
-        <Badge variant="pro" size="sm" class="mt-2">
+        <div class="building-info__heading">
+          <Badge variant={getDifficultyVariant(product.difficulty)} size="sm">
+            {getDifficultyText(product.difficulty)}
+          </Badge>
+          <h1 class="building-info__title">{product.title}</h1>
+          <p class="building-info__subtitle">{product.subtitle}</p>
+        </div>
+        <Badge variant="pro" size="sm" class="building-info__category">
           {product.category === 'savings'
             ? 'Накопления'
             : product.category === 'investment'
@@ -147,88 +115,254 @@
                     : 'Продукт'}
         </Badge>
       </div>
+    {/snippet}
 
-      <div class="modal-content-game space-y-6">
-        <!-- Описание продукта -->
-        <div class="game-card gradient-wealth text-white p-4">
-          <h2 class="font-section-title flex items-center gap-2 mb-3">
-            <Book size={20} class="neon-glow" />
-            О продукте
-          </h2>
-          <p class="font-ui-primary opacity-90">{product.detailedDescription}</p>
+    <div class="building-info__content">
+      <section class="building-info__section">
+        <div class="building-info__section-heading">
+          <Book size={18} />
+          <h2>О продукте</h2>
         </div>
+        <p>{product.detailedDescription}</p>
+      </section>
 
-        {#if product.benefits.length > 0}
-          <!-- Преимущества -->
-          <div class="game-card gradient-power text-white p-4">
-            <h2 class="font-section-title flex items-center gap-2 mb-4">
-              <CheckCircle size={20} class="neon-glow" />
-              Преимущества
-            </h2>
-            <div class="grid gap-2">
-              {#each product.benefits as benefit}
-                <Badge variant="new" size="sm" class="justify-start">
-                  <CheckCircle size={12} />
+      {#if product.benefits.length > 0}
+        <section class="building-info__section">
+          <div class="building-info__section-heading">
+            <CheckCircle size={18} />
+            <h2>Преимущества</h2>
+          </div>
+          <ul class="building-info__list">
+            {#each product.benefits as benefit}
+              <li>
+                <Badge variant="new" size="sm" class="building-info__chip">
+                  <CheckCircle size={14} />
                   {benefit}
                 </Badge>
-              {/each}
-            </div>
-          </div>
-        {/if}
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
 
-        {#if product.conditions.length > 0}
-          <!-- Условия -->
-          <div class="game-card gradient-mystery text-white p-4">
-            <h2 class="font-section-title flex items-center gap-2 mb-4">
-              <Star size={20} class="neon-glow" />
-              Условия
-            </h2>
-            <div class="grid gap-2">
-              {#each product.conditions as condition}
-                <Badge variant="pro" size="sm" class="justify-start">
-                  <Star size={12} />
+      {#if product.conditions.length > 0}
+        <section class="building-info__section">
+          <div class="building-info__section-heading">
+            <Star size={18} />
+            <h2>Условия</h2>
+          </div>
+          <ul class="building-info__list">
+            {#each product.conditions as condition}
+              <li>
+                <Badge variant="pro" size="sm" class="building-info__chip">
+                  <Star size={14} />
                   {condition}
                 </Badge>
-              {/each}
-            </div>
-          </div>
-        {/if}
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
 
-        <!-- Образовательная заметка -->
-        <div class="glass-effect p-4 rounded-xl border border-white/20 bg-gpb-mint/10">
-          <div class="flex items-start gap-3">
-            <div class="p-2 rounded-full bg-gpb-mint/20">
-              <Star size={16} class="text-gpb-mint neon-glow" />
-            </div>
-            <div>
-              <span class="font-badge block text-gpb-mint">Финансовая грамотность</span>
-              <span class="font-ui-secondary text-sm opacity-80">
-                Изучите материалы о продукте в разделе "Квесты" для лучшего понимания
-              </span>
-            </div>
-          </div>
+      <div class="building-info__note">
+        <div class="building-info__note-icon">
+          <Star size={18} />
+        </div>
+        <div>
+          <span class="building-info__note-title">Финансовая грамотность</span>
+          <span class="building-info__note-text">
+            Изучите материалы о продукте в разделе «Квесты», чтобы ускорить развитие города
+          </span>
         </div>
       </div>
+    </div>
 
-      <div class="modal-footer-game">
-        <Button
-          variant="secondary"
-          onclick={closeModal}
-          class="btn-game-secondary flex-1"
-        >
+    {#snippet footer()}
+      <div class="building-info__footer">
+        <Button variant="secondary" class="building-info__action" onclick={closeModal}>
           Закрыть
         </Button>
-
-        <Button
-          variant="primary"
-          onclick={handleLearnMore}
-          class="btn-game-primary flex-1 hover-lift active-press"
-        >
-          <TrendingUp size={16} class="neon-glow" />
+        <Button variant="primary" class="building-info__action" onclick={handleLearnMore}>
+          <TrendingUp size={16} />
           {product.ctaText}
         </Button>
       </div>
-    </div>
-  </div>
+    {/snippet}
+  </Modal>
 {/if}
 
+<style>
+  .building-info__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .building-info__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-lg);
+    background: var(--layer-brand-050);
+    border: 1px solid var(--layer-brand-150);
+    color: var(--color-brand-600);
+  }
+
+  .building-info__heading {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .building-info__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-fg-primary);
+  }
+
+  .building-info__subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-fg-muted);
+  }
+
+  .building-info__category {
+    white-space: nowrap;
+  }
+
+  .building-info__content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 1.6vw, 1.5rem);
+  }
+
+  .building-info__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(0.95rem, 1.5vw, 1.4rem);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-surface-card) 94%, white 6%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .building-info__section-heading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
+  }
+
+  .building-info__section-heading h2 {
+    margin: 0;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  .building-info__section p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--color-fg-secondary);
+  }
+
+  .building-info__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .building-info__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  .building-info__note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-xl);
+    border: 1px dashed var(--color-accent-300);
+    background: color-mix(in srgb, var(--color-accent-100) 55%, white 45%);
+  }
+
+  .building-info__note-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(31, 196, 217, 0.16);
+    color: var(--color-accent-600);
+  }
+
+  .building-info__note-title {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-brand-600);
+  }
+
+  .building-info__note-text {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--color-fg-secondary);
+  }
+
+  .building-info__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .building-info__action {
+    min-width: 160px;
+  }
+
+  @media (max-width: 720px) {
+    .building-info__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .building-info__category {
+      align-self: flex-start;
+    }
+
+    .building-info__footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .building-info__action {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .building-info__section,
+    .building-info__action {
+      transition: none;
+    }
+  }
+</style>

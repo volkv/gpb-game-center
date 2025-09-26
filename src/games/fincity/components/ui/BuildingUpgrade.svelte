@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, ProgressBar } from '.';
+  import { Button, Modal, ProgressBar, Bubble } from '.';
   import { Badge } from '$lib';
   import { modal, closeModal } from '../../stores/ui';
   import {
@@ -13,7 +13,7 @@
   import { resources } from '../../stores/playerData';
   import { showToast } from '../../stores/ui';
   import { onMount, onDestroy } from 'svelte';
-  import { Building, Coins, Gem, TrendingUp, Star, CheckCircle } from 'lucide-svelte';
+  import { Building, Coins, Gem, TrendingUp, Star } from 'lucide-svelte';
 
   interface Props {
     class?: string;
@@ -23,7 +23,6 @@
 
   const isOpen = $derived($modal.type === 'building_upgrade' && $modal.isOpen);
   const buildingId = $derived($modal.data?.buildingId as string | undefined);
-
 
   const building = $derived(
     buildingId ? $buildings.find(b => b.id === buildingId) || null : null
@@ -137,177 +136,381 @@
 </script>
 
 {#if isOpen && building && config}
-  <div class="modal-overlay-game">
-    <div class="modal-game">
-      <!-- Декоративные элементы -->
-      <div class="particles-container">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-      </div>
-
-      <div class="modal-header-game gradient-power text-white">
-        <div class="decoration-orb bg-gpb-gold w-6 h-6 -top-2 -right-2"></div>
-        <div class="decoration-shine"></div>
-
-        <div class="game-card-icon neon-glow mb-4">
-          <Building size={48} class="text-white neon-glow" />
+  <Modal
+    open={isOpen}
+    onclose={closeModal}
+    size="lg"
+    class="building-upgrade-modal {className}"
+  >
+    {#snippet header()}
+      <div class="building-upgrade__header">
+        <div class="building-upgrade__icon">
+          <Building size={28} />
         </div>
-
-        <Badge variant="pro" size="sm" class="mb-2">
-          Уровень {building.level}
-        </Badge>
-
-        <h1 class="modal-title-game">{config.name}</h1>
-        <p class="opacity-90 text-center">{config.description}</p>
+        <div class="building-upgrade__heading">
+          <Badge variant="pro" size="sm">Уровень {building.level}</Badge>
+          <h1 class="building-upgrade__title">{config.name}</h1>
+          <p class="building-upgrade__subtitle">{config.description}</p>
+        </div>
       </div>
+    {/snippet}
 
-      <div class="modal-content-game space-y-6">
-        <!-- Текущее состояние -->
-        <div class="game-card gradient-wealth text-white p-4">
-          <h2 class="font-section-title flex items-center gap-2 mb-4">
-            <Star size={20} class="neon-glow" />
-            Текущее состояние
-          </h2>
+    <div class="building-upgrade__content">
+      <section class="building-upgrade__section">
+        <div class="building-upgrade__section-heading">
+          <Star size={18} />
+          <h2>Текущее состояние</h2>
+        </div>
+        <div class="building-upgrade__stats">
+          <Bubble variant="info" size="sm" class="building-upgrade__stat">
+            <Coins size={16} />
+            <span class="building-upgrade__stat-value">{currentIncome.coins}</span>
+            <span class="building-upgrade__stat-label">монет в час</span>
+          </Bubble>
+          <Bubble variant="info" size="sm" class="building-upgrade__stat">
+            <Gem size={16} />
+            <span class="building-upgrade__stat-value">{currentIncome.crystals}</span>
+            <span class="building-upgrade__stat-label">кристаллов в час</span>
+          </Bubble>
+        </div>
+      </section>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div class="mini-stat">
-              <div class="mini-stat-icon">
-                <Coins size={16} class="text-gpb-gold neon-glow" />
-              </div>
-              <div class="mini-stat-value">{currentIncome.coins}</div>
-              <div class="mini-stat-label">монет в час</div>
-            </div>
-
-            <div class="mini-stat">
-              <div class="mini-stat-icon">
-                <Gem size={16} class="text-gpb-raspberry neon-glow" />
-              </div>
-              <div class="mini-stat-value">{currentIncome.crystals}</div>
-              <div class="mini-stat-label">кристаллов в час</div>
-            </div>
+      {#if isMaxLevel}
+        <div class="building-upgrade__message building-upgrade__message--success">
+          <div class="building-upgrade__message-icon">
+            <Star size={18} />
+          </div>
+          <div>
+            <span class="building-upgrade__message-title">Максимальный уровень достигнут</span>
+            <span class="building-upgrade__message-text">Это здание уже полностью улучшено</span>
           </div>
         </div>
-
-        {#if !isMaxLevel}
-          <!-- Прокачка -->
-          <div class="game-card gradient-electric text-white p-4">
-            <h2 class="font-section-title flex items-center gap-2 mb-4">
-              <TrendingUp size={20} class="neon-glow" />
-              Прокачка до уровня {building.level + 1}
-            </h2>
-
-            {#if isUpgrading}
-              <!-- Прогресс прокачки -->
-              <div class="space-y-3">
-                <div class="flex justify-between items-center">
-                  <span class="font-ui-primary">Прокачка в процессе...</span>
-                  <span class="font-ui-secondary">{Math.round(upgradeProgress * 100)}%</span>
-                </div>
-                <ProgressBar
-                  value={upgradeProgress * 100}
-                  max={100}
-                  variant="linear"
-                  color="emerald"
-                  animated={true}
-                  glowing={true}
-                  size="lg"
-                />
-              </div>
-            {:else}
-              <!-- Стоимость и улучшения -->
-              <div class="space-y-4">
-                <div>
-                  <h3 class="font-card-title mb-3">Стоимость:</h3>
-                  <div class="flex gap-2">
-                    <Badge
-                      variant={canAffordUpgrade || !upgradeCost?.coins ? 'new' : 'locked'}
-                      size="sm"
-                    >
-                      <Coins size={12} />
-                      {upgradeCost?.coins || 0}
-                    </Badge>
-
-                    <Badge
-                      variant={canAffordUpgrade || !upgradeCost?.crystals ? 'hot' : 'locked'}
-                      size="sm"
-                    >
-                      <Gem size={12} />
-                      {upgradeCost?.crystals || 0}
-                    </Badge>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 class="font-card-title mb-3">Улучшения:</h3>
-                  <div class="space-y-2">
-                    <Badge variant="new" size="sm" class="w-full justify-start">
-                      <TrendingUp size={12} />
-                      +{incomeIncrease.coins} монет в час
-                    </Badge>
-
-                    <Badge variant="new" size="sm" class="w-full justify-start">
-                      <TrendingUp size={12} />
-                      +{incomeIncrease.crystals} кристаллов в час
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-            {/if}
+      {:else if isUpgrading}
+        <section class="building-upgrade__section">
+          <div class="building-upgrade__section-heading">
+            <TrendingUp size={18} />
+            <h2>Прокачка в процессе</h2>
           </div>
-        {:else}
-          <!-- Максимальный уровень -->
-          <div class="glass-effect p-4 rounded-xl border border-white/20 bg-gpb-gold/10">
-            <div class="flex items-start gap-3">
-              <div class="p-2 rounded-full bg-gpb-gold/20">
-                <Star size={16} class="text-gpb-gold neon-glow" />
+          <div class="building-upgrade__progress">
+            <div class="building-upgrade__progress-info">
+              <span>Прогресс</span>
+              <span>{Math.round(upgradeProgress * 100)}%</span>
+            </div>
+            <ProgressBar
+              value={upgradeProgress * 100}
+              max={100}
+              variant="linear"
+              color="emerald"
+              animated={true}
+              glowing={true}
+              size="lg"
+            />
+          </div>
+        </section>
+      {:else}
+        <section class="building-upgrade__section">
+          <div class="building-upgrade__section-heading">
+            <TrendingUp size={18} />
+            <h2>Прокачка до уровня {building.level + 1}</h2>
+          </div>
+          <div class="building-upgrade__grid">
+            <div class="building-upgrade__card">
+              <h3>Стоимость</h3>
+              <div class="building-upgrade__chips">
+                <Bubble
+                  color={canAffordUpgrade || !upgradeCost?.coins ? 'mint' : 'raspberry-light'}
+                  size="sm"
+                >
+                  <Coins size={14} />
+                  {upgradeCost?.coins || 0}
+                </Bubble>
+                <Bubble
+                  color={canAffordUpgrade || !upgradeCost?.crystals ? 'raspberry' : 'raspberry-light'}
+                  size="sm"
+                >
+                  <Gem size={14} />
+                  {upgradeCost?.crystals || 0}
+                </Bubble>
               </div>
-              <div>
-                <span class="font-badge block text-gpb-gold">Максимальный уровень достигнут!</span>
-                <span class="font-ui-secondary text-sm opacity-80">
-                  Это здание нельзя улучшить дальше
-                </span>
+            </div>
+            <div class="building-upgrade__card">
+              <h3>Улучшения</h3>
+              <div class="building-upgrade__chips">
+                <Bubble variant="new" size="sm">
+                  <TrendingUp size={14} />
+                  +{incomeIncrease.coins} монет / час
+                </Bubble>
+                <Bubble variant="new" size="sm">
+                  <TrendingUp size={14} />
+                  +{incomeIncrease.crystals} кристаллов / час
+                </Bubble>
               </div>
             </div>
           </div>
-        {/if}
-      </div>
+        </section>
+      {/if}
 
-      <div class="modal-footer-game">
-        <Button
-          variant="secondary"
-          onclick={closeModal}
-          class="btn-game-secondary flex-1"
-        >
+      {#if !isMaxLevel && !canUpgradeBuilding}
+        <div class="building-upgrade__message building-upgrade__message--warning">
+          <div class="building-upgrade__message-icon">
+            <Coins size={16} />
+          </div>
+          <div>
+            <span class="building-upgrade__message-title">Невозможно прокачать</span>
+            <span class="building-upgrade__message-text">{getReasonDisabled()}</span>
+          </div>
+        </div>
+      {/if}
+    </div>
+
+    {#snippet footer()}
+      <div class="building-upgrade__footer">
+        <Button variant="secondary" class="building-upgrade__action" onclick={closeModal}>
           Закрыть
         </Button>
 
         {#if !isMaxLevel}
           <Button
             variant="primary"
+            class="building-upgrade__action"
             onclick={handleUpgrade}
             disabled={!canUpgradeBuilding}
-            class="btn-game-primary flex-1 hover-lift active-press {!canUpgradeBuilding ? 'opacity-60' : ''}"
           >
             {#if isUpgrading}
-              <CheckCircle size={16} class="neon-glow" />
+              <TrendingUp size={16} />
               Прокачивается...
             {:else}
-              <Star size={16} class="neon-glow" />
+              <Star size={16} />
               Прокачать
             {/if}
           </Button>
         {/if}
       </div>
-
-      {#if !canUpgradeBuilding && !isMaxLevel}
-        <div class="px-6 pb-4 text-center">
-          <span class="font-ui-secondary text-sm text-gpb-raspberry">
-            {getReasonDisabled()}
-          </span>
-        </div>
-      {/if}
-    </div>
-  </div>
+    {/snippet}
+  </Modal>
 {/if}
 
+<style>
+  .building-upgrade__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .building-upgrade__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    background: var(--layer-brand-050);
+    border: 1px solid var(--layer-brand-150);
+    color: var(--color-brand-600);
+  }
+
+  .building-upgrade__heading {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .building-upgrade__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.55rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-fg-primary);
+  }
+
+  .building-upgrade__subtitle {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-fg-muted);
+  }
+
+  .building-upgrade__content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 1.6vw, 1.4rem);
+  }
+
+  .building-upgrade__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(0.95rem, 1.6vw, 1.4rem);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-surface-card) 94%, white 6%);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+
+  .building-upgrade__section-heading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .building-upgrade__section-heading h2 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .building-upgrade__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .building-upgrade__stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--color-neutral-50) 80%, white 20%);
+    border: 1px solid var(--color-border-subtle);
+    color: var(--color-fg-primary);
+  }
+
+  .building-upgrade__stat-value {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .building-upgrade__stat-label {
+    font-size: 0.8rem;
+    color: var(--color-fg-muted);
+  }
+
+  .building-upgrade__grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  .building-upgrade__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-neutral-50) 80%, white 20%);
+  }
+
+  .building-upgrade__card h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
+  }
+
+  .building-upgrade__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .building-upgrade__progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .building-upgrade__progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--color-fg-secondary);
+  }
+
+  .building-upgrade__message {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-xl);
+    border: 1px dashed var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-neutral-50) 75%, white 25%);
+  }
+
+  .building-upgrade__message--success {
+    border-color: rgba(43, 180, 138, 0.35);
+    background: color-mix(in srgb, rgba(43, 180, 138, 0.12) 40%, white 60%);
+  }
+
+  .building-upgrade__message--warning {
+    border-color: rgba(209, 60, 106, 0.3);
+    background: color-mix(in srgb, rgba(209, 60, 106, 0.1) 40%, white 60%);
+  }
+
+  .building-upgrade__message-icon {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(25, 25, 239, 0.12);
+    color: var(--color-brand-600);
+  }
+
+  .building-upgrade__message-title {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .building-upgrade__message-text {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--color-fg-secondary);
+  }
+
+  .building-upgrade__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .building-upgrade__action {
+    min-width: 160px;
+  }
+
+  @media (max-width: 720px) {
+    .building-upgrade__header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .building-upgrade__footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .building-upgrade__action {
+      width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .building-upgrade__section,
+    .building-upgrade__message,
+    .building-upgrade__action {
+      transition: none;
+    }
+  }
+</style>

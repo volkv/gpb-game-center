@@ -33,35 +33,39 @@
 			>
 				{#if story.isActive}
 					<div class="story-gradient bg-gradient-to-br {story.gradient}">
-						<div class="story-icon">
-							🎮
+						<div class="story-badge">
+							Новинка
+						</div>
+						<div class="story-content">
+							<div class="story-icon">
+								🎮
+							</div>
+							<div class="story-text">
+								Игровой центр
+							</div>
 						</div>
 					</div>
 				{:else}
 					<div class="skeleton-circle"></div>
 				{/if}
 			</button>
-			{#if story.isActive}
-				<span class="story-title">{story.title}</span>
-			{:else}
-				<div class="skeleton-title"></div>
-			{/if}
 		{/each}
 	</div>
 </div>
 
 <style>
 	.stories-container {
-		padding: 16px 20px;
+		padding-bottom: 16px;
 		border-bottom: 1px solid rgb(240, 240, 240);
 	}
 
 	.stories-list {
 		display: flex;
-		gap: 16px;
+		gap: 12px;
 		overflow-x: auto;
 		scrollbar-width: none;
 		-ms-overflow-style: none;
+		padding: 4px 0;
 	}
 
 	.stories-list::-webkit-scrollbar {
@@ -78,6 +82,8 @@
 		border: none;
 		cursor: pointer;
 		transition: transform 0.2s ease;
+		position: relative;
+		padding: 4px;
 	}
 
 	.story-item:not(:disabled):hover {
@@ -89,47 +95,63 @@
 	}
 
 	.story-gradient {
-		width: 64px;
-		height: 64px;
-		border-radius: 50%;
+		width: 90px;
+		height: 120px;
+		border-radius: 12px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		position: relative;
-		border: 3px solid white;
+		border: 2px solid white;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	}
 
+	.story-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 2px;
+		text-align: center;
+		padding: 8px;
+	}
+
 	.story-icon {
-		font-size: 24px;
+		font-size: 28px;
 		filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 	}
 
-	.skeleton-circle {
-		width: 64px;
-		height: 64px;
-		border-radius: 50%;
-		background: #f0f0f0;
-	}
-
-	.story-title {
-		font-size: 12px;
-		color: rgb(51, 51, 51);
-		font-weight: 500;
-		text-align: center;
-		max-width: 64px;
+	.story-text {
+		font-size: 14px;
+		font-weight: 600;
+		color: white;
 		line-height: 1.2;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 	}
 
-	.skeleton-title {
-		width: 48px;
-		height: 12px;
-		border-radius: 6px;
-		background: #f0f0f0;
-		margin-top: 4px;
+	.story-badge {
+		position: absolute;
+		top: -4px;
+		right: -4px;
+		background: #ff4757;
+		color: white;
+		font-size: 8px;
+		font-weight: 700;
+		padding: 2px 6px;
+		border-radius: 8px;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		border: 2px solid white;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+		z-index: 10;
 	}
+
+	.skeleton-circle {
+		width: 90px;
+		height: 120px;
+		border-radius: 12px;
+		background: #f0f0f0;
+	}
+
 
 </style>

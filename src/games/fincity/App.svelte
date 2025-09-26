@@ -46,13 +46,22 @@
 </script>
 
 <div class="app">
-	<ResourcesBar />
+	<div class="app__background"></div>
+	<div class="app__overlay"></div>
 
-	<div class="game-content">
-		<GameCanvas onGameReady={handleGameReady} />
+	<div class="app__canvas-layer">
+		<div class="app__canvas-frame">
+			<GameCanvas class="app__canvas" onGameReady={handleGameReady} />
+		</div>
 	</div>
 
-	<ActionButtons class="game-action-buttons" />
+	<header class="app__overlay-top">
+		<ResourcesBar class="app__resources" />
+	</header>
+
+	<footer class="app__overlay-bottom">
+		<ActionButtons class="app__actions" />
+	</footer>
 
 	{#if $modal.isOpen && $modal.type === 'build_menu'}
 		<BuildMenu {gameEngine} />
@@ -83,38 +92,117 @@
 
 <style>
 	.app {
-		width: 100%;
-		height: 100vh;
-		overflow: hidden;
 		position: relative;
-		background: #2d5a3d;
-		display: flex;
-		flex-direction: column;
+		min-height: 100vh;
+		height: 100dvh;
+		background: var(--color-surface-page);
+		color: var(--color-fg-primary);
+		overflow: hidden;
 	}
 
-	.game-content {
+	.app__background {
 		position: absolute;
-		top: 64px; /* Space for StatusBar + ResourcesBar */
-		left: 0;
-		right: 0;
-		bottom: 0;
-		width: 100%;
-		height: calc(100vh - 64px);
+		inset: -20% -10%;
+		background: var(--gradient-brand-hero);
+		opacity: 0.78;
+		filter: blur(40px);
+		pointer-events: none;
 	}
 
-	:global(.game-action-buttons) {
+	.app__overlay {
+		position: absolute;
+		inset: 0;
+		background-image:
+			radial-gradient(180% 100% at 10% 0%, rgba(64, 214, 230, 0.18) 0%, transparent 52%),
+			radial-gradient(130% 120% at 90% -10%, rgba(68, 80, 255, 0.18) 0%, transparent 60%),
+			radial-gradient(110% 110% at 50% 120%, rgba(25, 25, 239, 0.12) 0%, transparent 55%);
+		mix-blend-mode: lighten;
+		opacity: 0.9;
+		pointer-events: none;
+	}
+
+	.app__canvas-layer {
+		position: relative;
+		z-index: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: stretch;
+		box-sizing: border-box;
+	}
+
+	.app__canvas-frame {
+		position: relative;
+		flex: 1;
+		max-width: 1120px;
+		border-radius: var(--radius-xl);
+		border: 1px solid var(--color-border-muted);
+		background: var(--color-surface-elevated);
+		box-shadow: var(--shadow-hard);
+		overflow: hidden;
+		display: flex;
+	}
+
+	.app__canvas-frame::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		opacity: 0.18;
+		background: linear-gradient(140deg, rgba(25, 25, 239, 0.12) 0%, rgba(31, 196, 217, 0.08) 65%, rgba(255, 255, 255, 0.12) 100%);
+		pointer-events: none;
+	}
+
+	.app__canvas {
+		flex: 1;
+		position: relative;
+		z-index: 1;
+	}
+
+	.app__overlay-top,
+	.app__overlay-bottom {
 		position: fixed;
-		bottom: 1rem;
-		left: 50%;
-		transform: translateX(-50%);
-		z-index: 100;
-		width: auto;
-		max-width: calc(100% - 2rem);
+		left: 0;
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		pointer-events: none;
+		z-index: 5;
+	}
+
+	.app__overlay-top {
+		top: calc(100px + clamp(0.6rem, 1.8vw, 1.5rem));
+	}
+
+	.app__overlay-bottom {
+		bottom: clamp(0.6rem, 1.8vw, 1.5rem);
+	}
+
+	.app__resources,
+	.app__actions {
+		pointer-events: auto;
+		width: min(840px, 100%);
+	}
+
+	@media (max-width: 768px) {
+		.app__canvas-layer {
+			padding: clamp(0.5rem, 4vw, 1.25rem);
+		}
+
+		.app__canvas-frame {
+			border-radius: var(--radius-lg);
+		}
+
+		.app__resources,
+		.app__actions {
+			width: calc(100% - clamp(1rem, 6vw, 2rem));
+		}
 	}
 
 	:global(body) {
 		margin: 0;
 		padding: 0;
-		overflow: hidden;
+		background-color: var(--color-surface-page);
+		color: var(--color-fg-primary);
 	}
 </style>

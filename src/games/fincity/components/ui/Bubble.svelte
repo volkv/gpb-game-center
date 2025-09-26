@@ -24,37 +24,37 @@
     ...restProps
   }: Props = $props();
 
-  const baseClasses = 'inline-flex items-center justify-center font-ui-primary rounded-xl transition-all duration-300 ease-out backdrop-blur-sm neon-glow';
+  const baseClass = 'bubble';
 
   const variantClasses = {
-    info: 'glass-effect bg-gpb-violet/10 text-gpb-violet border border-gpb-violet/30',
-    tag: 'glass-effect bg-gpb-mint/10 text-gpb-mint border border-gpb-mint/30',
-    success: 'glass-effect bg-gpb-emerald/10 text-gpb-emerald border border-gpb-emerald/30',
-    warning: 'glass-effect bg-gpb-orange/10 text-gpb-orange border border-gpb-orange/30',
-    error: 'glass-effect bg-gpb-raspberry/10 text-gpb-raspberry border border-gpb-raspberry/30'
-  };
+    info: 'bubble--info',
+    tag: 'bubble--tag',
+    success: 'bubble--success',
+    warning: 'bubble--warning',
+    error: 'bubble--error'
+  } satisfies Record<Props['variant'], string>;
 
   const colorClasses = {
-    violet: 'glass-effect bg-gpb-violet/10 text-gpb-violet border border-gpb-violet/30',
-    mint: 'glass-effect bg-gpb-mint/10 text-gpb-mint border border-gpb-mint/30',
-    raspberry: 'glass-effect bg-gpb-raspberry/10 text-gpb-raspberry border border-gpb-raspberry/30',
-    emerald: 'glass-effect bg-gpb-emerald/10 text-gpb-emerald border border-gpb-emerald/30',
-    'raspberry-light': 'glass-effect bg-gpb-raspberry-light/10 text-gpb-raspberry-light border border-gpb-raspberry-light/30',
-    henbane: 'glass-effect bg-gpb-gray-200/80 text-gpb-gray-800 border border-gpb-gray-300/50',
-    lily: 'glass-effect bg-gpb-gray-50/90 text-gpb-black border border-gpb-gray-200/50',
-    orange: 'glass-effect bg-gpb-orange/10 text-gpb-orange border border-gpb-orange/30'
+    violet: 'bubble--violet',
+    mint: 'bubble--mint',
+    raspberry: 'bubble--raspberry',
+    emerald: 'bubble--emerald',
+    'raspberry-light': 'bubble--raspberry-light',
+    henbane: 'bubble--henbane',
+    lily: 'bubble--lily',
+    orange: 'bubble--orange'
   };
 
   const sizeClasses = {
-    sm: 'px-2 py-1 text-xs gap-1',
-    md: 'px-3 py-2 text-sm gap-2',
-    lg: 'px-4 py-3 text-base gap-3'
+    sm: 'bubble--sm',
+    md: 'bubble--md',
+    lg: 'bubble--lg'
   };
 
-  const interactiveClasses = 'cursor-pointer hover-lift active-press focus-game touch-target';
+  const interactiveClasses = 'bubble--interactive';
 
   const bubbleClasses = $derived([
-    baseClasses,
+    baseClass,
     color ? colorClasses[color] : variantClasses[variant],
     sizeClasses[size],
     interactive ? interactiveClasses : '',
@@ -84,3 +84,119 @@
     {@render children?.()}
   </div>
 {/if}
+
+<style>
+	.bubble {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-neutral-50) 84%, white 16%);
+		color: var(--color-fg-primary);
+		font-weight: 600;
+		font-size: 0.9rem;
+		line-height: 1;
+		transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+	}
+
+	.bubble--sm {
+		padding: 0.35rem 0.65rem;
+		font-size: 0.75rem;
+	}
+
+	.bubble--md {
+		padding: 0.45rem 0.85rem;
+		font-size: 0.85rem;
+	}
+
+	.bubble--lg {
+		padding: 0.6rem 1rem;
+		font-size: 0.95rem;
+	}
+
+	.bubble--interactive {
+		cursor: pointer;
+	}
+
+	.bubble--interactive:hover {
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-soft);
+		border-color: var(--layer-brand-150);
+	}
+
+	.bubble--interactive:focus-visible {
+		outline: none;
+		box-shadow: var(--shadow-focus);
+	}
+
+	.bubble--info {
+		background: color-mix(in srgb, var(--color-brand-50) 65%, white 35%);
+		border-color: rgba(25, 25, 239, 0.2);
+		color: var(--color-brand-600);
+	}
+
+	.bubble--tag {
+		background: color-mix(in srgb, var(--color-accent-100) 65%, white 35%);
+		border-color: rgba(31, 196, 217, 0.28);
+		color: var(--color-accent-600);
+	}
+
+	.bubble--success,
+	.bubble--emerald {
+		background: color-mix(in srgb, rgba(43, 180, 138, 0.12) 40%, white 60%);
+		border-color: rgba(43, 180, 138, 0.28);
+		color: var(--color-accent-600);
+	}
+
+	.bubble--warning,
+	.bubble--orange {
+		background: color-mix(in srgb, rgba(226, 165, 58, 0.12) 40%, white 60%);
+		border-color: rgba(226, 165, 58, 0.3);
+		color: var(--color-gpb-gold);
+	}
+
+	.bubble--error,
+	.bubble--raspberry {
+		background: color-mix(in srgb, rgba(209, 60, 106, 0.12) 40%, white 60%);
+		border-color: rgba(209, 60, 106, 0.28);
+		color: rgba(209, 60, 106, 1);
+	}
+
+	.bubble--mint {
+		background: color-mix(in srgb, rgba(31, 196, 217, 0.12) 40%, white 60%);
+		border-color: rgba(31, 196, 217, 0.28);
+		color: var(--color-accent-600);
+	}
+
+	.bubble--violet {
+		background: color-mix(in srgb, rgba(68, 80, 255, 0.12) 40%, white 60%);
+		border-color: rgba(68, 80, 255, 0.28);
+		color: var(--color-brand-600);
+	}
+
+	.bubble--raspberry-light {
+		background: color-mix(in srgb, rgba(232, 137, 181, 0.12) 40%, white 60%);
+		border-color: rgba(232, 137, 181, 0.28);
+		color: rgba(209, 60, 106, 0.85);
+	}
+
+	.bubble--henbane {
+		background: color-mix(in srgb, var(--color-neutral-100) 70%, white 30%);
+		border-color: var(--color-border-muted);
+		color: var(--color-fg-secondary);
+	}
+
+	.bubble--lily {
+		background: var(--color-surface-muted);
+		border-color: var(--color-border-subtle);
+		color: var(--color-fg-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bubble {
+			transition: none;
+		}
+	}
+</style>

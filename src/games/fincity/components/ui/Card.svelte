@@ -36,8 +36,8 @@
 
   const variantClasses = {
     default: 'game-card',
-    elevated: 'game-card shadow-xl',
-    outlined: 'game-card border-2 border-gpb-violet'
+    elevated: 'game-card game-card--elevated',
+    outlined: 'game-card game-card--outlined'
   };
 
   const gradientClasses = {
@@ -48,19 +48,19 @@
   };
 
   const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-2xl'
+    sm: 'game-card--sm',
+    md: 'game-card--md',
+    lg: 'game-card--lg'
   };
 
   const paddingClasses = {
     none: '',
-    sm: 'p-3',
-    md: 'p-4',
-    lg: 'p-6'
+    sm: 'game-card--padding-sm',
+    md: 'game-card--padding-md',
+    lg: 'game-card--padding-lg'
   };
 
-  const clickableClasses = 'cursor-pointer select-none focus-game hover-lift active-press';
+  const clickableClasses = 'game-card--clickable';
 
   const cardClasses = $derived([
     variantClasses[variant],
@@ -101,10 +101,7 @@
       </div>
     {/if}
 
-    {#if decorative}
-      <div class="decoration-shine"></div>
-      <div class="decoration-orb w-16 h-16 top-2 right-2 bg-white/10"></div>
-    {/if}
+
 
     <div class="game-card-content relative z-10">
       {#if header}
@@ -138,10 +135,6 @@
       </div>
     {/if}
 
-    {#if decorative}
-      <div class="decoration-shine"></div>
-      <div class="decoration-orb w-16 h-16 top-2 right-2 bg-white/10"></div>
-    {/if}
 
     <div class="game-card-content relative z-10">
       {#if header}
@@ -162,3 +155,133 @@
     </div>
   </div>
 {/if}
+
+<style>
+	.game-card {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		border-radius: var(--radius-xl);
+		border: 1px solid var(--color-border-subtle);
+		background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
+		box-shadow: var(--shadow-soft);
+		transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+		overflow: hidden;
+	}
+
+	.game-card--elevated {
+		box-shadow: var(--shadow-medium);
+	}
+
+	.game-card--outlined {
+		border: 1px solid var(--color-border-strong);
+	}
+
+	.game-card--sm {
+		max-width: 420px;
+	}
+
+	.game-card--md {
+		max-width: 640px;
+	}
+
+	.game-card--lg {
+		max-width: 880px;
+	}
+
+	.game-card--padding-sm {
+		padding: 0.9rem;
+	}
+
+	.game-card--padding-md {
+		padding: 1.1rem;
+	}
+
+	.game-card--padding-lg {
+		padding: 1.5rem;
+	}
+
+	.game-card--clickable {
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.game-card--clickable:hover {
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-medium);
+		border-color: var(--layer-brand-150);
+	}
+
+	.game-card--clickable:focus-visible {
+		outline: none;
+		box-shadow: var(--shadow-focus);
+	}
+
+	.game-card-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.game-card-header,
+	.game-card-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.game-card-footer {
+		margin-top: 0.5rem;
+	}
+
+	.particles-container {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		opacity: 0.25;
+	}
+
+	.particle {
+		position: absolute;
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		background: var(--color-brand-300);
+		opacity: 0.35;
+		animation: cardParticle 6s ease-in-out infinite;
+	}
+
+	.particle:nth-child(2) {
+		top: 30%;
+		left: 70%;
+		animation-delay: 1s;
+	}
+
+	.particle:nth-child(3) {
+		top: 65%;
+		left: 20%;
+		animation-delay: 2s;
+	}
+
+	@keyframes cardParticle {
+		0%, 100% {
+			transform: translate3d(0, 0, 0) scale(0.8);
+			opacity: 0.4;
+		}
+		50% {
+			transform: translate3d(12px, -10px, 0) scale(1.1);
+			opacity: 1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.game-card,
+		.game-card--clickable,
+		.particle {
+			transition: none;
+			animation: none;
+		}
+	}
+</style>

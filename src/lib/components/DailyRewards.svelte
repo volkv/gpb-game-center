@@ -257,7 +257,6 @@
 	.daily-rewards__toast {
 		position: fixed;
 		inset-inline: 0;
-		bottom: clamp(1rem, 5vh, 2.5rem);
 		display: flex;
 		justify-content: center;
 		padding: 0 1rem;
