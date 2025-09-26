@@ -101,7 +101,8 @@ export const GAME_TYPES = {
 	CROSSWORD_FINANCIAL: 'crossword-financial',
 	DETECTIVE_BANKING: 'detective-banking',
 	INVESTMENT_STRATEGY: 'investment-strategy',
-	FINCITY: 'fincity'
+	FINCITY: 'fincity',
+	ANTI_FRAUD_HUNTER: 'anti-fraud-hunter'
 } as const;
 
 export const GAME_CATEGORIES = {

@@ -95,6 +95,8 @@ class GameLoaderService {
 				return import('../../games/crossword-financial/CrosswordDemo.svelte');
 			case '/games/fincity/FincityGame.svelte':
 				return import('../../games/fincity/FincityGame.svelte');
+			case '/games/anti-fraud-hunter/AntiFraudGame.svelte':
+				return import('../../games/anti-fraud-hunter/AntiFraudGame.svelte');
 			default:
 				throw new Error(`Unknown game component path: ${path}`);
 		}

@@ -50,7 +50,6 @@
 		position: relative;
 		overflow: hidden;
 		color: white;
-		padding-top: 16px;
 	}
 
 	.game-layout::before {
@@ -69,9 +68,7 @@
 		position: relative;
 		z-index: 2;
 		width: 100%;
-		max-width: 420px;
 		margin: 0 auto;
-		padding: 1rem;
 	}
 
 	@keyframes sparkle {
