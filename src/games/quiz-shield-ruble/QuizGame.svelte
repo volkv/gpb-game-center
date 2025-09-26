@@ -15,8 +15,6 @@
 	let showResult = $state(false);
 	let selectedAnswer = $state<number | null>(null);
 	let showExplanation = $state(false);
-	let showParticles = $state(false);
-	let showConfetti = $state(false);
 	let mounted = $state(false);
 
 	onMount(() => {
@@ -48,36 +46,36 @@
 		},
 		{
 			id: 3,
-			text: 'В социальной сети пришло сообщение от "друга": "Срочно нужны деньги! Переведи на номер +7..." Ваши действия?',
+			text: 'На каком сайте безопасно вводить данные банковской карты?',
 			answers: [
-				'Сразу перевести деньги - друг в беде',
-				'Связаться с другом по телефону для подтверждения',
-				'Попросить прислать селфи с паспортом'
+				'На любом сайте, если есть форма оплаты',
+				'Только на сайтах с SSL-сертификатом (https://)',
+				'На сайтах с красивым дизайном'
 			],
 			correctAnswer: 1,
-			explanation: 'Правильно! Мошенники часто взламывают аккаунты в соцсетях. Всегда проверяйте подобные просьбы через другие каналы связи.'
+			explanation: 'Правильно! SSL-сертификат (https://) и замок в адресной строке — основные признаки защищенного соединения.'
 		},
 		{
 			id: 4,
-			text: 'На сайте интернет-магазина товар стоит в 5 раз дешевле, чем везде. Сайт требует полную предоплату. Что делать?',
+			text: 'Что делать, если банкомат "съел" карту?',
 			answers: [
-				'Заплатить полностью - отличная цена!',
-				'Проверить отзывы и репутацию магазина',
-				'Заплатить только 50% предоплаты'
+				'Уйти и забыть про карту',
+				'Немедленно позвонить в банк',
+				'Попросить помощи у прохожих'
 			],
 			correctAnswer: 1,
-			explanation: 'Верно! Подозрительно низкие цены - красный флаг. Всегда проверяйте репутацию магазина через независимые источники.'
+			explanation: 'Верно! Сразу звоните в банк по номеру на банкомате или с обратной стороны карты для блокировки.'
 		},
 		{
 			id: 5,
-			text: 'Пришло письмо от "банка" с просьбой обновить данные, иначе счет заблокируют. В письме есть ссылка. Что делать?',
+			text: 'Безопасно ли пользоваться общественным Wi-Fi для банковских операций?',
 			answers: [
-				'Перейти по ссылке и обновить данные',
-				'Зайти на сайт банка через поисковик и проверить уведомления',
-				'Переслать письмо коллегам для проверки'
+				'Да, если сеть требует пароль',
+				'Нет, никогда не используйте публичный Wi-Fi для банкинга',
+				'Можно, если быстро'
 			],
 			correctAnswer: 1,
-			explanation: 'Правильно! Банки не просят обновлять данные по почте. Всегда заходите на сайт банка самостоятельно или звоните в службу поддержки.'
+			explanation: 'Правильно! Публичные Wi-Fi сети небезопасны. Используйте мобильный интернет для банковских операций.'
 		}
 	];
 
@@ -88,8 +86,8 @@
 		gameStore.startGame('quiz-shield-ruble');
 	}
 
-	function handleAnswerSelect(answerIndex: number) {
-		selectedAnswer = answerIndex;
+	function handleAnswerSelect(index: number) {
+		selectedAnswer = index;
 	}
 
 	function handleAnswerSubmit() {
@@ -98,21 +96,9 @@
 		const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
 		if (isCorrect) {
 			score += 100;
-			triggerParticles();
 		}
 
 		showExplanation = true;
-
-		gameStore.updateGameState(state => ({
-			...state,
-			score: { ...state.score, current: score },
-			progress: {
-				...state.progress,
-				currentQuestion: currentQuestionIndex + 1,
-				totalQuestions: questions.length,
-				percentage: progress
-			}
-		}));
 	}
 
 	function handleNext() {
@@ -121,22 +107,34 @@
 			selectedAnswer = null;
 			showExplanation = false;
 		} else {
-			showResult = true;
-			triggerConfetti();
-			gameStore.completeGame({
-				score,
-				maxScore: questions.length * 100,
-				accuracy: score / (questions.length * 100),
-				correctAnswers: Math.floor(score / 100),
-				totalAnswers: questions.length,
-				grade: score >= 150 ? 'A' : score >= 100 ? 'B' : 'C'
-			});
+			finishGame();
 		}
 	}
 
-	function handleExit() {
-		gameStore.exitGame();
-		onexit?.();
+	function finishGame() {
+		const finalScore = score;
+		const totalQuestions = questions.length;
+		const maxScore = totalQuestions * 100;
+		const percentage = (finalScore / maxScore) * 100;
+
+		let level = 'Новичок';
+		if (percentage >= 80) {
+			level = 'Эксперт по безопасности';
+		} else if (percentage >= 60) {
+			level = 'Защитник';
+		} else if (percentage >= 40) {
+			level = 'Ученик';
+		}
+
+		gameStore.completeGame({
+			score: finalScore,
+			maxScore,
+			correctAnswers: Math.round((finalScore / 100)),
+			totalAnswers: totalQuestions,
+			accuracy: percentage / 100
+		});
+
+		showResult = true;
 	}
 
 	function handleRestart() {
@@ -147,33 +145,13 @@
 		showExplanation = false;
 		handleStart();
 	}
-
-	function triggerParticles() {
-		showParticles = true;
-		setTimeout(() => {
-			showParticles = false;
-		}, 1500);
-	}
-
-	function triggerConfetti() {
-		showConfetti = true;
-		setTimeout(() => {
-			showConfetti = false;
-		}, 3000);
-	}
 </script>
 
 <GameLayout gameName="Щит и Рубль" background="gradient-electric" showScore={true}>
 
 	{#if !$currentGameState || $currentGameState.status === 'idle'}
-		<div class="welcome-screen" class:mounted>
-			<div class="game-card gradient-electric text-white mx-4 stagger-item">
-				<div class="particles-container">
-					{#each Array(3) as _, i}
-						<div class="particle" style="--animation-delay: {i * 200}ms"></div>
-					{/each}
-				</div>
-
+		<div class="welcome-screen">
+			<div class="game-card gradient-electric text-white mx-4">
 				<div class="game-card-content text-center">
 					<div class="game-card-icon neon-glow mb-6">
 						<Shield size={64} />
@@ -202,99 +180,65 @@
 						</div>
 					</div>
 
-					<Button variant="primary" size="lg" onclick={handleStart} class="btn-game-primary hover-lift active-press">
+					<Button variant="primary" size="lg" onclick={handleStart} class="btn-game-primary">
 						<Zap size={20} class="mr-2" />
 						Начать квиз
 					</Button>
 				</div>
-
-				<div class="decoration-shine"></div>
 			</div>
 		</div>
 	{:else if showResult}
 		<div class="result-screen p-4">
 			<div class="modal-game">
 				<div class="modal-header-game">
-					<div class="confetti-container">
-						{#if showConfetti}
-							{#each Array(8) as _, i}
-								<div class="confetti confetti-{(i % 4) + 1}" style="left: {10 + i * 10}%; animation-delay: {i * 0.1}s;"></div>
-							{/each}
-						{/if}
-					</div>
-
-					<div class="neon-glow mb-4">
-						{#if score >= 150}
-							<Trophy size={48} class="text-gpb-gold" />
-							<Badge variant="pro" icon class="mt-2">
-								Эксперт
-							</Badge>
-						{:else if score >= 100}
-							<CheckCircle size={48} class="text-gpb-emerald" />
-							<Badge variant="hot" icon class="mt-2">
-								Хорошо
-							</Badge>
-						{:else}
-							<XCircle size={48} class="text-gpb-warning" />
-							<Badge variant="new" icon class="mt-2">
-								Учись
-							</Badge>
-						{/if}
-					</div>
-
-					<h2 class="modal-title-game">Результат</h2>
+					<h1 class="modal-title-game">
+						<Trophy size={40} class="mx-auto mb-4 text-gpb-gold neon-glow" />
+						Квиз завершен!
+					</h1>
 				</div>
 
 				<div class="modal-content-game">
-					<div class="score-display mb-4">
-						<Counter
-							value={0}
-							target={score}
-							variant="score"
-							size="xl"
-							label="из {questions.length * 100} очков"
-							animated={true}
-						/>
+					<div class="result-stats mb-6">
+						<div class="score-display mb-4">
+							<Star size={24} class="text-gpb-gold mb-2 mx-auto neon-glow" />
+							<div class="score-value">{score}</div>
+							<div class="score-label">баллов заработано</div>
+						</div>
+
+						<div class="grid grid-cols-2 gap-4">
+							<div class="mini-stat">
+								<div class="mini-stat-value">{Math.round(score/100)}</div>
+								<div class="mini-stat-label">правильных</div>
+							</div>
+							<div class="mini-stat">
+								<div class="mini-stat-value">{Math.round((score/(questions.length*100))*100)}%</div>
+								<div class="mini-stat-label">точность</div>
+							</div>
+						</div>
 					</div>
 
-					<p class="font-ui-primary text-center mb-4 text-gpb-gray-700">
-						{#if score >= 150}
-							Отлично! Вы настоящий эксперт по финансовой безопасности.
-						{:else if score >= 100}
-							Хорошо! У вас есть базовые знания, но стоит изучить тему глубже.
-						{:else}
-							Рекомендуем изучить основы финансовой безопасности.
-						{/if}
-					</p>
-
-					<div class="game-card gradient-wealth text-white p-4 mb-4">
-						<h3 class="font-card-title mb-2">
-							<Star size={16} class="inline mr-2" />
-							Рекомендуем
-						</h3>
-						<p class="font-card-subtitle mb-3 opacity-90">
-							Безопасная карта с повышенным уровнем защиты от мошенничества
-						</p>
-						<Button variant="secondary" size="sm" disabled class="btn-game-secondary">
-							Узнать подробнее
-						</Button>
+					<div class="result-level mb-6">
+						<Badge variant="pro">
+							{score >= 400 ? 'Эксперт по безопасности' :
+							 score >= 300 ? 'Защитник' :
+							 score >= 200 ? 'Ученик' : 'Новичок'}
+						</Badge>
 					</div>
 				</div>
 
 				<div class="modal-footer-game">
-					<Button variant="secondary" onclick={handleExit} class="flex-1 btn-game-secondary">
-						В центр
+					<Button variant="secondary" onclick={handleRestart} class="btn-game-secondary">
+						Пройти снова
 					</Button>
-					<Button variant="primary" onclick={handleRestart} class="flex-1 btn-game-primary hover-lift active-press">
-						<Zap size={16} class="mr-1" />
-						Еще раз
+					<Button variant="primary" onclick={onexit} class="btn-game-primary">
+						Завершить
 					</Button>
 				</div>
 			</div>
 		</div>
 	{:else}
 		<div class="game-screen p-4">
-			<div class="section-spacing mb-6">
+			<div class="mb-6">
 				<ProgressBar
 					value={progress}
 					max={100}
@@ -306,7 +250,7 @@
 			</div>
 
 			<div class="question-container max-w-md mx-auto">
-				<div class="game-card glass-effect text-gpb-gray-900 mb-6 stagger-item">
+				<div class="game-card glass-effect text-gpb-gray-900 mb-6">
 					<div class="game-card-content">
 						<h2 class="font-section-title mb-4 text-center leading-tight">
 							{currentQuestion.text}
@@ -317,13 +261,12 @@
 				<div class="space-y-3 mb-6">
 					{#each currentQuestion.answers as answer, index}
 						<button
-							class="game-card bg-white hover-lift active-press focus-game w-full text-left transition-all duration-200"
+							class="game-card bg-white w-full text-left"
 							class:gradient-electric={selectedAnswer === index}
 							class:text-white={selectedAnswer === index}
 							class:opacity-70={showExplanation && selectedAnswer !== index}
 							onclick={() => handleAnswerSelect(index)}
 							disabled={showExplanation}
-							style="--animation-delay: {index * 100}ms"
 						>
 							<div class="game-card-content flex items-center gap-4">
 								<div class="w-8 h-8 rounded-full bg-gpb-violet text-white flex items-center justify-center font-bold text-sm"
@@ -339,14 +282,6 @@
 
 				{#if showExplanation}
 					<div class="game-card gradient-mystery text-white mb-6">
-						<div class="particles-container">
-							{#if showParticles}
-								{#each Array(6) as _, i}
-									<div class="particle" style="--particle-delay: {i * 100}ms"></div>
-								{/each}
-							{/if}
-						</div>
-
 						<div class="game-card-content">
 							<div class="flex items-center gap-2 mb-3">
 								{#if selectedAnswer === currentQuestion.correctAnswer}
@@ -362,8 +297,6 @@
 								{currentQuestion.explanation}
 							</p>
 						</div>
-
-						<div class="decoration-shine"></div>
 					</div>
 				{/if}
 
@@ -374,7 +307,7 @@
 							size="lg"
 							onclick={handleAnswerSubmit}
 							disabled={selectedAnswer === null}
-							class="btn-game-primary hover-lift active-press"
+							class="btn-game-primary"
 						>
 							<CheckCircle size={20} class="mr-2" />
 							Ответить
@@ -384,7 +317,7 @@
 							variant="primary"
 							size="lg"
 							onclick={handleNext}
-							class="btn-game-primary hover-lift active-press"
+							class="btn-game-primary"
 						>
 							{#if currentQuestionIndex < questions.length - 1}
 								<Zap size={20} class="mr-2" />
@@ -399,41 +332,14 @@
 			</div>
 		</div>
 	{/if}
-
-	<!-- Particle Effects -->
-	{#if showParticles}
-		<div class="particles-effect-overlay">
-			{#each Array(12) as _, i}
-				<div class="particle-success" style="--particle-index: {i}"></div>
-			{/each}
-		</div>
-	{/if}
-
-	<!-- Confetti Effect -->
-	{#if showConfetti}
-		<div class="confetti-overlay">
-			{#each Array(20) as _, i}
-				<div class="confetti confetti-{(i % 4) + 1}" style="left: {Math.random() * 100}%; animation-delay: {Math.random() * 2}s;"></div>
-			{/each}
-		</div>
-	{/if}
 </GameLayout>
 
 <style>
-
 	.welcome-screen {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		min-height: calc(100vh - 80px);
-		opacity: 0;
-		transform: translateY(20px);
-		transition: all 0.6s ease-out;
-	}
-
-	.welcome-screen.mounted {
-		opacity: 1;
-		transform: translateY(0);
 	}
 
 	.result-screen {
@@ -448,89 +354,11 @@
 		padding-top: 2rem;
 	}
 
-	.particles-effect-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		pointer-events: none;
-		z-index: 100;
+	.result-stats {
+		text-align: center;
 	}
 
-	.particle-success {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 6px;
-		height: 6px;
-		background: var(--color-gpb-emerald);
-		border-radius: 50%;
-		animation: particleSuccess 1.5s ease-out forwards;
-		animation-delay: calc(var(--particle-index) * 50ms);
-	}
-
-	.confetti-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		pointer-events: none;
-		z-index: 90;
-	}
-
-	.confetti {
-		position: absolute;
-		top: -10px;
-		width: 10px;
-		height: 10px;
-		animation: confettiFall 3s linear forwards;
-	}
-
-	.confetti-1 { background: var(--color-gpb-gold); }
-	.confetti-2 { background: var(--color-gpb-mint); }
-	.confetti-3 { background: var(--color-gpb-raspberry); }
-	.confetti-4 { background: var(--color-gpb-violet); }
-
-	@keyframes particleSuccess {
-		0% {
-			opacity: 1;
-			transform: translate(-50%, -50%) scale(0);
-		}
-		30% {
-			opacity: 1;
-			transform: translate(-50%, -50%) scale(1.5);
-		}
-		100% {
-			opacity: 0;
-			transform: translate(
-				calc(-50% + var(--particle-index) * 15px - 90px),
-				calc(-50% - var(--particle-index) * 10px - 60px)
-			) scale(0.5);
-		}
-	}
-
-	@keyframes confettiFall {
-		0% {
-			transform: translateY(0) rotate(0deg);
-			opacity: 1;
-		}
-		100% {
-			transform: translateY(100vh) rotate(720deg);
-			opacity: 0;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.welcome-screen, .particle-success, .confetti {
-			animation: none !important;
-			transition: none !important;
-		}
-
-		.welcome-screen {
-			opacity: 1;
-			transform: none;
-		}
+	.result-level {
+		text-align: center;
 	}
 </style>

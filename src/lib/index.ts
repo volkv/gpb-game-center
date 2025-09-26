@@ -125,43 +125,6 @@ export type {
   EventType
 } from './utils/constants.js';
 
-// Утилиты анимаций
-export {
-  slideUpBounce,
-  scaleSpring,
-  slideHorizontal,
-  createStaggeredAnimation,
-  pulse,
-  flip,
-  explode,
-  typewriter,
-  glitch,
-  animationPresets,
-  sequenceAnimation,
-  gameAnimations
-} from './utils/animations.js';
-
-// Svelte Transitions
-export {
-  slideEnhanced,
-  scaleEnhanced,
-  slideInOut,
-  scaleAndSlide,
-  staggeredFadeIn,
-  bounceIn,
-  slideHorizontalSmooth,
-  fadeBlur,
-  spring,
-  slideUpBounce as slideUpBounceTransition,
-  transitionPresets,
-  gameTransitions,
-  createStaggered,
-  reduceMotionTransition
-} from './utils/transitions.js';
-
-export type {
-  TransitionParams
-} from './utils/transitions.js';
 
 // Данные игр
 export {

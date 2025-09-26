@@ -564,10 +564,6 @@
 		box-shadow: 0 4px 16px rgba(88, 255, 255, 0.3);
 	}
 
-	.shield-icon {
-		color: white;
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-	}
 
 	.intro-rules {
 		display: flex;

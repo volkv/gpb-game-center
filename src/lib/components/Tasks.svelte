@@ -7,7 +7,6 @@
 	import DailyRewards from './DailyRewards.svelte';
 	import TaskCard from './TaskCard.svelte';
 	import TaskModal from './TaskModal.svelte';
-	import { staggeredFadeIn, scaleAndSlide } from '$lib/utils/transitions.js';
 	import type { Task } from '$lib/types/Tasks';
 
 	let mounted = $state(false);
@@ -110,7 +109,7 @@
 	{/if}
 
 	{#if showContent}
-		<div class="content" in:scaleAndSlide={{ delay: 200, duration: 500, y: 20 }}>
+		<div class="content">
 			{#if showDailyRewardsSection}
 				<section class="daily-rewards-wrapper section-spacing">
 					<DailyRewards />

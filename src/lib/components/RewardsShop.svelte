@@ -6,7 +6,6 @@
 	import { getAvailableRewards } from '$lib/data/rewards';
 	import RewardCard from './RewardCard.svelte';
 	import PurchaseModal from './PurchaseModal.svelte';
-	import { staggeredFadeIn, scaleAndSlide } from '$lib/utils/transitions.js';
 	import type { Reward } from '$lib/types/Points';
 
 	let mounted = $state(false);
@@ -71,7 +70,7 @@
 	{/if}
 
 	{#if showContent}
-		<div class="content" in:scaleAndSlide={{ delay: 200, duration: 500, y: 20 }}>
+		<div class="content">
 			{#if showStatsSection}
 				<section class="stats-section section-spacing stagger-item" style="--animation-delay: 100ms;">
 					<div class="points-display">

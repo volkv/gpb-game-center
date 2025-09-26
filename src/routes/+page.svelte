@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { currentScreen } from '$lib/stores/navigationStore';
 	import BankHome from '$lib/components/BankHome.svelte';
-	import { slideInOut, reduceMotionTransition } from '$lib/utils/transitions.js';
 	import type { Game } from '$lib/types/Game';
 	import type GameCenter from '$lib/components/GameCenter.svelte';
 	import type GameContainer from '$lib/components/GameContainer.svelte';
@@ -23,13 +22,6 @@
 	let isRewardsShopLoading = $state(false);
 	let isTasksLoading = $state(false);
 
-	const slideLeft = reduceMotionTransition(
-		(node, params) => slideInOut(node, { ...params, x: -100 })
-	);
-
-	const slideRight = reduceMotionTransition(
-		(node, params) => slideInOut(node, { ...params, x: 100 })
-	);
 
 	async function ensureGameCenterLoaded() {
 		if (GameCenterComponent) return;
@@ -147,17 +139,11 @@
 
 {#key $currentScreen}
 	{#if $currentScreen === 'bank-home'}
-		<div
-			in:slideRight={{ duration: 400, delay: 50 }}
-			out:slideLeft={{ duration: 300 }}
-		>
+		<div>
 			<BankHome />
 		</div>
 	{:else if $currentScreen === 'game-center'}
-		<div
-			in:slideRight={{ duration: 400, delay: 50 }}
-			out:slideLeft={{ duration: 300 }}
-		>
+		<div>
 			{#if GameCenterComponent}
 				<GameCenterComponent on:gameSelected={handleGameSelected} />
 			{:else}
@@ -168,10 +154,7 @@
 			{/if}
 		</div>
 	{:else if $currentScreen === 'tasks'}
-		<div
-			in:slideRight={{ duration: 400, delay: 50 }}
-			out:slideLeft={{ duration: 300 }}
-		>
+		<div>
 			{#if TasksComponent}
 				<TasksComponent />
 			{:else}
@@ -182,10 +165,7 @@
 			{/if}
 		</div>
 	{:else if $currentScreen === 'rewards-shop'}
-		<div
-			in:slideRight={{ duration: 400, delay: 50 }}
-			out:slideLeft={{ duration: 300 }}
-		>
+		<div>
 			{#if RewardsShopComponent}
 				<RewardsShopComponent />
 			{:else}
@@ -196,10 +176,7 @@
 			{/if}
 		</div>
 	{:else if $currentScreen === 'game' && selectedGame}
-		<div
-			in:slideLeft={{ duration: 400, delay: 50 }}
-			out:slideRight={{ duration: 300 }}
-		>
+		<div>
 			{#if GameContainerComponent}
 				<GameContainerComponent
 					game={selectedGame}
@@ -213,10 +190,7 @@
 			{/if}
 		</div>
 	{:else}
-		<div
-			in:slideRight={{ duration: 400, delay: 50 }}
-			out:slideLeft={{ duration: 300 }}
-		>
+		<div>
 			<BankHome />
 		</div>
 	{/if}

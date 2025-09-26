@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
   import { X } from 'lucide-svelte';
 
   interface Props {
@@ -61,7 +60,6 @@
 {#if open}
   <div
     class="modal-backdrop"
-    transition:fade={{ duration: 200 }}
     onclick={handleBackdropClick}
     onkeydown={(e) => e.key === 'Escape' && handleClose()}
     role="dialog"
@@ -128,19 +126,11 @@
     overflow-y: auto;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     position: relative;
-    transform: scale(0.95);
-    animation: modalEnter 0.2s ease-out forwards;
   }
 
   .modal-content.success {
     background: linear-gradient(135deg, var(--color-gpb-emerald) 0%, #45b369 100%);
     color: white;
-  }
-
-  @keyframes modalEnter {
-    to {
-      transform: scale(1);
-    }
   }
 
   .modal-content.max-w-sm {
@@ -168,7 +158,6 @@
     border-radius: 50%;
     cursor: pointer;
     color: var(--color-gpb-gray-600);
-    transition: all 0.2s ease;
   }
 
   .close-button:hover {
@@ -214,13 +203,6 @@
     .modal-body,
     .modal-footer {
       padding: 1rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .modal-content {
-      animation: none;
-      transform: scale(1);
     }
   }
 </style>

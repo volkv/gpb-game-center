@@ -160,20 +160,6 @@
       inset -8px -8px 16px #ffffff;
   }
 
-  /* Декоративные элементы */
-  .decoration-orb {
-    @apply absolute rounded-full blur-xl opacity-30 animate-pulse;
-  }
-
-  .decoration-shine {
-    @apply absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent;
-    @apply opacity-0 transition-opacity duration-300;
-  }
-
-  .decoration-shine:hover {
-    @apply opacity-100;
-  }
-
   /* === ИГРОВАЯ ТИПОГРАФИКА === */
   .font-game-title {
     @apply font-black text-4xl md:text-5xl tracking-tight;
@@ -227,31 +213,8 @@
   /* === ИГРОВЫЕ КАРТОЧКИ === */
   .game-card {
     @apply relative overflow-hidden rounded-2xl shadow-lg;
-    @apply transition-all duration-300 ease-out;
     @apply cursor-pointer;
     min-height: 160px;
-    will-change: auto;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .game-card:hover {
-      @apply scale-105 shadow-xl;
-      will-change: transform;
-    }
-    .game-card:not(:hover) {
-      will-change: auto;
-    }
-  }
-
-  .game-card::before {
-    content: '';
-    @apply absolute top-2 right-2 w-16 h-16 bg-white/10 rounded-full blur-xl;
-  }
-
-  .game-card::after {
-    content: '';
-    @apply absolute bottom-0 left-0 w-20 h-20 bg-black/10 rounded-full blur-lg;
-    transform: translate(1rem, 1rem);
   }
 
   .game-card-content {
@@ -272,7 +235,6 @@
 
   .game-card-locked {
     @apply opacity-60 cursor-not-allowed;
-    @apply hover:scale-100 hover:shadow-lg;
   }
 
   /* === СЧЕТЧИКИ И СТАТИСТИКА === */
@@ -286,12 +248,6 @@
     @apply font-black text-3xl md:text-4xl;
     @apply tabular-nums tracking-tight;
     @apply bg-gradient-to-r from-white to-yellow-200 bg-clip-text text-transparent;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .score-value {
-      @apply animate-pulse;
-    }
   }
 
   .score-label {
@@ -321,14 +277,8 @@
   }
 
   .progress-fill {
-    @apply h-full bg-white/80 rounded-full transition-all duration-1000 ease-out;
+    @apply h-full bg-white/80 rounded-full;
     @apply relative overflow-hidden;
-  }
-
-  .progress-fill::after {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent;
-    animation: shimmer 2s linear infinite;
   }
 
   .circular-progress {
@@ -353,12 +303,6 @@
     @apply shadow-lg;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .badge-new {
-      @apply animate-pulse;
-    }
-  }
-
   .badge-locked {
     @apply bg-gpb-gray-600 text-white text-xs font-bold px-2 py-1 rounded-full;
     @apply flex items-center gap-1;
@@ -369,12 +313,6 @@
     @apply text-xs font-bold px-2 py-1 rounded-full;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .badge-hot {
-      @apply animate-bounce;
-    }
-  }
-
   .badge-pro {
     @apply bg-gradient-to-r from-gpb-violet to-gpb-raspberry text-white;
     @apply text-xs font-bold px-2 py-1 rounded-full;
@@ -383,12 +321,6 @@
   .status-online {
     @apply w-3 h-3 bg-green-400 rounded-full;
     box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .status-online {
-      @apply animate-pulse;
-    }
   }
 
   .status-offline {
@@ -410,28 +342,20 @@
     @apply px-6 py-3 rounded-xl font-semibold text-base tracking-wide;
     background: linear-gradient(135deg, #1919EF 0%, #58FFFF 100%);
     @apply text-white shadow-lg;
-    @apply hover:scale-105 hover:shadow-xl active:scale-95;
-    @apply transition-all duration-200;
     @apply focus:outline-none focus:ring-4 focus:ring-gpb-violet/30;
-    @apply relative overflow-hidden;
+    @apply relative overflow-hidden cursor-pointer;
   }
 
   .btn-game-primary::before {
     content: '';
     @apply absolute inset-0 bg-white/20 opacity-0 rounded-xl;
-    @apply transition-opacity duration-200;
-  }
-
-  .btn-game-primary:hover::before {
-    @apply opacity-100;
   }
 
   /* Вторичная кнопка */
   .btn-game-secondary {
     @apply px-6 py-3 rounded-xl font-semibold text-base tracking-wide;
     @apply bg-transparent border-2 border-gpb-violet text-gpb-violet;
-    @apply hover:bg-gpb-violet hover:text-white hover:scale-105;
-    @apply active:scale-95 transition-all duration-200;
+    @apply cursor-pointer;
   }
 
   /* Кнопка с иконкой */
@@ -439,8 +363,7 @@
     @apply flex items-center justify-center gap-2;
     @apply p-3 rounded-full aspect-square;
     @apply bg-white/20 backdrop-blur-sm text-current;
-    @apply hover:bg-white/30 hover:scale-110;
-    @apply transition-all duration-200;
+    @apply cursor-pointer;
   }
 
   /* Размеры кнопок */
@@ -456,25 +379,18 @@
     @apply text-gpb-gray-800 placeholder-gpb-gray-500;
     @apply focus:bg-white focus:border-gpb-violet focus:outline-none;
     @apply focus:ring-4 focus:ring-gpb-violet/20;
-    @apply transition-all duration-200;
-  }
-
-  .input-game:focus {
-    @apply shadow-lg scale-[1.02];
   }
 
   .checkbox-game {
     @apply w-6 h-6 rounded-lg border-2 border-gpb-violet;
     @apply bg-transparent checked:bg-gpb-violet;
     @apply focus:ring-4 focus:ring-gpb-violet/20;
-    @apply transition-all duration-200;
   }
 
   .radio-game {
     @apply w-6 h-6 rounded-full border-2 border-gpb-violet;
     @apply bg-transparent checked:bg-gpb-violet;
     @apply focus:ring-4 focus:ring-gpb-violet/20;
-    @apply transition-all duration-200;
   }
 
   .slider-game {
@@ -483,7 +399,7 @@
 
   .slider-game::-webkit-slider-thumb {
     @apply appearance-none w-6 h-6 bg-gpb-violet rounded-full cursor-pointer;
-    @apply shadow-lg hover:scale-110 transition-transform;
+    @apply shadow-lg;
   }
 
   /* === НАВИГАЦИЯ === */
@@ -496,9 +412,8 @@
   .nav-item {
     @apply flex flex-col items-center justify-center;
     @apply py-2 px-3 rounded-lg;
-    @apply text-gpb-gray-500 transition-all duration-200;
-    @apply hover:text-gpb-violet hover:bg-gpb-violet/5;
-    @apply focus:outline-none focus:text-gpb-violet;
+    @apply text-gpb-gray-500;
+    @apply focus:outline-none focus:text-gpb-violet cursor-pointer;
   }
 
   .nav-item-active {
@@ -506,11 +421,7 @@
   }
 
   .nav-icon {
-    @apply w-6 h-6 mb-1 transition-transform duration-200;
-  }
-
-  .nav-item:hover .nav-icon {
-    @apply scale-110;
+    @apply w-6 h-6 mb-1;
   }
 
   .nav-label {
@@ -525,28 +436,22 @@
   .tab-item {
     @apply flex-1 py-2 px-4 rounded-lg text-center;
     @apply text-sm font-medium text-gpb-gray-600;
-    @apply transition-all duration-200 cursor-pointer;
+    @apply cursor-pointer;
   }
 
   .tab-item-active {
     @apply bg-white text-gpb-violet shadow-sm;
   }
 
-  .tab-item:hover:not(.tab-item-active) {
-    @apply text-gpb-gray-800 bg-gpb-gray-50;
-  }
-
   /* === МОДАЛЬНЫЕ ОКНА === */
   .modal-overlay-game {
     @apply fixed inset-0 z-50 flex items-center justify-center;
     @apply bg-black/60 backdrop-blur-sm p-4;
-    animation: fadeIn 0.3s ease-out;
   }
 
   .modal-game {
     @apply w-full max-w-sm bg-white rounded-2xl shadow-2xl;
     @apply transform overflow-hidden;
-    animation: slideUp 0.4s ease-out;
   }
 
   .modal-header-game {
@@ -579,7 +484,6 @@
   .toast {
     @apply px-4 py-3 rounded-xl shadow-lg;
     @apply bg-white border-l-4 border-gpb-violet;
-    animation: slide-in-right 0.3s ease-out;
   }
 
   .toast-success {
@@ -596,8 +500,7 @@
 
   /* === МАКЕТНАЯ СИСТЕМА === */
   .game-container {
-    @apply  mx-auto ;
-
+    @apply mx-auto;
     @apply bg-gradient-to-br from-gpb-gray-50 to-gpb-gray-100;
   }
 
@@ -645,282 +548,12 @@
     @apply fixed bottom-20 right-4 z-40;
     @apply p-4 rounded-full shadow-lg;
     background: linear-gradient(135deg, #1919EF 0%, #58FFFF 100%);
-    @apply text-white hover:scale-110 active:scale-95 transition-transform duration-200;
+    @apply text-white cursor-pointer;
   }
 }
 
 @layer utilities {
-  /* === АНИМАЦИИ === */
-  /* Hover эффекты для интерактивных элементов */
-  .hover-lift {
-    @apply transition-all duration-300 ease-out;
-    @apply hover:scale-105 hover:-translate-y-1 hover:shadow-xl;
-  }
-
-  .hover-glow {
-    @apply transition-all duration-300;
-    @apply hover:shadow-2xl;
-  }
-
-  .hover-glow:hover {
-    filter: drop-shadow(0 0 20px rgba(88, 255, 255, 0.4));
-  }
-
-  /* Активные состояния */
-  .active-press {
-    @apply active:scale-95 active:duration-75;
-  }
-
-  .active-bounce {
-    @apply active:animate-bounce;
-  }
-
-  /* Базовые анимации */
-  .animate-fade-in {
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
-  }
-
-  .animate-bounce-in {
-    animation: bounceIn 0.5s ease-out;
-  }
-
-  .animate-shimmer {
-    animation: shimmer 2s linear infinite;
-  }
-
-
-
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-
-  .animate-count-up {
-    animation: count-up 0.5s ease-out;
-  }
-
-  .animate-slide-in-right {
-    animation: slide-in-right 0.3s ease-out;
-  }
-
-  /* Переходы состояний */
-  .loading-enter {
-    @apply opacity-0 translate-y-4 scale-95;
-  }
-
-  .loading-enter-active {
-    @apply opacity-100 translate-y-0 scale-100;
-    @apply transition-all duration-500 ease-out;
-  }
-
-  .screen-transition-enter {
-    @apply opacity-0 translate-x-full;
-  }
-
-  .screen-transition-enter-active {
-    @apply opacity-100 translate-x-0;
-    @apply transition-all duration-300 ease-out;
-  }
-
-  .screen-transition-exit {
-    @apply opacity-100 translate-x-0;
-  }
-
-  .screen-transition-exit-active {
-    @apply opacity-0 -translate-x-full;
-    @apply transition-all duration-300 ease-in;
-  }
-
-
-
-  /* Keyframes */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  @keyframes bounceIn {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.05); }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  @keyframes pulse-glow {
-    0%, 100% {
-      filter: drop-shadow(0 0 5px currentColor);
-    }
-    50% {
-      filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 40px currentColor);
-    }
-  }
-
-  @keyframes count-up {
-    from {
-      transform: scale(1.2);
-      opacity: 0;
-    }
-    to {
-      transform: scale(1);
-      opacity: 1;
-    }
-  }
-
-
-  @keyframes slide-in-right {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-
-  /* === СПЕЦИАЛЬНЫЕ ЭФФЕКТЫ === */
-  /* Частицы в фоне */
-  .particles-container {
-    @apply absolute inset-0 overflow-hidden pointer-events-none;
-  }
-
-  .particle {
-    @apply absolute w-2 h-2 bg-white/30 rounded-full;
-    animation: float-particle 4s ease-in-out infinite;
-  }
-
-  @keyframes float-particle {
-    0%, 100% {
-      transform: translateY(0px) translateX(0px) scale(0.8);
-      opacity: 0.3;
-    }
-    33% {
-      transform: translateY(-20px) translateX(10px) scale(1);
-      opacity: 0.8;
-    }
-    66% {
-      transform: translateY(-10px) translateX(-5px) scale(0.9);
-      opacity: 0.5;
-    }
-  }
-
-  .particle:nth-child(odd) {
-    animation-delay: 0.5s;
-    animation-duration: 6s;
-  }
-
-  .particle:nth-child(even) {
-    animation-delay: 1.5s;
-    animation-duration: 5s;
-  }
-
-  /* Звездочки и искры */
-  .sparkle {
-    @apply absolute pointer-events-none;
-  }
-
-  .sparkle::before,
-  .sparkle::after {
-    content: '';
-    @apply absolute w-1 h-1 bg-white rounded-full;
-    animation: sparkle 1.5s ease-in-out infinite;
-  }
-
-  .sparkle::before {
-    @apply -top-2 -left-2;
-  }
-
-  .sparkle::after {
-    @apply -bottom-2 -right-2;
-    animation-delay: 0.7s;
-  }
-
-  @keyframes sparkle {
-    0%, 100% { opacity: 0; transform: scale(0); }
-    50% { opacity: 1; transform: scale(1); }
-  }
-
-  /* Конфетти эффект */
-  .confetti-container {
-    @apply fixed inset-0 pointer-events-none z-40;
-  }
-
-  .confetti {
-    @apply absolute w-2 h-2 opacity-90;
-    animation: confetti-fall 3s ease-out forwards;
-  }
-
-  .confetti-1 { @apply bg-gpb-gold; }
-  .confetti-2 { @apply bg-gpb-mint; }
-  .confetti-3 { @apply bg-gpb-raspberry; }
-  .confetti-4 { @apply bg-gpb-violet; }
-
-  @keyframes confetti-fall {
-    0% {
-      transform: translateY(-100vh) rotate(0deg);
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100vh) rotate(720deg);
-      opacity: 0;
-    }
-  }
-
-  /* Ripple эффект при клике */
-  .ripple {
-    @apply absolute pointer-events-none;
-    @apply w-0 h-0 rounded-full bg-white/50;
-    animation: ripple 0.6s ease-out;
-  }
-
-  @keyframes ripple {
-    to {
-      width: 100px;
-      height: 100px;
-      margin: -50px 0 0 -50px;
-      opacity: 0;
-    }
-  }
-
-  /* Пульсирующий border */
-  .pulse-border {
-    @apply relative;
-  }
-
-  .pulse-border::before {
-    content: '';
-    @apply absolute -inset-1 rounded-2xl opacity-75 blur-sm;
-    @apply bg-gradient-to-r from-gpb-violet via-gpb-raspberry to-gpb-mint;
-    animation: pulse-border 2s ease-in-out infinite alternate;
-  }
-
-  @keyframes pulse-border {
-    0% { opacity: 0.5; transform: scale(1); }
-    100% { opacity: 1; transform: scale(1.02); }
-  }
-}
-
-/* === АДАПТИВНОСТЬ И ACCESSIBILITY === */
-@layer utilities {
-  /* Фокус для клавиатурной навигации */
+  /* === ФОКУС ДЛЯ ACCESSIBILITY === */
   .focus-game {
     @apply focus:outline-none focus:ring-4 focus:ring-gpb-violet/30;
     @apply focus:ring-offset-2 focus:ring-offset-white;
@@ -964,47 +597,6 @@
   /* Skip to content ссылка */
   .skip-to-content {
     @apply absolute -top-10 left-4 z-50 bg-gpb-violet text-white px-4 py-2 rounded;
-    @apply focus:top-4 transition-all duration-200;
-  }
-
-  /* Респект к пользовательским настройкам движения */
-  @media (prefers-reduced-motion: reduce) {
-    .respect-motion-preference {
-      @apply transition-none;
-      animation: none !important;
-    }
-
-    .respect-motion-preference * {
-      @apply transition-none;
-      animation: none !important;
-    }
-
-    /* Упрощенные hover эффекты */
-    .game-card:hover,
-    .btn-game-primary:hover,
-    .btn-game-secondary:hover {
-      transform: none !important;
-    }
-
-    /* Сохраняем только активные состояния */
-    .btn-game-primary:active,
-    .btn-game-secondary:active {
-      transform: scale(0.98) !important;
-    }
-  }
-
-  /* Enhanced focus states для accessibility */
-  @media (prefers-reduced-motion: no-preference) {
-    .btn-game-primary:focus-visible,
-    .btn-game-secondary:focus-visible {
-      @apply ring-4;
-      transform: translateY(-1px);
-    }
-
-    .game-card:focus-visible {
-      @apply ring-4 ring-gpb-violet/50;
-      transform: translateY(-2px) scale(1.01);
-    }
   }
 }
 
@@ -1040,4 +632,3 @@
     color-scheme: dark;
   }
 }
-

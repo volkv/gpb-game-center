@@ -1,8 +1,6 @@
 <script lang="ts">
 	import { Calendar } from 'lucide-svelte';
 	import { tasksStore, dailyRewards, currentDay } from '$lib/stores/tasksStore';
-	import { fade, scale } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
 
 	let showRewardClaimed = $state(false);
 	let claimedAmount = $state(0);
@@ -46,10 +44,9 @@
 				class:available={isRewardAvailable(reward.day)}
 				class:claimable={canClaimReward(reward.day)}
 				class:claimed={isRewardClaimed(reward.day)}
-				style="--animation-delay: {index * 100}ms"
 			>
 				<div class="day-number">День {reward.day}</div>
-				<div class="reward-icon" class:pulse={canClaimReward(reward.day)}>
+				<div class="reward-icon">
 					{reward.icon}
 				</div>
 				<div class="reward-amount">+{reward.reward.toLocaleString()}</div>
@@ -85,7 +82,7 @@
 </section>
 
 {#if showRewardClaimed}
-	<div class="reward-popup" transition:scale={{ duration: 400, easing: quintOut }}>
+	<div class="reward-popup">
 		<div class="popup-content">
 			<div class="popup-icon">🎉</div>
 			<div class="popup-title">Награда получена!</div>
@@ -103,30 +100,6 @@
 		color: white;
 		position: relative;
 		overflow: hidden;
-	}
-
-	.daily-rewards-section::before {
-		content: '';
-		position: absolute;
-		top: -50%;
-		left: -50%;
-		width: 200%;
-		height: 200%;
-		background: linear-gradient(45deg,
-			transparent 30%,
-			rgba(255, 255, 255, 0.1) 50%,
-			transparent 70%);
-		animation: shine 4s ease-in-out infinite;
-		transform: rotate(-45deg);
-	}
-
-	@keyframes shine {
-		0%, 100% {
-			transform: translateX(-100%) rotate(-45deg);
-		}
-		50% {
-			transform: translateX(100%) rotate(-45deg);
-		}
 	}
 
 	.section-header {
@@ -149,7 +122,6 @@
 		margin: 0;
 		line-height: 1.2;
 	}
-
 
 	.rewards-calendar {
 		display: flex;
@@ -188,19 +160,11 @@
 		border-radius: 12px;
 		padding: 0.75rem;
 		text-align: center;
-		transition: all 0.3s ease;
 		opacity: 1;
 		transform: translateY(0);
 		flex-shrink: 0;
 		width: 120px;
 		scroll-snap-align: start;
-	}
-
-	@keyframes staggerIn {
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	}
 
 	.reward-day.available {
@@ -212,16 +176,6 @@
 		background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(80, 200, 120, 0.3) 100%);
 		border-color: rgba(255, 215, 0, 0.6);
 		box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-		animation: glow 2s ease-in-out infinite alternate;
-	}
-
-	@keyframes glow {
-		from {
-			box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-		}
-		to {
-			box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-		}
 	}
 
 	.reward-day.claimed {
@@ -241,20 +195,6 @@
 	.reward-icon {
 		font-size: 1.5rem;
 		margin-bottom: 0.5rem;
-		transition: transform 0.3s ease;
-	}
-
-	.reward-icon.pulse {
-		animation: pulse 1.5s ease-in-out infinite;
-	}
-
-	@keyframes pulse {
-		0%, 100% {
-			transform: scale(1);
-		}
-		50% {
-			transform: scale(1.1);
-		}
 	}
 
 	.reward-amount {
@@ -390,28 +330,5 @@
 		.reward-description {
 			font-size: 0.6rem;
 		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.reward-day,
-		.reward-icon.pulse,
-		.daily-rewards-section::before {
-			animation: none;
-		}
-
-		.reward-day.claimable {
-			animation: none;
-		}
-
-		.reward-day {
-			opacity: 1 !important;
-			transform: translateY(0) !important;
-			animation: none !important;
-		}
-	}
-
-	:global(.reward-day) {
-		opacity: 1 !important;
-		transform: translateY(0) !important;
 	}
 </style>
