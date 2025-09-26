@@ -13,17 +13,17 @@
 		easy: {
 			label: 'Легко',
 			accent: 'var(--color-accent-500)',
-			background: 'rgba(44, 134, 134, 0.12)'
+			background: 'var(--layer-mint-080)'
 		},
 		medium: {
 			label: 'Средне',
 			accent: 'var(--color-brand-500)',
-			background: 'rgba(41, 80, 157, 0.14)'
+			background: 'var(--layer-brand-100)'
 		},
 		hard: {
 			label: 'Сложно',
 			accent: 'var(--color-state-danger)',
-			background: 'rgba(203, 58, 75, 0.14)'
+			background: 'rgba(209, 60, 106, 0.14)'
 		}
 	} as const;
 
@@ -32,7 +32,7 @@
 		return token ?? {
 			label: 'Неизвестно',
 			accent: 'var(--color-fg-muted)',
-			background: 'rgba(103, 112, 131, 0.12)'
+			background: 'rgba(86, 97, 124, 0.14)'
 		};
 	});
 
@@ -143,7 +143,7 @@
 	.task-card:hover {
 		transform: translateY(-2px);
 		box-shadow: var(--shadow-medium);
-		border-color: rgba(41, 80, 157, 0.22);
+		border-color: var(--layer-brand-150);
 	}
 
 	.task-card:focus-visible {
@@ -168,7 +168,7 @@
 		width: 48px;
 		height: 48px;
 		border-radius: var(--radius-lg);
-		background: rgba(41, 80, 157, 0.08);
+		background: var(--layer-brand-050);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -197,9 +197,9 @@
 	}
 
 	.task-card__badge--completed {
-		background: rgba(58, 163, 116, 0.16);
+		background: color-mix(in srgb, var(--color-state-success) 18%, white 82%);
 		color: var(--color-state-success);
-		border: 1px solid rgba(58, 163, 116, 0.24);
+		border: 1px solid color-mix(in srgb, var(--color-state-success) 32%, transparent);
 	}
 
 	.task-card__body {
@@ -259,7 +259,7 @@
 		padding: 0.6rem 1.1rem;
 		border-radius: var(--radius-lg);
 		border: 1px solid transparent;
-		background: var(--color-brand-500);
+		background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
 		color: var(--color-fg-inverse);
 		font-family: var(--font-display);
 		font-size: 0.9rem;
@@ -271,6 +271,7 @@
 	.task-card__action:hover {
 		transform: translateY(-1px);
 		box-shadow: var(--shadow-soft);
+		background: linear-gradient(135deg, var(--color-brand-700) 0%, var(--color-brand-500) 100%);
 	}
 
 	.task-card__action:focus-visible {

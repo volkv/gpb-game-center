@@ -16,6 +16,7 @@
 		onCancel: () => void;
 	} = $props();
 
+	const SUCCESS_CLOSE_TIMEOUT = 2000;
 	let isProcessing = $state(false);
 	let isSuccess = $state(false);
 
@@ -35,7 +36,7 @@
 					isSuccess = false;
 					isProcessing = false;
 					isOpen = false;
-				}, 2000);
+				}, SUCCESS_CLOSE_TIMEOUT);
 			} else {
 				isProcessing = false;
 			}
@@ -102,6 +103,7 @@
 				<p class="success-message">
 					{reward.title} был добавлен в ваши призы
 				</p>
+				<div class="success-progress" style={`--timer-duration: ${SUCCESS_CLOSE_TIMEOUT}ms;`}></div>
 			</div>
 		{/if}
 	{/snippet}
@@ -145,7 +147,7 @@
 		align-items: center;
 		justify-content: center;
 		margin: 0 auto;
-		background: linear-gradient(135deg, rgba(41, 80, 157, 0.14) 0%, rgba(44, 134, 134, 0.18) 100%);
+		background: linear-gradient(135deg, rgba(6, 6, 152, 0.18) 0%, rgba(31, 196, 217, 0.18) 100%);
 		color: var(--color-brand-600);
 	}
 
@@ -242,31 +244,67 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
 		text-align: center;
-		padding: 2rem 1rem;
+		padding: 1.75rem 1.25rem;
 	}
 
 	.success-icon {
-		width: 72px;
-		height: 72px;
-		border-radius: var(--radius-xl);
+		width: 56px;
+		height: 56px;
+		border-radius: 999px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(255, 255, 255, 0.18);
+		background: color-mix(in srgb, var(--color-state-success) 18%, white 82%);
+		border: 1px solid color-mix(in srgb, var(--color-state-success) 38%, transparent);
+		color: color-mix(in srgb, var(--color-state-success) 72%, var(--color-fg-primary) 28%);
 	}
 
 	.success-title {
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: 1.35rem;
+		font-size: 1.25rem;
 		font-weight: 600;
+		color: color-mix(in srgb, var(--color-state-success) 70%, var(--color-fg-primary) 30%);
 	}
 
 	.success-message {
 		margin: 0;
 		font-size: 0.9rem;
+		color: var(--color-fg-secondary);
+	}
+
+	.success-progress {
+		position: relative;
+		width: 100%;
+		height: 4px;
+		margin-top: 0.5rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--color-state-success) 12%, transparent);
+		overflow: hidden;
+		align-self: stretch;
+	}
+
+	.success-progress::after {
+		content: '';
+		display: block;
+		width: 100%;
+		height: 100%;
+		background: color-mix(in srgb, var(--color-state-success) 70%, var(--color-fg-primary) 30%);
+		transform-origin: left center;
+		animation: success-close var(--timer-duration, 2000ms) linear forwards;
+		will-change: transform;
+	}
+
+	@keyframes success-close {
+		from {
+			transform: scaleX(1);
+		}
+
+		to {
+			transform: scaleX(0);
+		}
 	}
 
 	@media (max-width: 420px) {

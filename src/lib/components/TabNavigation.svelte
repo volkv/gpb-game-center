@@ -112,14 +112,14 @@
 	}
 
 	.tab-item:focus-visible {
-		border-color: rgba(41, 80, 157, 0.35);
+		border-color: var(--layer-brand-150);
 		box-shadow: var(--shadow-focus);
 		outline: none;
 	}
 
 	.tab-item.active {
 		background: var(--color-brand-50);
-		border-color: rgba(41, 80, 157, 0.35);
+		border-color: var(--layer-brand-150);
 		color: var(--color-brand-600);
 	}
 

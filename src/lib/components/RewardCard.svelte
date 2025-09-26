@@ -68,7 +68,7 @@
 		inset: 0;
 		border-radius: inherit;
 		opacity: 0;
-		background: linear-gradient(135deg, rgba(41, 80, 157, 0.12) 0%, rgba(44, 134, 134, 0.08) 100%);
+		background: linear-gradient(135deg, rgba(6, 6, 152, 0.14) 0%, rgba(31, 196, 217, 0.12) 100%);
 		pointer-events: none;
 		transition: opacity 160ms ease;
 	}
@@ -76,7 +76,7 @@
 	.reward-card:hover {
 		transform: translateY(-2px);
 		box-shadow: var(--shadow-medium);
-		border-color: rgba(41, 80, 157, 0.22);
+		border-color: var(--layer-brand-150);
 	}
 
 	.reward-card:hover::before {
@@ -84,7 +84,7 @@
 	}
 
 	.reward-card--affordable {
-		border-color: rgba(44, 134, 134, 0.35);
+		border-color: color-mix(in srgb, var(--color-accent-400) 55%, transparent);
 	}
 
 	.reward-card--disabled {
@@ -102,7 +102,7 @@
 		width: 52px;
 		height: 52px;
 		border-radius: var(--radius-lg);
-		background: rgba(41, 80, 157, 0.08);
+		background: var(--layer-brand-050);
 		display: flex;
 		align-items: center;
 		justify-content: center;

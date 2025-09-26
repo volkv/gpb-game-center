@@ -17,26 +17,27 @@
 		easy: {
 			label: 'Легкое',
 			accent: 'var(--color-state-success)',
-			background: 'rgba(58, 163, 116, 0.14)'
+			background: 'color-mix(in srgb, var(--color-state-success) 16%, white 84%)'
 		},
 		medium: {
 			label: 'Среднее',
 			accent: 'var(--color-brand-500)',
-			background: 'rgba(41, 80, 157, 0.14)'
+			background: 'var(--layer-brand-100)'
 		},
 		hard: {
 			label: 'Сложное',
 			accent: 'var(--color-state-danger)',
-			background: 'rgba(203, 58, 75, 0.14)'
+			background: 'rgba(209, 60, 106, 0.14)'
 		}
 	} as const;
 
 	const defaultDifficulty = {
 		label: 'Неизвестно',
 		accent: 'var(--color-fg-muted)',
-		background: 'rgba(103, 112, 131, 0.12)'
+		background: 'rgba(86, 97, 124, 0.14)'
 	};
 
+	const SUCCESS_CLOSE_TIMEOUT = 3000;
 	let showCompletionAnimation = $state(false);
 	let earnedPoints = $state(0);
 
@@ -56,7 +57,7 @@
 			setTimeout(() => {
 				showCompletionAnimation = false;
 				onClose?.();
-			}, 3000);
+			}, SUCCESS_CLOSE_TIMEOUT);
 		}
 	}
 
@@ -172,6 +173,7 @@
 				<p class="success-message">
 					Поздравляем! Вы получили {earnedPoints.toLocaleString()} баллов
 				</p>
+				<div class="success-progress" style={`--timer-duration: ${SUCCESS_CLOSE_TIMEOUT}ms;`}></div>
 			</div>
 		{/if}
 	{/snippet}
@@ -219,7 +221,7 @@
 		width: 5rem;
 		height: 5rem;
 		border-radius: var(--radius-xl);
-		background: linear-gradient(135deg, rgba(41, 80, 157, 0.12) 0%, rgba(44, 134, 134, 0.16) 100%);
+		background: linear-gradient(135deg, rgba(6, 6, 152, 0.16) 0%, rgba(31, 196, 217, 0.18) 100%);
 		color: var(--color-brand-600);
 	}
 
@@ -266,7 +268,7 @@
 		gap: 0.35rem;
 		padding: 0.3rem 0.75rem;
 		border-radius: var(--radius-full);
-		background: rgba(41, 80, 157, 0.12);
+		background: var(--layer-brand-050);
 		color: var(--color-brand-600);
 		font-size: 0.78rem;
 		font-weight: 600;
@@ -373,8 +375,8 @@
 		gap: 0.75rem;
 		padding: 1rem;
 		border-radius: var(--radius-lg);
-		border: 1px solid rgba(58, 163, 116, 0.25);
-		background: rgba(58, 163, 116, 0.12);
+		border: 1px solid color-mix(in srgb, var(--color-state-success) 28%, transparent);
+		background: color-mix(in srgb, var(--color-state-success) 18%, white 82%);
 		color: var(--color-state-success);
 	}
 
@@ -394,31 +396,67 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
+		padding: 1.75rem 1.25rem;
 		text-align: center;
-		padding: 2rem 1rem;
 	}
 
 	.success-icon {
-		width: 72px;
-		height: 72px;
-		border-radius: var(--radius-xl);
+		width: 56px;
+		height: 56px;
+		border-radius: 999px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		background: rgba(255, 255, 255, 0.18);
+		background: color-mix(in srgb, var(--color-state-success) 18%, white 82%);
+		border: 1px solid color-mix(in srgb, var(--color-state-success) 38%, transparent);
+		color: color-mix(in srgb, var(--color-state-success) 72%, var(--color-fg-primary) 28%);
 	}
 
 	.success-title {
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: 1.4rem;
+		font-size: 1.25rem;
 		font-weight: 600;
+		color: color-mix(in srgb, var(--color-state-success) 70%, var(--color-fg-primary) 30%);
 	}
 
 	.success-message {
 		margin: 0;
 		font-size: 0.95rem;
+		color: var(--color-fg-secondary);
+	}
+
+	.success-progress {
+		position: relative;
+		width: 100%;
+		height: 4px;
+		margin-top: 0.5rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--color-state-success) 12%, transparent);
+		overflow: hidden;
+		align-self: stretch;
+	}
+
+	.success-progress::after {
+		content: '';
+		display: block;
+		width: 100%;
+		height: 100%;
+		background: color-mix(in srgb, var(--color-state-success) 70%, var(--color-fg-primary) 30%);
+		transform-origin: left center;
+		animation: success-close var(--timer-duration, 3000ms) linear forwards;
+		will-change: transform;
+	}
+
+	@keyframes success-close {
+		from {
+			transform: scaleX(1);
+		}
+
+		to {
+			transform: scaleX(0);
+		}
 	}
 
 	@media (max-width: 560px) {
@@ -441,4 +479,3 @@
 		}
 	}
 </style>
-

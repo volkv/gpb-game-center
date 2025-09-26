@@ -207,9 +207,9 @@
 		gap: 0.25rem;
 		padding: 0.5rem 0.75rem;
 		border-radius: var(--radius-lg);
-		border: 1px solid rgba(41, 80, 157, 0.18);
-		background: rgba(41, 80, 157, 0.08);
-		color: var(--color-brand-700);
+		border: 1px solid var(--layer-brand-150);
+		background: var(--layer-brand-050);
+		color: var(--color-brand-600);
 	}
 
 	.score-card__label {

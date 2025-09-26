@@ -53,7 +53,7 @@
 <div
 	class="game-card"
 	class:game-card--disabled={!isActive}
-	style={`--game-gradient: ${game.gradient ?? 'linear-gradient(135deg, rgba(41,80,157,0.14) 0%, rgba(31,106,106,0.08) 100%)'}; --game-accent: ${game.themeColor ?? 'var(--color-brand-500)'};`}
+	style={`--game-gradient: ${game.gradient ?? 'linear-gradient(135deg, rgba(6,6,152,0.16) 0%, rgba(31,196,217,0.12) 100%)'}; --game-accent: ${game.themeColor ?? 'var(--color-brand-500)'};`}
 	role="button"
 	tabindex={isActive ? 0 : -1}
 	aria-label={`${game.name}: ${game.shortDescription}${isComingSoon ? ' — скоро' : ''}`}
@@ -104,7 +104,7 @@
 		gap: 1rem;
 		padding: 1.25rem;
 		border-radius: var(--radius-xl);
-		border: 1px solid var(--color-border-muted);
+	border: 1px solid var(--color-border-muted);
 		background: var(--color-surface-card);
 		box-shadow: var(--shadow-soft);
 		transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
@@ -124,7 +124,7 @@
 	.game-card:hover {
 		transform: translateY(-2px);
 		box-shadow: var(--shadow-medium);
-		border-color: rgba(41, 80, 157, 0.25);
+		border-color: var(--layer-brand-150);
 	}
 
 	.game-card:focus-visible {
@@ -159,7 +159,7 @@
 		align-items: center;
 		justify-content: center;
 		color: var(--game-accent);
-		background: rgba(41, 80, 157, 0.08);
+		background: var(--layer-brand-050);
 	}
 
 	.game-card__icon :global(svg) {
@@ -176,13 +176,13 @@
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
-		background: rgba(41, 80, 157, 0.12);
+		background: var(--layer-brand-100);
 		color: var(--game-accent);
 	}
 
 	.game-card__badge--outline {
 		background: transparent;
-		border: 1px solid rgba(41, 80, 157, 0.25);
+		border: 1px solid var(--layer-brand-150);
 	}
 
 	.game-card__badge--muted {

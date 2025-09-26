@@ -16,8 +16,8 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-accent-400) 100%)',
-		themeColor: 'var(--color-brand-500)',
+		gradient: 'linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-accent-400) 100%)',
+		themeColor: 'var(--color-brand-600)',
 
 		metrics: {
 			averagePlayTime: 300,
@@ -59,7 +59,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-brand-600) 0%, color-mix(in srgb, var(--color-state-warning) 60%, white) 100%)',
+		gradient: 'linear-gradient(135deg, var(--color-brand-700) 0%, color-mix(in srgb, var(--color-state-warning) 55%, white 45%) 100%)',
 		themeColor: 'var(--color-state-warning)',
 
 		metrics: {
@@ -102,8 +102,8 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-brand-400) 0%, var(--color-accent-500) 100%)',
-		themeColor: 'var(--color-brand-400)',
+		gradient: 'linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-accent-300) 100%)',
+		themeColor: 'var(--color-brand-500)',
 
 		metrics: {
 			averagePlayTime: 360,
@@ -145,8 +145,8 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-brand-700) 0%, rgba(44, 134, 134, 0.82) 100%)',
-		themeColor: 'var(--color-brand-700)',
+		gradient: 'linear-gradient(135deg, var(--color-brand-800) 0%, rgba(15, 169, 194, 0.72) 100%)',
+		themeColor: 'var(--color-brand-800)',
 
 		metrics: {
 			averagePlayTime: 720,
@@ -188,7 +188,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, color-mix(in srgb, var(--color-accent-600) 70%, white) 0%, color-mix(in srgb, var(--color-brand-500) 40%, white) 100%)',
+		gradient: 'linear-gradient(135deg, color-mix(in srgb, var(--color-accent-500) 65%, white 35%) 0%, color-mix(in srgb, var(--color-brand-500) 45%, white 55%) 100%)',
 		themeColor: 'var(--color-accent-600)',
 
 		metrics: {
@@ -231,7 +231,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-brand-500) 0%, color-mix(in srgb, var(--color-accent-400) 60%, white) 100%)',
+		gradient: 'linear-gradient(135deg, var(--color-brand-500) 0%, color-mix(in srgb, var(--color-accent-300) 60%, white 40%) 100%)',
 		themeColor: 'var(--color-accent-500)',
 
 		metrics: {
@@ -288,7 +288,7 @@ export const GAMES_DATA: Game[] = [
 			width: 64,
 			height: 64
 		},
-		gradient: 'linear-gradient(135deg, var(--color-brand-600) 0%, rgba(203, 58, 75, 0.75) 100%)',
+		gradient: 'linear-gradient(135deg, var(--color-brand-700) 0%, color-mix(in srgb, var(--color-state-danger) 70%, white 30%) 100%)',
 		themeColor: 'var(--color-state-danger)',
 
 		metrics: {

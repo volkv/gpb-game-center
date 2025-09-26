@@ -205,11 +205,11 @@
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-subtle);
 		padding: 1rem;
-		background: linear-gradient(135deg, rgba(41, 80, 157, 0.08) 0%, rgba(31, 106, 106, 0.06) 100%);
+		background: linear-gradient(135deg, rgba(6, 6, 152, 0.1) 0%, rgba(31, 196, 217, 0.06) 100%);
 	}
 
 	.metric-card:nth-child(2) {
-		background: linear-gradient(135deg, rgba(31, 106, 106, 0.1) 0%, rgba(41, 80, 157, 0.04) 100%);
+		background: linear-gradient(135deg, rgba(31, 196, 217, 0.12) 0%, rgba(6, 6, 152, 0.05) 100%);
 	}
 
 	.metric-card :global(svg) {

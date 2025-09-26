@@ -128,9 +128,9 @@
   }
 
   .modal-content.success {
-    background: linear-gradient(135deg, rgba(41, 80, 157, 0.95) 0%, rgba(44, 134, 134, 0.85) 100%);
-    color: var(--color-fg-inverse);
-    border-color: transparent;
+    background: var(--color-surface-card);
+    border-color: color-mix(in srgb, var(--color-state-success) 45%, var(--color-border-muted) 55%);
+    box-shadow: 0 18px 38px color-mix(in srgb, var(--color-state-success) 18%, transparent);
   }
 
   .modal-content.max-w-sm {
@@ -187,10 +187,6 @@
     color: var(--color-fg-primary);
     margin: 0 0 1rem;
     letter-spacing: -0.01em;
-  }
-
-  .modal-content.success .modal-title {
-    color: var(--color-fg-inverse);
   }
 
   .modal-footer {

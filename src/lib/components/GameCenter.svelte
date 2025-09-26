@@ -208,15 +208,15 @@
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-subtle);
 		padding: 1rem;
-		background: var(--gradient-brand-muted);
+		background: linear-gradient(135deg, rgba(6, 6, 152, 0.12) 0%, rgba(31, 196, 217, 0.08) 100%);
 	}
 
 	.metric-card:nth-child(2) {
-		background: linear-gradient(135deg, rgba(44, 134, 134, 0.12) 0%, rgba(44, 134, 134, 0.04) 100%);
+		background: linear-gradient(135deg, rgba(31, 196, 217, 0.14) 0%, rgba(31, 196, 217, 0.05) 100%);
 	}
 
 	.metric-card:nth-child(3) {
-		background: linear-gradient(135deg, rgba(41, 80, 157, 0.12) 0%, rgba(41, 80, 157, 0.04) 100%);
+		background: linear-gradient(135deg, rgba(6, 6, 152, 0.14) 0%, rgba(6, 6, 152, 0.05) 100%);
 	}
 
 	.metric-card :global(svg) {

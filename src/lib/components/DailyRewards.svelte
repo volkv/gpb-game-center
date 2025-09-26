@@ -126,68 +126,86 @@
 	}
 
 	.daily-rewards__list {
-		display: grid;
-		gap: 1rem;
-		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+		display: flex;
+		flex-wrap: nowrap;
+		gap: 0.75rem;
+		padding: 0.25rem 0.35rem 0.75rem;
+		margin-inline: calc(var(--layout-gutter, 0px) * -1);
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		overscroll-behavior-x: contain;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.daily-rewards__list::-webkit-scrollbar {
+		height: 4px;
+	}
+
+	.daily-rewards__list::-webkit-scrollbar-thumb {
+		background: var(--layer-brand-150);
+		border-radius: var(--radius-full);
 	}
 
 	.daily-rewards__item {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
-		padding: 1rem;
+		gap: 0.45rem;
+		padding: 0.85rem 1rem;
+		flex: 0 0 min(220px, 68vw);
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-subtle);
-		background: var(--color-neutral-50);
-		text-align: center;
+		background: var(--color-surface-card);
+		text-align: left;
+		scroll-snap-align: start;
 		transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 	}
 
-	.daily-rewards__item--available {
-		background: var(--color-surface-card);
-	}
-
 	.daily-rewards__item--claimable {
-		border-color: rgba(41, 80, 157, 0.35);
+		border-color: color-mix(in srgb, var(--color-brand-600) 35%, transparent);
 		box-shadow: var(--shadow-soft);
 		transform: translateY(-2px);
 	}
 
 	.daily-rewards__item--claimed {
-		border-color: rgba(58, 163, 116, 0.3);
-		background: rgba(58, 163, 116, 0.08);
+		border-color: color-mix(in srgb, var(--color-state-success) 32%, transparent);
+		background: color-mix(in srgb, var(--color-state-success) 14%, white 86%);
 	}
 
 	.daily-rewards__day {
-		font-size: 0.75rem;
-		letter-spacing: 0.05em;
+		font-size: 0.7rem;
+		letter-spacing: 0.06em;
 		text-transform: uppercase;
 		color: var(--color-fg-muted);
 	}
 
 	.daily-rewards__icon {
-		font-size: 1.7rem;
+		font-size: 1.5rem;
 	}
 
 	.daily-rewards__amount {
 		font-family: var(--font-display);
-		font-size: 1.1rem;
+		font-size: 1rem;
 		font-weight: 600;
 		color: var(--color-brand-600);
 	}
 
 	.daily-rewards__description {
 		margin: 0;
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		color: var(--color-fg-secondary);
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
 	}
 
 	.daily-rewards__action {
-		margin-top: 0.5rem;
+		margin-top: auto;
 		padding: 0.45rem 0.75rem;
 		border-radius: var(--radius-full);
 		border: 1px solid transparent;
-		background: var(--color-brand-500);
+		background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
 		color: var(--color-fg-inverse);
 		font-size: 0.8rem;
 		font-weight: 600;
@@ -197,10 +215,11 @@
 
 	.daily-rewards__action:hover {
 		transform: translateY(-1px);
+		background: linear-gradient(135deg, var(--color-brand-700) 0%, var(--color-brand-500) 100%);
 	}
 
 	.daily-rewards__status {
-		margin-top: 0.5rem;
+		margin-top: auto;
 		display: inline-block;
 		padding: 0.3rem 0.6rem;
 		border-radius: var(--radius-full);
@@ -237,14 +256,13 @@
 
 	.daily-rewards__toast {
 		position: fixed;
-		left: 50%;
-		bottom: clamp(1rem, 5vh, 2rem);
-		transform: translateX(-50%);
-		background: var(--color-surface-card);
-		border: 1px solid var(--color-border-muted);
-		border-radius: var(--radius-lg);
-		box-shadow: var(--shadow-medium);
-		padding: 0.9rem 1.25rem;
+		inset-inline: 0;
+		bottom: clamp(1rem, 5vh, 2.5rem);
+		display: flex;
+		justify-content: center;
+		padding: 0 1rem;
+		pointer-events: none;
+		z-index: 30;
 	}
 
 	.daily-rewards__toast-content {
@@ -252,6 +270,13 @@
 		flex-direction: column;
 		align-items: center;
 		gap: 0.35rem;
+		padding: 0.9rem 1.25rem;
+		max-width: min(22rem, 100%);
+		background: var(--color-surface-card);
+		border: 1px solid var(--color-border-muted);
+		border-radius: var(--radius-xl);
+		box-shadow: var(--shadow-medium);
+		pointer-events: auto;
 	}
 
 	.daily-rewards__toast-icon {
@@ -271,8 +296,8 @@
 	}
 
 	@media (max-width: 560px) {
-		.daily-rewards__list {
-			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		.daily-rewards__item {
+			flex: 0 0 min(240px, 82vw);
 		}
 	}
 

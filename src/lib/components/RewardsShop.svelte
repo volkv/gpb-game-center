@@ -151,7 +151,7 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: var(--radius-lg);
-		background: rgba(41, 80, 157, 0.1);
+		background: var(--layer-brand-050);
 		color: var(--color-brand-600);
 	}
 
