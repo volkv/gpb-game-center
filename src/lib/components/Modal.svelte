@@ -104,11 +104,11 @@
 
 <style>
   .modal-backdrop {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
@@ -117,6 +117,7 @@
     padding: 1rem;
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
+    box-sizing: border-box;
   }
 
   .modal-content {

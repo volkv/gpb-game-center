@@ -238,7 +238,6 @@
 
 <style>
 	.game-container {
-		min-height: 100vh;
 		width: 100%;
 		opacity: 0;
 		transform: translateY(20px);
@@ -252,13 +251,13 @@
 	}
 
 	.loading-screen {
-		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		background: linear-gradient(to bottom, #ffffff 0%, var(--color-gpb-lily) 100%);
 		position: relative;
+		padding: 2rem 1rem;
 	}
 
 	.loading-content {
@@ -447,13 +446,13 @@
 	}
 
 	.error-screen {
-		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		background: linear-gradient(to bottom, #ffffff 0%, var(--color-gpb-lily) 100%);
 		position: relative;
+		padding: 2rem 1rem;
 	}
 
 	.error-content {
@@ -514,7 +513,6 @@
 
 	.game-wrapper {
 		width: 100%;
-		min-height: 100vh;
 		animation: gameSlideIn 0.6s ease-out;
 	}
 

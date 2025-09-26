@@ -94,18 +94,14 @@
 	<meta name="theme-color" content="#1919EF" />
 </svelte:head>
 
-<div class="mobile-app" class:loaded={isLoaded}>
-	<div class="mobile-container">
+<ErrorBoundary>
+	<main class="app-container" class:loaded={isLoaded}>
 		{#if $currentScreen !== 'bank-home'}
 			<StatusBar />
 		{/if}
-		<div class="main-content">
-			<ErrorBoundary>
-				{@render children?.()}
-			</ErrorBoundary>
-		</div>
-	</div>
-</div>
+		{@render children?.()}
+	</main>
+</ErrorBoundary>
 
 <style>
 	:global(body) {
@@ -122,54 +118,33 @@
 		padding: 0;
 		width: 100%;
 		min-height: 100vh;
-		overflow: hidden;
+		overflow: auto;
 	}
 
 	:global(.animations-ready) {
 		--animation-ready: 1;
 	}
 
-	.mobile-app {
+	.app-container {
+		width: 100%;
+		max-width: 500px;
 		min-height: 100vh;
-		background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry) 100%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0;
+		margin: 0 auto;
+		background: white;
 		font-family: var(--font-body);
-		isolation: isolate;
-		contain: layout style;
+		padding-top: var(--ios-safe-area-top, 0px);
+		padding-bottom: var(--ios-safe-area-bottom, 0px);
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		scroll-behavior: smooth;
 	}
 
-	.mobile-app.loaded {
+	.app-container.loaded {
 		will-change: auto;
 	}
 
-	.mobile-container {
-		width: 100%;
-		max-width: 500px;
-		height: min(100vh, 1000px);
-		max-height: 1000px;
-		background: white;
-		position: relative;
-		border-radius: 0;
-		contain: layout style paint;
-		display: flex;
-		flex-direction: column;
-		padding-top: var(--ios-safe-area-top, 0px);
-		padding-bottom: var(--ios-safe-area-bottom, 0px);
-	}
-
-	.main-content {
-		flex: 1;
-		overflow: visible;
-		-webkit-overflow-scrolling: touch;
-		scroll-behavior: smooth;
-		position: relative;
-	}
-
 	@media (prefers-reduced-motion: reduce) {
-		.main-content {
+		.app-container {
 			scroll-behavior: auto;
 		}
 
@@ -182,19 +157,9 @@
 	}
 
 	@media (min-width: 501px) {
-		.mobile-container {
+		.app-container {
 			border-radius: 1.5rem;
 			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-		}
-	}
-
-	@media (max-width: 500px) {
-		.mobile-app {
-			padding: 0;
-		}
-
-		.mobile-container {
-			border-radius: 0;
 		}
 	}
 </style>

@@ -107,7 +107,7 @@ function createTasksStore() {
 			let canClaim = false;
 			const unsubscribe = subscribe(state => {
 				const reward = state.dailyRewards.find(r => r.day === day);
-				canClaim = day === state.currentDay && reward && !reward.claimed;
+				canClaim = day === state.currentDay && !!reward && !reward.claimed;
 			});
 			unsubscribe();
 			return canClaim;

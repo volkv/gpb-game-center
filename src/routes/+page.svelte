@@ -145,113 +145,88 @@
 	}
 </script>
 
-<div class="screen-container">
-	{#key $currentScreen}
-		{#if $currentScreen === 'bank-home'}
-			<div
-				class="screen"
-				in:slideRight={{ duration: 400, delay: 50 }}
-				out:slideLeft={{ duration: 300 }}
-			>
-				<BankHome />
-			</div>
-		{:else if $currentScreen === 'game-center'}
-			<div
-				class="screen"
-				in:slideRight={{ duration: 400, delay: 50 }}
-				out:slideLeft={{ duration: 300 }}
-			>
-				{#if GameCenterComponent}
-					<GameCenterComponent on:gameSelected={handleGameSelected} />
-				{:else}
-					<div class="lazy-fallback" aria-live="polite" aria-busy={isGameCenterLoading}>
-						<div class="lazy-spinner" aria-hidden="true"></div>
-						<p class="lazy-text">Загружаем игровой центр…</p>
-					</div>
-				{/if}
-			</div>
-		{:else if $currentScreen === 'tasks'}
-			<div
-				class="screen"
-				in:slideRight={{ duration: 400, delay: 50 }}
-				out:slideLeft={{ duration: 300 }}
-			>
-				{#if TasksComponent}
-					<TasksComponent />
-				{:else}
-					<div class="lazy-fallback" aria-live="polite" aria-busy={isTasksLoading}>
-						<div class="lazy-spinner" aria-hidden="true"></div>
-						<p class="lazy-text">Загружаем задания…</p>
-					</div>
-				{/if}
-			</div>
-		{:else if $currentScreen === 'rewards-shop'}
-			<div
-				class="screen"
-				in:slideRight={{ duration: 400, delay: 50 }}
-				out:slideLeft={{ duration: 300 }}
-			>
-				{#if RewardsShopComponent}
-					<RewardsShopComponent />
-				{:else}
-					<div class="lazy-fallback" aria-live="polite" aria-busy={isRewardsShopLoading}>
-						<div class="lazy-spinner" aria-hidden="true"></div>
-						<p class="lazy-text">Загружаем магазин подарков…</p>
-					</div>
-				{/if}
-			</div>
-		{:else if $currentScreen === 'game' && selectedGame}
-			<div
-				class="screen"
-				in:slideLeft={{ duration: 400, delay: 50 }}
-				out:slideRight={{ duration: 300 }}
-			>
-				{#if GameContainerComponent}
-					<GameContainerComponent
-						game={selectedGame}
-						onexit={handleGameExit}
-					/>
-				{:else}
-					<div class="lazy-fallback" aria-live="polite" aria-busy={isGameContainerLoading}>
-						<div class="lazy-spinner" aria-hidden="true"></div>
-						<p class="lazy-text">Готовим игру…</p>
-					</div>
-				{/if}
-			</div>
-		{:else}
-			<div
-				class="screen"
-				in:slideRight={{ duration: 400, delay: 50 }}
-				out:slideLeft={{ duration: 300 }}
-			>
-				<BankHome />
-			</div>
-		{/if}
-	{/key}
-</div>
+{#key $currentScreen}
+	{#if $currentScreen === 'bank-home'}
+		<div
+			in:slideRight={{ duration: 400, delay: 50 }}
+			out:slideLeft={{ duration: 300 }}
+		>
+			<BankHome />
+		</div>
+	{:else if $currentScreen === 'game-center'}
+		<div
+			in:slideRight={{ duration: 400, delay: 50 }}
+			out:slideLeft={{ duration: 300 }}
+		>
+			{#if GameCenterComponent}
+				<GameCenterComponent on:gameSelected={handleGameSelected} />
+			{:else}
+				<div class="lazy-fallback" aria-live="polite" aria-busy={isGameCenterLoading}>
+					<div class="lazy-spinner" aria-hidden="true"></div>
+					<p class="lazy-text">Загружаем игровой центр…</p>
+				</div>
+			{/if}
+		</div>
+	{:else if $currentScreen === 'tasks'}
+		<div
+			in:slideRight={{ duration: 400, delay: 50 }}
+			out:slideLeft={{ duration: 300 }}
+		>
+			{#if TasksComponent}
+				<TasksComponent />
+			{:else}
+				<div class="lazy-fallback" aria-live="polite" aria-busy={isTasksLoading}>
+					<div class="lazy-spinner" aria-hidden="true"></div>
+					<p class="lazy-text">Загружаем задания…</p>
+				</div>
+			{/if}
+		</div>
+	{:else if $currentScreen === 'rewards-shop'}
+		<div
+			in:slideRight={{ duration: 400, delay: 50 }}
+			out:slideLeft={{ duration: 300 }}
+		>
+			{#if RewardsShopComponent}
+				<RewardsShopComponent />
+			{:else}
+				<div class="lazy-fallback" aria-live="polite" aria-busy={isRewardsShopLoading}>
+					<div class="lazy-spinner" aria-hidden="true"></div>
+					<p class="lazy-text">Загружаем магазин подарков…</p>
+				</div>
+			{/if}
+		</div>
+	{:else if $currentScreen === 'game' && selectedGame}
+		<div
+			in:slideLeft={{ duration: 400, delay: 50 }}
+			out:slideRight={{ duration: 300 }}
+		>
+			{#if GameContainerComponent}
+				<GameContainerComponent
+					game={selectedGame}
+					onexit={handleGameExit}
+				/>
+			{:else}
+				<div class="lazy-fallback" aria-live="polite" aria-busy={isGameContainerLoading}>
+					<div class="lazy-spinner" aria-hidden="true"></div>
+					<p class="lazy-text">Готовим игру…</p>
+				</div>
+			{/if}
+		</div>
+	{:else}
+		<div
+			in:slideRight={{ duration: 400, delay: 50 }}
+			out:slideLeft={{ duration: 300 }}
+		>
+			<BankHome />
+		</div>
+	{/if}
+{/key}
 
 {#if $currentScreen === 'game-center' || $currentScreen === 'tasks' || $currentScreen === 'rewards-shop'}
 	<TabNavigation />
 {/if}
 
 <style>
-	.screen-container {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		min-height: 100%;
-		overflow-x: hidden;
-	}
-
-	.screen {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		min-height: 100%;
-		will-change: transform, opacity;
-	}
 
 	.lazy-fallback {
 		display: flex;
@@ -286,9 +261,4 @@
 		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.screen {
-			will-change: auto;
-		}
-	}
 </style>
