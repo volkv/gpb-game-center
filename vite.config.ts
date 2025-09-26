@@ -16,6 +16,7 @@ export default defineConfig({
 					'match3-game': ['./src/games/match3-golden-reserve/Match3Demo.svelte'],
 					'crossword-game': ['./src/games/crossword-financial/CrosswordDemo.svelte'],
 					'fincity-game': ['./src/games/fincity/FincityGame.svelte'],
+					'anti-fraud-game': ['./src/games/anti-fraud-hunter/AntiFraudGame.svelte'],
 					'vendor-svelte': ['svelte', 'svelte/store', 'svelte/transition', 'svelte/motion']
 				}
 			}

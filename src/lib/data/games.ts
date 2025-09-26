@@ -272,6 +272,63 @@ export const GAMES_DATA: Game[] = [
 		updatedAt: new Date('2024-02-10'),
 		componentPath: '/games/fincity/FincityGame.svelte',
 		locale: 'ru'
+	},
+
+	{
+		id: GAME_TYPES.ANTI_FRAUD_HUNTER,
+		name: 'Охотник за мошенниками',
+		description: 'Реакционная игра по распознаванию мошеннических SMS. Научитесь быстро отличать опасные сообщения от безопасных уведомлений банка.',
+		shortDescription: 'Анти-фрод аркада',
+		category: GAME_CATEGORIES.ACTION,
+		status: GAME_STATUS.ACTIVE,
+
+		icon: {
+			url: '/games/anti-fraud-hunter/icon.svg',
+			alt: 'Иконка Охотник за мошенниками',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(135deg, var(--color-gpb-raspberry) 0%, var(--color-gpb-violet) 100%)',
+		themeColor: 'var(--color-gpb-raspberry)',
+
+		metrics: {
+			averagePlayTime: 240,
+			completionRate: 0.75,
+			difficulty: 'medium',
+			maxScore: 2000,
+			averageScore: 1200
+		},
+		estimatedDuration: 4,
+
+		relatedProducts: [
+			{
+				id: 'fraud-protection',
+				name: 'Защита от мошенничества',
+				description: 'Комплексная система защиты ваших средств',
+				url: '/products/fraud-protection',
+				category: 'service'
+			},
+			{
+				id: 'sms-notifications',
+				name: 'SMS-уведомления',
+				description: 'Безопасные уведомления обо всех операциях',
+				url: '/products/sms-notifications',
+				category: 'service'
+			},
+			{
+				id: 'security-consultation',
+				name: 'Консультации по кибербезопасности',
+				description: 'Персональные рекомендации по защите',
+				url: '/products/security-consultation',
+				category: 'service'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-09-26'),
+		updatedAt: new Date('2024-09-26'),
+		componentPath: '/games/anti-fraud-hunter/AntiFraudGame.svelte',
+		locale: 'ru'
 	}
 ];
 
