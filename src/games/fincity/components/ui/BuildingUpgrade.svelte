@@ -236,11 +236,11 @@
             <div class="building-upgrade__card">
               <h3>Улучшения</h3>
               <div class="building-upgrade__chips">
-                <Bubble variant="new" size="sm">
+                <Bubble variant="info" size="sm">
                   <TrendingUp size={14} />
                   +{incomeIncrease.coins} монет / час
                 </Bubble>
-                <Bubble variant="new" size="sm">
+                <Bubble variant="info" size="sm">
                   <TrendingUp size={14} />
                   +{incomeIncrease.crystals} кристаллов / час
                 </Bubble>

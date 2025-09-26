@@ -93,9 +93,9 @@
 					<div class="task-badges">
 						<span
 							class="difficulty-badge"
-							style={`--difficulty-accent:${difficultyTheme.accent}; --difficulty-background:${difficultyTheme.background};`}
+							style={`--difficulty-accent:${difficultyTheme().accent}; --difficulty-background:${difficultyTheme().background};`}
 						>
-							{difficultyTheme.label}
+							{difficultyTheme().label}
 						</span>
 						<div class="reward-badge">
 								<Star size={14} />

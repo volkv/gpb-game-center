@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
 	import { Home, User, Star } from 'lucide-svelte';
 	import { telegramStore, telegramUserName, activityStats, isInTelegram } from '$lib/stores/telegramStore';
 	import {
@@ -22,7 +22,7 @@
 		}
 	}
 
-  onMount(async () => {
+  onMount(async (): Promise<void> => {
     // telegramStore is initialized in layout; keep subscription warm
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     telegramStore;
@@ -33,12 +33,12 @@
 			resizeObserver = new ResizeObserver(() => updateStatusBarHeight());
 			resizeObserver.observe(statusElement);
 		}
-
-		return () => {
-			resizeObserver?.disconnect();
-			resizeObserver = null;
-		};
 	});
+
+  onDestroy(() => {
+    resizeObserver?.disconnect();
+    resizeObserver = null;
+  });
 
 	function handleHomeClick() {
 		navigateToGameCenter();

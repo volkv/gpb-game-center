@@ -103,7 +103,7 @@
   {#snippet header()}
     <div class="build-menu__header">
       <div class="build-menu__header-icon">
-        <Icon name="hammer" size="22" />
+        <Icon name="hammer" size="lg" />
       </div>
       <div class="build-menu__heading">
         <h2 class="modal-title-game">Меню строительства</h2>
@@ -114,7 +114,7 @@
 
   <div class="build-menu__filters">
     <div class="build-menu__search">
-      <Icon name="search" size="18" class="build-menu__search-icon" />
+      <Icon name="search" size="sm" class="build-menu__search-icon" />
       <input
         type="text"
         placeholder="Поиск зданий..."
@@ -123,7 +123,7 @@
       />
       {#if searchTerm}
         <button type="button" onclick={clearSearch} class="build-menu__clear-search" aria-label="Очистить поиск">
-          <Icon name="close" size="16" />
+          <Icon name="close" size="sm" />
         </button>
       {/if}
     </div>
@@ -178,7 +178,7 @@
                   class="building-card__sprite {!isUnlocked ? 'is-locked' : ''}"
                 />
               {:else}
-                <Icon name="building" size={28} class="building-card__placeholder-icon" />
+                <Icon name="building" size="xl" class="building-card__placeholder-icon" />
               {/if}
             </div>
 
@@ -258,7 +258,6 @@
               size="sm"
               onclick={() => showProductInfo(type as BuildingType)}
               class="building-card__info"
-              aria-label="Подробнее о продукте"
             >
               <Icon name="book" size="sm" />
             </Button>
@@ -291,7 +290,7 @@
 
     {#if availableBuildings.length === 0}
       <div class="build-menu__empty">
-        <Icon name="search" size="26" class="build-menu__empty-icon" />
+        <Icon name="search" size="xl" class="build-menu__empty-icon" />
         <p class="build-menu__empty-title">Здания не найдены</p>
         <p class="build-menu__empty-text">Попробуйте изменить фильтры или поисковый запрос</p>
       </div>

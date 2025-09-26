@@ -114,6 +114,15 @@
 						<div
 							class="game-cell"
 							onclick={() => handleCellClick(rowIndex, colIndex)}
+							onkeydown={(e) => {
+								if (e.key === 'Enter' || e.key === ' ') {
+									e.preventDefault();
+									handleCellClick(rowIndex, colIndex);
+								}
+							}}
+							role="button"
+							tabindex={0}
+							aria-label={`Game cell at row ${rowIndex + 1}, column ${colIndex + 1}`}
 						>
 							{#if IconComponent}
 								<IconComponent

@@ -36,7 +36,7 @@
 				disabled={!canBuild}
 				class="action-toolbar__button action-toolbar__button--primary"
 			>
-				<Icon name="hammer" size="18" class="action-toolbar__icon" />
+				<Icon name="hammer" size="sm" class="action-toolbar__icon" />
 				<span>Строить</span>
 			</Button>
 
@@ -46,7 +46,7 @@
 				onclick={openQuestLog}
 				class="action-toolbar__button action-toolbar__button--secondary"
 			>
-				<Icon name="quest" size="18" class="action-toolbar__icon action-toolbar__icon--accent" />
+				<Icon name="quest" size="sm" class="action-toolbar__icon action-toolbar__icon--accent" />
 				<span>Квесты</span>
 			</Button>
 
@@ -56,14 +56,14 @@
 				onclick={openAchievements}
 				class="action-toolbar__button action-toolbar__button--secondary"
 			>
-				<Icon name="star" size="18" class="action-toolbar__icon action-toolbar__icon--gold" />
+				<Icon name="star" size="sm" class="action-toolbar__icon action-toolbar__icon--gold" />
 				<span>Достижения</span>
 			</Button>
 		</div>
 
 		{#if !canBuild}
 			<div class="action-toolbar__hint">
-				<Icon name="coin" size="16" class="action-toolbar__hint-icon" />
+				<Icon name="coin" size="sm" class="action-toolbar__hint-icon" />
 				<span>Нужно минимум {requiredCoins.toLocaleString('ru-RU')} монет для строительства</span>
 			</div>
 		{/if}

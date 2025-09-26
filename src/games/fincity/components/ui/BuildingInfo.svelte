@@ -90,9 +90,10 @@
     class="building-info-modal {className}"
   >
     {#snippet header()}
+      {@const IconComponent = getCategoryIcon(product.category)}
       <div class="building-info__header">
         <div class="building-info__icon">
-          <svelte:component this={getCategoryIcon(product.category)} size={28} />
+          <IconComponent size={28} />
         </div>
         <div class="building-info__heading">
           <Badge variant={getDifficultyVariant(product.difficulty)} size="sm">

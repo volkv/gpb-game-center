@@ -60,7 +60,7 @@
 	}
 </script>
 
-<article
+<div
 	class="task-card"
 	class:task-card--completed={isCompleted}
 	onclick={handleCardClick}
@@ -76,9 +76,9 @@
 		<div class="task-card__badges">
 			<span
 				class="task-card__badge"
-				style={`--badge-accent: ${difficulty.accent}; --badge-background: ${difficulty.background};`}
+				style={`--badge-accent: ${difficulty().accent}; --badge-background: ${difficulty().background};`}
 			>
-				{difficulty.label}
+				{difficulty().label}
 			</span>
 			{#if isCompleted}
 				<span class="task-card__badge task-card__badge--completed">
@@ -124,7 +124,7 @@
 			</div>
 		{/if}
 	</footer>
-</article>
+</div>
 
 <style>
 	.task-card {

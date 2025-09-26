@@ -11,6 +11,7 @@
     onclick?: (event: MouseEvent) => void;
     children?: any;
     class?: string;
+    [key: string]: any;
   }
 
   let {
@@ -23,6 +24,7 @@
     onclick,
     children,
     class: className = '',
+    'aria-label': ariaLabel,
     ...restProps
   }: Props = $props();
 
@@ -48,6 +50,7 @@
     class:opacity-50={disabled}
     class:cursor-not-allowed={disabled}
     onclick={handleClick}
+    aria-label={ariaLabel}
     {...restProps}
   >
     {#if loading}
@@ -63,6 +66,7 @@
     class:cursor-not-allowed={disabled}
     disabled={disabled || loading}
     onclick={handleClick}
+    aria-label={ariaLabel}
     {...restProps}
   >
     {#if loading}

@@ -32,7 +32,7 @@
     success: 'bubble--success',
     warning: 'bubble--warning',
     error: 'bubble--error'
-  } satisfies Record<Props['variant'], string>;
+  } satisfies Record<NonNullable<Props['variant']>, string>;
 
   const colorClasses = {
     violet: 'bubble--violet',
