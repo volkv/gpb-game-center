@@ -13,7 +13,7 @@
 				showRewardClaimed = true;
 				setTimeout(() => {
 					showRewardClaimed = false;
-				}, 3000);
+				}, 2800);
 			}
 		}
 	}
@@ -27,308 +27,259 @@
 	}
 
 	function isRewardClaimed(day: number): boolean {
-		return $dailyRewards.find(r => r.day === day)?.claimed || false;
+		return $dailyRewards.find(r => r.day === day)?.claimed ?? false;
 	}
 </script>
 
-<section class="daily-rewards-section">
-	<div class="section-header">
-		<Calendar size={24} class="text-gpb-violet" style="filter: drop-shadow(0 0 8px currentColor);" />
-		<h2 class="font-section-title">Ежедневные награды</h2>
-	</div>
+<section class="daily-rewards" aria-labelledby="daily-rewards-title">
+	<header class="daily-rewards__header">
+		<div class="daily-rewards__heading">
+			<Calendar size={20} aria-hidden="true" />
+			<h2 class="daily-rewards__title" id="daily-rewards-title">Ежедневные награды</h2>
+		</div>
+		<p class="daily-rewards__hint">Возвращайтесь каждый день — сумма баллов увеличивается с серией.</p>
+	</header>
 
-	<div class="rewards-calendar">
-		{#each $dailyRewards as reward, index}
+	<div class="daily-rewards__list" role="list">
+		{#each $dailyRewards as reward}
 			<div
-				class="reward-day"
-				class:available={isRewardAvailable(reward.day)}
-				class:claimable={canClaimReward(reward.day)}
-				class:claimed={isRewardClaimed(reward.day)}
+				class="daily-rewards__item"
+				class:daily-rewards__item--available={isRewardAvailable(reward.day)}
+				class:daily-rewards__item--claimable={canClaimReward(reward.day)}
+				class:daily-rewards__item--claimed={isRewardClaimed(reward.day)}
+				role="listitem"
 			>
-				<div class="day-number">День {reward.day}</div>
-				<div class="reward-icon">
-					{reward.icon}
-				</div>
-				<div class="reward-amount">+{reward.reward.toLocaleString()}</div>
-				<div class="reward-description">{reward.description}</div>
+				<span class="daily-rewards__day">День {reward.day}</span>
+				<div class="daily-rewards__icon" aria-hidden="true">{reward.icon}</div>
+				<div class="daily-rewards__amount">+{reward.reward.toLocaleString()}</div>
+				<p class="daily-rewards__description">{reward.description}</p>
 
 				{#if canClaimReward(reward.day)}
 					<button
 						type="button"
-						class="btn-game-primary btn-claim"
+						class="daily-rewards__action"
 						onclick={() => handleClaimReward(reward.day)}
 					>
-						Забрать
+						Получить
 					</button>
 				{:else if isRewardClaimed(reward.day)}
-					<div class="status-claimed">✓ Получено</div>
+					<span class="daily-rewards__status">Получено</span>
 				{:else if !isRewardAvailable(reward.day)}
-					<div class="status-locked">🔒 Заблокировано</div>
+					<span class="daily-rewards__status daily-rewards__status--locked">Откроется позже</span>
 				{/if}
 			</div>
 		{/each}
 	</div>
 
-	<div class="rewards-info">
-		<p class="info-text">
-			Заходите каждый день и получайте растущие награды!
-			Чем больше дней подряд, тем больше баллов.
-		</p>
-		<div class="streak-info">
-			<span class="streak-label">Текущая серия:</span>
-			<span class="streak-value">{$currentDay - 1} дней</span>
-		</div>
-	</div>
+	<footer class="daily-rewards__footer">
+		<span class="daily-rewards__streak-label">Текущая серия</span>
+		<span class="daily-rewards__streak-value">{$currentDay - 1} дней</span>
+	</footer>
 </section>
 
 {#if showRewardClaimed}
-	<div class="reward-popup">
-		<div class="popup-content">
-			<div class="popup-icon">🎉</div>
-			<div class="popup-title">Награда получена!</div>
-			<div class="popup-amount">+{claimedAmount.toLocaleString()} баллов</div>
+	<div class="daily-rewards__toast" role="status" aria-live="polite">
+		<div class="daily-rewards__toast-content">
+			<span class="daily-rewards__toast-icon">🎉</span>
+			<span class="daily-rewards__toast-title">Награда получена</span>
+			<span class="daily-rewards__toast-amount">+{claimedAmount.toLocaleString()} баллов</span>
 		</div>
 	</div>
 {/if}
 
 <style>
-	.daily-rewards-section {
-		margin-bottom: 2rem;
-		background: linear-gradient(135deg, #1919EF 0%, #9B59B6 50%, #DD41DB 100%);
-		border-radius: 1rem;
-		padding: 1.5rem;
-		color: white;
-		position: relative;
-		overflow: hidden;
-	}
-
-	.section-header {
+	.daily-rewards {
 		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		margin-bottom: 1.5rem;
-		justify-content: center;
-		text-align: center;
-		position: relative;
-		z-index: 1;
+		flex-direction: column;
+		gap: 1.25rem;
 	}
 
-	.font-section-title {
-		font-family: var(--font-heading);
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: white;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-		margin: 0;
-		line-height: 1.2;
-	}
-
-	.rewards-calendar {
+	.daily-rewards__header {
 		display: flex;
-		gap: 1rem;
-		margin-bottom: 1.5rem;
-		position: relative;
-		z-index: 1;
-		overflow-x: auto;
-		overflow-y: hidden;
-		padding-bottom: 0.5rem;
-		scroll-snap-type: x mandatory;
-	}
-
-	.rewards-calendar::-webkit-scrollbar {
-		height: 6px;
-	}
-
-	.rewards-calendar::-webkit-scrollbar-track {
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 3px;
-	}
-
-	.rewards-calendar::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.3);
-		border-radius: 3px;
-	}
-
-	.rewards-calendar::-webkit-scrollbar-thumb:hover {
-		background: rgba(255, 255, 255, 0.5);
-	}
-
-	.reward-day {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 12px;
-		padding: 0.75rem;
-		text-align: center;
-		opacity: 1;
-		transform: translateY(0);
-		flex-shrink: 0;
-		width: 120px;
-		scroll-snap-align: start;
-	}
-
-	.reward-day.available {
-		background: rgba(255, 255, 255, 0.15);
-		border-color: rgba(255, 255, 255, 0.3);
-	}
-
-	.reward-day.claimable {
-		background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(80, 200, 120, 0.3) 100%);
-		border-color: rgba(255, 215, 0, 0.6);
-		box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-	}
-
-	.reward-day.claimed {
-		background: rgba(80, 200, 120, 0.2);
-		border-color: rgba(80, 200, 120, 0.4);
-	}
-
-	.day-number {
-		font-size: 0.75rem;
-		font-weight: 600;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: rgba(255, 255, 255, 0.8);
-		margin-bottom: 0.5rem;
-	}
-
-	.reward-icon {
-		font-size: 1.5rem;
-		margin-bottom: 0.5rem;
-	}
-
-	.reward-amount {
-		font-size: 0.875rem;
-		font-weight: 700;
-		color: #FFD700;
-		text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-		margin-bottom: 0.25rem;
-	}
-
-	.reward-description {
-		font-size: 0.65rem;
-		color: rgba(255, 255, 255, 0.7);
-		margin-bottom: 0.75rem;
-		line-height: 1.2;
-	}
-
-	.btn-claim {
-		width: 100%;
-		padding: 0.375rem 0.75rem;
-		font-size: 0.75rem;
-		border-radius: 6px;
-	}
-
-	.status-claimed {
-		color: #50C878;
-		font-size: 0.75rem;
-		font-weight: 600;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.25rem;
-	}
-
-	.status-locked {
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 0.75rem;
-		font-weight: 600;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.25rem;
-	}
-
-	.rewards-info {
-		text-align: center;
-		position: relative;
-		z-index: 1;
-	}
-
-	.info-text {
-		color: rgba(255, 255, 255, 0.9);
-		font-size: 0.875rem;
-		line-height: 1.5;
-		margin-bottom: 1rem;
-	}
-
-	.streak-info {
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		flex-direction: column;
 		gap: 0.5rem;
-		padding: 0.75rem 1rem;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 8px;
-		backdrop-filter: blur(4px);
 	}
 
-	.streak-label {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.8);
+	.daily-rewards__heading {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--color-brand-600);
 	}
 
-	.streak-value {
-		font-size: 1rem;
-		font-weight: 700;
-		color: #FFD700;
-		text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+	.daily-rewards__heading :global(svg) {
+		color: var(--color-brand-600);
 	}
 
-	.reward-popup {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		z-index: 1000;
-		background: linear-gradient(135deg, #FFD700 0%, #50C878 100%);
-		border-radius: 1rem;
-		padding: 2rem;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-		color: white;
+	.daily-rewards__title {
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--color-fg-primary);
+	}
+
+	.daily-rewards__hint {
+		margin: 0;
+		font-size: 0.85rem;
+		color: var(--color-fg-muted);
+	}
+
+	.daily-rewards__list {
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	}
+
+	.daily-rewards__item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
+		background: var(--color-neutral-50);
 		text-align: center;
+		transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 	}
 
-	.popup-content {
+	.daily-rewards__item--available {
+		background: var(--color-surface-card);
+	}
+
+	.daily-rewards__item--claimable {
+		border-color: rgba(41, 80, 157, 0.35);
+		box-shadow: var(--shadow-soft);
+		transform: translateY(-2px);
+	}
+
+	.daily-rewards__item--claimed {
+		border-color: rgba(58, 163, 116, 0.3);
+		background: rgba(58, 163, 116, 0.08);
+	}
+
+	.daily-rewards__day {
+		font-size: 0.75rem;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		color: var(--color-fg-muted);
+	}
+
+	.daily-rewards__icon {
+		font-size: 1.7rem;
+	}
+
+	.daily-rewards__amount {
+		font-family: var(--font-display);
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--color-brand-600);
+	}
+
+	.daily-rewards__description {
+		margin: 0;
+		font-size: 0.8rem;
+		color: var(--color-fg-secondary);
+	}
+
+	.daily-rewards__action {
+		margin-top: 0.5rem;
+		padding: 0.45rem 0.75rem;
+		border-radius: var(--radius-full);
+		border: 1px solid transparent;
+		background: var(--color-brand-500);
+		color: var(--color-fg-inverse);
+		font-size: 0.8rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: background-color 140ms ease, transform 140ms ease;
+	}
+
+	.daily-rewards__action:hover {
+		transform: translateY(-1px);
+	}
+
+	.daily-rewards__status {
+		margin-top: 0.5rem;
+		display: inline-block;
+		padding: 0.3rem 0.6rem;
+		border-radius: var(--radius-full);
+		background: var(--color-neutral-100);
+		color: var(--color-fg-secondary);
+		font-size: 0.75rem;
+		font-weight: 600;
+	}
+
+	.daily-rewards__status--locked {
+		background: var(--color-neutral-50);
+		color: var(--color-fg-muted);
+	}
+
+	.daily-rewards__footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+		font-size: 0.85rem;
+		color: var(--color-fg-muted);
+	}
+
+	.daily-rewards__streak-label {
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
+
+	.daily-rewards__streak-value {
+		font-family: var(--font-display);
+		font-weight: 600;
+		color: var(--color-brand-600);
+	}
+
+	.daily-rewards__toast {
+		position: fixed;
+		left: 50%;
+		bottom: clamp(1rem, 5vh, 2rem);
+		transform: translateX(-50%);
+		background: var(--color-surface-card);
+		border: 1px solid var(--color-border-muted);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--shadow-medium);
+		padding: 0.9rem 1.25rem;
+	}
+
+	.daily-rewards__toast-content {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.35rem;
 	}
 
-	.popup-icon {
-		font-size: 3rem;
-		margin-bottom: 0.5rem;
-	}
-
-	.popup-title {
-		font-size: 1.25rem;
-		font-weight: 700;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-	}
-
-	.popup-amount {
+	.daily-rewards__toast-icon {
 		font-size: 1.5rem;
-		font-weight: 800;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 	}
 
-	@media (max-width: 480px) {
-		.reward-day {
-			width: 100px;
-			padding: 0.5rem;
-		}
+	.daily-rewards__toast-title {
+		font-family: var(--font-display);
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--color-fg-primary);
+	}
 
-		.reward-icon {
-			font-size: 1.25rem;
-		}
+	.daily-rewards__toast-amount {
+		font-size: 0.85rem;
+		color: var(--color-brand-600);
+	}
 
-		.reward-amount {
-			font-size: 0.75rem;
+	@media (max-width: 560px) {
+		.daily-rewards__list {
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 		}
+	}
 
-		.reward-description {
-			font-size: 0.6rem;
+	@media (prefers-reduced-motion: reduce) {
+		.daily-rewards__item,
+		.daily-rewards__action {
+			transition: none;
 		}
 	}
 </style>

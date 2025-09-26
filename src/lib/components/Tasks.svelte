@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
 	import { CheckSquare, Trophy, Filter } from 'lucide-svelte';
 	import { tasksStore, availableTasks, completedTasks, totalTasksCompleted, totalRewardsEarned } from '$lib/stores/tasksStore';
 	import { getTasksData } from '$lib/data/tasks';
@@ -10,23 +9,9 @@
 	import type { Task } from '$lib/types/Tasks';
 
 	let mounted = $state(false);
-	let showContent = $state(false);
-	let showDailyRewardsSection = $state(false);
-	let showStatsSection = $state(false);
-	let showTasksSection = $state(false);
-
 	let selectedTask = $state<Task | null>(null);
 	let isModalOpen = $state(false);
-
 	let currentFilter = $state<'all' | 'available' | 'completed'>('available');
-
-	$effect(() => {
-		const filteredTasks = currentFilter === 'all'
-			? [...$availableTasks, ...$completedTasks]
-			: currentFilter === 'available'
-				? $availableTasks
-				: $completedTasks;
-	});
 
 	const filteredTasks = $derived(() => {
 		switch (currentFilter) {
@@ -41,26 +26,9 @@
 		}
 	});
 
-	onMount(async () => {
-		const tasks = getTasksData();
-		tasksStore.initializeTasks(tasks);
+	onMount(() => {
+		tasksStore.initializeTasks(getTasksData());
 		mounted = true;
-
-		setTimeout(() => {
-			showContent = true;
-		}, 100);
-
-		setTimeout(() => {
-			showDailyRewardsSection = true;
-		}, 200);
-
-		setTimeout(() => {
-			showStatsSection = true;
-		}, 400);
-
-		setTimeout(() => {
-			showTasksSection = true;
-		}, 600);
 	});
 
 	function handleTaskClick(task: Task) {
@@ -87,110 +55,87 @@
 	}
 </script>
 
-<main class="tasks-container">
-	<div class="particles-container">
-		<div class="particle" style="left: 10%; top: 15%; animation-delay: 0s;"></div>
-		<div class="particle" style="left: 90%; top: 25%; animation-delay: 1.2s;"></div>
-		<div class="particle" style="left: 20%; top: 75%; animation-delay: 0.6s;"></div>
-		<div class="particle" style="left: 80%; top: 85%; animation-delay: 1.8s;"></div>
-	</div>
+{#if mounted}
+	<main class="tasks">
+		<section class="hero surface-contrast" aria-labelledby="tasks-title">
+			<div class="hero-copy">
+				<p class="hero-eyebrow">Повышайте активность</p>
+				<h1 class="hero-title" id="tasks-title">Задания</h1>
+				<p class="hero-subtitle text-balance">
+					Выполняйте задания, проходите игры и накапливайте баллы для обмена на привилегии.
+				</p>
+			</div>
+		</section>
 
-	{#if mounted}
-		<header class="header" in:fade={{ duration: 600 }}>
-			<div class="decoration-orb bg-gpb-mint w-20 h-20 -top-6 -right-6"></div>
-			<div class="decoration-orb bg-gpb-raspberry w-14 h-14 -bottom-3 -left-3"></div>
-			<h1 class="font-game-title" id="main-title">
-				Задания
-			</h1>
-			<p class="subtitle font-ui-secondary" aria-describedby="main-title">
-				Выполняйте задания и получайте баллы
-			</p>
-		</header>
-	{/if}
+		<section class="daily surface-card" aria-label="Ежедневные награды">
+			<DailyRewards />
+		</section>
 
-	{#if showContent}
-		<div class="content">
-			{#if showDailyRewardsSection}
-				<section class="daily-rewards-wrapper section-spacing">
-					<DailyRewards />
-				</section>
-			{/if}
-
-			{#if showStatsSection}
-				<section class="stats-section section-spacing stagger-item" style="--animation-delay: 200ms;">
-					<div class="stats-grid">
-						<div class="stat-card">
-							<div class="stat-icon">
-								<CheckSquare size={24} class="text-gpb-violet" />
-							</div>
-							<div class="stat-content">
-								<div class="stat-value">{$totalTasksCompleted}</div>
-								<div class="stat-label">Выполнено заданий</div>
-							</div>
-						</div>
-						<div class="stat-card">
-							<div class="stat-icon">
-								<Trophy size={24} class="text-gpb-gold" />
-							</div>
-							<div class="stat-content">
-								<div class="stat-value">{$totalRewardsEarned.toLocaleString()}</div>
-								<div class="stat-label">Баллов заработано</div>
-							</div>
-						</div>
+		<section class="stats surface-card" aria-label="Результаты">
+			<div class="stats-grid">
+				<div class="metric-card">
+					<CheckSquare size={18} aria-hidden="true" />
+					<div>
+						<span class="metric-card__label">Выполнено заданий</span>
+						<span class="metric-card__value">{$totalTasksCompleted}</span>
 					</div>
-				</section>
-			{/if}
-
-			{#if showTasksSection}
-				<section class="tasks-section section-spacing stagger-item" style="--animation-delay: 300ms;">
-					<div class="section-header">
-						<div class="section-title-wrapper">
-							<CheckSquare size={24} class="text-gpb-violet" style="filter: drop-shadow(0 0 8px currentColor);" />
-							<h2 class="font-section-title">Доступные задания</h2>
-						</div>
-
-						<div class="filter-controls">
-							<Filter size={16} class="text-gpb-gray-500" />
-							<select
-								bind:value={currentFilter}
-								class="filter-select"
-								aria-label="Фильтр заданий"
-							>
-								<option value="all">Все ({$availableTasks.length + $completedTasks.length})</option>
-								<option value="available">Доступные ({$availableTasks.length})</option>
-								<option value="completed">Выполненные ({$completedTasks.length})</option>
-							</select>
-						</div>
+				</div>
+				<div class="metric-card">
+					<Trophy size={18} aria-hidden="true" />
+					<div>
+						<span class="metric-card__label">Баллов заработано</span>
+						<span class="metric-card__value">{$totalRewardsEarned.toLocaleString()}</span>
 					</div>
+				</div>
+			</div>
+		</section>
 
-					<div class="tasks-grid">
-						{#each filteredTasks() as task, index}
-							<div class="stagger-item" style="--animation-delay: {400 + index * 100}ms;">
-								<TaskCard {task} onTaskClick={handleTaskClick} />
-							</div>
-						{/each}
+		<section class="section" aria-labelledby="tasks-list-heading">
+			<div class="section-heading section-heading--split">
+				<div>
+					<p class="section-heading__eyebrow">Список</p>
+					<h2 class="section-heading__title" id="tasks-list-heading">Доступные задания</h2>
+				</div>
+				<div class="filter-controls">
+					<Filter size={16} aria-hidden="true" />
+					<select
+						bind:value={currentFilter}
+						class="filter-select"
+						aria-label={`Фильтр заданий: ${getFilterLabel(currentFilter)}`}
+					>
+						<option value="all">Все ({$availableTasks.length + $completedTasks.length})</option>
+						<option value="available">Доступные ({$availableTasks.length})</option>
+						<option value="completed">Выполненные ({$completedTasks.length})</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="tasks-grid" role="list">
+				{#each filteredTasks() as task (task.id)}
+					<div class="tasks-grid__item" role="listitem">
+						<TaskCard {task} onTaskClick={handleTaskClick} />
 					</div>
+				{/each}
+			</div>
 
-					{#if filteredTasks().length === 0}
-						<div class="empty-state">
-							<div class="empty-icon">📋</div>
-							<h3 class="empty-title">Пока нет заданий</h3>
-							<p class="empty-description">
-								{#if currentFilter === 'available'}
-									Все доступные задания уже выполнены!
-								{:else if currentFilter === 'completed'}
-									Пока не выполнено ни одного задания.
-								{:else}
-									Задания скоро появятся.
-								{/if}
-							</p>
-						</div>
-					{/if}
-				</section>
+			{#if filteredTasks().length === 0}
+				<div class="empty-state">
+					<div class="empty-icon" aria-hidden="true">📋</div>
+					<h3 class="empty-title">Нет заданий для отображения</h3>
+					<p class="empty-description">
+						{#if currentFilter === 'available'}
+							Все активные задания выполнены. Загляните позже.
+						{:else if currentFilter === 'completed'}
+							Вы ещё не завершили ни одного задания.
+						{:else}
+							Новые задания появятся в ближайшее время.
+						{/if}
+					</p>
+				</div>
 			{/if}
-		</div>
-	{/if}
-</main>
+		</section>
+	</main>
+{/if}
 
 <TaskModal
 	task={selectedTask}
@@ -199,110 +144,52 @@
 />
 
 <style>
-	.tasks-container {
-		padding-left: 1rem;
-		padding-right: 1rem;
+	.tasks {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
 		padding-top: 1.5rem;
-		padding-bottom: calc(88px + 1.5rem);
-		background: linear-gradient(135deg, #1919EF 0%, #9B59B6 50%, #DD41DB 100%);
-		color: white;
-		position: relative;
-		min-height: 100%;
+		padding-bottom: calc(96px + 1.5rem);
 	}
 
-	.particles-container {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		overflow: hidden;
-		z-index: 0;
+	.hero {
+		padding: 1.75rem;
 	}
 
-	.particle {
-		position: absolute;
-		width: 4px;
-		height: 4px;
-		background: rgba(255, 255, 255, 0.3);
-		border-radius: 50%;
-		animation: float 6s ease-in-out infinite;
+	.hero-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
 	}
 
-	@keyframes float {
-		0%, 100% {
-			transform: translateY(0px) rotate(0deg);
-			opacity: 0.3;
-		}
-		25% {
-			transform: translateY(-10px) rotate(90deg);
-			opacity: 0.6;
-		}
-		50% {
-			transform: translateY(-20px) rotate(180deg);
-			opacity: 0.3;
-		}
-		75% {
-			transform: translateY(-10px) rotate(270deg);
-			opacity: 0.6;
-		}
+	.hero-eyebrow {
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.72);
 	}
 
-	.header {
-		text-align: center;
-		margin-bottom: 2rem;
-		padding-top: 1rem;
-		position: relative;
-		z-index: 1;
+	.hero-title {
+		font-family: var(--font-display);
+		font-size: clamp(1.6rem, 1.3rem + 1vw, 2.05rem);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		color: var(--color-fg-inverse);
 	}
 
-	.decoration-orb {
-		position: absolute;
-		border-radius: 50%;
-		opacity: 0.6;
-		filter: blur(1px);
-		animation: float 8s ease-in-out infinite;
+	.hero-subtitle {
+		font-size: 0.95rem;
+		color: rgba(255, 255, 255, 0.78);
+		max-width: 32rem;
+		margin: 0;
 	}
 
-	.bg-gpb-mint {
-		background-color: var(--color-gpb-mint);
+	.daily {
+		padding: 1.5rem;
 	}
 
-	.bg-gpb-raspberry {
-		background-color: var(--color-gpb-raspberry);
-	}
-
-	.w-20 { width: 5rem; }
-	.h-20 { height: 5rem; }
-	.w-14 { width: 3.5rem; }
-	.h-14 { height: 3.5rem; }
-	.-top-6 { top: -1.5rem; }
-	.-right-6 { right: -1.5rem; }
-	.-bottom-3 { bottom: -0.75rem; }
-	.-left-3 { left: -0.75rem; }
-
-	.subtitle {
-		color: rgba(255, 255, 255, 0.9);
-		font-size: 1.125rem;
-		font-weight: 500;
-		margin-top: 0.5rem;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-	}
-
-	.content {
-		max-width: 56rem;
-		margin-left: auto;
-		margin-right: auto;
-		position: relative;
-		z-index: 1;
-	}
-
-	.daily-rewards-wrapper {
-		margin-bottom: 2rem;
-	}
-
-	.stats-section {
-		margin-bottom: 2rem;
+	.stats {
+		padding: 1.5rem;
 	}
 
 	.stats-grid {
@@ -311,254 +198,134 @@
 		gap: 1rem;
 	}
 
-	.stat-card {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 1rem;
-		padding: 1.5rem;
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		transition: all 0.3s ease;
-	}
-
-	.stat-card:hover {
-		background: rgba(255, 255, 255, 0.15);
-		transform: translateY(-2px);
-	}
-
-	.stat-icon {
-		background: rgba(255, 255, 255, 0.2);
-		border-radius: 12px;
-		padding: 0.75rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.stat-content {
-		flex: 1;
-	}
-
-	.stat-value {
-		font-family: var(--font-heading);
-		font-size: 1.75rem;
-		font-weight: 800;
-		line-height: 1;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-		margin-bottom: 0.25rem;
-	}
-
-	.stat-label {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.8);
-	}
-
-	.tasks-section {
-		margin-bottom: 2rem;
-	}
-
-	.section-header {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		margin-bottom: 1.5rem;
-		gap: 1rem;
-	}
-
-	.section-title-wrapper {
+	.metric-card {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
+		padding: 1rem;
+		background: linear-gradient(135deg, rgba(41, 80, 157, 0.08) 0%, rgba(31, 106, 106, 0.06) 100%);
+	}
+
+	.metric-card:nth-child(2) {
+		background: linear-gradient(135deg, rgba(31, 106, 106, 0.1) 0%, rgba(41, 80, 157, 0.04) 100%);
+	}
+
+	.metric-card :global(svg) {
+		color: var(--color-brand-600);
+	}
+
+	.metric-card__label {
+		display: block;
+		font-size: 0.75rem;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-fg-muted);
+	}
+
+	.metric-card__value {
+		font-family: var(--font-display);
+		font-size: 1.4rem;
+		font-weight: 600;
+	}
+
+	.section {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.section-heading--split {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
 	}
 
 	.filter-controls {
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
+		padding: 0.35rem 0.6rem;
+		border-radius: var(--radius-full);
+		background: var(--color-neutral-100);
+		border: 1px solid var(--color-border-subtle);
+		color: var(--color-fg-secondary);
+	}
+
+	.filter-controls :global(svg) {
+		color: var(--color-fg-muted);
 	}
 
 	.filter-select {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 8px;
-		color: white;
-		padding: 0.5rem 0.75rem;
-		font-size: 0.875rem;
+		background: transparent;
+		border: none;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--color-fg-primary);
+		appearance: none;
+		padding: 0;
 		cursor: pointer;
-		transition: all 0.2s ease;
 	}
 
-	.filter-select:focus {
+	.filter-select:focus-visible {
 		outline: none;
-		background: rgba(255, 255, 255, 0.15);
-		border-color: rgba(255, 255, 255, 0.4);
-	}
-
-	.filter-select option {
-		background: #1919EF;
-		color: white;
 	}
 
 	.tasks-grid {
 		display: grid;
-		grid-template-columns: 1fr;
 		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	}
+
+	.tasks-grid__item {
+		list-style: none;
 	}
 
 	.empty-state {
+		padding: 2.5rem 1.5rem;
 		text-align: center;
-		padding: 3rem 1rem;
-		color: rgba(255, 255, 255, 0.8);
+		border-radius: var(--radius-lg);
+		border: 1px dashed var(--color-border-muted);
+		background: var(--color-neutral-50);
 	}
 
 	.empty-icon {
-		font-size: 3rem;
-		margin-bottom: 1rem;
-		opacity: 0.6;
+		font-size: 2rem;
+		margin-bottom: 0.5rem;
 	}
 
 	.empty-title {
-		font-family: var(--font-heading);
-		font-size: 1.25rem;
-		font-weight: 600;
-		margin: 0 0 0.5rem 0;
-		color: white;
+		margin: 0 0 0.5rem;
+		font-family: var(--font-display);
+		font-size: 1.1rem;
+		color: var(--color-fg-primary);
 	}
 
 	.empty-description {
-		font-size: 0.875rem;
-		line-height: 1.5;
 		margin: 0;
+		font-size: 0.9rem;
+		color: var(--color-fg-muted);
 	}
 
-	.stagger-item {
-		opacity: 0;
-		transform: translateY(20px);
-		animation: staggerIn 0.6s ease-out forwards;
-		animation-delay: var(--animation-delay, 0ms);
-	}
-
-	@keyframes staggerIn {
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	.section-spacing {
-		margin-bottom: 2rem;
-	}
-
-	.font-game-title {
-		font-family: var(--font-heading);
-		font-size: 2.5rem;
-		font-weight: 800;
-		text-shadow: 0 4px 8px rgba(0,0,0,0.3);
-		margin: 0;
-		line-height: 1.1;
-	}
-
-	.font-section-title {
-		font-family: var(--font-heading);
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: white;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-		margin: 0;
-		line-height: 1.2;
-	}
-
-	.font-ui-secondary {
-		font-family: var(--font-body);
-		font-weight: 500;
-	}
-
-
-	@media (min-width: 768px) {
-		.content {
-			max-width: 64rem;
-		}
-	}
-
-	@media (min-width: 1024px) {
-		.content {
-			max-width: 80rem;
-		}
-	}
-
-	@media (max-width: 480px) {
-		.tasks-container {
-			padding-left: 0.75rem;
-			padding-right: 0.75rem;
-			padding-top: 1rem;
-			padding-bottom: calc(88px + 1rem);
-		}
-
-		.section-header {
-			flex-direction: column;
-			align-items: stretch;
-			gap: 1rem;
-		}
-
-		.section-title-wrapper {
-			justify-content: center;
-		}
-
-		.filter-controls {
-			justify-content: center;
+	@media (max-width: 540px) {
+		.hero,
+		.daily,
+		.stats {
+			padding: 1.25rem;
 		}
 
 		.tasks-grid {
-			gap: 0.75rem;
-		}
-
-		.stats-grid {
 			grid-template-columns: 1fr;
-		}
-
-		.font-game-title {
-			font-size: 2rem;
-		}
-
-		.font-section-title {
-			font-size: 1.25rem;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.particle,
-		.decoration-orb,
-		.stagger-item {
-			animation: none;
-		}
-
-		.stat-card:hover {
-			transform: none;
-		}
-
-		.stagger-item {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	@media (prefers-contrast: high) {
-		.tasks-container {
-			background-color: #000000;
-			border: 2px solid white;
-		}
-
-		.subtitle {
-			color: white;
-		}
-
-		.stat-card,
-		.filter-select {
-			background: #333333;
-			border: 2px solid white;
+		.metric-card,
+		.filter-controls {
+			transition: none;
 		}
 	}
 </style>

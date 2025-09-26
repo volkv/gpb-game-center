@@ -127,16 +127,19 @@
 
 	.app-container {
 		width: 100%;
-		max-width: 500px;
+		max-width: 512px;
 		min-height: 100vh;
 		margin: 0 auto;
-		background: white;
-		font-family: var(--font-body);
+		background: var(--color-surface-card);
+		color: var(--color-fg-primary);
+		font-family: var(--font-sans);
+		display: flex;
+		flex-direction: column;
+		overscroll-behavior: contain;
 		padding-top: var(--ios-safe-area-top, 0px);
 		padding-bottom: var(--ios-safe-area-bottom, 0px);
-		overflow-y: auto;
-		-webkit-overflow-scrolling: touch;
-		scroll-behavior: smooth;
+		padding-inline: clamp(1rem, 3vw, 1.5rem);
+		gap: 1rem;
 	}
 
 	.app-container.loaded {
@@ -156,10 +159,12 @@
 		}
 	}
 
-	@media (min-width: 501px) {
+	@media (min-width: 520px) {
 		.app-container {
-			border-radius: 1.5rem;
-			box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+			border-radius: var(--radius-xl);
+			border: 1px solid var(--color-border-subtle);
+			box-shadow: var(--shadow-medium);
+			margin-block: 1.5rem;
 		}
 	}
 </style>

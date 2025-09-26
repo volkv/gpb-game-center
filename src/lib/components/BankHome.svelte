@@ -5,153 +5,184 @@
 	import { telegramUserName } from '$lib/stores/telegramStore';
 </script>
 
-<div class="bank-home">
-	<div class="content">
-		<div class="greeting">
-			<h1 class="greeting-text">Привет, {$telegramUserName}!</h1>
-		</div>
+<main class="bank-home">
+	<section class="hero surface-contrast">
+		<p class="hero-eyebrow">Газпромбанк</p>
+		<h1 class="hero-title">Привет, {$telegramUserName}!</h1>
+		<p class="hero-subtitle text-balance">
+			Все ваши продукты и игровые активности — в одном аккуратном пространстве.
+		</p>
+	</section>
 
+	<section aria-label="Истории и акции" class="stories-wrapper">
 		<Stories />
+	</section>
 
-		<div class="cards-section">
-			<div class="section-header">
-				<h2 class="section-title">Карты</h2>
-				<button class="add-button" disabled>+</button>
-			</div>
-
-			<div class="cards-grid">
-				<SkeletonCard width="calc(50% - 8px)" height="120px" hasIcon={true} hasText={true} textLines={3} />
-				<SkeletonCard width="calc(50% - 8px)" height="120px" hasIcon={true} hasText={true} textLines={2} />
-			</div>
-
-			<div class="bank-card">
-				<div class="card-info">
-					<div class="card-icon">💳</div>
-					<div class="card-details">
-						<div class="skeleton-line-small"></div>
-						<div class="skeleton-line-mini"></div>
-					</div>
-				</div>
-				<div class="skeleton-amount"></div>
+	<section class="product-section surface-card" aria-labelledby="cards-heading">
+		<div class="section-heading">
+			<p class="section-heading__eyebrow">Карты</p>
+			<div class="section-heading__title-row">
+				<h2 class="section-heading__title" id="cards-heading">Ваши продукты</h2>
+				<button class="ghost-action" type="button" disabled aria-disabled="true" title="Добавление пока недоступно">
+					Добавить
+				</button>
 			</div>
 		</div>
+		<div class="cards-grid" role="group" aria-label="Скелетные карточки продуктов">
+			<SkeletonCard width="100%" height="124px" hasIcon={true} hasText={true} textLines={3} />
+			<SkeletonCard width="100%" height="124px" hasIcon={true} hasText={true} textLines={2} />
+		</div>
+		<div class="bank-card surface-muted" aria-hidden="true">
+			<div class="card-info">
+				<div class="card-icon" aria-hidden="true">💳</div>
+				<div class="card-details">
+					<div class="skeleton-line skeleton-line-small"></div>
+					<div class="skeleton-line skeleton-line-mini"></div>
+				</div>
+			</div>
+			<div class="skeleton-line skeleton-amount"></div>
+		</div>
+	</section>
 
-		<SkeletonSection title="Кредит" hasAction={true} itemsCount={1} />
-		<SkeletonSection title="Вклады" hasAction={true} itemsCount={2} />
-
-	</div>
-</div>
+	<SkeletonSection title="Кредит" hasAction={true} itemsCount={1} />
+	<SkeletonSection title="Вклады" hasAction={true} itemsCount={2} />
+</main>
 
 <style>
 	.bank-home {
-		min-height: 100%;
-		background: rgb(248, 248, 248);
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+		padding-top: 1.25rem;
+		padding-bottom: calc(96px + 1.5rem);
 	}
 
-	.content {
-		background: white;
-		min-height: 100%;
+	.hero {
+		padding: 1.75rem 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
 	}
 
-	.greeting {
-		padding: 20px 20px 16px 20px;
-		background: white;
-		border-bottom: 1px solid rgb(240, 240, 240);
+	.hero-eyebrow {
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.72);
 	}
 
-	.greeting-text {
-		font-size: 24px;
-		font-weight: 600;
-		color: rgb(51, 51, 51);
+	.hero-title {
+		font-family: var(--font-display);
+		font-size: clamp(1.5rem, 1.2rem + 1vw, 1.85rem);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		color: var(--color-fg-inverse);
 		margin: 0;
-		font-family: var(--font-heading);
 	}
 
-	.cards-section {
-		padding: 20px;
-		border-bottom: 8px solid rgb(248, 248, 248);
+	.hero-subtitle {
+		font-size: 0.95rem;
+		color: rgba(255, 255, 255, 0.82);
+		margin: 0;
+		max-width: 24rem;
 	}
 
-	.section-header {
+	.stories-wrapper {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.product-section {
+		padding: 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.section-heading__title-row {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 16px;
+		gap: 0.75rem;
 	}
 
-	.section-title {
-		font-size: 18px;
+	.ghost-action {
+		background: var(--color-surface-muted);
+		border: 1px solid var(--color-border-muted);
+		border-radius: var(--radius-full);
+		padding: 0.35rem 0.9rem;
+		font-size: 0.8125rem;
 		font-weight: 600;
-		color: rgb(51, 51, 51);
-		margin: 0;
-	}
-
-	.add-button {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		background: rgb(240, 240, 240);
-		border: none;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 18px;
-		color: rgb(160, 160, 160);
+		letter-spacing: 0.02em;
+		color: var(--color-fg-secondary);
 		cursor: not-allowed;
 	}
 
 	.cards-grid {
-		display: flex;
-		gap: 16px;
-		margin-bottom: 16px;
+		display: grid;
+		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(152px, 1fr));
 	}
 
 	.bank-card {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 16px;
-		background: white;
-		border-radius: 12px;
-		border: 1px solid rgb(240, 240, 240);
+		padding: 1rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
 	}
 
 	.card-info {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 0.75rem;
 	}
 
 	.card-icon {
-		font-size: 24px;
+		font-size: 1.5rem;
 	}
 
 	.card-details {
 		display: flex;
 		flex-direction: column;
-		gap: 6px;
+		gap: 0.4rem;
+	}
+
+	.skeleton-line {
+		border-radius: 999px;
+		background: rgba(26, 37, 54, 0.08);
 	}
 
 	.skeleton-line-small {
-		width: 120px;
-		height: 16px;
-		border-radius: 8px;
-		background: #f0f0f0;
+		width: 140px;
+		height: 0.75rem;
 	}
 
 	.skeleton-line-mini {
-		width: 80px;
-		height: 12px;
-		border-radius: 6px;
-		background: #f0f0f0;
+		width: 96px;
+		height: 0.6rem;
 	}
 
 	.skeleton-amount {
-		width: 100px;
-		height: 20px;
-		border-radius: 8px;
-		background: #f0f0f0;
+		width: 110px;
+		height: 0.8rem;
 	}
 
+	@media (max-width: 420px) {
+		.product-section {
+			padding: 1.25rem;
+		}
 
+		.section-heading__title-row {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.ghost-action {
+			align-self: stretch;
+			text-align: center;
+		}
+	}
 </style>

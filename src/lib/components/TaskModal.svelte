@@ -13,8 +13,37 @@
 
 	let { task, isOpen = false, onClose }: Props = $props();
 
+	const difficultyMap = {
+		easy: {
+			label: 'Легкое',
+			accent: 'var(--color-state-success)',
+			background: 'rgba(58, 163, 116, 0.14)'
+		},
+		medium: {
+			label: 'Среднее',
+			accent: 'var(--color-brand-500)',
+			background: 'rgba(41, 80, 157, 0.14)'
+		},
+		hard: {
+			label: 'Сложное',
+			accent: 'var(--color-state-danger)',
+			background: 'rgba(203, 58, 75, 0.14)'
+		}
+	} as const;
+
+	const defaultDifficulty = {
+		label: 'Неизвестно',
+		accent: 'var(--color-fg-muted)',
+		background: 'rgba(103, 112, 131, 0.12)'
+	};
+
 	let showCompletionAnimation = $state(false);
 	let earnedPoints = $state(0);
+
+	const difficultyTheme = $derived(() => {
+		if (!task) return defaultDifficulty;
+		return difficultyMap[task.difficulty as keyof typeof difficultyMap] ?? defaultDifficulty;
+	});
 
 	function handleCompleteTask() {
 		if (!task) return;
@@ -42,31 +71,6 @@
 		onClose?.();
 	}
 
-	function getDifficultyColor(difficulty: string): string {
-		switch (difficulty) {
-			case 'easy':
-				return 'text-green-400';
-			case 'medium':
-				return 'text-yellow-400';
-			case 'hard':
-				return 'text-red-400';
-			default:
-				return 'text-gray-400';
-		}
-	}
-
-	function getDifficultyText(difficulty: string): string {
-		switch (difficulty) {
-			case 'easy':
-				return 'Легкое';
-			case 'medium':
-				return 'Среднее';
-			case 'hard':
-				return 'Сложное';
-			default:
-				return 'Неизвестно';
-		}
-	}
 </script>
 
 <Modal
@@ -85,11 +89,14 @@
 					<div class="task-icon-large">{task.icon}</div>
 					<div class="task-info">
 						<h2 class="task-title">{task.title}</h2>
-						<div class="task-badges">
-							<span class="difficulty-badge {getDifficultyColor(task.difficulty)}">
-								{getDifficultyText(task.difficulty)}
-							</span>
-							<div class="reward-badge">
+					<div class="task-badges">
+						<span
+							class="difficulty-badge"
+							style={`--difficulty-accent:${difficultyTheme.accent}; --difficulty-background:${difficultyTheme.background};`}
+						>
+							{difficultyTheme.label}
+						</span>
+						<div class="reward-badge">
 								<Star size={14} />
 								<span>+{task.reward.toLocaleString()} баллов</span>
 							</div>
@@ -108,7 +115,7 @@
 							<h3 class="section-title">Продукт</h3>
 							<div class="product-card">
 								<div class="product-info">
-									<ExternalLink size={16} class="text-gpb-violet" />
+								<ExternalLink size={16} />
 									<span class="product-name">{task.productName}</span>
 								</div>
 								<Button
@@ -127,7 +134,7 @@
 						<ul class="requirements-list">
 							{#each task.requirements as requirement}
 								<li class="requirement-item">
-									<CheckCircle size={16} class="text-green-500" />
+									<CheckCircle size={16} />
 									<span>{requirement}</span>
 								</li>
 							{/each}
@@ -136,11 +143,11 @@
 
 					<div class="task-meta-info">
 						<div class="meta-item">
-							<Clock size={16} class="text-gpb-gray-500" />
+							<Clock size={16} />
 							<span>Примерное время: {task.estimatedTime}</span>
 						</div>
 						<div class="meta-item">
-							<Award size={16} class="text-gpb-gold" />
+							<Award size={16} />
 							<span>Награда: +{task.reward.toLocaleString()} баллов</span>
 						</div>
 					</div>
@@ -148,7 +155,7 @@
 
 				{#if task.status === 'completed'}
 					<div class="completion-notice">
-						<CheckCircle size={24} class="text-green-500" />
+						<CheckCircle size={24} />
 						<div>
 							<h4>Задание выполнено!</h4>
 							<p>Вы получили {task.reward.toLocaleString()} баллов</p>
@@ -190,7 +197,6 @@
 </Modal>
 
 <style>
-
 	.task-modal-content {
 		display: flex;
 		flex-direction: column;
@@ -199,37 +205,38 @@
 
 	.task-header {
 		display: flex;
-		align-items: flex-start;
 		gap: 1rem;
-		margin-bottom: 1.5rem;
+		align-items: flex-start;
 		padding-bottom: 1rem;
-		border-bottom: 1px solid rgba(75, 85, 99, 0.2);
+		border-bottom: 1px solid var(--color-border-subtle);
 	}
 
 	.task-icon-large {
-		font-size: 2.5rem;
-		width: 5rem;
-		height: 5rem;
-		border-radius: 50%;
-		background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry) 100%);
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		color: white;
-		line-height: 1;
+		font-size: 2.4rem;
+		width: 5rem;
+		height: 5rem;
+		border-radius: var(--radius-xl);
+		background: linear-gradient(135deg, rgba(41, 80, 157, 0.12) 0%, rgba(44, 134, 134, 0.16) 100%);
+		color: var(--color-brand-600);
 	}
 
 	.task-info {
 		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
 	}
 
 	.task-title {
-		font-family: var(--font-heading);
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--color-gpb-black);
-		margin: 0 0 1rem 0;
-		line-height: 1.2;
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 1.45rem;
+		font-weight: 600;
+		color: var(--color-fg-primary);
+		letter-spacing: -0.01em;
 	}
 
 	.task-badges {
@@ -239,26 +246,30 @@
 	}
 
 	.difficulty-badge {
-		padding: 0.25rem 0.75rem;
-		border-radius: 12px;
-		background: rgba(75, 85, 99, 0.1);
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		padding: 0.3rem 0.75rem;
+		border-radius: var(--radius-full);
 		font-size: 0.75rem;
 		font-weight: 600;
+		letter-spacing: 0.06em;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
+		color: var(--difficulty-accent);
+		background: var(--difficulty-background);
+		border: 1px solid color-mix(in srgb, var(--difficulty-accent) 20%, transparent);
 	}
 
 	.reward-badge {
-		display: flex;
+		display: inline-flex;
 		align-items: center;
-		gap: 0.25rem;
-		padding: 0.25rem 0.75rem;
-		border-radius: 12px;
-		background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-		color: white;
-		font-size: 0.75rem;
+		gap: 0.35rem;
+		padding: 0.3rem 0.75rem;
+		border-radius: var(--radius-full);
+		background: rgba(41, 80, 157, 0.12);
+		color: var(--color-brand-600);
+		font-size: 0.78rem;
 		font-weight: 600;
-		text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 	}
 
 	.task-body {
@@ -274,57 +285,64 @@
 	}
 
 	.section-title {
-		font-family: var(--font-heading);
+		margin: 0;
+		font-family: var(--font-display);
 		font-size: 1rem;
 		font-weight: 600;
-		color: rgb(55, 65, 81);
-		margin: 0;
+		color: var(--color-fg-primary);
 	}
 
 	.task-description {
-		color: rgb(75, 85, 99);
-		line-height: 1.6;
 		margin: 0;
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--color-fg-secondary);
 	}
 
 	.product-card {
 		display: flex;
 		align-items: center;
-		justify-content: space-between;
-		padding: 1rem;
-		background: rgba(25, 25, 239, 0.05);
-		border: 1px solid rgba(25, 25, 239, 0.1);
-		border-radius: 12px;
 		gap: 1rem;
+		padding: 1rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
+		background: var(--color-neutral-50);
 	}
 
 	.product-info {
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		flex: 1;
+		color: var(--color-fg-secondary);
+	}
+
+	.product-info :global(svg) {
+		color: var(--color-brand-500);
 	}
 
 	.product-name {
-		font-weight: 500;
-		color: rgb(55, 65, 81);
+		font-weight: 600;
 	}
 
 	.requirements-list {
-		list-style: none;
-		padding: 0;
 		margin: 0;
+		padding: 0;
+		list-style: none;
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
+		gap: 0.65rem;
 	}
 
 	.requirement-item {
-		display: flex;
+		display: inline-flex;
 		align-items: flex-start;
-		gap: 0.75rem;
-		color: rgb(75, 85, 99);
-		line-height: 1.5;
+		gap: 0.6rem;
+		color: var(--color-fg-secondary);
+		font-size: 0.9rem;
+	}
+
+	.requirement-item :global(svg) {
+		color: var(--color-state-success);
 	}
 
 	.task-meta-info {
@@ -332,163 +350,95 @@
 		flex-direction: column;
 		gap: 0.5rem;
 		padding: 1rem;
-		background: rgba(249, 250, 251, 1);
-		border-radius: 12px;
-		border: 1px solid rgba(229, 231, 235, 1);
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
+		background: var(--color-neutral-50);
 	}
 
 	.meta-item {
-		display: flex;
+		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		font-size: 0.875rem;
-		color: rgb(75, 85, 99);
+		font-size: 0.85rem;
+		color: var(--color-fg-muted);
 	}
 
-	.btn-secondary,
-	.btn-primary {
-		flex: 1;
-		padding: 0.875rem 1rem;
-		border: none;
-		border-radius: 0.75rem;
-		font-family: var(--font-heading);
-		font-size: 0.9375rem;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.btn-secondary {
-		background: var(--color-gpb-gray-100);
-		color: var(--color-gpb-gray-700);
-	}
-
-	.btn-secondary:hover:not(:disabled) {
-		background: var(--color-gpb-gray-200);
-	}
-
-	.btn-primary {
-		background: linear-gradient(135deg, var(--color-gpb-emerald) 0%, #45b369 100%);
-		color: white;
-		box-shadow: 0 4px 12px rgba(80, 200, 120, 0.3);
-	}
-
-	.btn-primary:hover:not(:disabled) {
-		transform: translateY(-1px);
-		box-shadow: 0 6px 16px rgba(80, 200, 120, 0.4);
-	}
-
-	.btn-secondary:disabled,
-	.btn-primary:disabled {
-		opacity: 0.7;
-		cursor: not-allowed;
-		transform: none;
+	.meta-item :global(svg) {
+		color: var(--color-brand-500);
 	}
 
 	.completion-notice {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
+		gap: 0.75rem;
 		padding: 1rem;
-		background: rgba(16, 185, 129, 0.1);
-		border: 1px solid rgba(16, 185, 129, 0.2);
-		border-radius: 12px;
-		margin-top: 1rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid rgba(58, 163, 116, 0.25);
+		background: rgba(58, 163, 116, 0.12);
+		color: var(--color-state-success);
 	}
 
 	.completion-notice h4 {
-		margin: 0 0 0.25rem 0;
+		margin: 0 0 0.25rem;
+		font-size: 1rem;
 		font-weight: 600;
-		color: rgb(5, 150, 105);
 	}
 
 	.completion-notice p {
 		margin: 0;
-		font-size: 0.875rem;
-		color: rgb(6, 78, 59);
+		font-size: 0.85rem;
+		color: color-mix(in srgb, var(--color-state-success) 70%, white 30%);
 	}
 
 	.success-content {
-		padding: 2rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
 		text-align: center;
+		padding: 2rem 1rem;
 	}
 
 	.success-icon {
-		margin: 0 auto 1rem;
-		color: white;
-		opacity: 0;
-		animation: successIconEnter 0.5s ease-out 0.3s forwards;
+		width: 72px;
+		height: 72px;
+		border-radius: var(--radius-xl);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(255, 255, 255, 0.18);
 	}
 
 	.success-title {
-		font-family: var(--font-heading);
-		font-size: 1.5rem;
-		font-weight: 700;
-		margin: 0 0 0.75rem;
-		color: white;
-		opacity: 0;
-		animation: successTextEnter 0.5s ease-out 0.6s forwards;
+		margin: 0;
+		font-family: var(--font-display);
+		font-size: 1.4rem;
+		font-weight: 600;
 	}
 
 	.success-message {
-		font-family: var(--font-body);
-		font-size: 1rem;
-		line-height: 1.4;
 		margin: 0;
-		color: rgba(255, 255, 255, 0.9);
-		opacity: 0;
-		animation: successTextEnter 0.5s ease-out 0.9s forwards;
+		font-size: 0.95rem;
 	}
 
-	@keyframes successIconEnter {
-		to {
-			opacity: 1;
-			transform: scale(1.1) rotate(10deg);
-		}
-	}
-
-	@keyframes successTextEnter {
-		to {
-			opacity: 1;
-		}
-	}
-
-	@media (max-width: 480px) {
-		.task-icon-large {
-			width: 4rem;
-			height: 4rem;
-			font-size: 2rem;
-		}
-
-		.task-title {
-			font-size: 1.25rem;
-		}
-
+	@media (max-width: 560px) {
 		.task-header {
 			flex-direction: column;
-			text-align: center;
 			align-items: center;
 		}
 
-		.task-badges {
+		.task-info {
+			align-items: center;
+			text-align: center;
+		}
+
+		.task-meta-info {
+			gap: 0.75rem;
+		}
+
+		.meta-item {
 			justify-content: center;
-		}
-
-		.success-content {
-			padding: 1.5rem;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.success-icon,
-		.success-title,
-		.success-message {
-			animation: none;
-			opacity: 1;
-		}
-
-		.btn-primary:hover {
-			transform: none;
 		}
 	}
 </style>
+

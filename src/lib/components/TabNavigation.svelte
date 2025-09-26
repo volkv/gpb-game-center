@@ -42,169 +42,120 @@
 		return false;
 	}
 
-	function handleTabClick(tab: typeof tabs[0]) {
+	function handleTabClick(tab: typeof tabs[number]) {
 		if (!isTabActive(tab.id)) {
 			tab.action();
 		}
 	}
 </script>
 
-<div class="tab-navigation">
+<nav class="tab-navigation" aria-label="Основная навигация">
 	{#each tabs as tab}
 		<button
 			type="button"
 			class="tab-item"
 			class:active={isTabActive(tab.id)}
 			onclick={() => handleTabClick(tab)}
+			title={tab.label}
 			aria-pressed={isTabActive(tab.id)}
+			aria-current={isTabActive(tab.id) ? 'page' : undefined}
 		>
-			<div class="tab-icon">
-				<svelte:component this={tab.icon} size={20} />
+			<div class="tab-icon" aria-hidden="true">
+				<svelte:component this={tab.icon} size={20} stroke-width={1.8} />
 			</div>
 			<span class="tab-label">{tab.label}</span>
-			{#if isTabActive(tab.id)}
-				<div class="active-indicator"></div>
-			{/if}
 		</button>
 	{/each}
-</div>
+</nav>
 
 <style>
 	.tab-navigation {
-		position: fixed;
-		bottom: 0;
+		position: sticky;
+		bottom: clamp(1rem, 4vh, 1.5rem);
 		left: 0;
 		right: 0;
-		background: white;
-		border-top: 1px solid rgb(240, 240, 240);
+		margin-inline: auto;
+		margin-top: auto;
+		max-width: 26rem;
+		padding: 0.5rem;
 		display: flex;
-		justify-content: center;
-		padding: 8px 0 calc(8px + var(--ios-safe-area-bottom, 0px));
-		z-index: 50;
-		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
+		gap: 0.5rem;
+		border-radius: var(--radius-xl);
+		background-color: rgba(255, 255, 255, 0.9);
+		border: 1px solid var(--color-border-muted);
+		box-shadow: var(--shadow-soft);
+		backdrop-filter: blur(12px);
+		z-index: 40;
 	}
 
 	.tab-item {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 4px;
-		padding: 12px 24px;
-		background: none;
-		border: none;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		border-radius: 12px;
-		position: relative;
 		flex: 1;
-		max-width: 140px;
-		color: var(--color-gpb-gray-600);
-	}
-
-	.tab-item:hover:not(.active) {
-		background: rgba(25, 25, 239, 0.05);
-		color: var(--color-gpb-violet);
-		transform: translateY(-1px);
-	}
-
-	.tab-item.active {
-		background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry) 100%);
-		color: white;
-		box-shadow: 0 4px 12px rgba(25, 25, 239, 0.3);
-		transform: translateY(-2px);
-	}
-
-	.tab-item.active:hover {
-		box-shadow: 0 6px 16px rgba(25, 25, 239, 0.4);
-		transform: translateY(-3px);
-	}
-
-	.tab-icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		transition: all 0.2s ease;
+		gap: 0.5rem;
+		padding: 0.75rem 0.5rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid transparent;
+		background: transparent;
+		color: var(--color-fg-muted);
+		font-family: var(--font-sans);
+		font-weight: 600;
+		font-size: 0.8125rem;
+		letter-spacing: 0.01em;
+		transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
 	}
 
-	.tab-item.active .tab-icon {
-		filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+	.tab-item:hover:not(.active) {
+		background: var(--color-neutral-50);
+		color: var(--color-fg-secondary);
+	}
+
+	.tab-item:focus-visible {
+		border-color: rgba(41, 80, 157, 0.35);
+		box-shadow: var(--shadow-focus);
+		outline: none;
+	}
+
+	.tab-item.active {
+		background: var(--color-brand-50);
+		border-color: rgba(41, 80, 157, 0.35);
+		color: var(--color-brand-600);
+	}
+
+	.tab-item.active .tab-icon :global(svg) {
+		color: var(--color-brand-600);
+	}
+
+	.tab-icon :global(svg) {
+		color: var(--color-fg-muted);
+		transition: color 140ms ease;
 	}
 
 	.tab-label {
-		font-family: var(--font-heading);
-		font-size: 12px;
-		font-weight: 600;
-		text-align: center;
-		line-height: 1.2;
-		transition: all 0.2s ease;
+		white-space: nowrap;
 	}
 
-	.tab-item.active .tab-label {
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-	}
-
-	.active-indicator {
-		position: absolute;
-		top: -1px;
-		left: 50%;
-		transform: translateX(-50%);
-		width: 24px;
-		height: 3px;
-		background: linear-gradient(90deg, var(--color-gpb-mint) 0%, var(--color-gpb-gold) 100%);
-		border-radius: 0 0 2px 2px;
-		box-shadow: 0 0 8px rgba(88, 255, 255, 0.6);
-	}
-
-
-	@media (max-width: 380px) {
-		.tab-item {
-			padding: 10px 16px;
-			max-width: 120px;
+	@media (max-width: 420px) {
+		.tab-navigation {
+			left: 0;
+			right: 0;
+			max-width: none;
+			border-radius: var(--radius-lg);
+			margin-inline: clamp(0.5rem, 3vw, 1rem);
 		}
 
-		.tab-label {
-			font-size: 11px;
+		.tab-item {
+			padding-block: 0.65rem;
+			gap: 0.35rem;
+			font-size: 0.75rem;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.tab-item,
-		.tab-icon,
-		.tab-label {
+		.tab-icon :global(svg) {
 			transition: none;
-		}
-
-		.tab-item:hover,
-		.tab-item.active,
-		.tab-item.active:hover {
-			transform: none;
-		}
-
-		.tab-item.active .tab-icon {
-			filter: none;
-		}
-	}
-
-	@media (prefers-contrast: high) {
-		.tab-navigation {
-			background: #000000;
-			border-top: 2px solid white;
-		}
-
-		.tab-item {
-			color: white;
-		}
-
-		.tab-item.active {
-			background: white;
-			color: #000000;
-			border: 2px solid white;
-		}
-
-		.active-indicator {
-			background: white;
 		}
 	}
 </style>

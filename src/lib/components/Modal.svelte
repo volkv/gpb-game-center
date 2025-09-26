@@ -103,34 +103,34 @@
 <style>
   .modal-backdrop {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
     padding: 1rem;
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    background: rgba(10, 19, 48, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 1000;
     box-sizing: border-box;
   }
 
   .modal-content {
-    background: white;
-    border-radius: 1.5rem;
+    background: var(--color-surface-card);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-muted);
     width: 100%;
-    max-height: 90vh;
+    max-height: 88vh;
     overflow-y: auto;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--shadow-hard);
     position: relative;
+    color: var(--color-fg-primary);
   }
 
   .modal-content.success {
-    background: linear-gradient(135deg, var(--color-gpb-emerald) 0%, #45b369 100%);
-    color: white;
+    background: linear-gradient(135deg, rgba(41, 80, 157, 0.95) 0%, rgba(44, 134, 134, 0.85) 100%);
+    color: var(--color-fg-inverse);
+    border-color: transparent;
   }
 
   .modal-content.max-w-sm {
@@ -146,23 +146,29 @@
   }
 
   .modal-header {
-    padding: 1.5rem 1.5rem 0;
     display: flex;
     justify-content: flex-end;
+    padding: 1.25rem 1.5rem 0;
   }
 
   .close-button {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-lg);
+    color: var(--color-fg-muted);
     cursor: pointer;
-    color: var(--color-gpb-gray-600);
+    transition: color 140ms ease, border-color 140ms ease, background-color 140ms ease;
   }
 
   .close-button:hover {
-    background: var(--color-gpb-gray-100);
-    color: var(--color-gpb-gray-800);
+    background: var(--color-neutral-100);
+    border-color: var(--color-border-muted);
+    color: var(--color-fg-secondary);
   }
 
   .close-button:disabled {
@@ -175,19 +181,24 @@
   }
 
   .modal-title {
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-gpb-black);
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
     margin: 0 0 1rem;
-    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .modal-content.success .modal-title {
+    color: var(--color-fg-inverse);
   }
 
   .modal-footer {
-    padding: 1.5rem;
-    border-top: 1px solid var(--color-gpb-gray-200);
+    padding: 1.25rem 1.5rem 1.5rem;
+    border-top: 1px solid var(--color-border-subtle);
     display: flex;
     gap: 1rem;
+    flex-wrap: wrap;
   }
 
   @media (max-width: 480px) {

@@ -1,29 +1,24 @@
 <script lang="ts">
 	import { onMount, createEventDispatcher } from 'svelte';
-	import { gameStore, currentGameState } from '$lib/stores/gameStore.js';
+	import { gameStore } from '$lib/stores/gameStore.js';
 	import { navigateToGame } from '$lib/stores/navigationStore.js';
-	import { telegramStore } from '$lib/stores/telegramStore.js';
 	import { totalPoints } from '$lib/stores/pointsStore.js';
 	import GameIcon from './GameIcon.svelte';
 	import { getActiveGames, getComingSoonGames } from '$lib/data/games.js';
-	import { Star, Clock, Trophy } from 'lucide-svelte';
+	import { Clock, Trophy, Star } from 'lucide-svelte';
 	import type { Game } from '$lib/types/Game.js';
 
 	const dispatch = createEventDispatcher<{ gameSelected: { game: Game } }>();
 
 	let mounted = $state(false);
 	let showContent = $state(false);
-	let showStatsSection = $state(false);
-	let showActiveSection = $state(false);
-	let showComingSoonSection = $state(false);
 	let activeGames: Game[] = $state([]);
 	let comingSoonGames: Game[] = $state([]);
 
-	// Статистика пользователя
-	let totalPlayTime = $derived(247); // в минутах
+	let totalPlayTime = $derived(247);
 	let completedGames = $derived(8);
 
-	onMount(async () => {
+	onMount(() => {
 		const allActiveGames = getActiveGames();
 		const allComingSoonGames = getComingSoonGames();
 
@@ -34,232 +29,258 @@
 
 		mounted = true;
 		showContent = true;
-		showStatsSection = true;
-		showActiveSection = true;
-		showComingSoonSection = true;
 	});
 
 	function handleGameClick(game: Game) {
 		dispatch('gameSelected', { game });
 		navigateToGame();
 	}
-
-	function handleGameHover() {
-	}
 </script>
 
-<main class="game-container">
+<main class="game-center">
 	{#if mounted}
-		<header class="header">
-			<h1 class="font-game-title" id="main-title">
-				Игровой Центр
-			</h1>
-			<p class="subtitle font-ui-secondary" aria-describedby="main-title">
-				Газпромбанка
-			</p>
-		</header>
+		<section class="hero surface-contrast" aria-labelledby="game-center-title">
+			<div class="hero-copy">
+				<p class="hero-eyebrow">Игровой центр</p>
+				<h1 class="hero-title" id="game-center-title">Газпромбанка</h1>
+				<p class="hero-subtitle text-balance">
+					Игровые сценарии, которые закрепляют финансовые навыки и мотивируют клиентов на развитие.
+				</p>
+			</div>
+			<div class="hero-score" aria-live="polite">
+				<Star size={20} aria-hidden="true" />
+				<div>
+					<span class="hero-score__label">Всего очков</span>
+					<span class="hero-score__value">{$totalPoints.toLocaleString()}</span>
+				</div>
+			</div>
+		</section>
 	{/if}
 
 	{#if showContent}
-		<div class="content">
-			{#if showStatsSection}
-				<section class="stats-section section-spacing">
-					<div class="stats-grid">
-						<div class="score-display">
-							<div class="flex items-center gap-2 mb-2">
-								<Star size={20} class="text-gpb-gold neon-glow" />
-								<span class="font-ui-secondary">Всего очков</span>
-							</div>
-							<div class="score-value">{$totalPoints.toLocaleString()}</div>
-						</div>
-
-						<div class="mini-stat">
-							<Clock size={20} class="mini-stat-icon text-gpb-mint neon-glow" />
-							<div class="mini-stat-value">{totalPlayTime}</div>
-							<div class="mini-stat-label">Минут в игре</div>
-						</div>
-
-						<div class="mini-stat">
-							<Trophy size={20} class="mini-stat-icon text-gpb-emerald neon-glow" />
-							<div class="mini-stat-value">{completedGames}</div>
-							<div class="mini-stat-label">Игр пройдено</div>
-						</div>
+		<section class="stats surface-card" aria-label="Статистика игрока">
+			<div class="stats-grid">
+				<div class="metric-card">
+					<Clock size={18} aria-hidden="true" />
+					<div>
+						<span class="metric-card__label">Минут в игре</span>
+						<span class="metric-card__value">{totalPlayTime}</span>
 					</div>
-				</section>
-			{/if}
-
-			{#if showActiveSection}
-				<section class="games-section section-spacing">
-					<h2 class="font-section-title">
-						Сейчас в игре
-					</h2>
-					<div class="games-grid">
-						{#each activeGames as game, index}
-							<div>
-								<GameIcon
-									{game}
-									animationDelay={0}
-									onclick={() => handleGameClick(game)}
-									onhover={handleGameHover}
-								/>
-							</div>
-						{/each}
+				</div>
+				<div class="metric-card">
+					<Trophy size={18} aria-hidden="true" />
+					<div>
+						<span class="metric-card__label">Игр пройдено</span>
+						<span class="metric-card__value">{completedGames}</span>
 					</div>
-				</section>
-			{/if}
-
-			{#if showComingSoonSection}
-				<section class="coming-soon-section section-spacing">
-					<h2 class="font-section-title">
-						Скоро в Центре
-					</h2>
-					<div class="coming-soon-grid">
-						{#each comingSoonGames as game, index}
-							<div>
-								<GameIcon
-									{game}
-									animationDelay={0}
-									onclick={() => handleGameClick(game)}
-									onhover={handleGameHover}
-								/>
-							</div>
-						{/each}
+				</div>
+				<div class="metric-card">
+					<Star size={18} aria-hidden="true" />
+					<div>
+						<span class="metric-card__label">Активных игр</span>
+						<span class="metric-card__value">{activeGames.length}</span>
 					</div>
-				</section>
-			{/if}
-		</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="section" aria-labelledby="active-games-heading">
+			<div class="section-heading">
+				<p class="section-heading__eyebrow">Коллекция</p>
+				<h2 class="section-heading__title" id="active-games-heading">Доступны сейчас</h2>
+			</div>
+			<div class="games-grid" role="list">
+				{#each activeGames as game (game.id)}
+					<div class="games-grid__item" role="listitem">
+						<GameIcon {game} onclick={() => handleGameClick(game)} />
+					</div>
+				{/each}
+			</div>
+		</section>
+
+		{#if comingSoonGames.length}
+			<section class="section" aria-labelledby="coming-soon-heading">
+				<div class="section-heading">
+					<p class="section-heading__eyebrow">Скоро</p>
+					<h2 class="section-heading__title" id="coming-soon-heading">В разработке</h2>
+				</div>
+				<div class="games-grid games-grid--compact" role="list">
+					{#each comingSoonGames as game (game.id)}
+						<div class="games-grid__item" role="listitem">
+							<GameIcon {game} onclick={() => handleGameClick(game)} />
+						</div>
+					{/each}
+				</div>
+			</section>
+		{/if}
 	{/if}
 </main>
 
 <style>
-	.game-container {
-		padding-left: 1rem;
-		padding-right: 1rem;
+	.game-center {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
 		padding-top: 1.5rem;
-		padding-bottom: calc(88px + 1.5rem);
-		background: linear-gradient(135deg, #1919EF 0%, #9B59B6 50%, #DD41DB 100%);
-		color: white;
-		position: relative;
-		min-height: 100%;
+		padding-bottom: calc(96px + 1.5rem);
 	}
 
-	.header {
-		text-align: center;
-		margin-bottom: 2rem;
-		padding-top: 1rem;
-		position: relative;
+	.hero {
+		display: flex;
+		flex-direction: column;
+		gap: 1.75rem;
+		padding: 1.75rem;
 	}
 
-	.subtitle {
-		color: rgba(255, 255, 255, 0.9);
-		font-size: 1.125rem;
-		font-weight: 500;
-		margin-top: 0.5rem;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	.hero-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
 	}
 
-	.content {
+	.hero-eyebrow {
+		font-size: 0.75rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: rgba(255, 255, 255, 0.72);
+	}
+
+	.hero-title {
+		font-family: var(--font-display);
+		font-size: clamp(1.6rem, 1.3rem + 1vw, 2.05rem);
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		color: var(--color-fg-inverse);
+		margin: 0;
+	}
+
+	.hero-subtitle {
+		font-size: 0.95rem;
+		color: rgba(255, 255, 255, 0.78);
+		margin: 0;
 		max-width: 28rem;
-		margin-left: auto;
-		margin-right: auto;
 	}
 
-	.stats-section {
-		margin-bottom: 2rem;
+	.hero-score {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 0.75rem;
+		align-items: center;
+		padding: 0.75rem 1rem;
+		border-radius: var(--radius-lg);
+		background-color: rgba(255, 255, 255, 0.14);
+		backdrop-filter: blur(6px);
+	}
+
+	.hero-score :global(svg) {
+		color: rgba(255, 255, 255, 0.82);
+	}
+
+	.hero-score__label {
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.7);
+		display: block;
+	}
+
+	.hero-score__value {
+		font-family: var(--font-display);
+		font-size: clamp(1.75rem, 1.4rem + 1vw, 2.2rem);
+		font-weight: 700;
+		color: var(--color-fg-inverse);
+	}
+
+	.stats {
+		padding: 1.5rem;
 	}
 
 	.stats-grid {
 		display: grid;
-		grid-template-columns: repeat(3, 1fr);
+		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 		gap: 1rem;
 	}
 
-	.stats-grid > .score-display {
-		grid-column: span 3;
-		text-align: center;
-		padding: 1.5rem;
-		border-radius: 1rem;
-		background: linear-gradient(135deg, #FFD700 0%, #50C878 100%);
-		color: white;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-		position: relative;
-		overflow: hidden;
+	.metric-card {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-subtle);
+		padding: 1rem;
+		background: var(--gradient-brand-muted);
 	}
 
-	.stats-grid > .mini-stat {
-		text-align: center;
+	.metric-card:nth-child(2) {
+		background: linear-gradient(135deg, rgba(44, 134, 134, 0.12) 0%, rgba(44, 134, 134, 0.04) 100%);
 	}
 
-	.games-section,
-	.coming-soon-section {
-		margin-bottom: 2rem;
+	.metric-card:nth-child(3) {
+		background: linear-gradient(135deg, rgba(41, 80, 157, 0.12) 0%, rgba(41, 80, 157, 0.04) 100%);
+	}
+
+	.metric-card :global(svg) {
+		color: var(--color-brand-500);
+	}
+
+	.metric-card__label {
+		display: block;
+		font-size: 0.75rem;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--color-fg-muted);
+	}
+
+	.metric-card__value {
+		font-family: var(--font-display);
+		font-size: 1.35rem;
+		font-weight: 600;
+		color: var(--color-fg-primary);
+	}
+
+	.section {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
 	}
 
 	.games-grid {
 		display: grid;
-		grid-template-columns: 1fr;
-		gap: 1rem;
+		gap: 1.25rem;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	}
 
-	.coming-soon-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 1rem;
+	.games-grid--compact {
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	}
 
-	@media (max-width: 380px) {
-		.game-container {
-			padding-left: 0.75rem;
-			padding-right: 0.75rem;
-			padding-top: 1rem;
-			padding-bottom: calc(88px + 1rem);
+	.games-grid__item {
+		list-style: none;
+	}
+
+	@media (max-width: 420px) {
+		.hero {
+			padding: 1.5rem;
 		}
 
-		.stats-grid {
-			grid-template-columns: 1fr;
-			gap: 0.75rem;
-		}
-
-		.stats-grid > .score-display {
-			grid-column: span 1;
-		}
-
-		.coming-soon-grid {
-			grid-template-columns: 1fr;
-			gap: 0.75rem;
+		.stats {
+			padding: 1.25rem;
 		}
 
 		.games-grid {
-			gap: 0.75rem;
+			grid-template-columns: 1fr;
 		}
 	}
 
-	@media (min-width: 440px) {
-		.content {
-			max-width: 32rem;
+	@media (min-width: 768px) {
+		.hero {
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
 		}
 
-		.stats-grid {
-			gap: 1.5rem;
-		}
-
-		.games-grid {
-			gap: 1.5rem;
-		}
-
-		.coming-soon-grid {
-			gap: 1.5rem;
-		}
-	}
-
-	@media (prefers-contrast: high) {
-		.game-container {
-			background-color: #000000;
-			border: 2px solid white;
-		}
-
-		.subtitle {
-			color: white;
+		.hero-score {
+			max-width: 15rem;
 		}
 	}
 </style>

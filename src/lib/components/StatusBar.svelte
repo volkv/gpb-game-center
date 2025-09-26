@@ -13,7 +13,9 @@
 	let mounted = false;
 
 	onMount(() => {
-		// telegramStore is now initialized in layout
+		// telegramStore is initialized in layout; keep subscription warm
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
+		telegramStore;
 		mounted = true;
 	});
 
@@ -26,57 +28,49 @@
 	<header class="status-bar" class:game-mode={$isGameStatusVisible}>
 		<div class="status-content">
 			{#if $isGameStatusVisible}
-				<!-- Game Mode: Navigation -->
-				<div class="game-status-left">
+				<div class="status-side status-side--left">
 					{#if $shouldShowBackButton}
 						<button
 							type="button"
-							class="btn-icon touch-target hover-lift active-press focus-game neon-glow"
+							class="nav-button"
 							onclick={handleHomeClick}
 							aria-label="На главную"
 						>
-							<Home size={20} />
+							<Home size={18} aria-hidden="true" />
 						</button>
 					{/if}
 				</div>
 
-				<!-- Game Mode: Game Info -->
-				<div class="game-status-center">
+				<div class="status-center" aria-live="polite">
 					{#if $gameStatusState.gameName}
-						<div class="game-name-container">
-							<h1 class="font-card-title game-name">{$gameStatusState.gameName}</h1>
+						<div class="game-name" title={$gameStatusState.gameName}>
+							{$gameStatusState.gameName}
 						</div>
 					{/if}
 
-					<div class="player-info">
-						<User size={16} class="user-icon neon-glow" />
-						<span class="font-ui-secondary player-name">{$gameStatusState.playerName}</span>
+					<div class="player-line">
+						<User size={16} aria-hidden="true" />
+						<span class="player-name">{$gameStatusState.playerName}</span>
 					</div>
 				</div>
 
-				<!-- Game Mode: Score -->
 				{#if $shouldShowScore}
-					<div class="game-status-right">
-						<div class="score-container mini-stat">
-							<div class="score-header">
-								<Star size={16} class="score-icon text-gpb-gold neon-glow" />
-								<span class="font-ui-caption">Очки</span>
+					<div class="status-side status-side--right">
+						<div class="score-card" aria-label="Текущие очки">
+							<div class="score-card__label">
+								<Star size={16} aria-hidden="true" />
+								<span>Очки</span>
 							</div>
-							<div class="score-value animate-count-up font-score">
-								{$gameStatusState.currentScore.toLocaleString()}
-							</div>
+							<div class="score-card__value">{$gameStatusState.currentScore.toLocaleString()}</div>
 						</div>
 					</div>
 				{/if}
 			{:else}
-				<!-- Normal Mode: User Info -->
-				<div class="user-info">
-					<div class="user-avatar">
-						<div class="avatar-icon">
-							<img src="/logo.svg" alt="Logo" width="20" height="20" />
-						</div>
+				<div class="user-overview">
+					<div class="user-avatar" aria-hidden="true">
+						<img src="/logo.svg" alt="" width="20" height="20" />
 					</div>
-					<div class="user-details">
+					<div class="user-meta">
 						<span class="user-name">{$telegramUserName}</span>
 						{#if $isInTelegram}
 							<span class="user-platform">Telegram</span>
@@ -84,142 +78,156 @@
 					</div>
 				</div>
 
-				<!-- Normal Mode: Activity Stats -->
-				<div class="activity-stats">
+				<div class="activity-stats" role="list">
 					{#if $activityStats.sessionCount > 0}
-						<div class="stat-item">
-							<span class="stat-label">Сессия</span>
-							<span class="stat-value">{$activityStats.sessionCount}</span>
+						<div class="activity-chip" role="listitem">
+							<span class="activity-chip__label">Сессия</span>
+							<span class="activity-chip__value">{$activityStats.sessionCount}</span>
 						</div>
 					{/if}
 
 					{#if $activityStats.totalGamesPlayed > 0}
-						<div class="stat-item">
-							<span class="stat-label">Игр</span>
-							<span class="stat-value">{$activityStats.totalGamesPlayed}</span>
+						<div class="activity-chip" role="listitem">
+							<span class="activity-chip__label">Игр</span>
+							<span class="activity-chip__value">{$activityStats.totalGamesPlayed}</span>
 						</div>
 					{/if}
 				</div>
 			{/if}
 		</div>
-
-		<!-- Decorative elements for game mode -->
-		{#if $isGameStatusVisible}
-			<div class="decoration-orb bg-gpb-mint w-8 h-8 -top-2 -right-2"></div>
-			<div class="decoration-orb bg-gpb-raspberry w-6 h-6 -bottom-1 -left-1"></div>
-			<div class="decoration-shine"></div>
-		{/if}
 	</header>
 {/if}
 
 <style>
 	.status-bar {
-
+		position: sticky;
 		top: 0;
-		left: 0;
-		right: 0;
-		z-index: 50;
-		background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry) 100%);
-		color: white;
-		padding: 0.75rem 1rem;
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
-		transition: all 300ms ease-out;
-		min-height: 64px;
+		z-index: 45;
+		margin-inline: calc(-1 * clamp(1rem, 3vw, 1.5rem));
+		padding-inline: clamp(1rem, 3vw, 1.5rem);
+		padding-block: 0.75rem;
+		background: rgba(242, 244, 249, 0.75);
+		backdrop-filter: blur(12px);
+		border-bottom: 1px solid var(--color-border-subtle);
 	}
 
 	.status-bar.game-mode {
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-		position: relative;
-		overflow: hidden;
+		background: var(--color-surface-card);
+		backdrop-filter: none;
+		box-shadow: var(--shadow-soft);
+		border-bottom: 1px solid var(--color-border-muted);
 	}
 
 	.status-content {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		max-width: 500px;
-		margin: 0 auto;
 		gap: 1rem;
-		position: relative;
-		z-index: 10;
 	}
 
-	/* Game mode layout */
-	.game-status-left {
+	.status-side {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
+	}
+
+	.status-side--left {
+		min-width: 48px;
+	}
+
+	.status-side--right {
 		flex-shrink: 0;
 	}
 
-	.game-status-center {
+	.status-center {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
-		justify-content: center;
+		gap: 0.4rem;
 		text-align: center;
 		min-width: 0;
-		gap: 0.25rem;
 	}
 
-	.game-status-right {
-		flex-shrink: 0;
+	.nav-button {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--color-border-muted);
+		background: var(--color-surface-card);
+		color: var(--color-brand-600);
+		transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
 	}
 
-	.game-name-container {
-		width: 100%;
+	.nav-button:hover {
+		background: var(--color-brand-50);
+	}
+
+	.nav-button:focus-visible {
+		outline: none;
+		box-shadow: var(--shadow-focus);
 	}
 
 	.game-name {
-		color: white;
-		font-weight: bold;
-		font-size: 1.125rem;
+		font-family: var(--font-display);
+		font-size: 1.05rem;
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		color: var(--color-fg-primary);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 100%;
-		text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 	}
 
-	.player-info {
-		display: flex;
+	.status-bar.game-mode .game-name {
+		color: var(--color-fg-primary);
+	}
+
+	.player-line {
+		display: inline-flex;
 		align-items: center;
-		gap: 0.375rem;
-		color: rgba(255, 255, 255, 0.9);
-		font-size: 0.875rem;
+		gap: 0.4rem;
+		justify-content: center;
+		color: var(--color-fg-muted);
+		font-size: 0.8125rem;
 	}
-
 
 	.player-name {
+		max-width: 8rem;
+		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;
-		max-width: 8rem;
 	}
 
-	.score-container {
-		text-align: center;
-	}
-
-	.score-header {
+	.score-card {
 		display: flex;
-		align-items: center;
-		justify-content: center;
+		flex-direction: column;
 		gap: 0.25rem;
-		margin-bottom: 0.25rem;
+		padding: 0.5rem 0.75rem;
+		border-radius: var(--radius-lg);
+		border: 1px solid rgba(41, 80, 157, 0.18);
+		background: rgba(41, 80, 157, 0.08);
+		color: var(--color-brand-700);
 	}
 
-	.score-value {
-		font-weight: 700;
-		font-size: 0.875rem;
-		line-height: 1;
-		color: white;
+	.score-card__label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.75rem;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
 	}
 
-	.user-info {
+	.score-card__value {
+		font-family: var(--font-display);
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
+
+	.user-overview {
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
@@ -229,146 +237,99 @@
 
 	.user-avatar {
 		flex-shrink: 0;
-	}
-
-	.avatar-icon {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		background: rgba(255, 255, 255, 0.15);
+		width: 36px;
+		height: 36px;
+		border-radius: var(--radius-lg);
+		background: var(--color-brand-50);
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: white;
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
+		border: 1px solid var(--color-border-muted);
 	}
 
-	.user-details {
+	.user-meta {
 		display: flex;
 		flex-direction: column;
 		gap: 0.125rem;
 		min-width: 0;
-		flex: 1;
 	}
 
 	.user-name {
-		font-family: var(--font-heading);
-		font-size: 0.875rem;
+		font-family: var(--font-display);
+		font-size: 0.9rem;
 		font-weight: 600;
-		line-height: 1.2;
+		color: var(--color-fg-primary);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		color: white;
 	}
 
 	.user-platform {
-		font-family: var(--font-body);
 		font-size: 0.75rem;
-		font-weight: 400;
-		line-height: 1;
-		color: rgba(255, 255, 255, 0.8);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		color: var(--color-fg-muted);
 	}
 
 	.activity-stats {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		flex-shrink: 0;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+		justify-content: flex-end;
 	}
 
-	.stat-item {
-		display: flex;
-		flex-direction: column;
+	.activity-chip {
+		display: inline-flex;
 		align-items: center;
-		gap: 0.125rem;
-		padding: 0.25rem 0.5rem;
-		border-radius: var(--radius-base);
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(4px);
-		-webkit-backdrop-filter: blur(4px);
+		gap: 0.35rem;
+		padding: 0.25rem 0.6rem;
+		border-radius: var(--radius-full);
+		background: var(--color-neutral-100);
+		border: 1px solid var(--color-border-subtle);
+		font-size: 0.75rem;
+		color: var(--color-fg-secondary);
 	}
 
-	.stat-label {
-		font-family: var(--font-body);
-		font-size: 0.6875rem;
-		font-weight: 400;
-		line-height: 1;
-		color: rgba(255, 255, 255, 0.9);
-		text-transform: lowercase;
+	.activity-chip__label {
+		font-weight: 500;
 	}
 
-	.stat-value {
-		font-family: var(--font-heading);
-		font-size: 0.875rem;
+	.activity-chip__value {
+		font-family: var(--font-display);
 		font-weight: 600;
-		line-height: 1;
-		color: white;
 	}
 
-	@media (max-width: 380px) {
+	@media (max-width: 420px) {
 		.status-bar {
-			padding: 0.625rem 0.75rem;
+			padding-block: 0.5rem;
 		}
 
 		.status-content {
 			gap: 0.75rem;
 		}
 
-		.user-info {
-			gap: 0.5rem;
+		.status-center {
+			gap: 0.3rem;
 		}
 
-		.avatar-icon {
-			width: 28px;
-			height: 28px;
+		.nav-button {
+			width: 36px;
+			height: 36px;
 		}
 
-		.user-name {
-			font-size: 0.8125rem;
-		}
-
-		.user-platform {
-			font-size: 0.6875rem;
+		.score-card {
+			padding: 0.4rem 0.6rem;
 		}
 
 		.activity-stats {
-			gap: 0.5rem;
-		}
-
-		.stat-item {
-			padding: 0.1875rem 0.375rem;
-		}
-
-		.stat-label {
-			font-size: 0.625rem;
-		}
-
-		.stat-value {
-			font-size: 0.8125rem;
-		}
-	}
-
-	@media (min-width: 440px) {
-		.status-content {
-			max-width: 440px;
+			justify-content: flex-start;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.status-bar {
-			backdrop-filter: none;
-			-webkit-backdrop-filter: none;
-		}
-
-		.avatar-icon,
-		.stat-item {
-			backdrop-filter: none;
-			-webkit-backdrop-filter: none;
+		.nav-button,
+		.score-card,
+		.activity-chip {
+			transition: none;
 		}
 	}
 </style>
