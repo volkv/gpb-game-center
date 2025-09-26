@@ -356,15 +356,15 @@
 					<div class="intro-rules">
 						<div class="rule">
 							<CheckCircle size={20} class="text-green-500" />
-							<span>Правильный ответ: +100 очков</span>
+							<div class="rule-text">Правильный ответ: +100 очков</div>
 						</div>
 						<div class="rule">
 							<Clock size={20} class="text-blue-500" />
-							<span>Бонус за скорость: +5 очков за секунду</span>
+							<div class="rule-text">Бонус за скорость: +5 очков за секунду</div>
 						</div>
 						<div class="rule">
 							<AlertTriangle size={20} class="text-red-500" />
-							<span>Ошибка: -1 жизнь</span>
+							<div class="rule-text">Ошибка: -1 жизнь</div>
 						</div>
 					</div>
 					<Button onclick={startGame}>
@@ -527,10 +527,13 @@
 		justify-content: center;
 		flex: 1;
 		padding: 1rem;
-		text-align: center;
 		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 		color: white;
 		overflow-y: auto;
+	}
+
+	.intro-content {
+		text-align: center;
 	}
 
 	.intro-content h1 {
@@ -548,6 +551,8 @@
 		line-height: 1.5;
 		color: rgba(255, 255, 255, 0.9);
 		max-width: 320px;
+		margin: 0 auto 1.5rem auto;
+		text-align: center;
 	}
 
 	.intro-icon {
@@ -567,24 +572,39 @@
 	.intro-rules {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
-		margin-bottom: 1.5rem;
+		gap: 0.75rem;
+		margin: 0 auto 1.5rem auto;
 		background: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(10px);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		border-radius: 0.75rem;
-		padding: 1rem;
+		padding: 1.25rem;
 		max-width: 320px;
+		width: 100%;
 	}
 
 	.rule {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.9rem;
+		align-items: flex-start;
+		gap: 0.75rem;
+		padding: 0.5rem 0;
+		width: 100%;
+	}
+
+	.rule :global(svg) {
+		flex-shrink: 0;
+		width: 20px;
+		height: 20px;
+		margin-top: 0.1rem;
+	}
+
+	.rule-text {
+		flex: 1;
+		font-size: 0.95rem;
 		font-weight: 500;
 		color: rgba(255, 255, 255, 0.95);
-		padding: 0.25rem 0;
+		text-align: left;
+		line-height: 1.4;
 	}
 
 
@@ -593,8 +613,30 @@
 		display: flex;
 		flex-direction: column;
 		padding: 1rem;
-		background: #f8fafc;
+		background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
 		color: #1e293b;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.game-screen::before {
+		content: '';
+		position: absolute;
+		top: -50%;
+		left: -50%;
+		width: 200%;
+		height: 200%;
+		background: radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+		            radial-gradient(circle at 70% 30%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
+		animation: float 20s ease-in-out infinite;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	@keyframes float {
+		0%, 100% { transform: translate(0, 0) rotate(0deg); }
+		33% { transform: translate(30px, -30px) rotate(120deg); }
+		66% { transform: translate(-20px, 20px) rotate(240deg); }
 	}
 
 	.game-header {
@@ -602,11 +644,14 @@
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: 1.5rem;
-		padding: 1rem;
-		background: white;
-		border-radius: 1rem;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-		border: 1px solid #e2e8f0;
+		padding: 1rem 1.25rem;
+		background: linear-gradient(135deg, white 0%, #f8fafc 100%);
+		border-radius: 1.25rem;
+		box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.8);
+		border: 1px solid rgba(226, 232, 240, 0.6);
+		position: relative;
+		z-index: 10;
+		backdrop-filter: blur(10px);
 	}
 
 	.lives {
@@ -625,27 +670,74 @@
 		flex-direction: column;
 		gap: 1.5rem;
 		padding-top: 1rem;
+		position: relative;
+		z-index: 10;
+		animation: slideInUp 0.6s ease-out;
+	}
+
+	@keyframes slideInUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.phone-mockup {
-		background: white;
-		border: 2px solid #e2e8f0;
-		border-radius: 1.5rem;
+		background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+		border: 2px solid transparent;
+		background-clip: padding-box;
+		border-radius: 2rem;
 		padding: 1.5rem;
 		position: relative;
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+		box-shadow:
+			0 20px 40px -10px rgba(0, 0, 0, 0.1),
+			0 0 0 1px rgba(255, 255, 255, 0.9),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7);
 		margin: 0 auto;
 		max-width: 350px;
+		transform: translateY(0);
+		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		z-index: 10;
+	}
+
+	.phone-mockup::before {
+		content: '';
+		position: absolute;
+		top: -2px;
+		left: -2px;
+		right: -2px;
+		bottom: -2px;
+		background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
+		border-radius: 2rem;
+		z-index: -1;
+		opacity: 0.6;
 	}
 
 
 	.message-bubble {
-		background: #f1f5f9;
-		border-radius: 1rem;
-		padding: 1.25rem;
-		box-shadow: none;
-		border: none;
+		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+		border-radius: 1.25rem;
+		padding: 1.5rem;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 8px rgba(0, 0, 0, 0.05);
+		border: 1px solid rgba(226, 232, 240, 0.5);
 		color: #1e293b;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.message-bubble::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 4px;
+		height: 100%;
+		background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
+		border-radius: 0 2px 2px 0;
 	}
 
 	.sender {
@@ -668,11 +760,17 @@
 		align-items: center;
 		gap: 0.75rem;
 		justify-content: center;
-		padding: 1rem;
-		background: white;
-		border: 1px solid #e2e8f0;
-		border-radius: 1rem;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		padding: 1.25rem;
+		background: linear-gradient(135deg, white 0%, #fefefe 100%);
+		border: 1px solid rgba(226, 232, 240, 0.6);
+		border-radius: 1.25rem;
+		box-shadow:
+			0 8px 25px -5px rgba(0, 0, 0, 0.1),
+			0 0 0 1px rgba(255, 255, 255, 0.9),
+			inset 0 1px 0 rgba(255, 255, 255, 0.7);
+		position: relative;
+		z-index: 10;
+		backdrop-filter: blur(10px);
 	}
 
 	.timer {
@@ -688,6 +786,8 @@
 		display: flex;
 		gap: 1rem;
 		justify-content: center;
+		position: relative;
+		z-index: 10;
 	}
 
 
