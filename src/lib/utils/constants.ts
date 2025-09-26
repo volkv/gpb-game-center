@@ -102,7 +102,8 @@ export const GAME_TYPES = {
 	DETECTIVE_BANKING: 'detective-banking',
 	INVESTMENT_STRATEGY: 'investment-strategy',
 	FINCITY: 'fincity',
-	ANTI_FRAUD_HUNTER: 'anti-fraud-hunter'
+	ANTI_FRAUD_HUNTER: 'anti-fraud-hunter',
+	CODE_TO_SUCCESS: 'code-to-success'
 } as const;
 
 export const GAME_CATEGORIES = {
@@ -111,7 +112,8 @@ export const GAME_CATEGORIES = {
 	MATCH3: 'match3',
 	CROSSWORD: 'crossword',
 	EDUCATIONAL: 'educational',
-	ACTION: 'action'
+	ACTION: 'action',
+	VISUAL_NOVEL: 'visual-novel'
 } as const;
 
 export const GAME_STATUS = {

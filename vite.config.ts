@@ -17,6 +17,7 @@ export default defineConfig({
 					'crossword-game': ['./src/games/crossword-financial/CrosswordDemo.svelte'],
 					'fincity-game': ['./src/games/fincity/FincityGame.svelte'],
 					'anti-fraud-game': ['./src/games/anti-fraud-hunter/AntiFraudGame.svelte'],
+					'novella-game': ['./src/games/code-to-success/CodeToSuccessGame.svelte'],
 					'vendor-svelte': ['svelte', 'svelte/store', 'svelte/transition', 'svelte/motion']
 				}
 			}

@@ -2,7 +2,7 @@ export type GameStatus = 'active' | 'coming_soon' | 'maintenance' | 'disabled';
 
 export type GameDifficulty = 'easy' | 'medium' | 'hard';
 
-export type GameCategory = 'quiz' | 'puzzle' | 'match3' | 'crossword' | 'educational' | 'action';
+export type GameCategory = 'quiz' | 'puzzle' | 'match3' | 'crossword' | 'educational' | 'action' | 'visual-novel';
 
 export interface GameImage {
   url: string;

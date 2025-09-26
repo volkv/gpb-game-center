@@ -329,6 +329,56 @@ export const GAMES_DATA: Game[] = [
 		updatedAt: new Date('2024-09-26'),
 		componentPath: '/games/anti-fraud-hunter/AntiFraudGame.svelte',
 		locale: 'ru'
+	},
+
+	{
+		id: GAME_TYPES.CODE_TO_SUCCESS,
+		name: 'Код к Успеху',
+		description: 'Интерактивная визуальная новелла о кибербезопасности и защите от мошенничества. Проживите историю героини Анны и научитесь распознавать мошеннические схемы.',
+		shortDescription: 'Визуальная новелла',
+		category: GAME_CATEGORIES.VISUAL_NOVEL,
+		status: GAME_STATUS.ACTIVE,
+
+		icon: {
+			url: '/games/code-to-success/icon.svg',
+			alt: 'Иконка Код к Успеху',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-accent-500) 100%)',
+		themeColor: 'var(--color-brand-600)',
+
+		metrics: {
+			averagePlayTime: 180,
+			completionRate: 0.88,
+			difficulty: 'easy',
+			maxScore: 100,
+			averageScore: 75
+		},
+		estimatedDuration: 3,
+
+		relatedProducts: [
+			{
+				id: 'fraud-protection',
+				name: 'Защита от мошенничества',
+				description: 'Комплексная система защиты ваших средств от мошенников',
+				url: '/products/fraud-protection',
+				category: 'service'
+			},
+			{
+				id: 'secure-sms',
+				name: 'Безопасные уведомления',
+				description: 'Система верификации SMS-сообщений от банка',
+				url: '/products/secure-sms',
+				category: 'service'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-09-26'),
+		updatedAt: new Date('2024-09-26'),
+		componentPath: '/games/code-to-success/CodeToSuccessGame.svelte',
+		locale: 'ru'
 	}
 ];
 
