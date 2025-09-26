@@ -1,943 +1,1107 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { Shield, Heart, AlertTriangle, CheckCircle, Clock, Smartphone } from 'lucide-svelte';
-	import { gameStore, currentGameState } from '$lib/stores/gameStore';
-	import { Button, Counter, ProgressBar, GameLayout } from '$lib';
+  import { onMount, onDestroy } from 'svelte';
+  import {
+    Shield,
+    Heart,
+    AlertTriangle,
+    CheckCircle,
+    Clock,
+    Smartphone,
+    ShieldCheck,
+    ShieldAlert,
+    Zap,
+    Sparkles
+  } from 'lucide-svelte';
+  import { gameStore } from '$lib/stores/gameStore';
+  import { Button, Counter, ProgressBar, GameLayout } from '$lib';
 
-	interface Props {
-		onexit?: () => void;
-	}
+  interface Props {
+    onexit?: () => void;
+  }
 
-	let { onexit }: Props = $props();
+  interface SMSMessage {
+    id: number;
+    text: string;
+    sender: string;
+    isFraud: boolean;
+    explanation: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+  }
 
-	function handleExit() {
-		clearTimers();
-		onexit?.();
-	}
+  let { onexit }: Props = $props();
 
-	let gameState = $state<'intro' | 'playing' | 'paused' | 'gameOver' | 'completed'>('intro');
-	let currentMessage = $state<SMSMessage | null>(null);
-	let score = $state(0);
-	let lives = $state(3);
-	let level = $state(1);
-	let messageIndex = $state(0);
-	let timeRemaining = $state(10);
-	let showResult = $state(false);
-	let lastAnswer = $state<boolean | null>(null);
-	let correctAnswer = $state<boolean | null>(null);
-	let streak = $state(0);
-	let totalMessages = $state(0);
-	let correctAnswers = $state(0);
+  const totalLevels = 3;
 
-	let gameTimer: ReturnType<typeof setTimeout> | null = null;
-	let messageTimer: ReturnType<typeof setInterval> | null = null;
+  let gameState = $state<'intro' | 'playing' | 'paused' | 'gameOver' | 'completed'>('intro');
+  let currentMessage = $state<SMSMessage | null>(null);
+  let score = $state(0);
+  let lives = $state(3);
+  let level = $state(1);
+  let messageIndex = $state(0);
+  let timeRemaining = $state(10);
+  let showResult = $state(false);
+  let lastAnswer = $state<boolean | null>(null);
+  let expectedFraudStatus = $state<boolean | null>(null);
+  let streak = $state(0);
+  let totalMessages = $state(0);
+  let correctAnswers = $state(0);
 
-	interface SMSMessage {
-		id: number;
-		text: string;
-		sender: string;
-		isFraud: boolean;
-		explanation: string;
-		difficulty: 'easy' | 'medium' | 'hard';
-	}
+  let messageTimer: ReturnType<typeof setInterval> | null = null;
 
-	const smsMessages: SMSMessage[] = [
-		// Level 1 - Easy (Obviously fraudulent)
-		{
-			id: 1,
-			text: 'ВНИМАНИЕ! Ваша карта заблокирована. Для разблокировки перейдите по ссылке: http://fake-bank.ru/unlock',
-			sender: 'BANK-ALERT',
-			isFraud: true,
-			explanation: 'Банки никогда не присылают ссылки в SMS. Это классический способ кражи данных.',
-			difficulty: 'easy'
-		},
-		{
-			id: 2,
-			text: 'Поздравляем! Вы выиграли 1.000.000 рублей в лотерее. Для получения переведите налог 50.000р на номер 1234',
-			sender: 'LOTTO-WIN',
-			isFraud: true,
-			explanation: 'Настоящие лотереи не требуют предоплаты налогов. Это мошенничество.',
-			difficulty: 'easy'
-		},
-		{
-			id: 3,
-			text: 'Покупка: Супермаркет ПЯТЕРОЧКА, 1 245,67 руб. Доступно: 12 345,23 руб. Время: 14:23',
-			sender: 'GAZPROMBANK',
-			isFraud: false,
-			explanation: 'Типичное уведомление о покупке от банка. Содержит конкретную информацию без подозрительных действий.',
-			difficulty: 'easy'
-		},
-		{
-			id: 4,
-			text: 'Срочно подтвердите операцию! Списание 25 000р. Если это не вы - введите код CVC: reply STOP',
-			sender: 'SECURITY',
-			isFraud: true,
-			explanation: 'Банки никогда не запрашивают CVC-код в SMS. Это попытка кражи данных карты.',
-			difficulty: 'easy'
-		},
-		{
-			id: 5,
-			text: 'Баланс по карте *1234: 15 678,90 руб. Запрос от 16:45',
-			sender: 'GAZPROMBANK',
-			isFraud: false,
-			explanation: 'Стандартный ответ на запрос баланса. Никаких подозрительных элементов.',
-			difficulty: 'easy'
-		},
-		// Level 2 - Medium (Mixed scenarios)
-		{
-			id: 6,
-			text: 'Зафиксирована подозрительная активность. Заблокировать карту? Ответьте ДА или НЕТ',
-			sender: 'SECURITY-GPB',
-			isFraud: true,
-			explanation: 'Банки не просят подтверждать блокировку через SMS. Звоните в банк по официальному номеру.',
-			difficulty: 'easy'
-		},
-		{
-			id: 7,
-			text: 'Уважаемый клиент! Ваш кредитный лимит увеличен до 500 000р. Подробности: 8-800-100-0707',
-			sender: 'GAZPROMBANK',
-			isFraud: false,
-			explanation: 'Банк может уведомлять об изменении лимитов и указывать официальный номер для справок.',
-			difficulty: 'easy'
-		},
-		{
-			id: 8,
-			text: 'НАЛОГОВАЯ: У вас задолженность 15 000р. Оплатите до 25.12 во избежание штрафа: www.nalog-pay.com',
-			sender: 'NALOG-RF',
-			isFraud: true,
-			explanation: 'Налоговая не присылает ссылки на сторонние сайты. Официальные уведомления приходят почтой.',
-			difficulty: 'easy'
-		},
-		{
-			id: 9,
-			text: 'Поступление: Зарплата ООО РОГА И КОПЫТА, 85 000,00 руб. Время: 10:15',
-			sender: 'GAZPROMBANK',
-			isFraud: false,
-			explanation: 'Обычное уведомление о поступлении средств с указанием источника.',
-			difficulty: 'easy'
-		},
-		{
-			id: 10,
-			text: 'Ваш аккаунт взломан! Смените пароль: bank-security.ru/change Код: 7463',
-			sender: 'BANK-SECURE',
-			isFraud: true,
-			explanation: 'Банки не присылают коды для смены паролей и не используют сторонние сайты.',
-			difficulty: 'easy'
-		},
-		// Level 3 - Hard (Sophisticated scams)
-		{
-			id: 11,
-			text: 'Газпромбанк: Напоминание о платеже по кредиту 12 500р до 28.12.2024. Просрочка: штраф 1500р.',
-			sender: 'GAZPROMBANK',
-			isFraud: false,
-			explanation: 'Банк может присылать напоминания о платежах с указанием штрафов за просрочку.',
-			difficulty: 'hard'
-		},
-		{
-			id: 12,
-			text: 'Отдел Безопасности: Подозрительный вход в систему. Если это не вы, заблокируйте карту по тел. 8-495-555-1234',
-			sender: 'GPB-SECURITY',
-			isFraud: true,
-			explanation: 'Мошенники используют поддельные номера. Звоните только по номеру с обратной стороны карты.',
-			difficulty: 'hard'
-		},
-		{
-			id: 13,
-			text: 'Курс валют на 26.12: USD 73.45↑ EUR 89.23↓ Инвестиции: gazprombank.ru/invest',
-			sender: 'GAZPROMBANK',
-			isFraud: false,
-			explanation: 'Банки могут присылать информацию о курсах валют и ссылки на официальные разделы сайта.',
-			difficulty: 'hard'
-		},
-		{
-			id: 14,
-			text: 'СБП: Неизвестное лицо пытается перевести с вашего номера 50 000р. Отменить? sberbank-cancel.com/stop',
-			sender: 'SBP-ALERT',
-			isFraud: true,
-			explanation: 'СБП не присылает ссылки на отмену операций. Это попытка получить доступ к вашему банкингу.',
-			difficulty: 'hard'
-		},
-		{
-			id: 15,
-			text: 'Автоплатеж: МТС +7901234567, списано 350,00 руб. Остаток лимита: 4 650,00 руб.',
-			sender: 'GAZPROMBANK',
-			isFraud: false,
-			explanation: 'Стандартное уведомление об автоплатеже с информацией об остатке лимита.',
-			difficulty: 'hard'
-		}
-	];
+  const levelConfig: Record<number, { messagesCount: number; timePerMessage: number }> = {
+    1: { messagesCount: 5, timePerMessage: 12 },
+    2: { messagesCount: 5, timePerMessage: 9 },
+    3: { messagesCount: 5, timePerMessage: 7 }
+  };
 
-	const levelConfig = {
-		1: { messagesCount: 5, timePerMessage: 10 },
-		2: { messagesCount: 5, timePerMessage: 8 },
-		3: { messagesCount: 5, timePerMessage: 6 }
-	};
+  const difficultyCopy: Record<SMSMessage['difficulty'], string> = {
+    easy: 'Начальный риск',
+    medium: 'Повышенный риск',
+    hard: 'Высокий риск'
+  };
 
-	onMount(() => {
-		startIntro();
-	});
+  const smsMessages: SMSMessage[] = [
+    // Level 1 - Easy (Obviously fraudulent)
+    {
+      id: 1,
+      text: 'ВНИМАНИЕ! Ваша карта заблокирована. Для разблокировки перейдите по ссылке: http://fake-bank.ru/unlock',
+      sender: 'BANK-ALERT',
+      isFraud: true,
+      explanation: 'Банки никогда не присылают ссылки в SMS. Это классический способ кражи данных.',
+      difficulty: 'easy'
+    },
+    {
+      id: 2,
+      text: 'Поздравляем! Вы выиграли 1.000.000 рублей в лотерее. Для получения переведите налог 50.000р на номер 1234',
+      sender: 'LOTTO-WIN',
+      isFraud: true,
+      explanation: 'Настоящие лотереи не требуют предоплаты налогов. Это мошенничество.',
+      difficulty: 'easy'
+    },
+    {
+      id: 3,
+      text: 'Покупка: Супермаркет ПЯТЕРОЧКА, 1 245,67 руб. Доступно: 12 345,23 руб. Время: 14:23',
+      sender: 'GAZPROMBANK',
+      isFraud: false,
+      explanation: 'Типичное уведомление о покупке от банка. Содержит конкретную информацию без подозрительных действий.',
+      difficulty: 'easy'
+    },
+    {
+      id: 4,
+      text: 'Срочно подтвердите операцию! Списание 25 000р. Если это не вы — введите код CVC: reply STOP',
+      sender: 'SECURITY',
+      isFraud: true,
+      explanation: 'Банки никогда не запрашивают CVC-код в SMS. Это попытка кражи данных карты.',
+      difficulty: 'easy'
+    },
+    {
+      id: 5,
+      text: 'Баланс по карте *1234: 15 678,90 руб. Запрос от 16:45',
+      sender: 'GAZPROMBANK',
+      isFraud: false,
+      explanation: 'Стандартный ответ на запрос баланса. Никаких подозрительных элементов.',
+      difficulty: 'easy'
+    },
+    // Level 2 - Medium (Mixed scenarios)
+    {
+      id: 6,
+      text: 'Зафиксирована подозрительная активность. Заблокировать карту? Ответьте ДА или НЕТ',
+      sender: 'SECURITY-GPB',
+      isFraud: true,
+      explanation: 'Банки не просят подтверждать блокировку через SMS. Звоните в банк по официальному номеру.',
+      difficulty: 'medium'
+    },
+    {
+      id: 7,
+      text: 'Уважаемый клиент! Ваш кредитный лимит увеличен до 500 000р. Подробности: 8-800-100-0707',
+      sender: 'GAZPROMBANK',
+      isFraud: false,
+      explanation: 'Банк может уведомлять об изменении лимитов и указывать официальный номер для справок.',
+      difficulty: 'medium'
+    },
+    {
+      id: 8,
+      text: 'НАЛОГОВАЯ: У вас задолженность 15 000р. Оплатите до 25.12 во избежание штрафа: www.nalog-pay.com',
+      sender: 'NALOG-RF',
+      isFraud: true,
+      explanation: 'Налоговая не присылает ссылки на сторонние сайты. Официальные уведомления приходят почтой.',
+      difficulty: 'medium'
+    },
+    {
+      id: 9,
+      text: 'Поступление: Зарплата ООО РОГА И КОПЫТА, 85 000,00 руб. Время: 10:15',
+      sender: 'GAZPROMBANK',
+      isFraud: false,
+      explanation: 'Обычное уведомление о поступлении средств с указанием источника.',
+      difficulty: 'medium'
+    },
+    {
+      id: 10,
+      text: 'Ваш аккаунт взломан! Смените пароль: bank-security.ru/change Код: 7463',
+      sender: 'BANK-SECURE',
+      isFraud: true,
+      explanation: 'Банки не присылают коды для смены паролей и не используют сторонние сайты.',
+      difficulty: 'medium'
+    },
+    // Level 3 - Hard (Sophisticated scams)
+    {
+      id: 11,
+      text: 'Газпромбанк: Напоминание о платеже по кредиту 12 500р до 28.12.2024. Просрочка: штраф 1500р.',
+      sender: 'GAZPROMBANK',
+      isFraud: false,
+      explanation: 'Банк может присылать напоминания о платежах с указанием штрафов за просрочку.',
+      difficulty: 'hard'
+    },
+    {
+      id: 12,
+      text: 'Отдел Безопасности: Подозрительный вход в систему. Если это не вы, заблокируйте карту по тел. 8-495-555-1234',
+      sender: 'GPB-SECURITY',
+      isFraud: true,
+      explanation: 'Мошенники используют поддельные номера. Звоните только по номеру с обратной стороны карты.',
+      difficulty: 'hard'
+    },
+    {
+      id: 13,
+      text: 'Курс валют на 26.12: USD 73.45↑ EUR 89.23↓ Инвестиции: gazprombank.ru/invest',
+      sender: 'GAZPROMBANK',
+      isFraud: false,
+      explanation: 'Банки могут присылать информацию о курсах валют и ссылки на официальные разделы сайта.',
+      difficulty: 'hard'
+    },
+    {
+      id: 14,
+      text: 'СБП: Неизвестное лицо пытается перевести с вашего номера 50 000р. Отменить? sberbank-cancel.com/stop',
+      sender: 'SBP-ALERT',
+      isFraud: true,
+      explanation: 'СБП не присылает ссылки на отмену операций. Это попытка получить доступ к вашему банкингу.',
+      difficulty: 'hard'
+    },
+    {
+      id: 15,
+      text: 'Автоплатеж: МТС +7901234567, списано 350,00 руб. Остаток лимита: 4 650,00 руб.',
+      sender: 'GAZPROMBANK',
+      isFraud: false,
+      explanation: 'Стандартное уведомление об автоплатеже с информацией об остатке лимита.',
+      difficulty: 'hard'
+    }
+  ];
 
-	onDestroy(() => {
-		clearTimers();
-	});
+  const currentLevelConfig = $derived(levelConfig[level]);
+  const levelProgress = $derived(Math.min(messageIndex, currentLevelConfig.messagesCount));
+  const accuracyPercent = $derived(totalMessages > 0 ? Math.round((correctAnswers / totalMessages) * 100) : 0);
 
-	function startIntro() {
-		gameState = 'intro';
-	}
+  onMount(() => {
+    startIntro();
+  });
 
-	function startGame() {
-		gameState = 'playing';
-		score = 0;
-		lives = 3;
-		level = 1;
-		messageIndex = 0;
-		streak = 0;
-		totalMessages = 0;
-		correctAnswers = 0;
-		currentMessage = null;
-		showResult = false;
-		showNextMessage();
-	}
+  onDestroy(() => {
+    clearTimers();
+  });
 
-	function showNextMessage() {
-		if (messageIndex >= levelConfig[level as keyof typeof levelConfig].messagesCount) {
-			if (level < 3) {
-				nextLevel();
-			} else {
-				endGame(true);
-			}
-			return;
-		}
+  function handleExit() {
+    clearTimers();
+    onexit?.();
+  }
 
-		const levelMessages = smsMessages.filter(msg => {
-			if (level === 1) return msg.difficulty === 'easy';
-			if (level === 2) return msg.difficulty === 'medium';
-			return msg.difficulty === 'hard';
-		});
+  function startIntro() {
+    gameState = 'intro';
+  }
 
-		const randomMessage = levelMessages[Math.floor(Math.random() * levelMessages.length)];
+  function startGame() {
+    gameState = 'playing';
+    score = 0;
+    lives = 3;
+    level = 1;
+    messageIndex = 0;
+    streak = 0;
+    totalMessages = 0;
+    correctAnswers = 0;
+    currentMessage = null;
+    showResult = false;
+    lastAnswer = null;
+    expectedFraudStatus = null;
+    gameStore.startGame('anti-fraud-hunter');
+    showNextMessage();
+  }
 
-		if (import.meta.env.DEV) {
-			console.log('Level:', level, 'Available messages:', levelMessages.length, 'Selected:', randomMessage);
-		}
+  function showNextMessage() {
+    clearTimers();
 
-		currentMessage = randomMessage;
-		timeRemaining = levelConfig[level as keyof typeof levelConfig].timePerMessage;
-		showResult = false;
+    if (messageIndex >= currentLevelConfig.messagesCount) {
+      if (level < totalLevels) {
+        nextLevel();
+      } else {
+        endGame(true);
+      }
+      return;
+    }
 
-		startMessageTimer();
-		messageIndex++;
-		totalMessages++;
-	}
+    const levelMessages = smsMessages.filter((msg) => {
+      if (level === 1) return msg.difficulty === 'easy';
+      if (level === 2) return msg.difficulty === 'medium';
+      return msg.difficulty === 'hard';
+    });
 
-	function startMessageTimer() {
-		clearTimers();
-		messageTimer = setInterval(() => {
-			timeRemaining--;
-			if (timeRemaining <= 0) {
-				handleTimeout();
-			}
-		}, 1000);
-	}
+    if (!levelMessages.length) {
+      console.warn('Нет сообщений для уровня', level);
+      endGame(false);
+      return;
+    }
 
-	function handleTimeout() {
-		lives--;
-		streak = 0;
-		showFeedback(null, currentMessage!.isFraud, currentMessage!.explanation);
+    const randomMessage = levelMessages[Math.floor(Math.random() * levelMessages.length)];
 
-		if (lives <= 0) {
-			endGame(false);
-		} else {
-			setTimeout(() => {
-				showNextMessage();
-			}, 2000);
-		}
-	}
+    if (import.meta.env.DEV) {
+      console.log('Level', level, 'message', randomMessage);
+    }
 
-	function handleAnswer(playerAnswer: boolean) {
-		if (!currentMessage || showResult) return;
+    currentMessage = randomMessage;
+    timeRemaining = currentLevelConfig.timePerMessage;
+    showResult = false;
+    lastAnswer = null;
+    expectedFraudStatus = null;
 
-		clearTimers();
-		const isCorrect = playerAnswer === currentMessage.isFraud;
+    startMessageTimer();
+    messageIndex++;
+    totalMessages++;
+  }
 
-		if (isCorrect) {
-			const timeBonus = Math.max(0, timeRemaining * 5);
-			const baseScore = 100;
-			const streakBonus = streak * 10;
-			const totalScore = baseScore + timeBonus + streakBonus;
+  function startMessageTimer() {
+    clearTimers();
+    messageTimer = setInterval(() => {
+      timeRemaining -= 1;
+      if (timeRemaining <= 0) {
+        handleTimeout();
+      }
+    }, 1000);
+  }
 
-			score += totalScore;
-			streak++;
-			correctAnswers++;
-		} else {
-			lives--;
-			streak = 0;
-		}
+  function handleTimeout() {
+    clearTimers();
+    lives -= 1;
+    streak = 0;
+    showFeedback(null, currentMessage?.isFraud ?? false, currentMessage?.explanation ?? 'Время истекло. Проверьте сообщение внимательнее.');
 
-		showFeedback(playerAnswer, currentMessage.isFraud, currentMessage.explanation);
+    if (lives <= 0) {
+      setTimeout(() => endGame(false), 1600);
+    } else {
+      setTimeout(() => showNextMessage(), 1600);
+    }
+  }
 
-		if (lives <= 0) {
-			setTimeout(() => endGame(false), 2000);
-		} else {
-			setTimeout(() => showNextMessage(), 2000);
-		}
-	}
+  function handleAnswer(playerAnswer: boolean) {
+    if (!currentMessage || showResult) return;
 
-	function showFeedback(playerAnswer: boolean | null, correctAnswer: boolean, explanation: string) {
-		lastAnswer = playerAnswer;
-		correctAnswer = correctAnswer;
-		showResult = true;
+    clearTimers();
+    const isCorrect = playerAnswer === currentMessage.isFraud;
 
-		// Update game state for analytics
-		gameStore.updateGameState(state => ({
-			...state,
-			score: { ...state.score, current: score }
-		}));
-	}
+    if (isCorrect) {
+      const timeBonus = Math.max(0, timeRemaining * 5);
+      const baseScore = 100;
+      const streakBonus = streak * 12;
+      const totalScore = baseScore + timeBonus + streakBonus;
 
-	function nextLevel() {
-		level++;
-		messageIndex = 0;
-		setTimeout(() => showNextMessage(), 1000);
-	}
+      score += totalScore;
+      streak++;
+      correctAnswers++;
+    } else {
+      lives -= 1;
+      streak = 0;
+    }
 
-	function endGame(completed: boolean) {
-		clearTimers();
-		gameState = completed ? 'completed' : 'gameOver';
+    showFeedback(playerAnswer, currentMessage.isFraud, currentMessage.explanation);
 
-		const accuracy = totalMessages > 0 ? Math.round((correctAnswers / totalMessages) * 100) : 0;
+    if (lives <= 0) {
+      setTimeout(() => endGame(false), 1600);
+    } else {
+      setTimeout(() => showNextMessage(), 1600);
+    }
+  }
 
-		// Complete game with results
-		gameStore.completeGame({
-			score: score,
-			maxScore: 2000,
-			accuracy: accuracy / 100,
-			correctAnswers: correctAnswers,
-			totalAnswers: totalMessages,
-			achievements: completed ? ['anti_fraud_master'] : []
-		});
-	}
+  function showFeedback(playerAnswer: boolean | null, correctAnswer: boolean, explanation: string) {
+    lastAnswer = playerAnswer;
+    expectedFraudStatus = correctAnswer;
+    showResult = true;
 
-	function restartGame() {
-		clearTimers();
-		startGame();
-	}
+    gameStore.updateGameState((state) => ({
+      ...state,
+      score: { ...state.score, current: score }
+    }));
+  }
 
-	function clearTimers() {
-		if (messageTimer) {
-			clearInterval(messageTimer);
-			messageTimer = null;
-		}
-		if (gameTimer) {
-			clearInterval(gameTimer);
-			gameTimer = null;
-		}
-	}
+  function nextLevel() {
+    level += 1;
+    messageIndex = 0;
+    setTimeout(() => showNextMessage(), 900);
+  }
 
-	function exitGame() {
-		clearTimers();
-		onexit?.();
-	}
+  function endGame(completed: boolean) {
+    clearTimers();
+    gameState = completed ? 'completed' : 'gameOver';
+
+    gameStore.completeGame({
+      score,
+      maxScore: 2000,
+      accuracy: accuracyPercent / 100,
+      correctAnswers,
+      totalAnswers: totalMessages,
+      achievements: completed ? ['anti_fraud_master'] : []
+    });
+  }
+
+  function restartGame() {
+    clearTimers();
+    startGame();
+  }
+
+  function clearTimers() {
+    if (messageTimer) {
+      clearInterval(messageTimer);
+      messageTimer = null;
+    }
+  }
 </script>
 
-<GameLayout gameName="Охотник за мошенниками">
-	<div class="anti-fraud-game">
-		{#if gameState === 'intro'}
-			<div class="intro-screen">
-				<div class="intro-content">
-					<div class="intro-icon">
-						<Shield size={48} class="shield-icon" />
-					</div>
-					<h1>Охотник за мошенниками</h1>
-					<p class="intro-description">
-						Определяйте мошеннические SMS и защитите свои финансы!
-						У вас есть ❤️❤️❤️ жизни. Будьте внимательны!
-					</p>
-					<div class="intro-rules">
-						<div class="rule">
-							<CheckCircle size={20} class="text-green-500" />
-							<div class="rule-text">Правильный ответ: +100 очков</div>
-						</div>
-						<div class="rule">
-							<Clock size={20} class="text-blue-500" />
-							<div class="rule-text">Бонус за скорость: +5 очков за секунду</div>
-						</div>
-						<div class="rule">
-							<AlertTriangle size={20} class="text-red-500" />
-							<div class="rule-text">Ошибка: -1 жизнь</div>
-						</div>
-					</div>
-					<Button onclick={startGame}>
-						Начать охоту
-					</Button>
-				</div>
-			</div>
-		{:else if gameState === 'playing'}
-			<div class="game-screen">
-				<div class="game-header">
-					<div class="lives">
-						{#each Array(3) as _, i}
-							<Heart
-								size={20}
-								class={i < lives ? 'text-red-500 fill-red-500' : 'text-gray-300'}
-							/>
-						{/each}
-					</div>
-					<div class="score">
-						<Counter value={score} label="Очки" />
-					</div>
-					<div class="level">
-						Уровень {level}
-					</div>
-				</div>
+<GameLayout gameName="Охотник за мошенниками" background="gradient-mystery">
+  <div class="anti-fraud-game">
+    {#if gameState === 'intro'}
+      <section class="game-stage game-stage--intro" aria-labelledby="intro-title">
+        <article class="intro-panel surface-card">
+          <div class="intro-panel__icon" aria-hidden="true">
+            <Shield size={40} />
+          </div>
+          <span class="chip intro-panel__badge">Финансовая разведка</span>
+          <h1 id="intro-title" class="intro-panel__title">Охотник за мошенниками</h1>
+          <p class="intro-panel__subtitle text-balance">
+            Распознавайте мошеннические SMS за секунды. Внимательность и скорость помогут защитить средства.
+          </p>
 
-				{#if currentMessage && !showResult}
-					<div class="message-container">
-						<div class="phone-mockup">
-							<Smartphone size={24} class="absolute top-4 right-4 text-gray-500" />
-							<div class="message-bubble">
-								<div class="sender">{currentMessage.sender}</div>
-								<div class="message-text">{currentMessage.text}</div>
-							</div>
-						</div>
+          <div class="intro-panel__metrics">
+            <div class="metric-tile">
+              <span class="metric-tile__label">Жизни</span>
+              <span class="metric-tile__value">3</span>
+            </div>
+            <div class="metric-tile">
+              <span class="metric-tile__label">Уровней</span>
+              <span class="metric-tile__value">{totalLevels}</span>
+            </div>
+            <div class="metric-tile">
+              <span class="metric-tile__label">Реакция</span>
+              <span class="metric-tile__value">{levelConfig[1].timePerMessage}–{levelConfig[3].timePerMessage} сек</span>
+            </div>
+          </div>
 
-						<div class="timer-section">
-							<Clock size={16} />
-							<span class="timer">{timeRemaining} сек</span>
-							<ProgressBar
-								value={timeRemaining}
-								max={levelConfig[level as keyof typeof levelConfig].timePerMessage}
-								class="flex-1 max-w-[200px]"
-							/>
-						</div>
+          <div class="intro-panel__actions">
+            <Button variant="primary" size="lg" onclick={startGame}>
+              <Zap size={18} aria-hidden="true" />
+              Начать тренировку
+            </Button>
+            {#if onexit}
+              <Button variant="secondary" size="md" onclick={handleExit}>
+                Вернуться назад
+              </Button>
+            {/if}
+          </div>
+        </article>
+      </section>
 
-						<div class="action-buttons">
-							<Button
-								onclick={() => handleAnswer(true)}
-								variant="secondary"
-								class="flex-1 text-lg font-semibold px-4 py-3 rounded-xl transition-transform active:scale-95"
-							>
-								🚨 МОШЕННИК
-							</Button>
-							<Button
-								onclick={() => handleAnswer(false)}
-								variant="primary"
-								class="flex-1 text-lg font-semibold px-4 py-3 rounded-xl transition-transform active:scale-95"
-							>
-								✅ БЕЗОПАСНО
-							</Button>
-						</div>
-					</div>
-				{:else if showResult && currentMessage}
-					<div class="result-screen">
-						<div class="result-icon">
-							{#if lastAnswer === null}
-								<Clock size={48} class="text-orange-500" />
-								<h3>Время истекло!</h3>
-							{:else if lastAnswer === correctAnswer}
-								<CheckCircle size={48} class="text-green-500" />
-								<h3>Правильно!</h3>
-							{:else}
-								<AlertTriangle size={48} class="text-red-500" />
-								<h3>Неверно!</h3>
-							{/if}
-						</div>
+    {:else if gameState === 'playing'}
+      <section class="game-stage game-stage--playing" aria-live="polite">
+        <header class="game-hud surface-card">
+          <div class="hud-section">
+            <span class="hud-section__label">Жизни</span>
+            <div class="hud-lives">
+              {#each Array(3) as _, i}
+                <Heart size={20} class={`hud-heart ${i < lives ? 'hud-heart--active' : ''}`} aria-hidden="true" />
+              {/each}
+            </div>
+          </div>
+          <div class="hud-section">
+            <span class="hud-section__label">Счёт</span>
+            <Counter value={score} class="hud-counter" />
+          </div>
+          <div class="hud-section">
+            <span class="hud-section__label">Уровень</span>
+            <span class="hud-section__value">{level}/{totalLevels}</span>
+          </div>
+          <div class="hud-section hud-section--timer">
+            <span class="hud-section__label">Время на ответ</span>
+            <div class="timer-pill">
+              <Clock size={16} aria-hidden="true" />
+              {timeRemaining} сек
+            </div>
+            <ProgressBar
+              value={timeRemaining}
+              max={currentLevelConfig.timePerMessage}
+              color="electric"
+              shimmer={false}
+            />
+          </div>
+        </header>
 
-						<div class="explanation">
-							<p><strong>Правильный ответ:</strong> {correctAnswer ? 'МОШЕННИК' : 'БЕЗОПАСНО'}</p>
-							<p class="explanation-text">{currentMessage.explanation}</p>
-						</div>
+        {#if currentMessage && !showResult}
+          <article class="message-panel surface-card" aria-labelledby={`message-title-${currentMessage.id}`}>
+            <div class="message-panel__header">
+              <div class="message-panel__sender">
+                <span class="chip chip--sender">{currentMessage.sender}</span>
+                <span class="message-panel__difficulty">{difficultyCopy[currentMessage.difficulty]}</span>
+              </div>
+              <div class="message-panel__progress">
+                <span class="progress-label">Сообщение</span>
+                <span class="progress-value">{levelProgress}/{currentLevelConfig.messagesCount}</span>
+              </div>
+            </div>
 
-						{#if streak > 1}
-							<div class="streak-bonus">
-								🔥 Серия: {streak} правильных ответов!
-							</div>
-						{/if}
-					</div>
-				{/if}
-			</div>
-		{:else if gameState === 'gameOver'}
-			<div class="game-over-screen">
-				<AlertTriangle size={64} class="text-red-500" />
-				<h2>Игра окончена</h2>
-				<div class="final-stats">
-					<div class="stat">
-						<Counter value={score} label="Итоговый счёт" />
-					</div>
-					<div class="stat">
-						<span class="stat-value">{Math.round((correctAnswers / totalMessages) * 100)}%</span>
-						<span class="stat-label">Точность</span>
-					</div>
-					<div class="stat">
-						<span class="stat-value">{level}</span>
-						<span class="stat-label">Достигнутый уровень</span>
-					</div>
-				</div>
-				<div class="game-over-actions">
-					<Button onclick={restartGame} variant="primary">
-						Попробовать снова
-					</Button>
-					<Button onclick={exitGame} variant="secondary">
-						В главное меню
-					</Button>
-				</div>
-			</div>
-		{:else if gameState === 'completed'}
-			<div class="victory-screen">
-				<Shield size={64} class="text-gpb-mint" />
-				<h2>Поздравляем!</h2>
-				<p>Вы успешно прошли все уровни!</p>
-				<div class="final-stats">
-					<div class="stat">
-						<Counter value={score} label="Итоговый счёт" />
-					</div>
-					<div class="stat">
-						<span class="stat-value">{Math.round((correctAnswers / totalMessages) * 100)}%</span>
-						<span class="stat-label">Точность</span>
-					</div>
-					<div class="stat">
-						<span class="stat-value">{correctAnswers}/{totalMessages}</span>
-						<span class="stat-label">Правильных ответов</span>
-					</div>
-				</div>
-				<div class="victory-actions">
-					<Button onclick={restartGame} variant="primary">
-						Играть снова
-					</Button>
-					<Button onclick={exitGame} variant="secondary">
-						В главное меню
-					</Button>
-				</div>
-			</div>
-		{/if}
-	</div>
+            <div class="message-panel__body">
+              <h2 id={`message-title-${currentMessage.id}`} class="message-panel__title">Новая SMS</h2>
+              <p class="message-text text-balance">{currentMessage.text}</p>
+            </div>
+
+            <div class="message-panel__device" aria-hidden="true">
+              <Smartphone size={46} />
+            </div>
+          </article>
+
+          <div class="decision-grid" role="group" aria-label="Выберите, мошенничество это или нет">
+            <button
+              type="button"
+              class="decision-button decision-button--fraud"
+              onclick={() => handleAnswer(true)}
+            >
+              <AlertTriangle size={20} aria-hidden="true" />
+              <span>Мошенник</span>
+            </button>
+            <button
+              type="button"
+              class="decision-button decision-button--safe"
+              onclick={() => handleAnswer(false)}
+            >
+              <CheckCircle size={20} aria-hidden="true" />
+              <span>Безопасно</span>
+            </button>
+          </div>
+        {:else if showResult && currentMessage}
+          <article class="feedback-panel surface-card" aria-live="polite">
+            <div class={`feedback-icon ${lastAnswer === expectedFraudStatus ? 'feedback-icon--success' : lastAnswer === null ? 'feedback-icon--warning' : 'feedback-icon--error'}`}>
+              {#if lastAnswer === null}
+                <Clock size={28} aria-hidden="true" />
+              {:else if lastAnswer === expectedFraudStatus}
+                <CheckCircle size={28} aria-hidden="true" />
+              {:else}
+                <AlertTriangle size={28} aria-hidden="true" />
+              {/if}
+            </div>
+
+            <div class="feedback-copy">
+              <h2 class="feedback-title">
+                {#if lastAnswer === null}
+                  Время истекло
+                {:else if lastAnswer === expectedFraudStatus}
+                  Верный ответ
+                {:else}
+                  Ошибка
+                {/if}
+              </h2>
+              <p class="feedback-text">{currentMessage.explanation}</p>
+            </div>
+
+            <div class="feedback-status">
+              <span class="feedback-status__label">Правильный ответ</span>
+              <span class={`feedback-status__value ${expectedFraudStatus ? 'is-fraud' : 'is-safe'}`}>
+                {expectedFraudStatus ? 'Мошенник' : 'Безопасно'}
+              </span>
+            </div>
+
+            {#if streak > 1 && lastAnswer === expectedFraudStatus}
+              <span class="streak-chip">
+                <Sparkles size={16} aria-hidden="true" />
+                Серия: {streak}
+              </span>
+            {/if}
+          </article>
+        {/if}
+      </section>
+
+    {:else if gameState === 'gameOver'}
+      <section class="game-stage game-stage--result" aria-live="polite">
+        <article class="end-panel surface-card end-panel--danger">
+          <div class="end-panel__icon" aria-hidden="true">
+            <ShieldAlert size={36} />
+          </div>
+          <h2 class="end-panel__title">Игра завершена</h2>
+          <p class="end-panel__subtitle text-balance">
+            Вы потеряли все жизни. Попробуйте ещё раз и укрепите навыки распознавания мошенников.
+          </p>
+
+          <div class="end-panel__stats">
+            <div class="end-stat">
+              <Counter value={score} label="Итоговый счёт" variant="score" />
+            </div>
+            <div class="end-stat">
+              <span class="end-stat__value">{accuracyPercent}%</span>
+              <span class="end-stat__label">Точность</span>
+            </div>
+            <div class="end-stat">
+              <span class="end-stat__value">Уровень {level}</span>
+              <span class="end-stat__label">Достигнутый прогресс</span>
+            </div>
+          </div>
+
+          <div class="end-panel__actions">
+            <Button variant="primary" size="lg" onclick={restartGame}>
+              Попробовать снова
+            </Button>
+            <Button variant="secondary" size="md" onclick={handleExit}>
+              В главное меню
+            </Button>
+          </div>
+        </article>
+      </section>
+
+    {:else if gameState === 'completed'}
+      <section class="game-stage game-stage--result" aria-live="polite">
+        <article class="end-panel surface-card end-panel--success">
+          <div class="end-panel__icon" aria-hidden="true">
+            <ShieldCheck size={36} />
+          </div>
+          <h2 class="end-panel__title">Поздравляем!</h2>
+          <p class="end-panel__subtitle text-balance">
+            Вы успешно прошли все уровни и заработали достижение «Anti Fraud Master».
+          </p>
+
+          <div class="end-panel__stats">
+            <div class="end-stat">
+              <Counter value={score} label="Итоговый счёт" variant="score" />
+            </div>
+            <div class="end-stat">
+              <span class="end-stat__value">{accuracyPercent}%</span>
+              <span class="end-stat__label">Точность</span>
+            </div>
+            <div class="end-stat">
+              <span class="end-stat__value">{correctAnswers}/{totalMessages}</span>
+              <span class="end-stat__label">Правильных ответов</span>
+            </div>
+          </div>
+
+          <div class="end-panel__actions">
+            <Button variant="primary" size="lg" onclick={restartGame}>
+              Играть снова
+            </Button>
+            <Button variant="secondary" size="md" onclick={handleExit}>
+              В главное меню
+            </Button>
+          </div>
+        </article>
+      </section>
+    {/if}
+  </div>
 </GameLayout>
 
 <style>
-	.anti-fraud-game {
-		height: 100vh;
-		display: flex;
-		flex-direction: column;
-	}
+  .anti-fraud-game {
+    min-height: calc(100vh - 80px);
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem);
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+  }
 
-	.intro-screen, .game-over-screen, .victory-screen {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		flex: 1;
-		padding: 1rem;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;
-		overflow-y: auto;
-	}
+  .game-stage {
+    width: min(720px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-block: auto;
+  }
 
-	.intro-content {
-		text-align: center;
-	}
+  .game-stage--intro,
+  .game-stage--result {
+    align-items: center;
+    text-align: center;
+  }
 
-	.intro-content h1 {
-		font-size: 1.8rem;
-		font-weight: 700;
-		margin: 0.75rem 0;
-		color: #58ffff;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-		line-height: 1.2;
-	}
+  .intro-panel,
+  .end-panel,
+  .game-hud,
+  .message-panel,
+  .feedback-panel {
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-muted);
+    background: var(--color-surface-card);
+    box-shadow: var(--shadow-soft);
+  }
 
-	.intro-description {
-		font-size: 1rem;
-		margin-bottom: 1.5rem;
-		line-height: 1.5;
-		color: rgba(255, 255, 255, 0.9);
-		max-width: 320px;
-		margin: 0 auto 1.5rem auto;
-		text-align: center;
-	}
+  .intro-panel {
+    padding: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
 
-	.intro-icon {
-		margin-bottom: 0.75rem;
-		padding: 1rem;
-		background: linear-gradient(135deg, #58ffff, #50c878);
-		border-radius: 50%;
-		display: inline-flex;
-		box-shadow: 0 4px 16px rgba(88, 255, 255, 0.3);
-	}
+  .intro-panel__icon {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-brand-soft);
+    color: var(--color-fg-on-brand);
+    display: grid;
+    place-items: center;
+  }
 
+  .intro-panel__badge {
+    background: var(--layer-brand-100);
+    color: var(--color-brand-700);
+  }
 
-	.intro-rules {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-		margin: 0 auto 1.5rem auto;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.75rem;
-		padding: 1.25rem;
-		max-width: 320px;
-		width: 100%;
-	}
+  .intro-panel__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 1.25rem + 1vw, 2.1rem);
+    color: var(--color-fg-primary);
+  }
 
-	.rule {
-		display: flex;
-		align-items: flex-start;
-		gap: 0.75rem;
-		padding: 0.5rem 0;
-		width: 100%;
-	}
+  .intro-panel__subtitle {
+    margin: 0;
+    max-width: 36ch;
+    color: var(--color-fg-muted);
+    font-size: 0.98rem;
+  }
 
-	.rule :global(svg) {
-		flex-shrink: 0;
-		width: 20px;
-		height: 20px;
-		margin-top: 0.1rem;
-	}
+  .intro-panel__metrics {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
 
-	.rule-text {
-		flex: 1;
-		font-size: 0.95rem;
-		font-weight: 500;
-		color: rgba(255, 255, 255, 0.95);
-		text-align: left;
-		line-height: 1.4;
-	}
+  .intro-panel__metrics .metric-tile {
+    background: var(--color-surface-muted);
+    border-color: var(--color-border-subtle);
+    text-align: center;
+  }
 
+  .intro-panel__metrics .metric-tile__value {
+    font-size: 1.35rem;
+  }
 
-	.game-screen {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-		color: #1e293b;
-		position: relative;
-		overflow: hidden;
-	}
+  .intro-panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
 
-	.game-screen::before {
-		content: '';
-		position: absolute;
-		top: -50%;
-		left: -50%;
-		width: 200%;
-		height: 200%;
-		background: radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-		            radial-gradient(circle at 70% 30%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
-		animation: float 20s ease-in-out infinite;
-		pointer-events: none;
-		z-index: 1;
-	}
+  .game-hud {
+    padding: 1.25rem;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    align-items: center;
+  }
 
-	@keyframes float {
-		0%, 100% { transform: translate(0, 0) rotate(0deg); }
-		33% { transform: translate(30px, -30px) rotate(120deg); }
-		66% { transform: translate(-20px, 20px) rotate(240deg); }
-	}
+  .hud-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
 
-	.game-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1.5rem;
-		padding: 1rem 1.25rem;
-		background: linear-gradient(135deg, white 0%, #f8fafc 100%);
-		border-radius: 1.25rem;
-		box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.8);
-		border: 1px solid rgba(226, 232, 240, 0.6);
-		position: relative;
-		z-index: 10;
-		backdrop-filter: blur(10px);
-	}
+  .hud-section__label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+  }
 
-	.lives {
-		display: flex;
-		gap: 0.25rem;
-	}
+  .hud-section__value {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-fg-primary);
+  }
 
-	.level {
-		font-weight: 600;
-		color: var(--color-gpb-violet);
-	}
+  .hud-section--timer {
+    grid-column: 1 / -1;
+  }
 
-	.message-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 1.5rem;
-		padding-top: 1rem;
-		position: relative;
-		z-index: 10;
-		animation: slideInUp 0.6s ease-out;
-	}
+  .hud-lives {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
 
-	@keyframes slideInUp {
-		from {
-			opacity: 0;
-			transform: translateY(30px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
+  :global(svg.hud-heart) {
+    color: var(--color-border-muted);
+    transition: transform 160ms ease, color 160ms ease;
+  }
 
-	.phone-mockup {
-		background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-		border: 2px solid transparent;
-		background-clip: padding-box;
-		border-radius: 2rem;
-		padding: 1.5rem;
-		position: relative;
-		box-shadow:
-			0 20px 40px -10px rgba(0, 0, 0, 0.1),
-			0 0 0 1px rgba(255, 255, 255, 0.9),
-			inset 0 1px 0 rgba(255, 255, 255, 0.7);
-		margin: 0 auto;
-		max-width: 350px;
-		transform: translateY(0);
-		transition: transform 0.3s ease, box-shadow 0.3s ease;
-		z-index: 10;
-	}
+  :global(svg.hud-heart--active) {
+    color: var(--color-state-danger);
+    transform: scale(1.05);
+  }
 
-	.phone-mockup::before {
-		content: '';
-		position: absolute;
-		top: -2px;
-		left: -2px;
-		right: -2px;
-		bottom: -2px;
-		background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-		border-radius: 2rem;
-		z-index: -1;
-		opacity: 0.6;
-	}
+  .hud-counter {
+    font-size: 1.35rem;
+  }
 
+  .timer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    background: var(--layer-brand-050);
+    color: var(--color-brand-700);
+    font-weight: 600;
+    width: fit-content;
+  }
 
-	.message-bubble {
-		background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-		border-radius: 1.25rem;
-		padding: 1.5rem;
-		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 8px rgba(0, 0, 0, 0.05);
-		border: 1px solid rgba(226, 232, 240, 0.5);
-		color: #1e293b;
-		position: relative;
-		overflow: hidden;
-	}
+  .message-panel {
+    padding: clamp(1.5rem, 1rem + 2vw, 2rem);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
 
-	.message-bubble::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 4px;
-		height: 100%;
-		background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
-		border-radius: 0 2px 2px 0;
-	}
+  .message-panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, var(--layer-brand-150), transparent 55%);
+    pointer-events: none;
+  }
 
-	.sender {
-		font-weight: 600;
-		font-size: 0.85rem;
-		color: #6366f1;
-		margin-bottom: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.5px;
-	}
+  .message-panel__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
 
-	.message-text {
-		line-height: 1.6;
-		color: #1e293b;
-		font-size: 0.95rem;
-	}
+  .message-panel__sender {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
-	.timer-section {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		justify-content: center;
-		padding: 1.25rem;
-		background: linear-gradient(135deg, white 0%, #fefefe 100%);
-		border: 1px solid rgba(226, 232, 240, 0.6);
-		border-radius: 1.25rem;
-		box-shadow:
-			0 8px 25px -5px rgba(0, 0, 0, 0.1),
-			0 0 0 1px rgba(255, 255, 255, 0.9),
-			inset 0 1px 0 rgba(255, 255, 255, 0.7);
-		position: relative;
-		z-index: 10;
-		backdrop-filter: blur(10px);
-	}
+  .chip--sender {
+    background: var(--layer-brand-100);
+    color: var(--color-brand-700);
+  }
 
-	.timer {
-		font-weight: 700;
-		font-size: 1.2rem;
-		color: #dc2626;
-		min-width: 60px;
-		text-align: center;
-	}
+  .message-panel__difficulty {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    background: var(--color-surface-muted);
+    color: var(--color-fg-secondary);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
 
+  .message-panel__progress {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--color-fg-muted);
+  }
 
-	.action-buttons {
-		display: flex;
-		gap: 1rem;
-		justify-content: center;
-		position: relative;
-		z-index: 10;
-	}
+  .progress-label {
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+  }
 
+  .progress-value {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--color-fg-primary);
+  }
 
-	.result-screen {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		text-align: center;
-		padding: 2rem;
-		gap: 1.5rem;
-	}
+  .message-panel__title {
+    margin: 0;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-fg-muted);
+  }
 
-	.result-icon h3 {
-		margin-top: 0.5rem;
-		font-size: 1.5rem;
-	}
+  .message-text {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--color-fg-primary);
+  }
 
-	.explanation {
-		background: white;
-		border: 1px solid #e2e8f0;
-		border-radius: 1rem;
-		padding: 1.5rem;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-	}
+  .message-panel__device {
+    position: absolute;
+    right: clamp(1.5rem, 4vw, 2.5rem);
+    bottom: clamp(1.25rem, 4vw, 2rem);
+    color: color-mix(in srgb, var(--color-brand-500) 18%, transparent);
+  }
 
-	.explanation-text {
-		margin-top: 0.75rem;
-		color: #64748b;
-		line-height: 1.6;
-		font-size: 0.95rem;
-	}
+  .decision-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
 
-	.streak-bonus {
-		background: linear-gradient(135deg, #ff6b35, #f7931e);
-		color: white;
-		padding: 0.75rem 1.5rem;
-		border-radius: 2rem;
-		font-weight: 600;
-		animation: pulse 1s ease-in-out;
-	}
+  .decision-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.9rem 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-muted);
+    background: var(--color-surface-card);
+    color: var(--color-fg-primary);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+  }
 
-	.final-stats {
-		display: flex;
-		gap: 2rem;
-		margin: 2rem 0;
-		flex-wrap: wrap;
-		justify-content: center;
-	}
+  .decision-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-soft);
+  }
 
-	.stat {
-		text-align: center;
-		min-width: 100px;
-	}
+  .decision-button:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+  }
 
-	.stat-value {
-		display: block;
-		font-size: 2rem;
-		font-weight: 700;
-		color: var(--color-gpb-mint);
-	}
+  .decision-button--fraud {
+    border-color: color-mix(in srgb, var(--color-state-danger) 45%, transparent);
+    background: color-mix(in srgb, var(--color-state-danger) 12%, transparent);
+    color: var(--color-state-danger);
+  }
 
-	.stat-label {
-		display: block;
-		font-size: 0.9rem;
-		color: #666;
-		margin-top: 0.25rem;
-	}
+  .decision-button--fraud:hover {
+    border-color: var(--color-state-danger);
+    background: color-mix(in srgb, var(--color-state-danger) 18%, transparent);
+  }
 
-	.game-over-actions, .victory-actions {
-		display: flex;
-		gap: 1rem;
-		flex-direction: column;
-		width: 100%;
-		max-width: 300px;
-	}
+  .decision-button--safe {
+    border-color: color-mix(in srgb, var(--color-accent-500) 45%, transparent);
+    background: color-mix(in srgb, var(--color-accent-500) 12%, transparent);
+    color: var(--color-accent-600);
+  }
 
-	.victory-screen h2 {
-		color: #58ffff;
-		font-size: 2.5rem;
-		margin-bottom: 1rem;
-		font-weight: 800;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-	}
+  .decision-button--safe:hover {
+    border-color: var(--color-accent-500);
+    background: color-mix(in srgb, var(--color-accent-500) 18%, transparent);
+  }
 
-	.game-over-screen h2 {
-		color: #ff6b6b;
-		font-size: 2.5rem;
-		margin-bottom: 1rem;
-		font-weight: 800;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-	}
+  .feedback-panel {
+    padding: clamp(1.6rem, 1.2rem + 1.5vw, 2.1rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: center;
+    text-align: center;
+  }
 
-	@keyframes pulse {
-		0%, 100% { transform: scale(1); }
-		50% { transform: scale(1.05); }
-	}
+  .feedback-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+    color: var(--color-fg-on-brand);
+  }
 
-	@media (max-width: 480px) {
-		.intro-screen, .game-over-screen, .victory-screen {
-			padding: 0.75rem;
-		}
+  .feedback-icon--success {
+    background: var(--gradient-brand-soft);
+  }
 
-		.intro-content h1 {
-			font-size: 1.5rem;
-			margin: 0.5rem 0;
-		}
+  .feedback-icon--warning {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-state-warning) 80%, transparent) 0%,
+      color-mix(in srgb, var(--color-state-warning) 60%, transparent) 100%
+    );
+  }
 
-		.intro-description {
-			font-size: 0.9rem;
-			margin-bottom: 1rem;
-		}
+  .feedback-icon--error {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-state-danger) 85%, transparent) 0%,
+      color-mix(in srgb, var(--color-state-danger) 60%, transparent) 100%
+    );
+  }
 
-		.intro-icon {
-			padding: 0.75rem;
-			margin-bottom: 0.5rem;
-		}
+  .feedback-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    color: var(--color-fg-primary);
+  }
 
-		.intro-rules {
-			padding: 0.75rem;
-			margin-bottom: 1rem;
-			max-width: 280px;
-		}
+  .feedback-text {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--color-fg-muted);
+    max-width: 38ch;
+  }
 
-		.rule {
-			font-size: 0.85rem;
-		}
+  .feedback-status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    align-items: center;
+  }
 
-		.final-stats {
-			gap: 1rem;
-		}
+  .feedback-status__label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+  }
 
-		.action-buttons {
-			flex-direction: column;
-		}
-	}
+  .feedback-status__value {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    padding: 0.35rem 1.1rem;
+    border-radius: var(--radius-full);
+  }
 
-	@media (max-height: 700px) {
-		.intro-screen {
-			justify-content: flex-start;
-			padding-top: 1rem;
-		}
+  .feedback-status__value.is-fraud {
+    background: color-mix(in srgb, var(--color-state-danger) 18%, transparent);
+    color: var(--color-state-danger);
+  }
 
-		.intro-content h1 {
-			font-size: 1.6rem;
-		}
+  .feedback-status__value.is-safe {
+    background: color-mix(in srgb, var(--color-accent-500) 18%, transparent);
+    color: var(--color-accent-600);
+  }
 
-		.intro-description {
-			margin-bottom: 1rem;
-		}
+  .streak-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.9rem;
+    border-radius: var(--radius-full);
+    background: var(--layer-brand-150);
+    color: var(--color-fg-on-brand);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
 
-		.intro-rules {
-			margin-bottom: 1rem;
-		}
-	}
+  .end-panel {
+    padding: clamp(1.85rem, 1.3rem + 2vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .end-panel__icon {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+    color: var(--color-fg-on-brand);
+  }
+
+  .end-panel--success .end-panel__icon {
+    background: var(--gradient-accent-soft);
+  }
+
+  .end-panel--danger .end-panel__icon {
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-state-danger) 90%, transparent) 0%,
+      color-mix(in srgb, var(--color-brand-800) 75%, transparent) 100%
+    );
+  }
+
+  .end-panel__title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+    color: var(--color-fg-primary);
+  }
+
+  .end-panel__subtitle {
+    margin: 0;
+    max-width: 38ch;
+    color: var(--color-fg-muted);
+    font-size: 0.95rem;
+  }
+
+  .end-panel__stats {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .end-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    align-items: center;
+    text-align: center;
+  }
+
+  .end-stat__value {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--color-fg-primary);
+  }
+
+  .end-stat__label {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--color-fg-muted);
+  }
+
+  .end-panel__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+    width: 100%;
+  }
+
+  @media (max-width: 540px) {
+    .anti-fraud-game {
+      padding: 1.25rem;
+    }
+
+    .game-hud {
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    }
+
+    .decision-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .message-panel__device {
+      display: none;
+    }
+  }
+
+  @media (max-height: 720px) {
+    .anti-fraud-game {
+      padding-block: 1.25rem 2rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .decision-button,
+    :global(svg.hud-heart) {
+      transition: none;
+    }
+  }
 </style>

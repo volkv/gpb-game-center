@@ -78,7 +78,7 @@
 
 	.resources-bar__container {
 		pointer-events: auto;
-		width: min(840px, 100%);
+		width: min(var(--game-shell-max-width, 840px), 100%);
 		display: flex;
 		align-items: center;
 		gap: clamp(0.75rem, 1.6vw, 1.5rem);

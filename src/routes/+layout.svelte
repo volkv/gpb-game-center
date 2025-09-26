@@ -95,7 +95,7 @@
 </svelte:head>
 
 <ErrorBoundary>
-	<main class="app-container" class:loaded={isLoaded}>
+	<main class="app-container" class:loaded={isLoaded} class:game-screen={$currentScreen === 'game'}>
 		{#if $currentScreen !== 'bank-home'}
 			<StatusBar />
 		{/if}
@@ -142,6 +142,14 @@
 		gap: 1rem;
 	}
 
+	.app-container.game-screen {
+		max-width: 500px;
+		padding-inline: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		gap: 0;
+	}
+
 	.app-container.loaded {
 		will-change: auto;
 	}
@@ -165,6 +173,13 @@
 			border: 1px solid var(--color-border-subtle);
 			box-shadow: var(--shadow-medium);
 			margin-block: 1.5rem;
+		}
+
+		.app-container.game-screen {
+			border-radius: 0;
+			border: none;
+			box-shadow: none;
+			margin-block: 0;
 		}
 	}
 </style>

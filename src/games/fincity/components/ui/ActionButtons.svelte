@@ -80,7 +80,7 @@
 
 	.action-toolbar__card {
 		pointer-events: auto;
-		width: min(680px, 100%);
+		width: min(var(--game-shell-max-width, 680px), 100%);
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;

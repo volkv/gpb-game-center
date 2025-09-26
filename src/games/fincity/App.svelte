@@ -98,6 +98,7 @@
 		background: var(--color-surface-page);
 		color: var(--color-fg-primary);
 		overflow: hidden;
+		--game-shell-max-width: 500px;
 	}
 
 	.app__background {
@@ -125,7 +126,8 @@
 		position: relative;
 		z-index: 0;
 		width: 100%;
-		height: 100%;
+		height: calc(100dvh - var(--global-status-bar-height, 0px));
+		min-height: calc(100dvh - var(--global-status-bar-height, 0px));
 		display: flex;
 		justify-content: center;
 		align-items: stretch;
@@ -135,7 +137,7 @@
 	.app__canvas-frame {
 		position: relative;
 		flex: 1;
-		max-width: 1120px;
+		max-width: var(--game-shell-max-width, 1120px);
 		border-radius: var(--radius-xl);
 		border: 1px solid var(--color-border-muted);
 		background: var(--color-surface-elevated);
@@ -181,13 +183,11 @@
 	.app__resources,
 	.app__actions {
 		pointer-events: auto;
-		width: min(840px, 100%);
+		width: min(var(--game-shell-max-width, 840px), 100%);
 	}
 
 	@media (max-width: 768px) {
-		.app__canvas-layer {
-			padding: clamp(0.5rem, 4vw, 1.25rem);
-		}
+	
 
 		.app__canvas-frame {
 			border-radius: var(--radius-lg);

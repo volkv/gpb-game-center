@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 	import { Home, User, Star } from 'lucide-svelte';
 	import { telegramStore, telegramUserName, activityStats, isInTelegram } from '$lib/stores/telegramStore';
 	import {
@@ -11,12 +11,33 @@
 	import { navigateToGameCenter } from '$lib/stores/navigationStore';
 
 	let mounted = false;
+	let statusElement: HTMLElement;
+	let resizeObserver: ResizeObserver | null = null;
 
-	onMount(() => {
-		// telegramStore is initialized in layout; keep subscription warm
-		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-		telegramStore;
-		mounted = true;
+	function updateStatusBarHeight() {
+		if (statusElement) {
+			document.documentElement.style.setProperty(
+				'--global-status-bar-height', `${statusElement.offsetHeight}px`
+			);
+		}
+	}
+
+  onMount(async () => {
+    // telegramStore is initialized in layout; keep subscription warm
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    telegramStore;
+    mounted = true;
+    await tick();
+    updateStatusBarHeight();
+		if ('ResizeObserver' in window && statusElement) {
+			resizeObserver = new ResizeObserver(() => updateStatusBarHeight());
+			resizeObserver.observe(statusElement);
+		}
+
+		return () => {
+			resizeObserver?.disconnect();
+			resizeObserver = null;
+		};
 	});
 
 	function handleHomeClick() {
@@ -25,7 +46,11 @@
 </script>
 
 {#if mounted}
-	<header class="status-bar" class:game-mode={$isGameStatusVisible}>
+	<header
+		class="status-bar"
+		class:game-mode={$isGameStatusVisible}
+		bind:this={statusElement}
+	>
 		<div class="status-content">
 			{#if $isGameStatusVisible}
 				<div class="status-side status-side--left">
