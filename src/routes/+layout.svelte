@@ -172,7 +172,6 @@
 			border-radius: var(--radius-xl);
 			border: 1px solid var(--color-border-subtle);
 			box-shadow: var(--shadow-medium);
-			margin-block: 1.5rem;
 		}
 
 		.app-container.game-screen {

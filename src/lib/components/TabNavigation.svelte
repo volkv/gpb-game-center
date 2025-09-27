@@ -13,7 +13,7 @@
 	const tabs = [
 		{
 			id: 'game-center',
-			label: 'Игровой центр',
+			label: 'Игры',
 			icon: Gamepad2,
 			action: navigateToGameCenter
 		},
@@ -25,7 +25,7 @@
 		},
 		{
 			id: 'rewards-shop',
-			label: 'Магазин подарков',
+			label: 'Подарки',
 			icon: Gift,
 			action: navigateToRewardsShop
 		}
@@ -70,8 +70,8 @@
 
 <style>
 	.tab-navigation {
-		position: sticky;
-		bottom: clamp(1rem, 4vh, 1.5rem);
+		position: fixed;
+		bottom: 16px;
 		left: 0;
 		right: 0;
 		margin-inline: auto;
