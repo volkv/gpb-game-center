@@ -124,14 +124,14 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-		padding-bottom: calc(96px + 1.5rem);
+		padding-bottom: calc(96px + 0.5rem);
 	}
 
 	.hero {
 		display: flex;
 		flex-direction: column;
 		gap: 1.75rem;
-		padding: 1.75rem;
+		padding: 1.5rem;
 	}
 
 	.hero-copy {
@@ -243,12 +243,12 @@
 	.section {
 		display: flex;
 		flex-direction: column;
-		gap: 1.25rem;
+		gap: 1.5rem;
 	}
 
 	.games-grid {
 		display: grid;
-		gap: 1.25rem;
+		gap: 1rem;
 		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	}
 

@@ -138,8 +138,8 @@
 		overscroll-behavior: contain;
 		padding-top: var(--ios-safe-area-top, 0px);
 		padding-bottom: var(--ios-safe-area-bottom, 0px);
-		padding-inline: clamp(1rem, 3vw, 1.5rem);
-		gap: 1rem;
+		padding-inline: 1.5rem;
+		gap: 1.5rem;
 	}
 
 	.app-container.game-screen {

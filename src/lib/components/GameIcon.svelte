@@ -72,8 +72,10 @@
 			<span class="game-card__badge game-card__badge--muted">Скоро</span>
 		{:else if game.name === 'Щит и Рубль'}
 			<span class="game-card__badge">В фокусе</span>
-		{:else}
+		{:else if game.name === 'Золотой Запас'}
 			<span class="game-card__badge game-card__badge--outline">Новое</span>
+		{:else}
+			<!-- <span class="game-card__badge game-card__badge--outline">Новое</span> -->
 		{/if}
 	</div>
 
@@ -88,7 +90,7 @@
 		</div>
 		<div class="game-card__meta">
 			<span class="game-card__meta-item">
-				<Star size={14} aria-hidden="true" />
+				<Star class="shrink-0" size={14} aria-hidden="true" />
 				{game.relatedProducts[0]?.name || 'Банковский продукт'}
 			</span>
 			<ChevronRight size={16} aria-hidden="true" />
@@ -243,7 +245,7 @@
 	.game-card__meta-item {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
+		gap: 0.75rem;
 	}
 
 	.game-card__meta :global(svg) {
