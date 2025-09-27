@@ -40,18 +40,21 @@
 <main class="game-center">
 	{#if mounted}
 		<section class="hero surface-contrast" aria-labelledby="game-center-title">
-			<div class="hero-copy">
-				<p class="hero-eyebrow">Игровой центр</p>
-				<h1 class="hero-title" id="game-center-title">Газпромбанка</h1>
-				<p class="hero-subtitle text-balance">
-					Игровые сценарии, которые закрепляют финансовые навыки и мотивируют клиентов на развитие.
-				</p>
-			</div>
-			<div class="hero-score" aria-live="polite">
-				<Star size={20} aria-hidden="true" />
-				<div>
-					<span class="hero-score__label">Всего очков</span>
-					<span class="hero-score__value">{$totalPoints.toLocaleString()}</span>
+			<div>
+				<div class="hero-copy">
+					<p class="hero-eyebrow">Игровой центр</p>
+					<h1 class="hero-title" id="game-center-title">Газпромбанка</h1>
+					<p class="hero-subtitle text-balance">
+						Игровые сценарии, которые закрепляют финансовые навыки и мотивируют клиентов на развитие.
+					</p>
+				</div>
+
+				<div class="mt-5 hero-score" aria-live="polite">
+					<Star size={20} aria-hidden="true" />
+					<div>
+						<span class="hero-score__label">Всего очков</span>
+						<span class="hero-score__value">{$totalPoints.toLocaleString()}</span>
+					</div>
 				</div>
 			</div>
 		</section>
