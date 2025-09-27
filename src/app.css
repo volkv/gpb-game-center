@@ -49,19 +49,19 @@
   --shadow-soft: 0 12px 40px rgba(4, 4, 58, 0.08);
   --shadow-medium: 0 18px 54px rgba(4, 4, 58, 0.12);
   --shadow-hard: 0 26px 74px rgba(3, 4, 58, 0.16);
-  --shadow-focus: 0 0 0 2px rgba(31, 196, 217, 0.35), 0 0 0 6px rgba(25, 25, 239, 0.22);
+  --shadow-focus: 0 0 0 2px rgba(31, 196, 217, 0.35), 0 0 0 6px rgba(0, 122, 195, 0.22);
 
-  --color-brand-950: #030330;
-  --color-brand-900: #04045a;
-  --color-brand-800: #060698;
-  --color-brand-700: #0f13d5;
-  --color-brand-600: #161ae3;
-  --color-brand-500: #1919ef;
-  --color-brand-400: #4450ff;
-  --color-brand-300: #7378ff;
-  --color-brand-200: #a4adff;
-  --color-brand-100: #d0d8ff;
-  --color-brand-50: #eff1ff;
+  --color-brand-950: #001a2e;
+  --color-brand-900: #002a47;
+  --color-brand-800: #003b5c;
+  --color-brand-700: #005a89;
+  --color-brand-600: #006ba5;
+  --color-brand-500: #007ac3;
+  --color-brand-400: #2693d4;
+  --color-brand-300: #52ade4;
+  --color-brand-200: #7dc7f0;
+  --color-brand-100: #b3e0f8;
+  --color-brand-50: #e6f5fc;
 
   --color-accent-600: #0fa9c2;
   --color-accent-500: #1fc4d9;
@@ -104,16 +104,16 @@
   --color-state-danger: #d13c6a;
   --color-state-info: #3a7bff;
 
-  --layer-brand-050: rgba(25, 25, 239, 0.06);
-  --layer-brand-100: rgba(25, 25, 239, 0.12);
-  --layer-brand-150: rgba(25, 25, 239, 0.18);
+  --layer-brand-050: rgba(0, 122, 195, 0.06);
+  --layer-brand-100: rgba(0, 122, 195, 0.12);
+  --layer-brand-150: rgba(0, 122, 195, 0.18);
   --layer-mint-080: rgba(31, 196, 217, 0.12);
   --layer-mint-120: rgba(31, 196, 217, 0.18);
   --layer-night-100: rgba(5, 7, 19, 0.16);
 
-  --gradient-brand-hero: linear-gradient(140deg, rgba(6, 6, 152, 0.98) 0%, rgba(25, 25, 239, 0.94) 65%, rgba(64, 214, 230, 0.42) 100%);
-  --gradient-brand-soft: linear-gradient(140deg, rgba(6, 6, 152, 0.95) 0%, rgba(25, 25, 239, 0.92) 60%, rgba(64, 214, 230, 0.35) 100%);
-  --gradient-brand-muted: linear-gradient(135deg, rgba(25, 25, 239, 0.12) 0%, rgba(25, 25, 239, 0.04) 100%);
+  --gradient-brand-hero: linear-gradient(140deg, rgba(0, 59, 92, 0.98) 0%, rgba(0, 122, 195, 0.94) 65%, rgba(64, 214, 230, 0.42) 100%);
+  --gradient-brand-soft: linear-gradient(140deg, rgba(0, 59, 92, 0.95) 0%, rgba(0, 122, 195, 0.92) 60%, rgba(0, 122, 195, 0.88) 100%);
+  --gradient-brand-muted: linear-gradient(135deg, rgba(0, 122, 195, 0.12) 0%, rgba(0, 122, 195, 0.04) 100%);
   --gradient-accent-soft: linear-gradient(135deg, rgba(15, 169, 194, 0.9) 0%, rgba(31, 196, 217, 0.88) 100%);
 
   /* Legacy aliases for in-game UI */
@@ -125,10 +125,10 @@
   --color-gpb-gold: #e2a53a;
   --color-gpb-emerald: #2bb48a;
   --color-gpb-blue: var(--color-brand-500);
-  --color-gpb-light: #eff1ff;
+  --color-gpb-light: #e6f5fc;
   --color-gpb-lily: #f4f6fb;
   --color-gpb-henbane: #5d6679;
-  --color-gpb-viola: #d0d8ff;
+  --color-gpb-viola: #b3e0f8;
   --color-gpb-warning: #e2a53a;
   --color-gpb-gray-50: #f2f4f9;
   --color-gpb-gray-100: #d9dfec;
@@ -378,7 +378,7 @@
   }
 
   .gradient-electric {
-    background: linear-gradient(135deg, rgba(6, 6, 152, 0.18) 0%, rgba(31, 196, 217, 0.14) 100%);
+    background: linear-gradient(135deg, rgba(0, 59, 92, 0.18) 0%, rgba(31, 196, 217, 0.14) 100%);
   }
 
   .gradient-power {
@@ -390,7 +390,7 @@
   }
 
   .gradient-mystery {
-    background: linear-gradient(135deg, rgba(6, 6, 152, 0.22) 0%, rgba(5, 7, 19, 0.34) 100%);
+    background: linear-gradient(135deg, rgba(0, 59, 92, 0.22) 0%, rgba(5, 7, 19, 0.34) 100%);
   }
 
   .stat-pill {
@@ -422,7 +422,7 @@
   }
 
   .neon-glow {
-    filter: drop-shadow(0 0 8px rgba(25, 25, 239, 0.28));
+    filter: drop-shadow(0 0 8px rgba(0, 122, 195, 0.28));
   }
 }
 
