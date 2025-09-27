@@ -73,7 +73,7 @@
 
 	<footer class="daily-rewards__footer">
 		<span class="daily-rewards__streak-label">Текущая серия</span>
-		<span class="daily-rewards__streak-value">{$currentDay - 1} дней</span>
+		<span class="daily-rewards__streak-value">{$currentDay} дней</span>
 	</footer>
 </section>
 
@@ -103,7 +103,7 @@
 	.daily-rewards__heading {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 1rem;
 		color: var(--color-brand-600);
 	}
 
@@ -227,6 +227,7 @@
 		color: var(--color-fg-secondary);
 		font-size: 0.75rem;
 		font-weight: 600;
+		text-align: center;
 	}
 
 	.daily-rewards__status--locked {

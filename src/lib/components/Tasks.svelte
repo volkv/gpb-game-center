@@ -96,7 +96,7 @@
 					<p class="section-heading__eyebrow">Список</p>
 					<h2 class="section-heading__title" id="tasks-list-heading">Доступные задания</h2>
 				</div>
-				<div class="filter-controls">
+				<!-- <div class="filter-controls">
 					<Filter size={16} aria-hidden="true" />
 					<select
 						bind:value={currentFilter}
@@ -107,7 +107,7 @@
 						<option value="available">Доступные ({$availableTasks.length})</option>
 						<option value="completed">Выполненные ({$completedTasks.length})</option>
 					</select>
-				</div>
+				</div> -->
 			</div>
 
 			<div class="tasks-grid" role="list">
@@ -148,8 +148,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-		padding-top: 1.5rem;
-		padding-bottom: calc(96px + 1.5rem);
+		padding-bottom: calc(96px + 0.5rem);
 	}
 
 	.hero {
@@ -201,7 +200,7 @@
 	.metric-card {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
+		gap: 1rem;
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-subtle);
 		padding: 1rem;
@@ -233,13 +232,12 @@
 	.section {
 		display: flex;
 		flex-direction: column;
-		gap: 1.25rem;
+		gap: 1.5rem;
 	}
 
 	.section-heading--split {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
 	}

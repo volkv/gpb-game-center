@@ -93,12 +93,12 @@
 		<h3 class="task-card__title">{task.title}</h3>
 		<p class="task-card__description text-balance">{task.description}</p>
 
-		{#if task.productName}
+		<!-- {#if task.productName}
 			<span class="task-card__product">
 				<ExternalLink size={14} aria-hidden="true" />
 				{task.productName}
 			</span>
-		{/if}
+		{/if} -->
 	</div>
 
 	<footer class="task-card__footer">
