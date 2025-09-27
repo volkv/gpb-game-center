@@ -103,7 +103,10 @@ export const GAME_TYPES = {
 	INVESTMENT_STRATEGY: 'investment-strategy',
 	FINCITY: 'fincity',
 	ANTI_FRAUD_HUNTER: 'anti-fraud-hunter',
-	CODE_TO_SUCCESS: 'code-to-success'
+	CODE_TO_SUCCESS: 'code-to-success',
+	TOWER_SAVINGS: 'tower-savings',
+	BUSINESS_DRIVE: 'business-drive',
+	DREAM_PATH: 'dream-path'
 } as const;
 
 export const GAME_CATEGORIES = {
@@ -113,7 +116,10 @@ export const GAME_CATEGORIES = {
 	CROSSWORD: 'crossword',
 	EDUCATIONAL: 'educational',
 	ACTION: 'action',
-	VISUAL_NOVEL: 'visual-novel'
+	VISUAL_NOVEL: 'visual-novel',
+	STACKER: 'stacker',
+	CARD: 'card',
+	RUNNER: 'runner'
 } as const;
 
 export const GAME_STATUS = {

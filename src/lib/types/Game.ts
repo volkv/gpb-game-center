@@ -2,7 +2,7 @@ export type GameStatus = 'active' | 'coming_soon' | 'maintenance' | 'disabled';
 
 export type GameDifficulty = 'easy' | 'medium' | 'hard';
 
-export type GameCategory = 'quiz' | 'puzzle' | 'match3' | 'crossword' | 'educational' | 'action' | 'visual-novel';
+export type GameCategory = 'quiz' | 'puzzle' | 'match3' | 'crossword' | 'educational' | 'action' | 'visual-novel' | 'stacker' | 'card' | 'runner';
 
 export interface GameImage {
   url: string;
@@ -16,7 +16,7 @@ export interface GameProduct {
   name: string;
   description: string;
   url: string;
-  category: 'deposit' | 'card' | 'loan' | 'investment' | 'insurance' | 'service';
+  category: 'deposit' | 'card' | 'loan' | 'investment' | 'insurance' | 'service' | 'credit';
 }
 
 export interface GameMetrics {

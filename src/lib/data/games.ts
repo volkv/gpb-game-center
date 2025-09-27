@@ -379,6 +379,184 @@ export const GAMES_DATA: Game[] = [
 		updatedAt: new Date('2024-09-26'),
 		componentPath: '/games/code-to-success/CodeToSuccessGame.svelte',
 		locale: 'ru'
+	},
+
+	{
+		id: GAME_TYPES.TOWER_SAVINGS,
+		name: 'Башня Сбережений',
+		description: 'Аркадная головоломка в стиле Stacker. Стройте башню из блоков доходов и расходов, создавая устойчивый финансовый фундамент.',
+		shortDescription: 'Аркадная головоломка',
+		category: GAME_CATEGORIES.STACKER,
+		status: GAME_STATUS.COMING_SOON,
+
+		icon: {
+			url: '/games/tower-savings/icon.svg',
+			alt: 'Иконка Башня Сбережений',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(135deg, var(--color-brand-500) 0%, color-mix(in srgb, var(--color-state-success) 60%, white 40%) 100%)',
+		themeColor: 'var(--color-state-success)',
+
+		metrics: {
+			averagePlayTime: 420,
+			completionRate: 0.0,
+			difficulty: 'medium',
+			maxScore: 3000,
+			averageScore: 0
+		},
+		estimatedDuration: 7,
+
+		relatedProducts: [
+			{
+				id: 'savings-deposit',
+				name: 'Накопительный вклад',
+				description: 'Надежное основание для ваших сбережений',
+				url: '/products/deposit',
+				category: 'deposit'
+			},
+			{
+				id: 'investment-funds',
+				name: 'Паевые инвестиционные фонды',
+				description: 'Растущие инвестиционные блоки для вашей башни',
+				url: '/products/pif',
+				category: 'investment'
+			},
+			{
+				id: 'emergency-fund',
+				name: 'Подушка безопасности',
+				description: 'Защита от финансовых падений',
+				url: '/products/emergency',
+				category: 'service'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-09-27'),
+		updatedAt: new Date('2024-09-27'),
+		componentPath: '/games/tower-savings/TowerSavingsGame.svelte',
+		locale: 'ru'
+	},
+
+	{
+		id: GAME_TYPES.BUSINESS_DRIVE,
+		name: 'Бизнес-Драйв',
+		description: 'Карточный симулятор с swipe-механикой для предпринимателей. Принимайте решения в бизнес-ситуациях и изучайте банковские инструменты для МСБ.',
+		shortDescription: 'Карточный симулятор',
+		category: GAME_CATEGORIES.CARD,
+		status: GAME_STATUS.COMING_SOON,
+
+		icon: {
+			url: '/games/business-drive/icon.svg',
+			alt: 'Иконка Бизнес-Драйв',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(135deg, var(--color-brand-700) 0%, var(--color-accent-500) 100%)',
+		themeColor: 'var(--color-accent-600)',
+
+		metrics: {
+			averagePlayTime: 300,
+			completionRate: 0.0,
+			difficulty: 'medium',
+			maxScore: 1000,
+			averageScore: 0
+		},
+		estimatedDuration: 5,
+
+		relatedProducts: [
+			{
+				id: 'factoring',
+				name: 'Факторинг',
+				description: 'Решение кассовых разрывов для бизнеса',
+				url: '/products/factoring',
+				category: 'service'
+			},
+			{
+				id: 'business-credit',
+				name: 'Кредит на пополнение оборотных средств',
+				description: 'Финансирование для развития бизнеса',
+				url: '/products/business-credit',
+				category: 'credit'
+			},
+			{
+				id: 'leasing',
+				name: 'Лизинг оборудования',
+				description: 'Приобретение оборудования без больших вложений',
+				url: '/products/leasing',
+				category: 'service'
+			},
+			{
+				id: 'acquiring',
+				name: 'Торговый эквайринг',
+				description: 'Прием безналичных платежей от клиентов',
+				url: '/products/acquiring',
+				category: 'service'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-09-27'),
+		updatedAt: new Date('2024-09-27'),
+		componentPath: '/games/business-drive/BusinessDriveGame.svelte',
+		locale: 'ru'
+	},
+
+	{
+		id: GAME_TYPES.DREAM_PATH,
+		name: 'Путь к Мечте',
+		description: 'Map-ранер стратегия для достижения финансовых целей. За 3-4 хода дойдите до цели, выбирая оптимальные инвестиционные инструменты.',
+		shortDescription: 'Стратегический ранер',
+		category: GAME_CATEGORIES.RUNNER,
+		status: GAME_STATUS.COMING_SOON,
+
+		icon: {
+			url: '/games/dream-path/icon.svg',
+			alt: 'Иконка Путь к Мечте',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(135deg, var(--color-accent-500) 0%, color-mix(in srgb, var(--color-brand-500) 70%, white 30%) 100%)',
+		themeColor: 'var(--color-accent-500)',
+
+		metrics: {
+			averagePlayTime: 180,
+			completionRate: 0.0,
+			difficulty: 'easy',
+			maxScore: 500,
+			averageScore: 0
+		},
+		estimatedDuration: 3,
+
+		relatedProducts: [
+			{
+				id: 'term-deposit',
+				name: 'Срочный вклад',
+				description: 'Фиксированная доходность для краткосрочных целей',
+				url: '/products/term-deposit',
+				category: 'deposit'
+			},
+			{
+				id: 'iis',
+				name: 'Индивидуальный инвестиционный счёт',
+				description: 'ИИС с налоговыми льготами',
+				url: '/products/iis',
+				category: 'investment'
+			},
+			{
+				id: 'life-insurance',
+				name: 'Страхование жизни с накоплением',
+				description: 'Долгосрочное накопление с защитой',
+				url: '/products/life-insurance',
+				category: 'insurance'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-09-27'),
+		updatedAt: new Date('2024-09-27'),
+		componentPath: '/games/dream-path/DreamPathGame.svelte',
+		locale: 'ru'
 	}
 ];
 
