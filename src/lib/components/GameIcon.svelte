@@ -109,6 +109,7 @@
 		box-shadow: var(--shadow-soft);
 		transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 		cursor: pointer;
+		height: 100%;
 	}
 
 	.game-card::before {
@@ -214,6 +215,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
+		margin-top: auto;
 	}
 
 	.progress {
