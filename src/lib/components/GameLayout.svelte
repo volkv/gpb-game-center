@@ -48,7 +48,8 @@
 	.game-layout {
 		min-height: 100vh;
 		position: relative;
-		overflow: hidden;
+		overflow-x: hidden;
+		overflow-y: auto;
 		color: white;
 	}
 
@@ -68,8 +69,6 @@
 		position: relative;
 		z-index: 2;
 		width: 100%;
-		height: calc(100vh - var(--global-status-bar-height, 0px));
-		height: calc(100dvh - var(--global-status-bar-height, 0px));
 		min-height: calc(100vh - var(--global-status-bar-height, 0px));
 		min-height: calc(100dvh - var(--global-status-bar-height, 0px));
 		margin: 0 auto;
