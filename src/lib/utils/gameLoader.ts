@@ -89,8 +89,8 @@ class GameLoaderService {
 		switch (path) {
 			case '/games/quiz-shield-ruble/QuizGame.svelte':
 				return import('../../games/quiz-shield-ruble/QuizGame.svelte');
-			case '/games/match3-golden-reserve/Match3Demo.svelte':
-				return import('../../games/match3-golden-reserve/Match3Demo.svelte');
+			case '/games/match3-golden-reserve/Match3Game.svelte':
+				return import('../../games/match3-golden-reserve/Match3Game.svelte');
 			case '/games/crossword-financial/CrosswordDemo.svelte':
 				return import('../../games/crossword-financial/CrosswordDemo.svelte');
 			case '/games/fincity/FincityGame.svelte':

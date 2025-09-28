@@ -84,7 +84,7 @@ export const GAMES_DATA: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-01-10'),
 		updatedAt: new Date('2024-01-18'),
-		componentPath: '/games/match3-golden-reserve/Match3Demo.svelte',
+		componentPath: '/games/match3-golden-reserve/Match3Game.svelte',
 		locale: 'ru'
 	},
 
@@ -556,6 +556,63 @@ export const GAMES_DATA: Game[] = [
 		createdAt: new Date('2024-09-27'),
 		updatedAt: new Date('2024-09-27'),
 		componentPath: '/games/dream-path/DreamPathGame.svelte',
+		locale: 'ru'
+	},
+
+	{
+		id: GAME_TYPES.ASSET_GUARDIAN,
+		name: 'Хранитель Активов',
+		description: 'Классический лабиринт с шариком, управляемый гироскопом. Проведите активы клиента через финансовые ловушки к безопасному сейфу.',
+		shortDescription: 'Гироскоп лабиринт',
+		category: GAME_CATEGORIES.PUZZLE,
+		status: GAME_STATUS.ACTIVE,
+
+		icon: {
+			url: '/images/games/asset-guardian.svg',
+			alt: 'Иконка Хранитель Активов',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(135deg, var(--color-brand-600) 0%, color-mix(in srgb, var(--color-state-success) 60%, white 40%) 100%)',
+		themeColor: 'var(--color-state-success)',
+
+		metrics: {
+			averagePlayTime: 300,
+			completionRate: 0.0,
+			difficulty: 'medium',
+			maxScore: 1000,
+			averageScore: 0
+		},
+		estimatedDuration: 5,
+
+		relatedProducts: [
+			{
+				id: 'fraud-protection',
+				name: 'Защита от мошенничества',
+				description: 'Комплексная защита ваших средств от финансовых ловушек',
+				url: '/products/fraud-protection',
+				category: 'service'
+			},
+			{
+				id: 'investment-portfolio',
+				name: 'Инвестиционный портфель',
+				description: 'Выбор оптимального пути для ваших активов',
+				url: '/products/investment',
+				category: 'investment'
+			},
+			{
+				id: 'asset-management',
+				name: 'Управление активами',
+				description: 'Профессиональное управление вашими средствами',
+				url: '/products/asset-management',
+				category: 'service'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-09-28'),
+		updatedAt: new Date('2024-09-28'),
+		componentPath: '/games/asset-guardian/AssetGuardianGame.svelte',
 		locale: 'ru'
 	}
 ];

@@ -136,6 +136,22 @@ export interface TelegramWebApp {
   readTextFromClipboard(callback?: (clipboardText: string) => void): void;
   requestWriteAccess(callback?: (accessGranted: boolean) => void): void;
   requestContact(callback?: (contactShared: boolean) => void): void;
+  startGyroscope(): void;
+  stopGyroscope(): void;
+}
+
+export interface TelegramGyroscopeData {
+  alpha: number;
+  beta: number;
+  gamma: number;
+}
+
+export interface TelegramGyroscopeEvent {
+  data: TelegramGyroscopeData;
+}
+
+export interface TelegramGyroscopeErrorEvent {
+  error: string;
 }
 
 declare global {

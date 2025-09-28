@@ -13,11 +13,12 @@ export default defineConfig({
 			output: {
 				manualChunks: {
 					'quiz-game': ['./src/games/quiz-shield-ruble/QuizGame.svelte'],
-					'match3-game': ['./src/games/match3-golden-reserve/Match3Demo.svelte'],
+					'match3-game': ['./src/games/match3-golden-reserve/Match3Game.svelte'],
 					'crossword-game': ['./src/games/crossword-financial/CrosswordDemo.svelte'],
 					'fincity-game': ['./src/games/fincity/FincityGame.svelte'],
 					'anti-fraud-game': ['./src/games/anti-fraud-hunter/AntiFraudGame.svelte'],
 					'novella-game': ['./src/games/code-to-success/CodeToSuccessGame.svelte'],
+					'asset-guardian-game': ['./src/games/asset-guardian/AssetGuardianGame.svelte'],
 					'vendor-svelte': ['svelte', 'svelte/store', 'svelte/transition', 'svelte/motion']
 				}
 			}

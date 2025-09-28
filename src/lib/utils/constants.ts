@@ -106,7 +106,8 @@ export const GAME_TYPES = {
 	CODE_TO_SUCCESS: 'code-to-success',
 	TOWER_SAVINGS: 'tower-savings',
 	BUSINESS_DRIVE: 'business-drive',
-	DREAM_PATH: 'dream-path'
+	DREAM_PATH: 'dream-path',
+	ASSET_GUARDIAN: 'asset-guardian'
 } as const;
 
 export const GAME_CATEGORIES = {
