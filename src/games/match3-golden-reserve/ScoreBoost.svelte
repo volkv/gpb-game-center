@@ -9,7 +9,7 @@
 
 	let { amount, visible = false, onComplete }: Props = $props();
 
-	let element: HTMLDivElement;
+	let element: HTMLDivElement | undefined = $state();
 
 	const getBoostType = (amount: number) => {
 		if (amount >= 500) return { icon: Star, color: 'gpb-gold', label: 'AMAZING!' };
@@ -38,7 +38,10 @@
 		class:visible
 	>
 		<div class="boost-icon text-{boostType.color}">
-			<svelte:component this={boostType.icon} size={24} />
+			{#if boostType.icon}
+				{@const IconComponent = boostType.icon}
+				<IconComponent size={24} />
+			{/if}
 		</div>
 		<div class="boost-amount text-{boostType.color}">
 			+{amount}

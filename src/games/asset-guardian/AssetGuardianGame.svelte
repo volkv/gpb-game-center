@@ -1217,7 +1217,10 @@
 
 	.instruction-list {
 		text-align: left;
-		space-y: 0.75rem;
+	}
+
+	.instruction-list > * + * {
+		margin-top: 0.75rem;
 	}
 
 	.instruction-item {
@@ -1293,14 +1296,6 @@
 		flex-shrink: 0;
 	}
 
-	.development-info {
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-	}
-
-	.start-game-btn {
-		animation: pulse-glow 2s infinite;
-	}
 
 	@keyframes pulse-glow {
 		0%, 100% {
@@ -1311,54 +1306,8 @@
 		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.start-game-btn {
-			animation: none;
-		}
 
-		.game-canvas-container {
-			transition: none;
-		}
 
-		.parallax-layer {
-			transition: none !important;
-		}
-	}
-
-	.parallax-layer {
-		position: absolute;
-		top: -10%;
-		left: -10%;
-		width: 120%;
-		height: 120%;
-		pointer-events: none;
-		border-radius: 1rem;
-		transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-	}
-
-	.parallax-layer-0 {
-		background: radial-gradient(ellipse at center,
-			rgba(15, 169, 194, 0.08) 0%,
-			rgba(0, 107, 165, 0.05) 50%,
-			transparent 100%);
-		z-index: -3;
-	}
-
-	.parallax-layer-1 {
-		background: radial-gradient(ellipse at 60% 40%,
-			rgba(26, 188, 156, 0.06) 0%,
-			rgba(52, 152, 219, 0.04) 40%,
-			transparent 80%);
-		z-index: -2;
-	}
-
-	.parallax-layer-2 {
-		background: radial-gradient(ellipse at 40% 60%,
-			rgba(243, 156, 18, 0.04) 0%,
-			rgba(230, 126, 34, 0.02) 30%,
-			transparent 70%);
-		z-index: -1;
-	}
 
 	.game-canvas-wrapper.perspective-active .game-canvas-container {
 		transform-style: preserve-3d;
@@ -1482,8 +1431,8 @@
 		margin-top: 0.25rem;
 	}
 
-	.high-scores-list {
-		space-y: 0.5rem;
+	.high-scores-list > * + * {
+		margin-top: 0.5rem;
 	}
 
 	.high-score-item {

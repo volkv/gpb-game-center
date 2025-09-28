@@ -224,8 +224,6 @@
 	</div>
 	<div
 		class="match3-container"
-		onkeydown={handleKeyNavigation}
-		tabindex="0"
 		role="application"
 		aria-label="Игра Золотой Резерв. Используйте стрелки для навигации, Enter для выбора, Escape для отмены"
 	>
@@ -293,7 +291,14 @@
 							class="game-cell {cell.isSelected ? 'selected' : ''} {cell.isRecommended ? 'recommended' : ''} {cell.isFalling ? 'falling' : ''} {cell.isBouncing ? 'bouncing' : ''} {cell.isFading ? 'fading' : ''} {cell.isAppearing ? 'appearing' : ''} {currentFocusPosition && currentFocusPosition.row === rowIndex && currentFocusPosition.col === colIndex ? 'keyboard-focus' : ''}"
 							style="animation-delay: {cell.animationDelay || 0}ms"
 							onclick={() => handleCellClick(rowIndex, colIndex)}
+							onkeydown={(event) => {
+								if (event.key === 'Enter' || event.key === ' ') {
+									event.preventDefault();
+									handleCellClick(rowIndex, colIndex);
+								}
+							}}
 							role="gridcell"
+							tabindex={currentFocusPosition && currentFocusPosition.row === rowIndex && currentFocusPosition.col === colIndex ? 0 : -1}
 							aria-label={`${getCellTypeName(cell.type)} в позиции ${rowIndex + 1}, ${colIndex + 1}${cell.isSelected ? '. Выбрана' : ''}${cell.isRecommended ? '. Рекомендуемая' : ''}`}
 							aria-selected={cell.isSelected}
 							aria-describedby={cell.isRecommended ? 'recommended-hint' : undefined}
@@ -571,14 +576,6 @@
 		pointer-events: none;
 	}
 
-	.game-cell.swapping {
-		animation: swap-animation 0.3s ease-in-out;
-		z-index: 10;
-	}
-
-	.game-cell.invalid-swap {
-		animation: invalid-shake 0.4s ease-in-out;
-	}
 
 	.game-controls {
 		flex-shrink: 0;
@@ -589,36 +586,8 @@
 		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
-	.booster-ready {
-		animation: pulse-glow 2s infinite, booster-shimmer 1.5s infinite;
-		position: relative;
-		overflow: hidden;
-	}
 
-	.booster-ready::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: -100%;
-		width: 100%;
-		height: 100%;
-		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-		animation: shimmer-sweep 2s infinite;
-		z-index: 1;
-	}
 
-	.booster-ready::after {
-		content: '';
-		position: absolute;
-		top: -2px;
-		left: -2px;
-		right: -2px;
-		bottom: -2px;
-		background: linear-gradient(45deg, var(--color-gpb-mint), var(--color-gpb-blue), var(--color-gpb-mint));
-		border-radius: inherit;
-		z-index: -1;
-		animation: rotate-border 3s linear infinite;
-	}
 
 	@keyframes pulse-glow {
 		0%, 100% {
@@ -707,10 +676,6 @@
 		transform: scale(1.05);
 	}
 
-	.game-cell.exploding {
-		animation: explosion-effect 0.8s ease-out;
-		z-index: 20;
-	}
 
 	.game-cell.falling {
 		animation: cell-fall 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -898,8 +863,7 @@
 	@media (prefers-reduced-motion: reduce) {
 		.game-cell,
 		.charge-progress,
-		.animated-score,
-		.booster-ready {
+		.animated-score {
 			animation: none !important;
 			transition: none !important;
 		}

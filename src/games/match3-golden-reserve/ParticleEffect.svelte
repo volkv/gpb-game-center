@@ -24,8 +24,8 @@
 	}
 
 	let particles: Particle[] = $state([]);
-	let animationFrame: number;
-	let container: HTMLDivElement;
+	let animationFrame: number | undefined = $state();
+	let container: HTMLDivElement | undefined = $state();
 
 	function createParticles() {
 		const newParticles: Particle[] = [];

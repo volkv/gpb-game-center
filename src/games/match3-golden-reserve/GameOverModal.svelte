@@ -270,18 +270,6 @@
 		animation: stars-appear 0.8s ease-out 0.3s both;
 	}
 
-	.star {
-		color: var(--color-gpb-gold);
-		animation: star-pop 0.4s ease-out;
-	}
-
-	.star.filled {
-		animation: star-pop 0.4s ease-out, star-glow 2s ease-in-out infinite;
-	}
-
-	.star.empty {
-		color: var(--color-gpb-gray-300);
-	}
 
 	.progress-section {
 		margin-bottom: 2rem;

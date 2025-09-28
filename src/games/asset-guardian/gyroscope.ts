@@ -93,14 +93,21 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		}
 
 		try {
-			if (typeof this.webApp.postEvent === 'function') {
-				console.log('🔄 [GYROSCOPE] Telegram WebApp API supports postEvent');
+			// Check for new direct methods first
+			if (typeof this.webApp.startGyroscope === 'function' && typeof this.webApp.stopGyroscope === 'function') {
+				console.log('🔄 [GYROSCOPE] Telegram WebApp API supports direct gyroscope methods');
+				return true;
+			}
+			// Fallback to postEvent method for older versions
+			else if (typeof this.webApp.postEvent === 'function') {
+				console.log('🔄 [GYROSCOPE] Telegram WebApp API supports postEvent (legacy)');
 				return true;
 			}
 		} catch (error) {
 			console.warn('🔄 [GYROSCOPE] Error checking gyroscope support:', error);
 		}
 
+		console.warn('🔄 [GYROSCOPE] No gyroscope support detected');
 		return false;
 	}
 
@@ -108,11 +115,14 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		if (!this.webApp || !this.isSupported) return;
 
 		try {
-			this.webApp.onEvent('gyroscopeChanged', () => this.gyroscopeChangedHandler);
-			this.webApp.onEvent('gyroscopeStarted', () => this.gyroscopeStartedHandler);
-			this.webApp.onEvent('gyroscopeFailed', () => this.gyroscopeFailedHandler);
+			// Register event handlers correctly by passing the handler function directly
+			this.webApp.onEvent('gyroscopeChanged', this.gyroscopeChangedHandler);
+			this.webApp.onEvent('gyroscopeStarted', this.gyroscopeStartedHandler);
+			this.webApp.onEvent('gyroscopeFailed', this.gyroscopeFailedHandler);
 
-			console.log('🔄 [GYROSCOPE] Event handlers registered');
+			console.log('🔄 [GYROSCOPE] Event handlers registered successfully');
+			console.log('🔄 [GYROSCOPE] WebApp API version:', this.webApp.version);
+			console.log('🔄 [GYROSCOPE] Platform:', this.webApp.platform);
 		} catch (error) {
 			console.error('🔄 [GYROSCOPE] Failed to setup event handlers:', error);
 			this.isSupported = false;
@@ -127,11 +137,27 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 		try {
 			console.log('🔄 [GYROSCOPE] Starting gyroscope...');
-			this.webApp.postEvent('web_app_start_gyroscope');
+			console.log('🔄 [GYROSCOPE] WebApp methods available:', {
+				startGyroscope: typeof this.webApp.startGyroscope,
+				stopGyroscope: typeof this.webApp.stopGyroscope,
+				postEvent: typeof this.webApp.postEvent
+			});
+
+			// Try direct method first (newer Telegram versions)
+			if (typeof this.webApp.startGyroscope === 'function') {
+				console.log('🔄 [GYROSCOPE] Using direct startGyroscope() method');
+				this.webApp.startGyroscope();
+			} else if (typeof this.webApp.postEvent === 'function') {
+				console.log('🔄 [GYROSCOPE] Using legacy postEvent method');
+				this.webApp.postEvent('web_app_start_gyroscope');
+			} else {
+				console.error('🔄 [GYROSCOPE] No gyroscope start method available');
+				return false;
+			}
 
 			return new Promise((resolve) => {
 				const timeout = setTimeout(() => {
-					console.warn('🔄 [GYROSCOPE] Start timeout');
+					console.warn('🔄 [GYROSCOPE] Start timeout after 5 seconds');
 					resolve(false);
 				}, 5000);
 
@@ -160,8 +186,18 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 		try {
 			console.log('🔄 [GYROSCOPE] Stopping gyroscope...');
-			this.webApp.postEvent('web_app_stop_gyroscope');
+
+			// Try direct method first (newer Telegram versions)
+			if (typeof this.webApp.stopGyroscope === 'function') {
+				console.log('🔄 [GYROSCOPE] Using direct stopGyroscope() method');
+				this.webApp.stopGyroscope();
+			} else if (typeof this.webApp.postEvent === 'function') {
+				console.log('🔄 [GYROSCOPE] Using legacy postEvent method');
+				this.webApp.postEvent('web_app_stop_gyroscope');
+			}
+
 			this.isActive = false;
+			console.log('🔄 [GYROSCOPE] Gyroscope stopped successfully');
 		} catch (error) {
 			console.error('🔄 [GYROSCOPE] Failed to stop gyroscope:', error);
 		}
@@ -252,9 +288,11 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	cleanup(): void {
 		if (this.webApp && this.isSupported) {
 			try {
-				this.webApp.offEvent('gyroscopeChanged', () => this.gyroscopeChangedHandler);
-				this.webApp.offEvent('gyroscopeStarted', () => this.gyroscopeStartedHandler);
-				this.webApp.offEvent('gyroscopeFailed', () => this.gyroscopeFailedHandler);
+				// Remove event handlers correctly by passing the same handler function
+				this.webApp.offEvent('gyroscopeChanged', this.gyroscopeChangedHandler);
+				this.webApp.offEvent('gyroscopeStarted', this.gyroscopeStartedHandler);
+				this.webApp.offEvent('gyroscopeFailed', this.gyroscopeFailedHandler);
+				console.log('🔄 [GYROSCOPE] Event handlers removed successfully');
 			} catch (error) {
 				console.warn('🔄 [GYROSCOPE] Error during cleanup:', error);
 			}
@@ -264,6 +302,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		this.changeCallback = null;
 		this.startedCallback = null;
 		this.failedCallback = null;
+		console.log('🔄 [GYROSCOPE] Cleanup completed');
 	}
 }
 
