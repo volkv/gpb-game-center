@@ -76,10 +76,8 @@
 		font-weight: 600;
 	}
 
-	@media (max-width: 500px) {
-		.bottom-navigation {
-			max-width: 500px;
-			margin: 0 auto;
-		}
+	.bottom-navigation {
+		max-width: 500px;
+		margin: 0 auto;
 	}
 </style>

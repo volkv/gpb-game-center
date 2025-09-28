@@ -111,23 +111,5 @@
 		margin-left: 1rem;
 	}
 
-	@media (max-width: 380px) {
-		.game-header {
-			padding: 0.75rem 1rem;
-		}
 
-		.game-title {
-			font-size: 1.25rem;
-		}
-
-		.game-content {
-			padding: 1rem;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.game-base {
-			transition: none;
-		}
-	}
 </style>

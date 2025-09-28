@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onMount, onDestroy, tick } from 'svelte';
 	import { Home, User, Star } from 'lucide-svelte';
-	import { telegramStore, telegramUserName, activityStats, isInTelegram } from '$lib/stores/telegramStore';
+	import { telegramStore, telegramUserName, isInTelegram } from '$lib/stores/telegramStore';
+	import { totalPoints } from '$lib/stores/pointsStore';
 	import {
 		gameStatusState,
 		isGameStatusVisible,
@@ -93,30 +94,19 @@
 			{:else}
 				<div class="user-overview">
 					<div class="user-avatar" aria-hidden="true">
-						<img src="/logo.svg" alt="" width="20" height="20" />
+						<img src="/logo_black.svg" alt="" width="20" height="20" />
 					</div>
 					<div class="user-meta">
 						<span class="user-name">{$telegramUserName}</span>
-						{#if $isInTelegram}
-							<span class="user-platform">Telegram</span>
-						{/if}
+				
 					</div>
 				</div>
 
-				<div class="activity-stats" role="list">
-					{#if $activityStats.sessionCount > 0}
-						<div class="activity-chip" role="listitem">
-							<span class="activity-chip__label">Сессия</span>
-							<span class="activity-chip__value">{$activityStats.sessionCount}</span>
-						</div>
-					{/if}
-
-					{#if $activityStats.totalGamesPlayed > 0}
-						<div class="activity-chip" role="listitem">
-							<span class="activity-chip__label">Игр</span>
-							<span class="activity-chip__value">{$activityStats.totalGamesPlayed}</span>
-						</div>
-					{/if}
+				<div class="points-display">
+					<div class="points-chip">
+						<Star size={16} aria-hidden="true" />
+						<span class="points-chip__value">{$totalPoints.toLocaleString()}</span>
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -124,12 +114,15 @@
 {/if}
 
 <style>
+
+	.status-bar.game-mode {
+		padding: .5rem 1.5rem;
+	}
+
 	.status-bar {
-		position: sticky;
-		top: 0;
-		z-index: 45;
-		margin-inline: calc(-1 * clamp(1rem, 3vw, 1.5rem));
-		padding-inline: clamp(1rem, 3vw, 1.5rem);
+		position: relative;
+		z-index: 1;
+		margin: 0 -1.5rem;
 		padding-block: 0.75rem;
 		background: rgba(242, 244, 249, 0.75);
 		backdrop-filter: blur(12px);
@@ -144,6 +137,7 @@
 	}
 
 	.status-content {
+		padding: 0 1.5rem;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
@@ -168,7 +162,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.4rem;
+		gap: 0.2rem;
 		text-align: center;
 		min-width: 0;
 	}
@@ -202,7 +196,7 @@
 		letter-spacing: -0.01em;
 		color: var(--color-fg-primary);
 		white-space: nowrap;
-		overflow: hidden;
+		
 		text-overflow: ellipsis;
 	}
 
@@ -222,13 +216,12 @@
 	.player-name {
 		max-width: 8rem;
 		white-space: nowrap;
-		overflow: hidden;
+		
 		text-overflow: ellipsis;
 	}
 
 	.score-card {
 		display: flex;
-		flex-direction: column;
 		gap: 0.25rem;
 		padding: 0.5rem 0.75rem;
 		border-radius: var(--radius-lg);
@@ -285,76 +278,34 @@
 		font-weight: 600;
 		color: var(--color-fg-primary);
 		white-space: nowrap;
-		overflow: hidden;
+		
 		text-overflow: ellipsis;
 	}
 
-	.user-platform {
-		font-size: 0.75rem;
-		color: var(--color-fg-muted);
-	}
 
-	.activity-stats {
+	.points-display {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		flex-wrap: wrap;
 		justify-content: flex-end;
 	}
 
-	.activity-chip {
+	.points-chip {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
 		padding: 0.25rem 0.6rem;
 		border-radius: var(--radius-full);
-		background: var(--color-neutral-100);
-		border: 1px solid var(--color-border-subtle);
+		background: var(--layer-brand-050);
+		border: 1px solid var(--layer-brand-150);
 		font-size: 0.75rem;
-		color: var(--color-fg-secondary);
+		color: var(--color-brand-600);
 	}
 
-	.activity-chip__label {
-		font-weight: 500;
-	}
-
-	.activity-chip__value {
+	.points-chip__value {
 		font-family: var(--font-display);
 		font-weight: 600;
 	}
 
-	@media (max-width: 420px) {
-		.status-bar {
-			padding-block: 0.5rem;
-		}
 
-		.status-content {
-			gap: 0.75rem;
-		}
 
-		.status-center {
-			gap: 0.3rem;
-		}
-
-		.nav-button {
-			width: 36px;
-			height: 36px;
-		}
-
-		.score-card {
-			padding: 0.4rem 0.6rem;
-		}
-
-		.activity-stats {
-			justify-content: flex-start;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.nav-button,
-		.score-card,
-		.activity-chip {
-			transition: none;
-		}
-	}
 </style>

@@ -363,7 +363,7 @@
 		background:
 			radial-gradient(120% 120% at 50% 20%, rgba(68, 80, 255, 0.14) 0%, rgba(31, 196, 217, 0.12) 40%, rgba(255, 255, 255, 0.92) 100%);
 		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-		overflow: hidden;
+		
 		touch-action: manipulation;
 		-webkit-user-select: none;
 		-moz-user-select: none;
@@ -451,7 +451,7 @@
 		height: 0.55rem;
 		border-radius: var(--radius-full);
 		background: rgba(255, 255, 255, 0.24);
-		overflow: hidden;
+		
 	}
 
 	.progress-fill {
@@ -507,20 +507,9 @@
 		100% { transform: rotate(360deg); }
 	}
 
-	@media (max-width: 640px) {
-		:global(.game-zoom-controls) {
-			bottom: 1rem !important;
-			right: 1rem !important;
-		}
+	:global(.game-zoom-controls) {
+		bottom: 1rem !important;
+		right: 1rem !important;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.loading-spinner {
-			animation: none;
-		}
-
-		.progress-fill {
-			transition: none;
-		}
-	}
 </style>

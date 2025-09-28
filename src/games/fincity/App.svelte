@@ -93,11 +93,11 @@
 <style>
 	.app {
 		position: relative;
-		min-height: 100vh;
-		height: 100dvh;
+		min-height: 100%;
+		height: 100%;
 		background: var(--color-surface-page);
 		color: var(--color-fg-primary);
-		overflow: hidden;
+		
 		--game-shell-max-width: 500px;
 	}
 
@@ -126,8 +126,8 @@
 		position: relative;
 		z-index: 0;
 		width: 100%;
-		height: calc(100dvh - var(--global-status-bar-height, 0px));
-		min-height: calc(100dvh - var(--global-status-bar-height, 0px));
+		height: 100%;
+		min-height: 0;
 		display: flex;
 		justify-content: center;
 		align-items: stretch;
@@ -142,7 +142,7 @@
 		border: 1px solid var(--color-border-muted);
 		background: var(--color-surface-elevated);
 		box-shadow: var(--shadow-hard);
-		overflow: hidden;
+		
 		display: flex;
 	}
 
@@ -155,11 +155,6 @@
 		pointer-events: none;
 	}
 
-	.app__canvas {
-		flex: 1;
-		position: relative;
-		z-index: 1;
-	}
 
 	.app__overlay-top,
 	.app__overlay-bottom {
@@ -180,23 +175,8 @@
 		bottom: clamp(0.6rem, 1.8vw, 1.5rem);
 	}
 
-	.app__resources,
-	.app__actions {
-		pointer-events: auto;
-		width: min(var(--game-shell-max-width, 840px), 100%);
-	}
-
-	@media (max-width: 768px) {
-	
-
-		.app__canvas-frame {
-			border-radius: var(--radius-lg);
-		}
-
-		.app__resources,
-		.app__actions {
-			width: calc(100% - clamp(1rem, 6vw, 2rem));
-		}
+	.app__canvas-frame {
+		border-radius: var(--radius-lg);
 	}
 
 	:global(body) {

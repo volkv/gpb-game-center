@@ -197,7 +197,8 @@
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
-		overflow: hidden;
+		
+		line-clamp: 2;
 	}
 
 	.daily-rewards__action {
@@ -295,16 +296,8 @@
 		color: var(--color-brand-600);
 	}
 
-	@media (max-width: 560px) {
-		.daily-rewards__item {
-			flex: 0 0 min(240px, 82vw);
-		}
+	.daily-rewards__item {
+		flex: 0 0 min(240px, 82vw);
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.daily-rewards__item,
-		.daily-rewards__action {
-			transition: none;
-		}
-	}
 </style>

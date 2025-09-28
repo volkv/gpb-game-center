@@ -136,26 +136,5 @@
 		white-space: nowrap;
 	}
 
-	@media (max-width: 420px) {
-		.tab-navigation {
-			left: 0;
-			right: 0;
-			max-width: none;
-			border-radius: var(--radius-lg);
-			margin-inline: clamp(0.5rem, 3vw, 1rem);
-		}
 
-		.tab-item {
-			padding-block: 0.65rem;
-			gap: 0.35rem;
-			font-size: 0.75rem;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.tab-item,
-		.tab-icon :global(svg) {
-			transition: none;
-		}
-	}
 </style>

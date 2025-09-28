@@ -170,7 +170,7 @@
 		height: 6px;
 		border-radius: var(--radius-full);
 		background: var(--color-neutral-100);
-		overflow: hidden;
+		
 	}
 
 	.resources-bar__fill {
@@ -217,30 +217,18 @@
 		color: var(--color-fg-primary);
 	}
 
-	@media (max-width: 768px) {
-		.resources-bar__container {
-			gap: 0.75rem;
-			padding: 0.55rem 0.75rem;
-		}
-
-		.resources-bar__track {
-			width: 88px;
-		}
+	.resources-bar__container {
+		gap: 0.75rem;
+		padding: 0.55rem 0.75rem;
+		padding-inline: 0.6rem;
 	}
 
-	@media (max-width: 520px) {
-		.resources-bar__hint {
-			display: none;
-		}
-
-		.resources-bar__container {
-			padding-inline: 0.6rem;
-		}
+	.resources-bar__track {
+		width: 88px;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.resources-bar__fill {
-			transition: none;
-		}
+	.resources-bar__hint {
+		display: none;
 	}
+
 </style>

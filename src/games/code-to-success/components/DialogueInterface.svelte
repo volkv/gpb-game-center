@@ -206,22 +206,10 @@
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     cursor: pointer;
     user-select: none;
   }
 
-  @media screen and (orientation: landscape) and (max-height: 600px) {
-    .dialogue-interface {
-      transform: rotate(90deg);
-      transform-origin: center;
-      width: 100vh;
-      height: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-  }
 
   .background-container {
     position: absolute;
@@ -395,55 +383,6 @@
     }
   }
 
-  @media (max-width: 480px) {
-    .character-container {
-      right: 1rem;
-      max-width: 200px;
-      max-height: 280px;
-    }
 
-    .dialogue-window {
-      padding: 1.5rem 1rem 1rem;
-    }
 
-    .dialogue-text {
-      font-size: 1rem;
-    }
-
-    .progress-indicator {
-      top: 1rem;
-    }
-
-    .progress-dots {
-      padding: 0.5rem 0.75rem;
-    }
-  }
-
-  @media (max-width: 380px) {
-    .character-container {
-      max-width: 160px;
-      max-height: 220px;
-    }
-
-    .dialogue-window {
-      padding: 1.25rem 0.75rem 0.75rem;
-    }
-
-    .dialogue-text {
-      font-size: 0.95rem;
-      margin-bottom: 0.75rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .character-container,
-    .dialogue-window,
-    .dialogue-continue-hint {
-      animation: none;
-    }
-
-    .dialogue-interface {
-      transform: none !important;
-    }
-  }
 </style>

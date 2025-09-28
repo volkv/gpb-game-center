@@ -84,7 +84,7 @@
 		box-shadow: var(--shadow-focus);
 	}
 
-	.zoom-controls__button[disabled] {
+	.zoom-controls__button:disabled {
 		opacity: 0.45;
 		transform: none;
 		box-shadow: none;
@@ -98,26 +98,5 @@
 		line-height: 1;
 	}
 
-	@media (max-width: 640px) {
-		.zoom-controls {
-			gap: 0.3rem;
-			padding: 0.3rem;
-			bottom: calc(180px + 1rem);
-		}
 
-		.zoom-controls__button {
-			width: 2.4rem !important;
-			height: 2.4rem !important;
-		}
-
-		.zoom-controls__icon {
-			font-size: 1.05rem;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.zoom-controls__button {
-			transition: none !important;
-		}
-	}
 </style>

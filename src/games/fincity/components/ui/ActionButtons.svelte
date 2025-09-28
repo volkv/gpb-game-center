@@ -178,22 +178,6 @@
 	.action-toolbar__hint-icon {
 		color: var(--color-brand-600);
 	}
-
-	@media (min-width: 640px) {
-		.action-toolbar__actions {
-			flex-wrap: wrap;
-			justify-content: center;
-			overflow: visible;
-			scroll-snap-type: none;
-		}
-
-		.action-toolbar__button {
-			flex: 1 1 0;
-			min-width: 0;
-		}
-	}
-
-	@media (max-width: 520px) {
 		.action-toolbar__card {
 			padding: 0.75rem;
 		}
@@ -201,11 +185,5 @@
 		.action-toolbar__button {
 			min-width: 140px;
 		}
-	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.action-toolbar__button {
-			transition: none !important;
-		}
-	}
 </style>

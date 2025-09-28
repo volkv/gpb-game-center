@@ -71,9 +71,4 @@
     line-height: 1.4;
   }
 
-  @media (max-width: 768px) {
-    .expert-advice-card {
-      padding: 1rem;
-    }
-  }
 </style>

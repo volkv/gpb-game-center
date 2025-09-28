@@ -170,9 +170,11 @@
 
 <style>
 	.match3-container {
-		min-height: calc(100vh - 80px);
 		display: flex;
 		flex-direction: column;
+		flex: 1;
+		height: 100%;
+		min-height: 0;
 	}
 
 	.game-header {
@@ -282,25 +284,4 @@
 		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
-	@media (max-width: 480px) {
-		.game-board {
-			max-width: 280px;
-			gap: 3px;
-			padding: 0.5rem;
-		}
-
-		.stats-bar {
-			padding: 1rem;
-		}
-
-		.stat-item {
-			flex-direction: column;
-			gap: 0.25rem;
-			text-align: center;
-		}
-
-		.stat-value {
-			font-size: 1rem;
-		}
-	}
 </style>

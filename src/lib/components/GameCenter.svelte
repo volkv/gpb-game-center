@@ -7,6 +7,7 @@
 	import { getActiveGames, getComingSoonGames } from '$lib/data/games.js';
 	import { Clock, Trophy, Star } from 'lucide-svelte';
 	import type { Game } from '$lib/types/Game.js';
+	import StatsSection from './StatsSection.svelte';
 
 	const dispatch = createEventDispatcher<{ gameSelected: { game: Game } }>();
 
@@ -17,6 +18,12 @@
 
 	let totalPlayTime = $derived(247);
 	let completedGames = $derived(8);
+
+	const statsMetrics = $derived([
+		{ label: 'Минут в игре', value: totalPlayTime, icon: Clock },
+		{ label: 'Игр пройдено', value: completedGames, icon: Trophy },
+		{ label: 'Активных игр', value: activeGames.length, icon: Star }
+	]);
 
 	onMount(() => {
 		const allActiveGames = getActiveGames();
@@ -50,10 +57,13 @@
 				</div>
 
 				<div class="mt-5 hero-score" aria-live="polite">
-					<Star size={20} aria-hidden="true" />
 					<div>
 						<span class="hero-score__label">Всего очков</span>
-						<span class="hero-score__value">{$totalPoints.toLocaleString()}</span>
+						<div class="hero-score__value-wrapper">
+					
+							<span class="hero-score__value">{$totalPoints.toLocaleString()}</span>
+							<Star size={20} aria-hidden="true" />
+						</div>
 					</div>
 				</div>
 			</div>
@@ -61,31 +71,7 @@
 	{/if}
 
 	{#if showContent}
-		<section class="stats surface-card" aria-label="Статистика игрока">
-			<div class="stats-grid">
-				<div class="metric-card">
-					<Clock size={18} aria-hidden="true" />
-					<div>
-						<span class="metric-card__label">Минут в игре</span>
-						<span class="metric-card__value">{totalPlayTime}</span>
-					</div>
-				</div>
-				<div class="metric-card">
-					<Trophy size={18} aria-hidden="true" />
-					<div>
-						<span class="metric-card__label">Игр пройдено</span>
-						<span class="metric-card__value">{completedGames}</span>
-					</div>
-				</div>
-				<div class="metric-card">
-					<Star size={18} aria-hidden="true" />
-					<div>
-						<span class="metric-card__label">Активных игр</span>
-						<span class="metric-card__value">{activeGames.length}</span>
-					</div>
-				</div>
-			</div>
-		</section>
+		<StatsSection ariaLabel="Статистика игрока" metrics={statsMetrics} columns={3} />
 
 		<section class="section" aria-labelledby="active-games-heading">
 			<div class="section-heading">
@@ -164,18 +150,12 @@
 	}
 
 	.hero-score {
-		display: grid;
-		grid-template-columns: auto 1fr;
-		gap: 0.75rem;
-		align-items: center;
+		display: flex;
+		justify-content: flex-start;
 		padding: 0.75rem 1rem;
 		border-radius: var(--radius-lg);
 		background-color: rgba(255, 255, 255, 0.14);
 		backdrop-filter: blur(6px);
-	}
-
-	.hero-score :global(svg) {
-		color: rgba(255, 255, 255, 0.82);
 	}
 
 	.hero-score__label {
@@ -193,52 +173,17 @@
 		color: var(--color-fg-inverse);
 	}
 
-	.stats {
-		padding: 1.5rem;
-	}
-
-	.stats-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-		gap: 1rem;
-	}
-
-	.metric-card {
+	.hero-score__value-wrapper {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		border-radius: var(--radius-lg);
-		border: 1px solid var(--color-border-subtle);
-		padding: 1rem;
-		background: linear-gradient(135deg, rgba(6, 6, 152, 0.12) 0%, rgba(31, 196, 217, 0.08) 100%);
+		gap: 0.5rem;
 	}
 
-	.metric-card:nth-child(2) {
-		background: linear-gradient(135deg, rgba(31, 196, 217, 0.14) 0%, rgba(31, 196, 217, 0.05) 100%);
+	.hero-score__value-wrapper :global(svg) {
+		color: rgba(255, 255, 255, 0.82);
+		flex-shrink: 0;
 	}
 
-	.metric-card:nth-child(3) {
-		background: linear-gradient(135deg, rgba(6, 6, 152, 0.14) 0%, rgba(6, 6, 152, 0.05) 100%);
-	}
-
-	.metric-card :global(svg) {
-		color: var(--color-brand-500);
-	}
-
-	.metric-card__label {
-		display: block;
-		font-size: 0.75rem;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: var(--color-fg-muted);
-	}
-
-	.metric-card__value {
-		font-family: var(--font-display);
-		font-size: 1.35rem;
-		font-weight: 600;
-		color: var(--color-fg-primary);
-	}
 
 	.section {
 		display: flex;
@@ -258,31 +203,5 @@
 
 	.games-grid__item {
 		list-style: none;
-	}
-
-	@media (max-width: 420px) {
-		.hero {
-			padding: 1.5rem;
-		}
-
-		.stats {
-			padding: 1.25rem;
-		}
-
-		.games-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (min-width: 768px) {
-		.hero {
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
-		}
-
-		.hero-score {
-			max-width: 15rem;
-		}
 	}
 </style>

@@ -118,7 +118,6 @@
     height: 1px;
     padding: 0;
     margin: -1px;
-    overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
@@ -137,17 +136,6 @@
     writing-mode: initial;
   }
 
-  @media screen and (orientation: landscape) and (max-height: 600px) {
-    .character-selection {
-      transform: rotate(90deg);
-      transform-origin: center;
-      width: 100vh;
-      height: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-  }
 
   .character-selection__header {
     text-align: center;
@@ -216,7 +204,6 @@
     height: 80px;
     margin: 0 auto 1rem;
     border-radius: var(--radius-full);
-    overflow: hidden;
     background: var(--color-neutral-100);
     box-shadow: var(--shadow-soft);
   }
@@ -275,56 +262,6 @@
     margin: 0 0 1.25rem 0;
   }
 
-  @media (max-width: 480px) {
-    .character-selection {
-      padding: 1.5rem 0.75rem;
-    }
 
-    .character-card {
-      padding: 1.25rem;
-    }
 
-    .character-selection__title {
-      font-size: 1.5rem;
-    }
-
-    .character-card__image {
-      width: 70px;
-      height: 70px;
-    }
-
-    .character-card__name {
-      font-size: 1.125rem;
-    }
-  }
-
-  @media (max-width: 380px) {
-    .character-selection {
-      padding: 1rem 0.5rem;
-    }
-
-    .character-card {
-      padding: 1rem;
-    }
-
-    .character-selection__title {
-      font-size: 1.375rem;
-    }
-
-    .character-card__image {
-      width: 60px;
-      height: 60px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .character-card,
-    .character-card__image img {
-      transition: none;
-    }
-
-    .character-card--available:hover {
-      transform: none;
-    }
-  }
 </style>

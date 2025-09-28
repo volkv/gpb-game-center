@@ -24,7 +24,6 @@
   import ProductSpotlight, { type ProductSpotlightData } from './components/ProductSpotlight.svelte';
   import ReminderOptIn from './components/ReminderOptIn.svelte';
   import ReminderBanner from './components/ReminderBanner.svelte';
-  import type StatsDashboardType from './components/StatsDashboard.svelte';
   import type {
     AchievementView,
     FavoriteCategory,
@@ -179,7 +178,7 @@
   let activeProduct = $state<ProductMoment | null>(null);
   let scorePulse = $state(false);
 
-  let StatsDashboardComponent = $state<StatsDashboardType | null>(null);
+  let StatsDashboardComponent = $state<any>(null);
   let isStatsComponentLoading = $state(false);
   let statsComponentError = $state<string | null>(null);
 
@@ -188,21 +187,14 @@
   let activeReminder = $state<ReminderQueueItem | null>(null);
   let reminderProcessing = $state(false);
 
-  let prefersReducedMotion = $state(false);
-  let motionQuery: MediaQueryList | null = null;
 
-  const reminderPermission = $derived<ReminderPermissionState>(() => reminderSettings.permission);
-  const nextReminderFireAt = $derived<number | undefined>(() => {
+  const reminderPermission = $derived<ReminderPermissionState>(reminderSettings.permission);
+  const nextReminderFireAt = $derived(() => {
     const upcoming = reminderSettings.reminders
       .filter((record) => !record.delivered)
       .sort((a, b) => a.fireAt - b.fireAt)[0];
     return upcoming?.fireAt;
   });
-  function accessibleFade(node: Element, options?: Parameters<typeof fade>[1]) {
-    const requested = options?.duration ?? 220;
-    const duration = prefersReducedMotion ? Math.max(1, Math.min(requested, 120)) : requested;
-    return fade(node, { ...options, duration });
-  }
 
   const questions: QuizQuestion[] = [
     {
@@ -934,21 +926,7 @@
     return { updatedProgress: updated, unlockedAchievements: newlyUnlocked };
   }
 
-  function handleMotionPreferenceChange(event: MediaQueryListEvent) {
-    prefersReducedMotion = event.matches;
-  }
 
-  function detachMotionPreferenceListener() {
-    if (!motionQuery) return;
-
-    if (typeof motionQuery.removeEventListener === 'function') {
-      motionQuery.removeEventListener('change', handleMotionPreferenceChange);
-    } else if (typeof motionQuery.removeListener === 'function') {
-      motionQuery.removeListener(handleMotionPreferenceChange);
-    }
-
-    motionQuery = null;
-  }
 
   function enqueueReminder(record: ReminderRecord, origin: ReminderOrigin) {
     const item: ReminderQueueItem = { ...record, origin };
@@ -1079,7 +1057,7 @@
 
     try {
       const module = await import('./components/StatsDashboard.svelte');
-      StatsDashboardComponent = module.default as StatsDashboardType;
+      StatsDashboardComponent = module.default;
       trackEvent('stats_component_loaded');
     } catch (error) {
       statsComponentError = 'Не удалось загрузить статистику';
@@ -1093,17 +1071,6 @@
     loadProgressFromStorage();
     trackEvent('quiz_view', { questions: questions.length });
 
-    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-      const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-      prefersReducedMotion = query.matches;
-      motionQuery = query;
-
-      if (typeof query.addEventListener === 'function') {
-        query.addEventListener('change', handleMotionPreferenceChange);
-      } else if (typeof query.addListener === 'function') {
-        query.addListener(handleMotionPreferenceChange);
-      }
-    }
 
     const { settings, dueReminders } = initReminderService(handleReminderDue);
     reminderSettings = settings;
@@ -1114,12 +1081,12 @@
     }
 
     return () => {
-      detachMotionPreferenceListener();
+      // Motion preference listener cleanup removed - function does not exist
     };
   });
 
   onDestroy(() => {
-    detachMotionPreferenceListener();
+    // Motion preference listener cleanup removed - function does not exist
   });
 
   const productMoments: ProductMoment[] = [
@@ -1229,13 +1196,13 @@
     };
   });
 
-  const currentMicroLesson = $derived(() => currentQuestion.microLesson);
-  const summaryMetrics = $derived<SummaryMetrics>(() => computeSummaryMetrics(playerProgress));
-  const topCategories = $derived<FavoriteCategory[]>(() => computeFavoriteCategories(playerProgress));
-  const levelOverview = $derived<LevelOverview>(() => buildLevelOverview(playerProgress));
-  const achievementViews = $derived<AchievementView[]>(() => buildAchievementViews(playerProgress, sessionAchievements));
+  const currentMicroLesson = $derived(currentQuestion.microLesson);
+  const summaryMetrics = $derived<SummaryMetrics>(computeSummaryMetrics(playerProgress));
+  const topCategories = $derived<FavoriteCategory[]>(computeFavoriteCategories(playerProgress));
+  const levelOverview = $derived<LevelOverview>(buildLevelOverview(playerProgress));
+  const achievementViews = $derived<AchievementView[]>(buildAchievementViews(playerProgress, sessionAchievements));
   const hasRecordedSessions = $derived(playerProgress.totalSessions > 0);
-  const recentAchievements = $derived(() => achievementViews.filter((achievement) => achievement.isNew));
+  const recentAchievements = $derived(achievementViews.filter((achievement) => achievement.isNew));
 
   function isProductUnlocked(id: string) {
     return unlockedProductIds.includes(id);
@@ -1319,7 +1286,7 @@
       if (typeof window !== 'undefined') {
         window.setTimeout(() => {
           scorePulse = false;
-        }, prefersReducedMotion ? 0 : 480);
+        }, 480);
       } else {
         scorePulse = false;
       }
@@ -1343,8 +1310,8 @@
       questionId: currentQuestion.id,
       correct: isCorrect,
       difficulty: currentQuestion.difficulty,
-      stageIndex: stageInfo.stageIndex,
-      stagePosition: stageInfo.stagePosition
+      stageIndex: stageInfo().stageIndex,
+      stagePosition: stageInfo().stagePosition
     });
   }
 
@@ -1457,7 +1424,7 @@
 <GameLayout gameName="Щит и Рубль" background="gradient-electric" showScore={true}>
   <div class="quiz-game">
     {#if activeReminder}
-      <div class="quiz-reminder" transition:accessibleFade|local={{ duration: 220 }}>
+      <div class="quiz-reminder">
         <ReminderBanner
           title={activeReminder.title}
           message={activeReminder.body}
@@ -1471,7 +1438,7 @@
       <section
         class="quiz-stage quiz-stage--stats"
         aria-live="polite"
-        transition:accessibleFade|local={{ duration: 220 }}
+
       >
         {#if StatsDashboardComponent}
           <StatsDashboardComponent
@@ -1501,19 +1468,12 @@
       <section
         class="quiz-stage quiz-stage--intro"
         aria-label="Информация об игре"
-        transition:accessibleFade|local={{ duration: 220 }}
       >
         <article class="intro-card surface-card">
           <div class="intro-card__icon">
             <Shield size={36} aria-hidden="true" />
           </div>
 
-          <LazyImage
-            src="/images/games/quiz-shield-ruble.svg"
-            alt="Иллюстрация защиты от финансовых мошенников"
-            class="intro-card__art"
-            loading="lazy"
-          />
 
           <div class="intro-card__copy">
             <span class="chip intro-card__chip">Финансовая безопасность</span>
@@ -1570,11 +1530,7 @@
               <BarChart3 size={16} aria-hidden="true" />
               Статистика и достижения
             </Button>
-            {#if onexit}
-              <Button variant="secondary" size="md" onclick={onexit}>
-                Вернуться назад
-              </Button>
-            {/if}
+     
           </div>
         </article>
       </section>
@@ -1582,7 +1538,6 @@
       <section
         class="quiz-stage quiz-stage--result"
         aria-live="polite"
-        transition:accessibleFade|local={{ duration: 220 }}
       >
         <article class="result-card surface-card">
           <div class="result-card__icon">
@@ -1679,7 +1634,7 @@
             isProcessing={reminderProcessing}
             onEnable={handleReminderEnable}
             onDisable={handleReminderDisable}
-            nextFireAt={nextReminderFireAt}
+            nextFireAt={nextReminderFireAt()}
           />
 
           {#if recentAchievements.length > 0}
@@ -1689,7 +1644,10 @@
                 {#each recentAchievements as achievement}
                   <li class="result-achievements__item">
                     <span class="result-achievements__icon">
-                      {@render achievement.icon({ size: 16, 'aria-hidden': true })}
+                      {#if achievement.icon}
+                        {@const IconComponent = achievement.icon}
+                        <IconComponent aria-hidden="true" />
+                      {/if}
                     </span>
                     <span class="result-achievements__title">{achievement.title}</span>
                   </li>
@@ -1749,7 +1707,6 @@
         <section
           class="quiz-stage quiz-stage--product"
           aria-live="polite"
-          transition:accessibleFade|local={{ duration: 220 }}
         >
           <div class="product-progress">
             <div
@@ -1775,64 +1732,38 @@
         <section
           class="quiz-stage quiz-stage--playing"
           aria-live="polite"
-          transition:accessibleFade|local={{ duration: 220 }}
         >
           <header class="quiz-hud surface-card">
-            <div class="quiz-hud__top">
-              <div>
-                <span class="quiz-hud__label">Вопрос</span>
-                <p class="quiz-hud__value">
-                  {currentQuestionIndex + 1}
-                  <span class="quiz-hud__total">/ {questions.length}</span>
-                </p>
+            <span class="quiz-hud__question">
+              {currentQuestionIndex + 1} / {questions.length}
+            </span>
+            <div class="quiz-hud__progress">
+              <ProgressBar value={quizProgress} max={100} color="electric" shimmer={false} />
+            </div>
+            <div class="quiz-hud__pills">
+              <div
+                class="score-pill"
+                class:score-pill--pulse={scorePulse}
+                aria-label={`Набрано очков: ${score}`}
+              >
+                <Star size={16} aria-hidden="true" />
+                <span>{score}</span>
               </div>
-              <div class="quiz-hud__pills">
-                <div
-                  class="score-pill"
-                  class:score-pill--pulse={scorePulse}
-                  aria-label={`Набрано очков: ${score}`}
-                >
-                  <Star size={16} aria-hidden="true" />
-                  <span>{score}</span>
-                </div>
-                <div
-                  class="score-pill score-pill--defense"
-                  aria-label={`Уровень защиты: ${defenseScore} из ${maxDefenseScore}`}
-                >
-                  <ShieldCheck size={16} aria-hidden="true" />
-                  <span>+{defenseScore}</span>
-                  <span class="score-pill__total">/ {maxDefenseScore}</span>
-                </div>
+              <div
+                class="score-pill score-pill--defense"
+                aria-label={`Уровень защиты: ${defenseScore} из ${maxDefenseScore}`}
+              >
+                <ShieldCheck size={16} aria-hidden="true" />
+                <span>+{defenseScore}</span>
               </div>
             </div>
-
-            <div class="quiz-stage-info" aria-live="polite">
-              <div class="quiz-stage-info__stage">
-                <BarChart3 size={16} aria-hidden="true" />
-              <span>Этап {stageInfo.stageIndex}/{stageInfo.totalStages}</span>
-            </div>
-            <div class="quiz-stage-info__details">
-              <span class="quiz-stage-info__label">{stageInfo.stageLabel}</span>
-              <span class="quiz-stage-info__counter">
-                Вопрос {stageInfo.stagePosition} из {stageInfo.questionsInStage}
-              </span>
-            </div>
-          </div>
-
-          <div class="quiz-progress">
-            <div class="quiz-progress__meta">
-              <span>Прогресс</span>
-              <span>{Math.round(quizProgress)}%</span>
-            </div>
-            <ProgressBar value={quizProgress} max={100} color="electric" shimmer={false} />
-          </div>
-        </header>
+          </header>
 
         <article class="question-card surface-card" aria-live="polite">
-          {#if stageInfo.isStageStart}
+          {#if stageInfo().isStageStart}
             <div class="stage-banner" role="status">
-              <span class="stage-banner__stage">Этап {stageInfo.stageIndex} из {stageInfo.totalStages}</span>
-              <span class="stage-banner__label">{stageInfo.stageLabel}</span>
+              <span class="stage-banner__stage">Этап {stageInfo().stageIndex} из {stageInfo().totalStages}</span>
+              <span class="stage-banner__label">{stageInfo().stageLabel}</span>
             </div>
           {/if}
 
@@ -1975,13 +1906,16 @@
 
 <style>
   .quiz-game {
-    min-height: calc(100vh - 80px);
-    padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 5vw, 2.25rem);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     gap: 1rem;
+    width: 100%;
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+
   }
 
   .quiz-stage {
@@ -1997,14 +1931,12 @@
 
   .quiz-stage--intro,
   .quiz-stage--result {
-    margin-block: auto;
+
     align-items: center;
     text-align: center;
   }
 
-  .quiz-stage--stats {
-    margin-block: auto;
-  }
+
 
   .stats-loader {
     display: inline-flex;
@@ -2036,7 +1968,7 @@
   }
 
   .quiz-stage--product {
-    margin-block: auto;
+
     align-items: center;
     gap: 1.5rem;
   }
@@ -2071,20 +2003,6 @@
     color: var(--color-brand-600);
   }
 
-  .intro-card__art {
-    width: clamp(160px, 45%, 220px);
-    aspect-ratio: 1;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    box-shadow: var(--shadow-soft);
-    animation: intro-art-float 6s ease-in-out infinite alternate;
-  }
-
-  .intro-card__art :global(img) {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
 
   .intro-card__chip {
     background: var(--layer-brand-100);
@@ -2108,8 +2026,8 @@
   .intro-card__metrics {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
   }
 
   .intro-card__progress {
@@ -2160,25 +2078,26 @@
   }
 
   .intro-metric {
-    padding: 0.85rem;
+    padding: 0.7rem 0.6rem;
     border-radius: var(--radius-lg);
     background: var(--color-surface-muted);
     border: 1px solid var(--color-border-subtle);
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.2rem;
     align-items: center;
+    text-align: center;
   }
 
   .intro-metric__value {
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 600;
     color: var(--color-fg-primary);
   }
 
   .intro-metric__label {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-fg-muted);
@@ -2542,18 +2461,66 @@
   }
 
   .quiz-hud {
-    padding: 1.25rem;
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-muted);
+    background: var(--color-surface-card);
+    box-shadow: var(--shadow-sm);
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 1rem;
   }
 
-  .quiz-hud__top {
+  .quiz-hud__question {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-fg-default);
+    white-space: nowrap;
+  }
+
+  .quiz-hud__progress {
+    flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
   }
+
+  .quiz-hud__progress :global(.progress-container) {
+    width: 100%;
+  }
+
+  .quiz-hud__progress :global(.progress-bar) {
+    height: 4px !important;
+    border-radius: var(--radius-full);
+    background: var(--color-border-muted);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .quiz-hud__progress :global(.progress-fill) {
+    height: 100%;
+    border-radius: var(--radius-full);
+    transition: width 300ms ease;
+  }
+
+  .quiz-hud__progress :global(.h-1) {
+    height: 4px !important;
+  }
+
+  .quiz-hud__progress :global(.h-2) {
+    height: 4px !important;
+  }
+
+  .quiz-hud__progress :global(.h-3) {
+    height: 4px !important;
+  }
+
+  .quiz-hud__pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
 
   .quiz-stage-info {
     display: flex;
@@ -2601,28 +2568,6 @@
     text-transform: uppercase;
   }
 
-  .quiz-hud__label {
-    display: block;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-fg-muted);
-    margin-bottom: 0.25rem;
-  }
-
-  .quiz-hud__value {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-fg-primary);
-  }
-
-  .quiz-hud__total {
-    font-size: 1rem;
-    color: var(--color-fg-muted);
-    margin-left: 0.25rem;
-  }
 
   .score-pill {
     display: inline-flex;
@@ -3065,73 +3010,55 @@
 
   .quiz-actions :global(button) {
     min-width: 200px;
+    width: 100%;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .intro-card__art,
-    .score-pill--pulse,
-    .result-score__value--pulse,
-    .reminder-optin__spinner,
-    .stats-loader__spinner {
-      animation: none !important;
-    }
 
-    .score-pill,
-    .result-score__value,
-    .answer-option,
-    .reminder-banner__close {
-      transition: none !important;
-    }
+
+  .quiz-hud__top {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
-  @media (max-width: 768px) {
-    .quiz-game {
-      padding: 1.5rem 1rem 2.5rem;
-    }
-
-    .quiz-hud__top {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .score-pill {
-      align-self: flex-start;
-    }
-
-    .quiz-stage-info {
-      flex-direction: column;
-      align-items: flex-start;
-      text-align: left;
-      width: 100%;
-    }
-
-    .quiz-stage-info__details {
-      text-align: left;
-      align-items: flex-start;
-    }
-
-    .quiz-actions :global(button) {
-      min-width: 0;
-      width: 100%;
-    }
-
-    .quiz-actions {
-      justify-content: stretch;
-    }
+  .score-pill {
+    align-self: flex-start;
   }
 
-  @media (max-width: 480px) {
-    .intro-card,
-    .result-card,
-    .quiz-hud,
-    .question-card,
-    .explanation-card {
-      border-radius: var(--radius-lg);
-    }
+  .quiz-stage-info {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+  }
 
-    .result-actions :global(button) {
-      flex: 1 1 100%;
-      min-width: 0;
-    }
+  .quiz-stage-info__details {
+    text-align: left;
+    align-items: flex-start;
+  }
+
+  .quiz-actions {
+    justify-content: stretch;
+  }
+
+  .intro-card__metrics {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .intro-metric {
+    padding: 0.8rem;
+  }
+
+  .intro-card,
+  .result-card,
+  .quiz-hud,
+  .question-card,
+  .explanation-card {
+    border-radius: var(--radius-lg);
+  }
+
+  .result-actions :global(button) {
+    flex: 1 1 100%;
+    min-width: 0;
   }
 </style>

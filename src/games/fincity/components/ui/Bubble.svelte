@@ -194,9 +194,4 @@
 		color: var(--color-fg-primary);
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.bubble {
-			transition: none;
-		}
-	}
 </style>

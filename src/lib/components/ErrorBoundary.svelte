@@ -166,14 +166,12 @@
 		100% { transform: rotate(360deg); }
 	}
 
-	@media (max-width: 480px) {
-		.error-content {
-			margin: 1rem;
-			padding: 1.5rem;
-		}
+	.error-content {
+		margin: 1rem;
+		padding: 1.5rem;
+	}
 
-		.error-actions {
-			flex-direction: column;
-		}
+	.error-actions {
+		flex-direction: column;
 	}
 </style>

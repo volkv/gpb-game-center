@@ -80,7 +80,7 @@
     social: 'Социальная инженерия'
   };
 
-  const ariaDescription = $derived(() => evidence.ariaLabel ?? typeLabels[evidence.type]);
+  const ariaDescription = $derived(evidence.ariaLabel ?? typeLabels[evidence.type]);
 
   function openModal() {
     isModalOpen = true;
@@ -291,7 +291,6 @@
     background: var(--color-surface-card);
     border: 1px solid var(--color-border-subtle);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-    overflow: hidden;
     display: flex;
     flex-direction: column;
   }
@@ -409,7 +408,6 @@
     background: var(--color-surface-base);
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border-muted);
-    overflow: hidden;
   }
 
   .web-header {
@@ -545,7 +543,6 @@
   .chat-shell {
     background: var(--color-surface-muted);
     border-radius: var(--radius-lg);
-    overflow: hidden;
     border: 1px solid var(--color-border-subtle);
   }
 
@@ -602,14 +599,4 @@
     color: var(--color-fg-secondary);
   }
 
-  @media (max-width: 480px) {
-    .evidence-preview__card {
-      padding: 0.75rem;
-    }
-
-    .evidence-frame--modal {
-      padding: 0.75rem;
-      gap: 0.75rem;
-    }
-  }
 </style>

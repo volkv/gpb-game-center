@@ -46,7 +46,6 @@
     background: linear-gradient(135deg, rgba(55, 151, 211, 0.16), rgba(27, 76, 176, 0.1));
     box-shadow: var(--shadow-soft);
     position: relative;
-    overflow: hidden;
   }
 
   .reminder-banner::before {
@@ -111,27 +110,5 @@
     color: var(--color-brand-600);
   }
 
-  @media (max-width: 580px) {
-    .reminder-banner {
-      grid-template-columns: auto 1fr;
-      grid-template-rows: repeat(3, auto);
-    }
 
-    .reminder-banner__actions {
-      grid-column: span 2;
-    }
-
-    .reminder-banner__close {
-      position: absolute;
-      top: 0.35rem;
-      right: 0.35rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .reminder-banner,
-    .reminder-banner__close {
-      transition: none;
-    }
-  }
 </style>

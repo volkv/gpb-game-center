@@ -291,53 +291,5 @@
   }
 
   /* Мобильная адаптация */
-  @media (max-width: 400px) {
-    .loading-content {
-      max-width: 320px;
-      padding: 1.5rem;
-      gap: 1.5rem;
-    }
 
-    .app-title {
-      font-size: 1.5rem;
-      line-height: 1.75rem;
-    }
-
-    .app-subtitle {
-      font-size: 1rem;
-      line-height: 1.5rem;
-    }
-
-    .stage-dot {
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-
-    .tip-bubble {
-      padding: 0.75rem 1rem;
-      gap: 0.5rem;
-    }
-
-    .tip-text {
-      font-size: 0.75rem;
-      line-height: 1rem;
-    }
-  }
-
-  @media (max-width: 320px) {
-    .loading-content {
-      max-width: 280px;
-      padding: 1rem;
-      gap: 1rem;
-    }
-
-    .app-title {
-      font-size: 1.25rem;
-      line-height: 1.5rem;
-    }
-
-    .stage-dots {
-      gap: 0.5rem;
-    }
-  }
 </style>

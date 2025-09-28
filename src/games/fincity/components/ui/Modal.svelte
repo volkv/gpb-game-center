@@ -134,7 +134,7 @@
 		border: 1px solid var(--color-border-muted);
 		background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
 		box-shadow: var(--shadow-hard);
-		overflow: hidden;
+		
 	}
 
 	.modal-game--sm {
@@ -223,35 +223,27 @@
 		min-height: 44px;
 	}
 
-	@media (max-width: 768px) {
-		.modal-overlay-game {
-			padding: clamp(0.75rem, 4vw, 1.5rem);
-		}
-
-		.modal-game {
-			width: 100%;
-			max-height: calc(100vh - clamp(1.5rem, 6vw, 2.5rem));
-		}
-
-		.modal-header-game {
-			padding: 1rem 1.25rem;
-		}
-
-		.modal-footer-game {
-			flex-direction: column;
-		}
-
-		.modal-footer-game :global(button) {
-			width: 100%;
-		}
+	.modal-overlay-game {
+		padding: clamp(0.75rem, 4vw, 1.5rem);
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.modal-overlay-game,
-		.btn-icon {
-			transition: none;
-		}
+	.modal-game {
+		width: 100%;
+		max-height: calc(100vh - clamp(1.5rem, 6vw, 2.5rem));
 	}
+
+	.modal-header-game {
+		padding: 1rem 1.25rem;
+	}
+
+	.modal-footer-game {
+		flex-direction: column;
+	}
+
+	.modal-footer-game :global(button) {
+		width: 100%;
+	}
+
 </style>
 
 {#if open}

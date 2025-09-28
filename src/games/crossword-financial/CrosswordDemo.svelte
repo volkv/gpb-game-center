@@ -740,33 +740,4 @@
 		75% { transform: rotate(5deg) scale(1.1); }
 	}
 
-	@media (max-width: 380px) {
-		.letter-cell {
-			width: calc(min(40px, (100vw - 3rem) / var(--word-length) - 0.25rem));
-			height: calc(min(40px, (100vw - 3rem) / var(--word-length) - 0.25rem));
-			font-size: clamp(0.875rem, 2vw, 1rem);
-		}
-
-
-
-		.keyboard-key {
-			min-width: 28px;
-			height: 42px;
-			font-size: 0.75rem;
-		}
-
-		.keyboard-key-wide {
-			min-width: 42px;
-			font-size: 0.65rem;
-		}
-
-		.virtual-keyboard {
-			margin: 1.5rem 0 0.75rem 0;
-			gap: 0.375rem;
-		}
-
-		.keyboard-row {
-			gap: 0.2rem;
-		}
-	}
 </style>

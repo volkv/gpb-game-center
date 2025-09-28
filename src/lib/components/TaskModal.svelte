@@ -434,7 +434,7 @@
 		margin-top: 0.5rem;
 		border-radius: 999px;
 		background: color-mix(in srgb, var(--color-state-success) 12%, transparent);
-		overflow: hidden;
+		
 		align-self: stretch;
 	}
 
@@ -459,23 +459,21 @@
 		}
 	}
 
-	@media (max-width: 560px) {
-		.task-header {
-			flex-direction: column;
-			align-items: center;
-		}
+	.task-header {
+		flex-direction: column;
+		align-items: center;
+	}
 
-		.task-info {
-			align-items: center;
-			text-align: center;
-		}
+	.task-info {
+		align-items: center;
+		text-align: center;
+	}
 
-		.task-meta-info {
-			gap: 0.75rem;
-		}
+	.task-meta-info {
+		gap: 0.75rem;
+	}
 
-		.meta-item {
-			justify-content: center;
-		}
+	.meta-item {
+		justify-content: center;
 	}
 </style>

@@ -6,12 +6,18 @@
 	import DailyRewards from './DailyRewards.svelte';
 	import TaskCard from './TaskCard.svelte';
 	import TaskModal from './TaskModal.svelte';
+	import StatsSection from './StatsSection.svelte';
 	import type { Task } from '$lib/types/Tasks';
 
 	let mounted = $state(false);
 	let selectedTask = $state<Task | null>(null);
 	let isModalOpen = $state(false);
 	let currentFilter = $state<'all' | 'available' | 'completed'>('available');
+
+	const statsMetrics = $derived([
+		{ label: 'Выполнено заданий', value: $totalTasksCompleted, icon: CheckSquare },
+		{ label: 'Баллов заработано', value: $totalRewardsEarned, icon: Trophy }
+	]);
 
 	const filteredTasks = $derived(() => {
 		switch (currentFilter) {
@@ -71,24 +77,7 @@
 			<DailyRewards />
 		</section>
 
-		<section class="stats surface-card" aria-label="Результаты">
-			<div class="stats-grid">
-				<div class="metric-card">
-					<CheckSquare size={18} aria-hidden="true" />
-					<div>
-						<span class="metric-card__label">Выполнено заданий</span>
-						<span class="metric-card__value">{$totalTasksCompleted}</span>
-					</div>
-				</div>
-				<div class="metric-card">
-					<Trophy size={18} aria-hidden="true" />
-					<div>
-						<span class="metric-card__label">Баллов заработано</span>
-						<span class="metric-card__value">{$totalRewardsEarned.toLocaleString()}</span>
-					</div>
-				</div>
-			</div>
-		</section>
+		<StatsSection ariaLabel="Результаты" metrics={statsMetrics} columns={2} />
 
 		<section class="section" aria-labelledby="tasks-list-heading">
 			<div class="section-heading section-heading--split">
@@ -96,18 +85,6 @@
 					<p class="section-heading__eyebrow">Список</p>
 					<h2 class="section-heading__title" id="tasks-list-heading">Доступные задания</h2>
 				</div>
-				<!-- <div class="filter-controls">
-					<Filter size={16} aria-hidden="true" />
-					<select
-						bind:value={currentFilter}
-						class="filter-select"
-						aria-label={`Фильтр заданий: ${getFilterLabel(currentFilter)}`}
-					>
-						<option value="all">Все ({$availableTasks.length + $completedTasks.length})</option>
-						<option value="available">Доступные ({$availableTasks.length})</option>
-						<option value="completed">Выполненные ({$completedTasks.length})</option>
-					</select>
-				</div> -->
 			</div>
 
 			<div class="tasks-grid" role="list">
@@ -187,47 +164,6 @@
 		padding: 1.5rem;
 	}
 
-	.stats {
-		padding: 1.5rem;
-	}
-
-	.stats-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 1rem;
-	}
-
-	.metric-card {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		border-radius: var(--radius-lg);
-		border: 1px solid var(--color-border-subtle);
-		padding: 1rem;
-		background: linear-gradient(135deg, rgba(6, 6, 152, 0.1) 0%, rgba(31, 196, 217, 0.06) 100%);
-	}
-
-	.metric-card:nth-child(2) {
-		background: linear-gradient(135deg, rgba(31, 196, 217, 0.12) 0%, rgba(6, 6, 152, 0.05) 100%);
-	}
-
-	.metric-card :global(svg) {
-		color: var(--color-brand-600);
-	}
-
-	.metric-card__label {
-		display: block;
-		font-size: 0.75rem;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-		color: var(--color-fg-muted);
-	}
-
-	.metric-card__value {
-		font-family: var(--font-display);
-		font-size: 1.4rem;
-		font-weight: 600;
-	}
 
 	.section {
 		display: flex;
@@ -242,35 +178,6 @@
 		gap: 1rem;
 	}
 
-	.filter-controls {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.35rem 0.6rem;
-		border-radius: var(--radius-full);
-		background: var(--color-neutral-100);
-		border: 1px solid var(--color-border-subtle);
-		color: var(--color-fg-secondary);
-	}
-
-	.filter-controls :global(svg) {
-		color: var(--color-fg-muted);
-	}
-
-	.filter-select {
-		background: transparent;
-		border: none;
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: var(--color-fg-primary);
-		appearance: none;
-		padding: 0;
-		cursor: pointer;
-	}
-
-	.filter-select:focus-visible {
-		outline: none;
-	}
 
 	.tasks-grid {
 		display: grid;
@@ -308,22 +215,13 @@
 		color: var(--color-fg-muted);
 	}
 
-	@media (max-width: 540px) {
-		.hero,
-		.daily,
-		.stats {
-			padding: 1.25rem;
-		}
-
-		.tasks-grid {
-			grid-template-columns: 1fr;
-		}
+	.hero,
+	.daily {
+		padding: 1.25rem;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.metric-card,
-		.filter-controls {
-			transition: none;
-		}
+	.tasks-grid {
+		grid-template-columns: 1fr;
 	}
+
 </style>

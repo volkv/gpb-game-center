@@ -167,7 +167,7 @@
 		background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
 		box-shadow: var(--shadow-soft);
 		transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-		overflow: hidden;
+		
 	}
 
 	.game-card--elevated {
@@ -276,12 +276,4 @@
 		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.game-card,
-		.game-card--clickable,
-		.particle {
-			transition: none;
-			animation: none;
-		}
-	}
 </style>

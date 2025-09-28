@@ -217,25 +217,5 @@
 		color: var(--color-fg-muted);
 	}
 
-	@media (max-width: 420px) {
-		.hero {
-			padding: 1.5rem;
-		}
 
-		.summary {
-			padding: 1.25rem;
-		}
-
-		.rewards-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.summary,
-		.section,
-		.rewards-grid__item {
-			transition: none;
-		}
-	}
 </style>

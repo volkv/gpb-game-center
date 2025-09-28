@@ -7,7 +7,10 @@
 
 <main class="bank-home">
 	<section class="hero surface-contrast">
-		<p class="hero-eyebrow">Газпромбанк</p>
+		<div class="hero-eyebrow">
+			<img src="/logo.svg" alt="Газпромбанк логотип" class="hero-logo" />
+			<p>ГАЗПРОМБАНК.ТЕХ</p>
+		</div>
 		<h1 class="hero-title">Привет, {$telegramUserName}!</h1>
 		<p class="hero-subtitle text-balance">
 			Все ваши продукты и игровые активности — в одном аккуратном пространстве.
@@ -54,7 +57,7 @@
 		flex-direction: column;
 		gap: 1.25rem;
 		padding-top: 1.25rem;
-		padding-bottom: calc(96px + 1.5rem);
+		padding-bottom: 48px ;
 	}
 
 	.hero {
@@ -65,10 +68,25 @@
 	}
 
 	.hero-eyebrow {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.hero-eyebrow p {
 		font-size: 0.75rem;
+		font-weight: 600;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
 		color: rgba(255, 255, 255, 0.72);
+		margin: 0;
+	}
+
+	.hero-logo {
+		width: 20px;
+		height: auto;
+		filter: brightness(0) invert(1);
+		opacity: 0.72;
 	}
 
 	.hero-title {
@@ -117,6 +135,7 @@
 		letter-spacing: 0.02em;
 		color: var(--color-fg-secondary);
 		cursor: not-allowed;
+		opacity: .4;
 	}
 
 	.cards-grid {
@@ -170,19 +189,4 @@
 		height: 0.8rem;
 	}
 
-	@media (max-width: 420px) {
-		.product-section {
-			padding: 1.25rem;
-		}
-
-		.section-heading__title-row {
-			flex-direction: column;
-			align-items: flex-start;
-		}
-
-		.ghost-action {
-			align-self: stretch;
-			text-align: center;
-		}
-	}
 </style>

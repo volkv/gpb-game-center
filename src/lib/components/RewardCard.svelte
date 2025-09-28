@@ -126,7 +126,7 @@
 		font-weight: 600;
 		color: var(--color-fg-primary);
 		white-space: nowrap;
-		overflow: hidden;
+		
 		text-overflow: ellipsis;
 	}
 
@@ -233,16 +233,6 @@
 		cursor: not-allowed;
 	}
 
-	@media (max-width: 420px) {
-		.reward-card {
-			padding: 1.25rem;
-		}
-	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.reward-card,
-		.reward-card__action {
-			transition: none;
-		}
-	}
+
 </style>

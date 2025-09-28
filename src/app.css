@@ -211,7 +211,6 @@
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-medium);
     position: relative;
-    overflow: hidden;
   }
 
   .section-heading {

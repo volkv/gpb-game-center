@@ -186,15 +186,4 @@
     justify-content: flex-start;
   }
 
-  @media (max-width: 480px) {
-    .product-card__actions {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .product-card__icon {
-      width: 56px;
-      height: 56px;
-    }
-  }
 </style>

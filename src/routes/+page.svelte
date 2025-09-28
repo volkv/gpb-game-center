@@ -139,11 +139,8 @@
 
 {#key $currentScreen}
 	{#if $currentScreen === 'bank-home'}
-		<div>
 			<BankHome />
-		</div>
 	{:else if $currentScreen === 'game-center'}
-		<div>
 			{#if GameCenterComponent}
 				<GameCenterComponent on:gameSelected={handleGameSelected} />
 			{:else}
@@ -152,9 +149,7 @@
 					<p class="lazy-text">Загружаем игровой центр…</p>
 				</div>
 			{/if}
-		</div>
 	{:else if $currentScreen === 'tasks'}
-		<div>
 			{#if TasksComponent}
 				<TasksComponent />
 			{:else}
@@ -163,9 +158,7 @@
 					<p class="lazy-text">Загружаем задания…</p>
 				</div>
 			{/if}
-		</div>
 	{:else if $currentScreen === 'rewards-shop'}
-		<div>
 			{#if RewardsShopComponent}
 				<RewardsShopComponent />
 			{:else}
@@ -174,9 +167,7 @@
 					<p class="lazy-text">Загружаем магазин подарков…</p>
 				</div>
 			{/if}
-		</div>
 	{:else if $currentScreen === 'game' && selectedGame}
-		<div>
 			{#if GameContainerComponent}
 				<GameContainerComponent
 					game={selectedGame}
@@ -188,11 +179,8 @@
 					<p class="lazy-text">Готовим игру…</p>
 				</div>
 			{/if}
-		</div>
 	{:else}
-		<div>
 			<BankHome />
-		</div>
 	{/if}
 {/key}
 

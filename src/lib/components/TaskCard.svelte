@@ -222,17 +222,6 @@
 		color: var(--color-fg-secondary);
 	}
 
-	.task-card__product {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-size: 0.78rem;
-		color: var(--color-fg-muted);
-		padding: 0.4rem 0.6rem;
-		border-radius: var(--radius-full);
-		background: var(--color-neutral-100);
-		border: 1px solid var(--color-border-subtle);
-	}
 
 	.task-card__footer {
 		display: flex;
@@ -288,26 +277,18 @@
 		color: var(--color-state-success);
 	}
 
-	@media (max-width: 560px) {
-		.task-card {
-			padding: 1.25rem;
-		}
-
-		.task-card__footer {
-			flex-direction: column;
-			align-items: stretch;
-			gap: 0.75rem;
-		}
-
-		.task-card__action {
-			width: 100%;
-		}
+	.task-card {
+		padding: 1.25rem;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.task-card,
-		.task-card__action {
-			transition: none;
-		}
+	.task-card__footer {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.75rem;
 	}
+
+	.task-card__action {
+		width: 100%;
+	}
+
 </style>

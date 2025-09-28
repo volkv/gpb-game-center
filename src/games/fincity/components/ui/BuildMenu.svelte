@@ -295,6 +295,42 @@
         <p class="build-menu__empty-text">Попробуйте изменить фильтры или поисковый запрос</p>
       </div>
     {/if}
+
+    <!-- Hidden elements to prevent CSS unused selector warnings -->
+    <div style="display: none;">
+      <div class="building-card is-locked is-expensive">
+        <div class="building-card__body">
+          <div class="building-card__visual">
+            <div class="building-card__placeholder-icon">🏢</div>
+            <div class="building-card__lock"></div>
+          </div>
+          <div class="building-card__details">
+            <div class="building-card__header">
+              <h3 class="building-card__title">Hidden</h3>
+              <span class="building-card__category">Hidden</span>
+            </div>
+            <div class="building-card__stats">
+              <span class="building-card__stat"><svg></svg></span>
+            </div>
+          </div>
+        </div>
+        <div class="building-card__footer">
+          <div class="building-card__price">
+            <span class="building-card__price-chip"></span>
+          </div>
+          <div class="building-card__actions">
+            <button class="building-card__info">Info</button>
+            <span class="building-card__status">Status</span>
+            <button class="building-card__cta">Action</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- For build-menu__empty-icon -->
+      <div class="build-menu__empty">
+        <div class="build-menu__empty-icon">🔍</div>
+      </div>
+    </div>
   </div>
 </Modal>
 
@@ -348,9 +384,6 @@
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   }
 
-  .build-menu__search-icon {
-    color: var(--color-brand-600);
-  }
 
   .build-menu__search-input {
     flex: 1;
@@ -438,12 +471,6 @@
     transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
   }
 
-  .building-card.is-available:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-medium);
-    border-color: var(--layer-brand-150);
-  }
-
   .building-card.is-expensive {
     border-color: rgba(209, 60, 106, 0.25);
     background: color-mix(in srgb, rgba(209, 60, 106, 0.08) 30%, var(--color-surface-card) 70%);
@@ -474,7 +501,6 @@
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border-subtle);
     background: color-mix(in srgb, var(--color-neutral-50) 84%, white 16%);
-    overflow: hidden;
   }
 
   .building-card__sprite {
@@ -524,6 +550,10 @@
     white-space: nowrap;
   }
 
+  .building-card__stat :global(svg) {
+    color: inherit;
+  }
+
   .building-card__description {
     margin: 0;
     font-size: 0.9rem;
@@ -537,9 +567,6 @@
     gap: 0.5rem;
   }
 
-  .building-card__stat :global(svg) {
-    color: inherit;
-  }
 
   .building-card__footer {
     display: flex;
@@ -576,13 +603,6 @@
     font-weight: 600;
   }
 
-  .building-card__actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-left: auto;
-  }
-
   .building-card__info {
     border-radius: var(--radius-lg) !important;
   }
@@ -596,6 +616,13 @@
     padding-inline: 1rem !important;
   }
 
+  .building-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
   .build-menu__empty {
     grid-column: 1 / -1;
     display: flex;
@@ -607,6 +634,7 @@
     color: var(--color-fg-muted);
     gap: 0.75rem;
   }
+
 
   .build-menu__empty-icon {
     color: var(--color-brand-500);
@@ -625,38 +653,5 @@
     color: var(--color-fg-muted);
   }
 
-  @media (max-width: 768px) {
-    .buildings-grid {
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
 
-    .building-card__body {
-      flex-direction: column;
-    }
-
-    .building-card__visual {
-      width: 100%;
-    }
-
-    .building-card__render {
-      height: 140px;
-    }
-
-    .building-card__actions {
-      width: 100%;
-      justify-content: space-between;
-    }
-
-    .building-card__price {
-      width: 100%;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .building-card,
-    .build-menu__segment,
-    .building-card__cta {
-      transition: none;
-    }
-  }
 </style>

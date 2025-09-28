@@ -195,21 +195,22 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    padding: 1rem;
   }
 
-  @media (max-width: 480px) {
-    .modal-backdrop {
-      padding: 0.5rem;
-    }
+  .modal-backdrop {
+    padding: 0.5rem;
+  }
 
-    .modal-content {
-      border-radius: 1rem;
-    }
+  .modal-content {
+    border-radius: 1rem;
+  }
 
-    .modal-header,
-    .modal-body,
-    .modal-footer {
-      padding: 1rem;
-    }
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
   }
 </style>

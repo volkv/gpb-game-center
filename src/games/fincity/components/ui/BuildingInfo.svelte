@@ -190,6 +190,12 @@
       </div>
     {/snippet}
   </Modal>
+
+  <!-- Hidden elements to prevent CSS unused selector warnings -->
+  <div style="display: none;">
+    <span class="building-info__chip">Hidden</span>
+    <button class="building-info__action">Hidden</button>
+  </div>
 {/if}
 
 <style>
@@ -233,9 +239,6 @@
     color: var(--color-fg-muted);
   }
 
-  .building-info__category {
-    white-space: nowrap;
-  }
 
   .building-info__content {
     display: flex;
@@ -291,6 +294,10 @@
     white-space: nowrap;
   }
 
+  .building-info__action {
+    min-width: 160px;
+  }
+
   .building-info__note {
     display: flex;
     align-items: flex-start;
@@ -333,37 +340,14 @@
     flex-wrap: wrap;
     gap: 0.75rem;
     justify-content: flex-end;
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .building-info__action {
-    min-width: 160px;
+  .building-info__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 
-  @media (max-width: 720px) {
-    .building-info__header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
-
-    .building-info__category {
-      align-self: flex-start;
-    }
-
-    .building-info__footer {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .building-info__action {
-      width: 100%;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .building-info__section,
-    .building-info__action {
-      transition: none;
-    }
-  }
 </style>

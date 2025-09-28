@@ -172,22 +172,4 @@
     justify-content: flex-start;
   }
 
-  .reminder-optin__spinner {
-    animation: reminder-spin 900ms linear infinite;
-  }
-
-  @keyframes reminder-spin {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .reminder-optin {
-      padding: 1rem;
-    }
-  }
 </style>

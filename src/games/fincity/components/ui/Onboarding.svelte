@@ -241,13 +241,6 @@
   }
 
   /* Мобильная адаптация */
-  @media (max-width: 480px) {
-    .onboarding-welcome .content-card {
-      min-width: 320px !important;
-      width: 95vw !important;
-      margin: 0 !important;
-    }
-  }
 
   .onboarding-welcome .background-media {
     position: absolute;

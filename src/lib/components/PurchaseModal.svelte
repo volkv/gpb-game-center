@@ -197,10 +197,6 @@
 		gap: 0.45rem;
 	}
 
-	.cost-icon {
-		color: var(--color-brand-500);
-	}
-
 	.cost-value {
 		font-family: var(--font-display);
 		font-size: 1.3rem;
@@ -282,7 +278,7 @@
 		margin-top: 0.5rem;
 		border-radius: 999px;
 		background: color-mix(in srgb, var(--color-state-success) 12%, transparent);
-		overflow: hidden;
+		
 		align-self: stretch;
 	}
 
@@ -307,9 +303,5 @@
 		}
 	}
 
-	@media (max-width: 420px) {
-		.reward-preview {
-			gap: 0.6rem;
-		}
-	}
+
 </style>

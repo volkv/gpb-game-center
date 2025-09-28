@@ -127,9 +127,13 @@
 <style>
 	.fincity-wrapper {
 		width: 100%;
-		height: 100vh;
 		position: relative;
-		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		height: 100%;
+		min-height: 0;
+		
 	}
 
 	.loading-content {
@@ -170,7 +174,7 @@
 		height: 8px;
 		background: rgba(255, 255, 255, 0.2);
 		border-radius: 4px;
-		overflow: hidden;
+		
 		margin-bottom: 2rem;
 		position: relative;
 	}
@@ -186,7 +190,8 @@
 
 	.game-container {
 		width: 100%;
-		height: calc(100vh - 64px);
+		height: 100%;
+		min-height: 0;
 		position: relative;
 		opacity: 0;
 		transform: translateY(20px);
@@ -201,8 +206,9 @@
 
 	:global(.fincity-wrapper .app) {
 		width: 100%;
-		height: 100vh;
-		overflow: hidden;
+		height: 100%;
+		min-height: 0;
+		
 	}
 
 
@@ -218,11 +224,8 @@
 		}
 	}
 
-	@media (max-width: 380px) {
-
-		.preview-icon {
-			width: 64px;
-			height: 64px;
-		}
+	.preview-icon {
+		width: 64px;
+		height: 64px;
 	}
 </style>

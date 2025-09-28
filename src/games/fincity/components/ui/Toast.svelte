@@ -235,7 +235,7 @@
 		height: 0.35rem;
 		border-radius: var(--radius-full);
 		background: color-mix(in srgb, var(--color-neutral-100) 70%, white 30%);
-		overflow: hidden;
+		
 	}
 
 	.fincity-toast-progress-bar {
@@ -244,12 +244,10 @@
 		background: linear-gradient(90deg, var(--color-brand-500) 0%, var(--color-accent-400) 100%);
 	}
 
-	@media (max-width: 640px) {
-		.fincity-toast-container {
-			left: 1rem;
-			right: 1rem;
-			bottom: 1rem;
-		}
+	.fincity-toast-container {
+		left: 1rem;
+		right: 1rem;
+		bottom: 1rem;
 	}
 
 	@keyframes toastFadeIn {

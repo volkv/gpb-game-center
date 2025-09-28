@@ -97,20 +97,8 @@ import type { NovellaGameState, Choice, ChoiceOption, Scene } from '../types';
     min-height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
   }
 
-  @media screen and (orientation: landscape) and (max-height: 600px) {
-    .choice-interface {
-      transform: rotate(90deg);
-      transform-origin: center;
-      width: 100vh;
-      height: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-  }
 
   .background-container {
     position: absolute;
@@ -305,65 +293,6 @@ import type { NovellaGameState, Choice, ChoiceOption, Scene } from '../types';
     }
   }
 
-  @media (max-width: 480px) {
-    .choice-content {
-      padding: 1.5rem 1rem;
-    }
 
-    .choice-panel {
-      padding: 1.5rem 1rem;
-    }
 
-    .choice-panel__title {
-      font-size: 1.25rem;
-    }
-
-    .choice-panel__text {
-      font-size: 1rem;
-    }
-
-    .choice-button {
-      padding: 1rem 1.25rem;
-      min-height: 70px;
-    }
-
-    .choice-button__text {
-      font-size: 0.95rem;
-    }
-
-    .choice-button__description {
-      font-size: 0.8rem;
-    }
-  }
-
-  @media (max-width: 380px) {
-    .choice-panel {
-      padding: 1.25rem 0.75rem;
-    }
-
-    .choice-panel__title {
-      font-size: 1.125rem;
-    }
-
-    .choice-button {
-      padding: 0.875rem 1rem;
-      min-height: 65px;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .choice-button,
-    .choice-panel {
-      animation: none;
-      transition: none;
-    }
-
-    .choice-interface {
-      transform: none !important;
-    }
-
-    .choice-button:hover {
-      transform: none;
-    }
-  }
 </style>

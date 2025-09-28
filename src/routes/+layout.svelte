@@ -29,20 +29,6 @@
 
 		initializeTelegram();
 
-		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-		document.documentElement.style.setProperty(
-			'--reduced-motion',
-			prefersReducedMotion.matches ? '1' : '0'
-		);
-
-		prefersReducedMotion.addEventListener('change', (e) => {
-			document.documentElement.style.setProperty(
-				'--reduced-motion',
-				e.matches ? '1' : '0'
-			);
-		});
-
 		function handleOrientationChange() {
 			if (window.orientation && Math.abs(window.orientation) === 90) {
 				document.body.style.transform = 'rotate(0deg)';
@@ -129,6 +115,7 @@
 		width: 100%;
 		max-width: 512px;
 		min-height: 100vh;
+
 		margin: 0 auto;
 		background: var(--color-surface-card);
 		color: var(--color-fg-primary);
@@ -148,37 +135,18 @@
 		padding-top: 0;
 		padding-bottom: 0;
 		gap: 0;
+
+		
+	}
+
+	.app-container.game-screen > :global(:last-child) {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
 	}
 
 	.app-container.loaded {
 		will-change: auto;
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.app-container {
-			scroll-behavior: auto;
-		}
-
-		:global(*) {
-			animation-duration: 0.01ms !important;
-			animation-iteration-count: 1 !important;
-			transition-duration: 0.01ms !important;
-			will-change: auto !important;
-		}
-	}
-
-	@media (min-width: 520px) {
-		.app-container {
-			border-radius: var(--radius-xl);
-			border: 1px solid var(--color-border-subtle);
-			box-shadow: var(--shadow-medium);
-		}
-
-		.app-container.game-screen {
-			border-radius: 0;
-			border: none;
-			box-shadow: none;
-			margin-block: 0;
-		}
 	}
 </style>

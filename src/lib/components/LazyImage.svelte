@@ -113,7 +113,7 @@
 	.lazy-image-container {
 		position: relative;
 		display: inline-block;
-		overflow: hidden;
+		
 	}
 
 	.lazy-image {
@@ -140,7 +140,7 @@
 		inset: 0;
 		background: #f3f4f6;
 		border-radius: 0.5rem;
-		overflow: hidden;
+		
 	}
 
 	.placeholder-shimmer {

@@ -224,7 +224,7 @@
 		height: 6px;
 		border-radius: 999px;
 		background: var(--color-neutral-100);
-		overflow: hidden;
+		
 	}
 
 	.progress__fill {
@@ -256,9 +256,4 @@
 		background: var(--color-neutral-300);
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.game-card {
-			transition: none;
-		}
-	}
 </style>

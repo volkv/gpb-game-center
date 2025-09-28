@@ -198,7 +198,10 @@
             aria-live={achievement.isNew ? 'polite' : undefined}
           >
             <div class="stats-achievement__icon" aria-hidden="true">
-              {@render achievement.icon({ size: 20 })}
+              {#if achievement.icon}
+                {@const IconComponent = achievement.icon}
+                <IconComponent />
+              {/if}
             </div>
             <div class="stats-achievement__body">
               <span class="stats-achievement__title">{achievement.title}</span>
@@ -318,19 +321,20 @@
 
   .stats-metrics {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
   }
 
   .stats-metric {
-    padding: 0.9rem;
+    padding: 0.7rem 0.6rem;
     border-radius: var(--radius-lg);
     background: var(--color-surface-muted);
     border: 1px solid var(--color-border-subtle);
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
-    align-items: flex-start;
+    gap: 0.2rem;
+    align-items: center;
+    text-align: center;
   }
 
   .stats-metric__label {
@@ -480,23 +484,26 @@
     color: var(--color-fg-muted);
   }
 
-  @media (max-width: 520px) {
-    .stats-header {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.75rem;
-    }
+  .stats-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
 
-    .stats-header :global(button) {
-      width: 100%;
-    }
+  .stats-header :global(button) {
+    width: 100%;
+  }
 
-    .stats-metric {
-      align-items: center;
-    }
+  .stats-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.6rem;
+  }
 
-    .stats-level__footer {
+  .stats-metric {
+    padding: 0.8rem 0.6rem;
+  }
+
+  .stats-level__footer {
       justify-content: center;
     }
-  }
 </style>

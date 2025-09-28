@@ -227,12 +227,12 @@
 			</div>
 		</div>
 	{:else if gameComponent}
-		<div class="game-wrapper">
+	
 			{#if gameComponent}
 				{@const GameComponent = gameComponent}
 				<GameComponent onexit={handleGameExit} />
 			{/if}
-		</div>
+	
 	{/if}
 </div>
 
@@ -283,7 +283,7 @@
 		justify-content: center;
 		margin-bottom: 1rem;
 		position: relative;
-		overflow: hidden;
+		
 		box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.2);
 	}
 
@@ -310,7 +310,7 @@
 		height: 8px;
 		background: var(--color-gpb-lily);
 		border-radius: 4px;
-		overflow: hidden;
+		
 		margin-bottom: 1rem;
 		position: relative;
 	}
@@ -511,10 +511,7 @@
 		justify-content: center;
 	}
 
-	.game-wrapper {
-		width: 100%;
-		animation: gameSlideIn 0.6s ease-out;
-	}
+
 
 
 	@keyframes fadeInLeft {
@@ -565,15 +562,6 @@
 			transform: translateX(0);
 		}
 	}
-
-	@media (min-width: 400px) {
-		.error-actions {
-			flex-direction: row;
-			justify-content: center;
-		}
-	}
-
-	@media (max-width: 380px) {
 		.back-button {
 			top: 1rem;
 			left: 1rem;
@@ -585,5 +573,5 @@
 			width: 64px;
 			height: 64px;
 		}
-	}
+	
 </style>

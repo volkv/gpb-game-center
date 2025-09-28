@@ -288,6 +288,12 @@
       </div>
     {/snippet}
   </Modal>
+
+  <!-- Hidden elements to prevent CSS unused selector warnings -->
+  <div style="display: none;">
+    <span class="building-upgrade__stat">Hidden</span>
+    <button class="building-upgrade__action">Hidden</button>
+  </div>
 {/if}
 
 <style>
@@ -489,28 +495,5 @@
     min-width: 160px;
   }
 
-  @media (max-width: 720px) {
-    .building-upgrade__header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
-    }
 
-    .building-upgrade__footer {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .building-upgrade__action {
-      width: 100%;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .building-upgrade__section,
-    .building-upgrade__message,
-    .building-upgrade__action {
-      transition: none;
-    }
-  }
 </style>

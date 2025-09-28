@@ -124,15 +124,14 @@
     height: 1px;
     padding: 0;
     margin: -1px;
-    overflow: hidden;
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
   }
 
   .education-screen {
-    min-height: calc(100vh - var(--global-status-bar-height, 0px));
-    min-height: calc(100dvh - var(--global-status-bar-height, 0px));
+    min-height: 100%;
+    height: 100%;
     background: var(--gradient-brand-muted);
     padding: 2rem 1rem;
     display: flex;
@@ -141,17 +140,6 @@
     overflow-y: auto;
   }
 
-  @media screen and (orientation: landscape) and (max-height: 600px) {
-    .education-screen {
-      transform: rotate(90deg);
-      transform-origin: center;
-      width: 100vh;
-      height: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-  }
 
   .education-content {
     width: 100%;
@@ -326,67 +314,6 @@
     box-shadow: var(--shadow-focus);
   }
 
-  @media (max-width: 480px) {
-    .education-screen {
-      padding: 1rem 0.75rem;
-    }
 
-    .education-content {
-      gap: 1rem;
-      max-width: 100%;
-    }
 
-    .surface-card {
-      padding: 1rem;
-    }
-
-    .success-title {
-      font-size: 1.25rem;
-    }
-
-    .badge-icon {
-      font-size: 2.5rem;
-    }
-
-    .section-title {
-      font-size: 1rem;
-    }
-
-    .claim-btn,
-    .exit-btn {
-      padding: 0.875rem;
-      font-size: 0.95rem;
-    }
-  }
-
-  @media (max-width: 380px) {
-    .education-screen {
-      padding: 0.75rem 0.5rem;
-    }
-
-    .success-badge {
-      padding: 1.5rem 0.75rem;
-    }
-
-    .badge-icon {
-      font-size: 2rem;
-    }
-
-    .success-title {
-      font-size: 1.125rem;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .claim-btn,
-    .exit-btn,
-    .surface-card {
-      transition: none;
-    }
-
-    .claim-btn:hover,
-    .exit-btn:hover {
-      transform: none;
-    }
-  }
 </style>

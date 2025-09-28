@@ -229,8 +229,9 @@
   .screen-container {
     position: relative;
     width: 100%;
+    flex: 1;
     height: 100%;
-    overflow: hidden;
+    min-height: 0;
   }
 
   .screen-wrapper {
@@ -253,18 +254,6 @@
     padding: 2rem 1rem;
   }
 
-  @media screen and (orientation: landscape) and (max-height: 600px) {
-    .fallback-screen,
-    .completion-screen {
-      transform: rotate(90deg);
-      transform-origin: center;
-      width: 100vh;
-      height: 100vw;
-      position: fixed;
-      top: 0;
-      left: 0;
-    }
-  }
 
   .completion-icon {
     font-size: 3rem;
@@ -306,14 +295,4 @@
   }
 
 
-  @media (prefers-reduced-motion: reduce) {
-    .fallback-screen,
-    .completion-screen {
-      transform: none !important;
-    }
-
-    .screen-wrapper {
-      animation: none !important;
-    }
-  }
 </style>

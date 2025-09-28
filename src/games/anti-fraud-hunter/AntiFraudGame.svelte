@@ -598,11 +598,13 @@
 
 <style>
   .anti-fraud-game {
-    min-height: calc(100vh - 80px);
-    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem);
     display: flex;
     justify-content: center;
     align-items: stretch;
+    flex: 1;
+    height: 100%;
+    min-height: 0;
+    padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2.5rem);
   }
 
   .game-stage {
@@ -610,7 +612,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    margin-block: auto;
+   
   }
 
   .game-stage--intro,
@@ -757,7 +759,6 @@
   .message-panel {
     padding: clamp(1.5rem, 1rem + 2vw, 2rem);
     position: relative;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
@@ -1074,34 +1075,21 @@
     width: 100%;
   }
 
-  @media (max-width: 540px) {
-    .anti-fraud-game {
-      padding: 1.25rem;
-    }
-
-    .game-hud {
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    }
-
-    .decision-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .message-panel__device {
-      display: none;
-    }
+  .anti-fraud-game {
+    padding: 1.25rem;
+    padding-block: 1.25rem 2rem;
   }
 
-  @media (max-height: 720px) {
-    .anti-fraud-game {
-      padding-block: 1.25rem 2rem;
-    }
+  .game-hud {
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .decision-button,
-    :global(svg.hud-heart) {
-      transition: none;
-    }
+  .decision-grid {
+    grid-template-columns: 1fr;
   }
+
+  .message-panel__device {
+    display: none;
+  }
+
 </style>
