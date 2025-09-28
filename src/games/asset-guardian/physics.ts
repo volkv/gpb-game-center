@@ -174,11 +174,11 @@ export class PhysicsEngine {
 		return walls;
 	}
 
-	createLevelGeometry(level: LevelConfig): void {
+	createLevelGeometry(level: LevelConfig, bounds: { width: number; height: number }): void {
 		this.clearLevelBodies();
 
-		const cellWidth = GAME_CONFIG.WORLD_WIDTH / GAME_CONFIG.GRID_WIDTH;
-		const cellHeight = GAME_CONFIG.WORLD_HEIGHT / GAME_CONFIG.GRID_HEIGHT;
+		const cellWidth = bounds.width / GAME_CONFIG.GRID_WIDTH;
+		const cellHeight = bounds.height / GAME_CONFIG.GRID_HEIGHT;
 
 		level.grid.forEach((row, rowIndex) => {
 			row.forEach((cellType, colIndex) => {

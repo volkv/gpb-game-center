@@ -65,7 +65,7 @@ export class AssetGuardianGameEngine {
 				backgroundColor: this.config.backgroundColor,
 				antialias: this.config.antialias,
 				resolution: this.config.resolution,
-				resizeTo: canvas
+				autoDensity: true
 			});
 
 			this.setupContainers();
@@ -87,8 +87,9 @@ export class AssetGuardianGameEngine {
 		this.gameContainer.addChild(this.ballGraphics);
 		this.gameContainer.addChild(this.ballHighlightGraphics);
 
-		this.gameContainer.width = GAME_CONFIG.WORLD_WIDTH;
-		this.gameContainer.height = GAME_CONFIG.WORLD_HEIGHT;
+		// Use dynamic canvas size instead of fixed WORLD_WIDTH/HEIGHT
+		this.gameContainer.width = this.config.width;
+		this.gameContainer.height = this.config.height;
 
 		const containerElement = this.app.canvas.parentElement;
 		if (containerElement) {
@@ -99,8 +100,8 @@ export class AssetGuardianGameEngine {
 
 	private setupPhysics(): void {
 		this.physics.createWalls({
-			width: GAME_CONFIG.WORLD_WIDTH,
-			height: GAME_CONFIG.WORLD_HEIGHT
+			width: this.config.width,
+			height: this.config.height
 		});
 
 		this.physics.addCollisionHandler('cashback', (result) => {
@@ -181,8 +182,8 @@ export class AssetGuardianGameEngine {
 	}
 
 	private renderLevel(level: LevelConfig): void {
-		const cellWidth = GAME_CONFIG.WORLD_WIDTH / GAME_CONFIG.GRID_WIDTH;
-		const cellHeight = GAME_CONFIG.WORLD_HEIGHT / GAME_CONFIG.GRID_HEIGHT;
+		const cellWidth = this.config.width / GAME_CONFIG.GRID_WIDTH;
+		const cellHeight = this.config.height / GAME_CONFIG.GRID_HEIGHT;
 
 		level.grid.forEach((row, rowIndex) => {
 			row.forEach((cellType, colIndex) => {
@@ -416,7 +417,10 @@ export class AssetGuardianGameEngine {
 	}
 
 	private setupLevelPhysics(level: LevelConfig): void {
-		this.physics.createLevelGeometry(level);
+		this.physics.createLevelGeometry(level, {
+			width: this.config.width,
+			height: this.config.height
+		});
 
 		const startPos = this.getStartPosition(level);
 		if (startPos) {
@@ -425,8 +429,8 @@ export class AssetGuardianGameEngine {
 	}
 
 	private getStartPosition(level: LevelConfig): Position | null {
-		const cellWidth = GAME_CONFIG.WORLD_WIDTH / GAME_CONFIG.GRID_WIDTH;
-		const cellHeight = GAME_CONFIG.WORLD_HEIGHT / GAME_CONFIG.GRID_HEIGHT;
+		const cellWidth = this.config.width / GAME_CONFIG.GRID_WIDTH;
+		const cellHeight = this.config.height / GAME_CONFIG.GRID_HEIGHT;
 
 		for (let row = 0; row < level.grid.length; row++) {
 			for (let col = 0; col < level.grid[row].length; col++) {

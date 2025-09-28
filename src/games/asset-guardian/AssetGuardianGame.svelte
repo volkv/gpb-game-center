@@ -43,6 +43,10 @@
 	let visualEffectsManager: VisualEffectsManager | null = $state(null);
 	let gameCanvasWrapper: HTMLElement | undefined = $state();
 
+	// Canvas adaptive sizing
+	let canvasSize = $state({ width: 400, height: 400 });
+	let containerSize = $state({ width: 0, height: 0 });
+
 	// Settings state
 	let settings = $state({
 		hapticFeedback: true,
@@ -51,10 +55,51 @@
 		gyroscopeSensitivity: 1.0
 	});
 
+	// Calculate adaptive canvas size
+	function calculateCanvasSize() {
+		if (typeof window === 'undefined') return { width: 400, height: 400 };
+
+		const viewportWidth = window.innerWidth;
+		const viewportHeight = window.innerHeight;
+
+		// Reserve space for UI elements (header, buttons, safe areas)
+		const availableWidth = viewportWidth - 32; // 16px padding on each side
+		const availableHeight = viewportHeight - 280; // Reserve for header and controls
+
+		// Ensure square aspect ratio and minimum/maximum sizes
+		const maxSize = Math.min(availableWidth, availableHeight);
+		const size = Math.max(280, Math.min(450, maxSize)); // Between 280px and 450px
+
+		return { width: size, height: size };
+	}
+
+	// Update canvas size on mount and resize
+	function updateCanvasSize() {
+		const newSize = calculateCanvasSize();
+		canvasSize = newSize;
+
+		if (gameEngine && gameEngineReady) {
+			gameEngine.resize(newSize.width, newSize.height);
+		}
+	}
+
 	$effect(() => {
 		gameState = $assetGuardianStore;
 		selectors = $assetGuardianSelectors;
 		scoringState = $scoringSelectors;
+	});
+
+	// Handle window resize
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			updateCanvasSize();
+			const handleResize = () => updateCanvasSize();
+			window.addEventListener('resize', handleResize);
+
+			return () => {
+				window.removeEventListener('resize', handleResize);
+			};
+		}
 	});
 
 	$effect(() => {
@@ -99,6 +144,10 @@
 
 	onMount(async () => {
 		mounted = true;
+
+		// Initialize adaptive canvas size
+		updateCanvasSize();
+
 		const level = loadCurrentLevel();
 		assetGuardianStore.initialize(level);
 		assetGuardianStore.initializeCollisionSystem();
@@ -184,11 +233,11 @@
 			console.log('🎮 [GAME] Initializing game engine...');
 
 			const config: GameEngineConfig = {
-				width: GAME_CONFIG.WORLD_WIDTH,
-				height: GAME_CONFIG.WORLD_HEIGHT,
+				width: canvasSize.width,
+				height: canvasSize.height,
 				backgroundColor: 0x2C3E50,
 				antialias: true,
-				resolution: globalThis.window?.devicePixelRatio || 1
+				resolution: 1
 			};
 
 			gameEngine = new AssetGuardianGameEngine(config);
@@ -563,9 +612,9 @@
 				<canvas
 					bind:this={gameCanvas}
 					class="game-canvas"
-					width={GAME_CONFIG.WORLD_WIDTH}
-					height={GAME_CONFIG.WORLD_HEIGHT}
-					style="touch-action: none; user-select: none;"
+					width={canvasSize.width}
+					height={canvasSize.height}
+					style="touch-action: none; user-select: none; max-width: 100%; max-height: 100%; object-fit: contain;"
 				></canvas>
 
 				<!-- Game State Overlays -->
@@ -1058,10 +1107,17 @@
 		position: relative;
 		perspective: 800px;
 		perspective-origin: center center;
+		min-height: 0;
+		overflow: hidden;
 	}
 
 	.game-canvas-container {
 		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		max-width: 100%;
+		max-height: 100%;
 		background:
 			radial-gradient(ellipse at center,
 				rgba(15, 169, 194, 0.1) 0%,
@@ -1113,6 +1169,11 @@
 	.game-canvas {
 		display: block;
 		border-radius: 0.75rem;
+		max-width: 100%;
+		max-height: 100vh;
+		width: auto;
+		height: auto;
+		object-fit: contain;
 		background:
 			radial-gradient(circle at 30% 30%,
 				rgba(26, 188, 156, 0.15) 0%,
