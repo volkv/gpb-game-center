@@ -93,14 +93,11 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		}
 
 		try {
-			// Check for new direct methods first
-			if (typeof this.webApp.startGyroscope === 'function' && typeof this.webApp.stopGyroscope === 'function') {
-				console.log('🔄 [GYROSCOPE] Telegram WebApp API supports direct gyroscope methods');
-				return true;
-			}
-			// Fallback to postEvent method for older versions
-			else if (typeof this.webApp.postEvent === 'function') {
-				console.log('🔄 [GYROSCOPE] Telegram WebApp API supports postEvent (legacy)');
+			// According to official docs, use postEvent for gyroscope control
+			if (typeof this.webApp.postEvent === 'function' && typeof this.webApp.onEvent === 'function') {
+				console.log('🔄 [GYROSCOPE] Telegram WebApp API supports gyroscope via postEvent');
+				console.log('🔄 [GYROSCOPE] WebApp version:', this.webApp.version);
+				console.log('🔄 [GYROSCOPE] Platform:', this.webApp.platform);
 				return true;
 			}
 		} catch (error) {
@@ -136,28 +133,21 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		}
 
 		try {
-			console.log('🔄 [GYROSCOPE] Starting gyroscope...');
-			console.log('🔄 [GYROSCOPE] WebApp methods available:', {
-				startGyroscope: typeof this.webApp.startGyroscope,
-				stopGyroscope: typeof this.webApp.stopGyroscope,
-				postEvent: typeof this.webApp.postEvent
+			console.log('🔄 [GYROSCOPE] Starting gyroscope via postEvent...');
+			console.log('🔄 [GYROSCOPE] WebApp API available:', {
+				postEvent: typeof this.webApp.postEvent,
+				onEvent: typeof this.webApp.onEvent,
+				version: this.webApp.version,
+				platform: this.webApp.platform
 			});
 
-			// Try direct method first (newer Telegram versions)
-			if (typeof this.webApp.startGyroscope === 'function') {
-				console.log('🔄 [GYROSCOPE] Using direct startGyroscope() method');
-				this.webApp.startGyroscope();
-			} else if (typeof this.webApp.postEvent === 'function') {
-				console.log('🔄 [GYROSCOPE] Using legacy postEvent method');
-				this.webApp.postEvent('web_app_start_gyroscope');
-			} else {
-				console.error('🔄 [GYROSCOPE] No gyroscope start method available');
-				return false;
-			}
+			// Use postEvent as per official documentation
+			this.webApp.postEvent('web_app_start_gyroscope');
+			console.log('🔄 [GYROSCOPE] postEvent("web_app_start_gyroscope") sent');
 
 			return new Promise((resolve) => {
 				const timeout = setTimeout(() => {
-					console.warn('🔄 [GYROSCOPE] Start timeout after 5 seconds');
+					console.warn('🔄 [GYROSCOPE] Start timeout after 5 seconds - gyroscope may not be supported on this device');
 					resolve(false);
 				}, 5000);
 
@@ -185,16 +175,11 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		if (!this.isSupported || !this.webApp) return;
 
 		try {
-			console.log('🔄 [GYROSCOPE] Stopping gyroscope...');
+			console.log('🔄 [GYROSCOPE] Stopping gyroscope via postEvent...');
 
-			// Try direct method first (newer Telegram versions)
-			if (typeof this.webApp.stopGyroscope === 'function') {
-				console.log('🔄 [GYROSCOPE] Using direct stopGyroscope() method');
-				this.webApp.stopGyroscope();
-			} else if (typeof this.webApp.postEvent === 'function') {
-				console.log('🔄 [GYROSCOPE] Using legacy postEvent method');
-				this.webApp.postEvent('web_app_stop_gyroscope');
-			}
+			// Use postEvent as per official documentation
+			this.webApp.postEvent('web_app_stop_gyroscope');
+			console.log('🔄 [GYROSCOPE] postEvent("web_app_stop_gyroscope") sent');
 
 			this.isActive = false;
 			console.log('🔄 [GYROSCOPE] Gyroscope stopped successfully');
