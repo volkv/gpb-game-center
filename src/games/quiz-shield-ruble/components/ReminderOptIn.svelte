@@ -130,3 +130,44 @@
   }
 
 </style>
+
+<div class="reminder-optin">
+  <div class="reminder-optin__header">
+    <div class="reminder-optin__icon">
+      {#if enabled}
+        <BellRing size="20" />
+      {:else}
+        <BellOff size="20" />
+      {/if}
+    </div>
+    <div>
+      <h3 class="reminder-optin__title">{permissionCopy[permission].title}</h3>
+      {#if permissionCopy[permission].note}
+        <p class="reminder-optin__note">{permissionCopy[permission].note}</p>
+      {/if}
+    </div>
+  </div>
+
+  {#if relativeHint}
+    <div class="reminder-optin__hint">
+      <Info size="16" />
+      <span>{relativeHint}</span>
+    </div>
+  {/if}
+
+  <div class="reminder-optin__actions">
+    <Button
+      onclick={handleToggle}
+      disabled={isProcessing || permission === 'unsupported'}
+      variant={enabled ? 'secondary' : 'primary'}
+    >
+      {#if isProcessing}
+        <Loader2 class="animate-spin" size="16" />
+      {:else if enabled}
+        Отключить напоминания
+      {:else}
+        Включить напоминания
+      {/if}
+    </Button>
+  </div>
+</div>
