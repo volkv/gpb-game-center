@@ -130,8 +130,7 @@
   }
 
   .education-screen {
-    min-height: 100%;
-    height: 100%;
+    flex: 1;
     background: var(--gradient-brand-muted);
     padding: 2rem 1rem;
     display: flex;

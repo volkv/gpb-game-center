@@ -6,6 +6,7 @@
   import DialogueInterface from './components/DialogueInterface.svelte';
   import ChoiceInterface from './components/ChoiceInterface.svelte';
   import EducationScreen from './components/EducationScreen.svelte';
+  import GameResultsModal from './components/GameResultsModal.svelte';
   import { codeToSuccessScenario, scenes } from './data/scenario';
   import type { Character, NovellaGameState, ChoiceOption, ChoiceHistoryEntry } from './types';
   import { NovellaScreen, CompletionPath, ChoiceConsequence } from './types';
@@ -44,6 +45,7 @@
   });
 
   let gameStarted = $state(false);
+  let showResultsModal = $state(false);
 
   $effect(() => {
     if (!gameStarted) {
@@ -99,7 +101,16 @@
   };
 
   const handleDialogueComplete = () => {
-    gameState.currentScreen = NovellaScreen.CHOICE;
+    const currentScene = scenes.find(scene => scene.id === gameState.currentSceneId);
+
+    if (currentScene?.choices && currentScene.choices.length > 0) {
+      gameState.currentScreen = NovellaScreen.CHOICE;
+    } else if (currentScene?.nextSceneId === 'education' ||
+               (currentScene?.id === 'good-ending' || currentScene?.id === 'bad-ending')) {
+      gameState.currentScreen = NovellaScreen.EDUCATION;
+    } else {
+      gameState.currentScreen = NovellaScreen.CHOICE;
+    }
     updateGameProgress();
   };
 
@@ -140,7 +151,27 @@
     };
 
     gameStore.completeGame(gameResults);
-    gameState.currentScreen = NovellaScreen.COMPLETED;
+    showResultsModal = true;
+  };
+
+  const handleRestartGame = () => {
+    showResultsModal = false;
+    gameState = {
+      currentScreen: NovellaScreen.CHARACTER_SELECTION,
+      currentSceneId: 'intro',
+      visitedScenes: [],
+      choiceHistory: [],
+      educationCompleted: false,
+      finalScore: 0,
+      completionPath: CompletionPath.INCOMPLETE
+    };
+    gameStore.startGame('code-to-success');
+  };
+
+  const handleFinalExit = () => {
+    showResultsModal = false;
+    gameStore.exitGame();
+    onexit();
   };
 
   const handleExit = () => {
@@ -155,127 +186,72 @@
   showScore={false}
   showBackButton={true}
 >
-  <div class="screen-container">
-    {#if gameState.currentScreen === NovellaScreen.CHARACTER_SELECTION}
-      <div class="screen-wrapper" in:screenEnter out:screenExit>
-        <CharacterSelection onCharacterSelect={handleCharacterSelect} />
+  {#if gameState.currentScreen === NovellaScreen.CHARACTER_SELECTION}
+    <div class="screen-wrapper" in:screenEnter out:screenExit>
+      <CharacterSelection onCharacterSelect={handleCharacterSelect} />
+    </div>
+  {:else if gameState.currentScreen === NovellaScreen.DIALOGUE}
+    <div class="screen-wrapper" in:screenEnter out:screenExit>
+      <DialogueInterface
+        gameState={gameState}
+        onStateUpdate={handleGameStateUpdate}
+        onDialogueComplete={handleDialogueComplete}
+      />
+    </div>
+  {:else if gameState.currentScreen === NovellaScreen.CHOICE}
+    <div class="screen-wrapper" in:screenEnter out:screenExit>
+      <ChoiceInterface
+        gameState={gameState}
+        onChoiceSelect={handleChoiceSelect}
+      />
+    </div>
+  {:else if gameState.currentScreen === NovellaScreen.EDUCATION}
+    <div class="screen-wrapper" in:screenEnter out:screenExit>
+      <EducationScreen
+        gameState={gameState}
+        onRewardClaim={handleRewardClaim}
+        onExit={handleExit}
+      />
+    </div>
+  {:else}
+    <div class="fallback-screen" in:screenEnter out:screenExit>
+      <div class="surface-card p-6 text-center max-w-md mx-auto">
+        <h3 class="fallback-title">
+          Экран в разработке
+        </h3>
+        <p class="fallback-text">
+          Этот экран будет реализован в следующих итерациях
+        </p>
+        <button type="button" class="btn-primary" onclick={handleExit}>
+          Вернуться в Игровой Центр
+        </button>
       </div>
-    {:else if gameState.currentScreen === NovellaScreen.DIALOGUE}
-      <div class="screen-wrapper" in:screenEnter out:screenExit>
-        <DialogueInterface
-          gameState={gameState}
-          onStateUpdate={handleGameStateUpdate}
-          onDialogueComplete={handleDialogueComplete}
-        />
-      </div>
-    {:else if gameState.currentScreen === NovellaScreen.CHOICE}
-      <div class="screen-wrapper" in:screenEnter out:screenExit>
-        <ChoiceInterface
-          gameState={gameState}
-          onChoiceSelect={handleChoiceSelect}
-        />
-      </div>
-    {:else if gameState.currentScreen === NovellaScreen.EDUCATION}
-      <div class="screen-wrapper" in:screenEnter out:screenExit>
-        <EducationScreen
-          gameState={gameState}
-          onRewardClaim={handleRewardClaim}
-          onExit={handleExit}
-        />
-      </div>
-    {:else if gameState.currentScreen === NovellaScreen.COMPLETED}
-      <div class="screen-wrapper" in:screenEnter out:screenExit>
-        <div class="completion-screen">
-          <div class="surface-card p-6 text-center max-w-md mx-auto">
-            <div class="completion-icon" aria-hidden="true">🎉</div>
-            <h3 class="completion-title">
-              Поздравляем! Игра завершена!
-            </h3>
-            <p class="completion-text">
-              Вы успешно прошли визуальную новеллу "Код к Успеху" и заработали {gameState.finalScore} очков!
-            </p>
-            <button
-              type="button"
-              class="btn-primary"
-              onclick={handleExit}
-              aria-label="Завершить игру и вернуться в игровой центр"
-            >
-              Вернуться в Игровой Центр
-            </button>
-          </div>
-        </div>
-      </div>
-    {:else}
-      <div class="screen-wrapper" in:screenEnter out:screenExit>
-        <div class="fallback-screen">
-          <div class="surface-card p-6 text-center max-w-md mx-auto">
-            <h3 class="fallback-title">
-              Экран в разработке
-            </h3>
-            <p class="fallback-text">
-              Этот экран будет реализован в следующих итерациях
-            </p>
-            <button type="button" class="btn-primary" onclick={handleExit}>
-              Вернуться в Игровой Центр
-            </button>
-          </div>
-        </div>
-      </div>
-    {/if}
-  </div>
+    </div>
+  {/if}
+
+  <!-- Results Modal -->
+  {#if showResultsModal}
+    <GameResultsModal
+      gameState={gameState}
+      onRestart={handleRestartGame}
+      onExit={handleFinalExit}
+    />
+  {/if}
 </GameLayout>
 
 <style>
-  .screen-container {
-    position: relative;
-    width: 100%;
-    flex: 1;
-    height: 100%;
-    min-height: 0;
-  }
-
   .screen-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
-  .fallback-screen,
-  .completion-screen {
-    min-height: 80vh;
-    min-height: 80dvh;
+  .fallback-screen {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem 1rem;
-  }
-
-
-  .completion-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-  }
-
-  .completion-title {
-    font-family: var(--font-heading);
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-brand-600);
-    margin: 0 0 1rem 0;
-    line-height: 1.3;
-  }
-
-  .completion-text {
-    font-family: var(--font-body);
-    font-size: 1rem;
-    color: var(--color-fg-secondary);
-    line-height: 1.5;
-    margin: 0 0 2rem 0;
   }
 
   .fallback-title {
@@ -293,6 +269,4 @@
     line-height: 1.5;
     margin: 0 0 2rem 0;
   }
-
-
 </style>

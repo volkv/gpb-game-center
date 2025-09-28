@@ -127,13 +127,10 @@
     padding: 2rem 1rem;
     max-width: 480px;
     margin: 0 auto;
-    height: 100%;
-    min-height: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    writing-mode: vertical-lr;
-    writing-mode: initial;
   }
 
 

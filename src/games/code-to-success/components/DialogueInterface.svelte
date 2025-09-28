@@ -36,7 +36,7 @@
 
   $effect(() => {
     backgroundImage = currentDialogueStep?.backgroundImage || currentScene?.backgroundImage || '';
-    characterImage = currentDialogueStep?.characterImage || '';
+    characterImage = '/games/code-to-success/avatar.png';
     isNarrator = currentDialogueStep?.speaker === SpeakerType.NARRATOR;
 
     if (!currentDialogueStep) {
@@ -92,6 +92,9 @@
           visitedScenes: updatedScenes
         };
         onStateUpdate(updatedState);
+      } else if (activeScene.nextSceneId === 'education') {
+        // Специальный случай для перехода к экрану образования
+        onDialogueComplete();
       } else {
         onDialogueComplete();
       }
@@ -149,17 +152,20 @@
     </div>
   {/if}
 
-  {#if characterImage}
-    <div class="character-container">
-      <img
-        src={characterImage}
-        alt={speakerName}
-        class="character-image"
-        onerror={(event) => {
-          const image = event.currentTarget as HTMLImageElement;
-          image.style.display = 'none';
-        }}
-      />
+  {#if currentDialogueStep && !isNarrator && speakerName}
+    <div class="character-bubble">
+      <div class="character-avatar">
+        <img
+          src={characterImage}
+          alt={speakerName}
+          class="character-image"
+          onerror={(event) => {
+            const image = event.currentTarget as HTMLImageElement;
+            image.style.display = 'none';
+          }}
+        />
+      </div>
+      <div class="speech-indicator" aria-hidden="true">💬</div>
     </div>
   {/if}
 
@@ -202,8 +208,7 @@
   .dialogue-interface {
     position: relative;
     width: 100%;
-    height: 100%;
-    min-height: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
     cursor: pointer;
@@ -227,23 +232,73 @@
     object-position: center;
   }
 
-  .character-container {
+  .character-bubble {
     position: absolute;
+    top: 2rem;
     right: 2rem;
-    top: 50%;
-    transform: translateY(-50%);
     z-index: 2;
-    max-width: 300px;
-    max-height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
     animation: characterFadeIn 0.6s ease-out;
+  }
+
+  .character-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(145deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.9) 100%
+    );
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-full);
+    padding: 6px;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.15),
+      0 4px 8px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .character-avatar::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg,
+      var(--color-brand-500),
+      var(--color-accent-500)
+    );
+    border-radius: var(--radius-full);
+    z-index: -1;
+    opacity: 0.8;
   }
 
   .character-image {
     width: 100%;
-    height: auto;
-    object-fit: contain;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-medium);
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-full);
+  }
+
+  .speech-indicator {
+    font-size: 1.5rem;
+    background: var(--color-accent-500);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-soft);
+    animation: speechPulse 2s infinite;
+    font-size: 1rem;
   }
 
   .dialogue-window {
@@ -380,6 +435,17 @@
     }
     50% {
       opacity: 1;
+    }
+  }
+
+  @keyframes speechPulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
     }
   }
 

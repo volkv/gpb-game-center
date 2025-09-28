@@ -93,8 +93,7 @@ import type { NovellaGameState, Choice, ChoiceOption, Scene } from '../types';
   .choice-interface {
     position: relative;
     width: 100%;
-    height: 100%;
-    min-height: 100%;
+    flex: 1;
     display: flex;
     flex-direction: column;
   }
@@ -120,7 +119,7 @@ import type { NovellaGameState, Choice, ChoiceOption, Scene } from '../types';
   .choice-content {
     position: relative;
     z-index: 2;
-    height: 100%;
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;

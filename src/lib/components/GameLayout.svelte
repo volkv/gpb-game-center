@@ -50,9 +50,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		height: 100%;
-		min-height: 0;
-		
+
 		color: white;
 	}
 
@@ -62,12 +60,11 @@
 		position: relative;
 		z-index: 2;
 		width: 100%;
-		height: 100%;
-		min-height: 0;
+		flex: 1;
 		display: flex;
 		flex-direction: column;
 		margin: 0 auto;
-		
+
 	}
 
 	@keyframes sparkle {
