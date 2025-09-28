@@ -1682,7 +1682,7 @@
               <h3 class="cta-card__title">Страхование карт и счетов</h3>
             </div>
           </div>
-          <p class="cta-card__lead text-balance">{finalCtaMessage}</p>
+          <p class="cta-card__lead text-balance">{finalCtaMessage()}</p>
           <ul class="cta-card__bullets">
             <li>Компенсация при подтверждённых мошеннических транзакциях</li>
             <li>Круглосуточное сопровождение и помощь в оформлении заявления</li>

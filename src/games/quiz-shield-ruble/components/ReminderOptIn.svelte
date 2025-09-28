@@ -69,50 +69,7 @@
   }
 </script>
 
-<section class="reminder-optin surface-card" aria-live="polite">
-  <header class="reminder-optin__header">
-    <div class="reminder-optin__icon" aria-hidden="true">
-      {#if enabled}
-        <BellRing size={20} />
-      {:else}
-        <BellOff size={20} />
-      {/if}
-    </div>
-    <div>
-      <p class="reminder-optin__title text-balance">{permissionCopy[permission].title}</p>
-      {#if permissionCopy[permission].note}
-        <p class="reminder-optin__note text-balance">{permissionCopy[permission].note}</p>
-      {/if}
-    </div>
-  </header>
 
-  {#if relativeHint}
-    <div class="reminder-optin__hint">
-      <Info size={16} aria-hidden="true" />
-      <span>{relativeHint}</span>
-    </div>
-  {/if}
-
-  <footer class="reminder-optin__actions">
-    <Button
-      variant={enabled ? 'secondary' : 'primary'}
-      size="md"
-      onclick={handleToggle}
-      disabled={isProcessing}
-    >
-      {#if isProcessing}
-        <Loader2 size={16} class="reminder-optin__spinner" aria-hidden="true" />
-        <span>{enabled ? 'Отключаем…' : 'Включаем…'}</span>
-      {:else if enabled}
-        <BellOff size={16} aria-hidden="true" />
-        <span>Отключить напоминания</span>
-      {:else}
-        <BellRing size={16} aria-hidden="true" />
-        <span>Включить напоминания</span>
-      {/if}
-    </Button>
-  </footer>
-</section>
 
 <style>
   .reminder-optin {

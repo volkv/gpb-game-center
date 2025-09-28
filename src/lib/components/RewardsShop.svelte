@@ -204,8 +204,8 @@
 
 	.rewards-grid {
 		display: grid;
-		gap: 1.25rem;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 1rem;
+		grid-template-columns: 1fr;
 	}
 
 	.rewards-grid__item {

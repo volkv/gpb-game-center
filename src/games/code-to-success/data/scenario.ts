@@ -21,7 +21,7 @@ export const characters: Character[] = [
     age: 30,
     profession: 'Фрилансер',
     description: 'Талантливый фрилансер. Только что завершила крупный проект, и на счет пришла приличная сумма – 250 тысяч рублей.',
-    avatar: '/games/code-to-success/1.png',
+    avatar: '/games/code-to-success/avatar.png',
     dialogueImages: [
       '/games/code-to-success/3.png',
       '/games/code-to-success/4.png',
@@ -37,7 +37,7 @@ export const characters: Character[] = [
     age: 45,
     profession: 'Семьянин',
     description: 'Заботливый семьянин, который всегда думает о благополучии своей семьи.',
-    avatar: '/games/code-to-success/2.png',
+    avatar: '/games/code-to-success/avatar2.png',
     dialogueImages: [],
     isAvailable: false
   },

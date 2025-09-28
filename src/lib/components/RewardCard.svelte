@@ -1,76 +1,104 @@
 <script lang="ts">
-	import { Star, ShoppingBag } from 'lucide-svelte';
+	import { Star, ShoppingBag, Clock } from 'lucide-svelte';
 	import { pointsStore } from '$lib/stores/pointsStore';
 	import type { Reward } from '$lib/types/Points';
 
 	let { reward, onPurchase }: { reward: Reward; onPurchase: (reward: Reward) => void } = $props();
 
 	let canAfford = $derived(pointsStore.canAfford(reward.cost));
+	let isDisabled = $derived(!canAfford || !reward.isAvailable);
+
+	function handleCardClick() {
+		if (!isDisabled) {
+			onPurchase(reward);
+		}
+	}
+
+	function handleCardKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter' || event.key === ' ') {
+			event.preventDefault();
+			handleCardClick();
+		}
+	}
+
+	function handleRewardAction(event: MouseEvent) {
+		event.stopPropagation();
+		if (!isDisabled) {
+			onPurchase(reward);
+		}
+	}
 </script>
 
-<article
+<div
 	class="reward-card"
 	class:reward-card--affordable={canAfford}
 	class:reward-card--disabled={!reward.isAvailable}
+	onclick={handleCardClick}
+	onkeydown={handleCardKeydown}
+	role="button"
+	tabindex={isDisabled ? -1 : 0}
+	aria-label={`Награда: ${reward.title}`}
 >
 	<header class="reward-card__header">
 		<div class="reward-card__icon" aria-hidden="true">
-			<span class="reward-card__emoji">{reward.icon}</span>
+			<span>{reward.icon}</span>
 		</div>
-		<div class="reward-card__title-block">
-			<h3 class="reward-card__title">{reward.title}</h3>
-			<span class="reward-card__partner">{reward.partner}</span>
+		<div class="reward-card__badges">
+			<span class="reward-card__badge reward-card__badge--partner">
+				{reward.partner}
+			</span>
+			{#if !reward.isAvailable}
+				<span class="reward-card__badge reward-card__badge--unavailable">
+					Недоступно
+				</span>
+			{/if}
 		</div>
 	</header>
 
-	<p class="reward-card__description text-balance">{reward.description}</p>
-
-	<div class="reward-card__meta" aria-label="Стоимость">
-		<span class="reward-card__cost">
-			<Star size={16} aria-hidden="true" />
-			<span class="reward-card__cost-value">{reward.cost.toLocaleString()}</span>
-			<span class="reward-card__cost-label">баллов</span>
-		</span>
-		{#if reward.validUntil}
-			<span class="reward-card__chip">до {reward.validUntil.toLocaleDateString('ru-RU')}</span>
-		{/if}
+	<div class="reward-card__body">
+		<h3 class="reward-card__title">{reward.title}</h3>
+		<p class="reward-card__description text-balance">{reward.description}</p>
 	</div>
 
 	<footer class="reward-card__footer">
-		<button
-			type="button"
-			class="reward-card__action"
-			disabled={!canAfford || !reward.isAvailable}
-			onclick={() => onPurchase(reward)}
-		>
-			<ShoppingBag size={16} aria-hidden="true" />
-			{canAfford && reward.isAvailable ? 'Получить' : !canAfford ? 'Недостаточно баллов' : 'Недоступно'}
-		</button>
+		<div class="reward-card__meta">
+			<span class="reward-card__meta-item">
+				<Star size={14} aria-hidden="true" />
+				{reward.cost.toLocaleString()}
+			</span>
+			{#if reward.validUntil}
+				<span class="reward-card__meta-item">
+					<Clock size={14} aria-hidden="true" />
+					до {reward.validUntil.toLocaleDateString('ru-RU')}
+				</span>
+			{/if}
+		</div>
+
+		{#if !isDisabled}
+			<button type="button" class="reward-card__action" onclick={handleRewardAction}>
+				Получить
+			</button>
+		{:else}
+			<div class="reward-card__status">
+				<ShoppingBag size={16} aria-hidden="true" />
+				<span>{!canAfford ? 'Недостаточно баллов' : 'Недоступно'}</span>
+			</div>
+		{/if}
 	</footer>
-</article>
+</div>
 
 <style>
 	.reward-card {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: 1.25rem;
 		padding: 1.5rem;
 		border-radius: var(--radius-xl);
 		border: 1px solid var(--color-border-muted);
 		background: var(--color-surface-card);
 		box-shadow: var(--shadow-soft);
 		transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-	}
-
-	.reward-card::before {
-		content: '';
-		position: absolute;
-		inset: 0;
-		border-radius: inherit;
-		opacity: 0;
-		background: linear-gradient(135deg, rgba(6, 6, 152, 0.14) 0%, rgba(31, 196, 217, 0.12) 100%);
-		pointer-events: none;
-		transition: opacity 160ms ease;
+		cursor: pointer;
 	}
 
 	.reward-card:hover {
@@ -79,8 +107,9 @@
 		border-color: var(--layer-brand-150);
 	}
 
-	.reward-card:hover::before {
-		opacity: 1;
+	.reward-card:focus-visible {
+		outline: none;
+		box-shadow: var(--shadow-focus);
 	}
 
 	.reward-card--affordable {
@@ -88,35 +117,64 @@
 	}
 
 	.reward-card--disabled {
-		opacity: 0.65;
-		cursor: not-allowed;
+		opacity: 0.72;
+		cursor: default;
+		transform: none;
 	}
 
 	.reward-card__header {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
+		justify-content: space-between;
 		gap: 1rem;
 	}
 
 	.reward-card__icon {
-		width: 52px;
-		height: 52px;
+		width: 48px;
+		height: 48px;
 		border-radius: var(--radius-lg);
 		background: var(--layer-brand-050);
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		font-size: 1.5rem;
 	}
 
-	.reward-card__emoji {
-		font-size: 1.8rem;
-	}
-
-	.reward-card__title-block {
+	.reward-card__badges {
 		display: flex;
 		flex-direction: column;
+		gap: 0.4rem;
+		align-items: flex-end;
+	}
+
+	.reward-card__badge {
+		display: inline-flex;
+		align-items: center;
 		gap: 0.3rem;
-		min-width: 0;
+		padding: 0.3rem 0.7rem;
+		border-radius: var(--radius-full);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.reward-card__badge--partner {
+		background: var(--color-neutral-100);
+		color: var(--color-fg-secondary);
+		border: 1px solid var(--color-border-subtle);
+	}
+
+	.reward-card__badge--unavailable {
+		background: color-mix(in srgb, var(--color-state-danger) 18%, white 82%);
+		color: var(--color-state-danger);
+		border: 1px solid color-mix(in srgb, var(--color-state-danger) 32%, transparent);
+	}
+
+	.reward-card__body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
 	}
 
 	.reward-card__title {
@@ -125,16 +183,6 @@
 		font-size: 1.15rem;
 		font-weight: 600;
 		color: var(--color-fg-primary);
-		white-space: nowrap;
-		
-		text-overflow: ellipsis;
-	}
-
-	.reward-card__partner {
-		font-size: 0.75rem;
-		letter-spacing: 0.05em;
-		text-transform: uppercase;
-		color: var(--color-fg-muted);
 	}
 
 	.reward-card__description {
@@ -143,74 +191,44 @@
 		color: var(--color-fg-secondary);
 	}
 
-	.reward-card__meta {
+	.reward-card__footer {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 0.75rem;
-		flex-wrap: wrap;
+		gap: 1rem;
 	}
 
-	.reward-card__cost {
+	.reward-card__meta {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+		color: var(--color-fg-muted);
+		font-size: 0.8rem;
+	}
+
+	.reward-card__meta-item {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
-		padding: 0.35rem 0.6rem;
-		border-radius: var(--radius-full);
-		background: var(--color-neutral-100);
-		border: 1px solid var(--color-border-subtle);
-		color: var(--color-fg-secondary);
-		font-size: 0.85rem;
-	}
-
-	.reward-card__cost-value {
-		font-family: var(--font-display);
-		font-weight: 600;
-		color: var(--color-brand-600);
-	}
-
-	.reward-card__cost-label {
-		font-size: 0.75rem;
-		color: var(--color-fg-muted);
-	}
-
-	.reward-card__chip {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.3rem;
-		padding: 0.25rem 0.55rem;
-		border-radius: var(--radius-full);
-		background: var(--color-neutral-50);
-		border: 1px solid var(--color-border-subtle);
-		font-size: 0.75rem;
-		color: var(--color-fg-muted);
-	}
-
-	.reward-card__footer {
-		margin-top: auto;
 	}
 
 	.reward-card__action {
-		width: 100%;
-		padding: 0.85rem 1rem;
+		padding: 0.6rem 1.1rem;
 		border-radius: var(--radius-lg);
 		border: 1px solid transparent;
-		background: var(--color-brand-500);
+		background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
 		color: var(--color-fg-inverse);
 		font-family: var(--font-display);
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 		font-weight: 600;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 		cursor: pointer;
+		transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 	}
 
 	.reward-card__action:hover {
 		transform: translateY(-1px);
 		box-shadow: var(--shadow-soft);
+		background: linear-gradient(135deg, var(--color-brand-700) 0%, var(--color-brand-500) 100%);
 	}
 
 	.reward-card__action:focus-visible {
@@ -218,21 +236,26 @@
 		box-shadow: var(--shadow-focus);
 	}
 
-	.reward-card__action:disabled {
-		background: var(--color-neutral-100);
+	.reward-card__status {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.85rem;
+		font-weight: 600;
 		color: var(--color-fg-muted);
-		border-color: var(--color-border-muted);
-		cursor: not-allowed;
-		box-shadow: none;
 	}
 
-	.reward-card--disabled .reward-card__action {
-		background: var(--color-neutral-100);
-		color: var(--color-fg-muted);
-		border-color: var(--color-border-muted);
-		cursor: not-allowed;
+	.reward-card {
+		padding: 1.25rem;
 	}
 
+	.reward-card__footer {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.75rem;
+	}
 
-
+	.reward-card__action {
+		width: 100%;
+	}
 </style>
