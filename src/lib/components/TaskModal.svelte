@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Star, Clock, ExternalLink, CheckCircle, Award } from 'lucide-svelte';
 	import { tasksStore } from '$lib/stores/tasksStore';
+	import { confettiEffects } from '$lib/utils/confetti';
 	import Button from './Button.svelte';
 	import Modal from './Modal.svelte';
 	import type { Task } from '$lib/types/Tasks';
@@ -53,6 +54,8 @@
 		if (reward > 0) {
 			earnedPoints = reward;
 			showCompletionAnimation = true;
+
+			confettiEffects.taskComplete();
 
 			setTimeout(() => {
 				showCompletionAnimation = false;

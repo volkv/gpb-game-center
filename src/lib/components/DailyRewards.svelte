@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Calendar } from 'lucide-svelte';
 	import { tasksStore, dailyRewards, currentDay } from '$lib/stores/tasksStore';
+	import { confettiEffects } from '$lib/utils/confetti';
 
 	let showRewardClaimed = $state(false);
 	let claimedAmount = $state(0);
@@ -11,6 +12,9 @@
 			if (reward > 0) {
 				claimedAmount = reward;
 				showRewardClaimed = true;
+
+				confettiEffects.dailyStreak(day);
+
 				setTimeout(() => {
 					showRewardClaimed = false;
 				}, 2800);

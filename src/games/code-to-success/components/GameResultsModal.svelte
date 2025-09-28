@@ -3,6 +3,8 @@
   import { CompletionPath } from '../types';
   import { fade, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
+  import { confettiEffects } from '$lib/utils/confetti';
+  import { onMount } from 'svelte';
 
   interface Props {
     gameState: NovellaGameState;
@@ -36,6 +38,10 @@
       action();
     }
   };
+
+  onMount(() => {
+    confettiEffects.gameComplete(isSuccess);
+  });
 </script>
 
 <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="results-title">

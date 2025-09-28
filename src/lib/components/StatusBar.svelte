@@ -162,7 +162,6 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.2rem;
 		text-align: center;
 		min-width: 0;
 	}
@@ -194,14 +193,14 @@
 		font-size: 1.05rem;
 		font-weight: 600;
 		letter-spacing: -0.01em;
-		color: var(--color-fg-primary);
+		color: var(--color-brand-600);
 		white-space: nowrap;
 		
 		text-overflow: ellipsis;
 	}
 
 	.status-bar.game-mode .game-name {
-		color: var(--color-fg-primary);
+		color: var(--color-brand-600);
 	}
 
 	.player-line {
@@ -209,7 +208,7 @@
 		align-items: center;
 		gap: 0.4rem;
 		justify-content: center;
-		color: var(--color-fg-muted);
+		color: var(--color-brand-600);
 		font-size: 0.8125rem;
 	}
 
@@ -276,9 +275,8 @@
 		font-family: var(--font-display);
 		font-size: 0.9rem;
 		font-weight: 600;
-		color: var(--color-fg-primary);
 		white-space: nowrap;
-		
+		color: var(--color-brand-600);
 		text-overflow: ellipsis;
 	}
 

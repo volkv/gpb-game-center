@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Star, CheckCircle } from 'lucide-svelte';
 	import { pointsStore } from '$lib/stores/pointsStore';
+	import { confettiEffects } from '$lib/utils/confetti';
 	import type { Reward } from '$lib/types/Points';
 	import Modal from './Modal.svelte';
 
@@ -31,6 +32,8 @@
 			if (success) {
 				isSuccess = true;
 				onConfirm(reward);
+
+				confettiEffects.purchaseSuccess();
 
 				setTimeout(() => {
 					isSuccess = false;
