@@ -113,6 +113,7 @@ export interface AssetGuardianGameState {
 	gravity: Gravity;
 	progress: GameProgress;
 	visualEffects: VisualEffects;
+	activeBonuses: Map<string, ActiveBonus>;
 	gyroscope: {
 		isSupported: boolean;
 		isActive: boolean;
@@ -195,5 +196,121 @@ export interface BankingProduct {
 		type: 'shield' | 'multiplier' | 'extra_life' | 'slow_time';
 		duration: number;
 		value: number;
+		triggerCondition: string;
 	};
+}
+
+export interface ActiveBonus {
+	id: string;
+	type: 'shield' | 'multiplier' | 'extra_life' | 'slow_time';
+	name: string;
+	icon: string;
+	duration: number;
+	startTime: number;
+	value: number;
+	isActive: boolean;
+	remainingTime: number;
+}
+
+export interface PlayerStats {
+	totalScore: number;
+	totalPlayTime: number;
+	levelsCompleted: number;
+	perfectRuns: number;
+	totalBonusesCollected: number;
+	totalTrapsHit: number;
+	averageScore: number;
+	bestSpeedRun: number;
+	favoriteLevel: number;
+	efficiency: number;
+	bankingProductsStudied: string[];
+	lastPlayedDate: number;
+	totalSessions: number;
+	currentStreak: number;
+	bestStreak: number;
+}
+
+export interface HighScore {
+	score: number;
+	level: number;
+	date: number;
+	timeUsed: number;
+	perfectRun: boolean;
+	difficulty: 'easy' | 'medium' | 'hard';
+	playerStats: {
+		bonusesCollected: number;
+		trapsHit: number;
+		bankingLessonCompleted: boolean;
+	};
+}
+
+export interface Achievement {
+	id: string;
+	name: string;
+	description: string;
+	icon: string;
+	category: 'score' | 'speed' | 'efficiency' | 'banking' | 'streak' | 'exploration';
+	rarity: 'common' | 'rare' | 'epic' | 'legendary';
+	unlockedAt?: number;
+	isUnlocked: boolean;
+	progress: number;
+	maxProgress: number;
+	condition: {
+		type: 'score' | 'perfect_runs' | 'speed' | 'banking_products' | 'streak' | 'total_levels';
+		value: number;
+		operator: '>=' | '>' | '==' | '<=' | '<';
+	};
+	reward: {
+		type: 'points' | 'title' | 'unlock';
+		value: number;
+		description: string;
+	};
+}
+
+export interface ProgressData {
+	version: string;
+	playerStats: PlayerStats;
+	highScores: {
+		overall: HighScore[];
+		byLevel: Record<number, HighScore>;
+		speedRuns: HighScore[];
+	};
+	achievements: Record<string, Achievement>;
+	unlockedContent: {
+		levels: number[];
+		achievements: string[];
+		titles: string[];
+	};
+	preferences: {
+		gyroscopeEnabled: boolean;
+		hapticFeedbackEnabled: boolean;
+		soundEnabled: boolean;
+		difficultyPreference: 'easy' | 'medium' | 'hard';
+	};
+	metadata: {
+		createdAt: number;
+		lastUpdatedAt: number;
+		dataVersion: number;
+		migrationHistory: string[];
+	};
+}
+
+export interface ScoringEvent {
+	type: 'level_complete' | 'perfect_run' | 'speed_record' | 'achievement_unlock' | 'banking_lesson';
+	levelId: number;
+	score: number;
+	timeUsed: number;
+	bonusesCollected: number;
+	trapsHit: number;
+	bankingProductUsed?: string;
+	timestamp: number;
+}
+
+export interface LeaderboardEntry {
+	rank: number;
+	playerName: string;
+	score: number;
+	level: number;
+	date: number;
+	achievements: string[];
 }

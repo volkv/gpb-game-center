@@ -202,9 +202,9 @@ function createMatch3Store() {
 
 		useBooster: () => {
 			update(state => {
-				const newState = {
+				const newState: Match3GameState = {
 					...state,
-					status: 'playing' as const,
+					status: 'playing',
 					booster: {
 						charge: 0,
 						isActive: false,
@@ -233,14 +233,14 @@ function createMatch3Store() {
 						pointsStore.addPoints(bonusPoints, 'Золотой Запас: Бонус за победу!', 'match3-golden-reserve');
 					}
 
-					const newState = {
-						...state,
-						status: 'completed' as const,
-						session: {
-							...state.session,
-							isCompleted: true
-						}
-					};
+				const newState: Match3GameState = {
+					...state,
+					status: 'completed',
+					session: {
+						...state.session,
+						isCompleted: true
+					}
+				};
 					syncWithMainStore(newState);
 					setTimeout(() => match3Store.finishSession(), 100);
 					return newState;
@@ -353,11 +353,11 @@ function createMatch3Store() {
 				const boosterScore = SCORE_VALUES.BOOSTER_USE;
 				const totalScore = boosterScore + totalResult.score;
 
-				const newState = {
+				const newState: Match3GameState = {
 					...state,
 					field: finalField,
 					selectedCell: null,
-					status: 'playing' as const,
+					status: 'playing',
 					score: state.score + totalScore,
 					booster: {
 						charge: 0,

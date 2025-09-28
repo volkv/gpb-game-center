@@ -12,6 +12,7 @@ export interface GyroscopeManager {
 	stop(): void;
 	calibrate(): Promise<GyroscopeData | null>;
 	convertToGravity(data: GyroscopeData): Gravity;
+	setSensitivity?(sensitivity: number): void;
 
 	onGyroscopeChanged: (callback: (data: GyroscopeData) => void) => void;
 	onGyroscopeStarted: (callback: () => void) => void;
@@ -107,9 +108,9 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		if (!this.webApp || !this.isSupported) return;
 
 		try {
-			this.webApp.onEvent('gyroscopeChanged', this.gyroscopeChangedHandler);
-			this.webApp.onEvent('gyroscopeStarted', this.gyroscopeStartedHandler);
-			this.webApp.onEvent('gyroscopeFailed', this.gyroscopeFailedHandler);
+			this.webApp.onEvent('gyroscopeChanged', () => this.gyroscopeChangedHandler);
+			this.webApp.onEvent('gyroscopeStarted', () => this.gyroscopeStartedHandler);
+			this.webApp.onEvent('gyroscopeFailed', () => this.gyroscopeFailedHandler);
 
 			console.log('🔄 [GYROSCOPE] Event handlers registered');
 		} catch (error) {
@@ -251,9 +252,9 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	cleanup(): void {
 		if (this.webApp && this.isSupported) {
 			try {
-				this.webApp.offEvent('gyroscopeChanged', this.gyroscopeChangedHandler);
-				this.webApp.offEvent('gyroscopeStarted', this.gyroscopeStartedHandler);
-				this.webApp.offEvent('gyroscopeFailed', this.gyroscopeFailedHandler);
+				this.webApp.offEvent('gyroscopeChanged', () => this.gyroscopeChangedHandler);
+				this.webApp.offEvent('gyroscopeStarted', () => this.gyroscopeStartedHandler);
+				this.webApp.offEvent('gyroscopeFailed', () => this.gyroscopeFailedHandler);
 			} catch (error) {
 				console.warn('🔄 [GYROSCOPE] Error during cleanup:', error);
 			}
@@ -447,7 +448,7 @@ export function throttle<T extends (...args: any[]) => void>(
 	limit: number
 ): T {
 	let inThrottle: boolean;
-	return ((...args: any[]) => {
+	return (function(this: any, ...args: any[]) {
 		if (!inThrottle) {
 			func.apply(this, args);
 			inThrottle = true;

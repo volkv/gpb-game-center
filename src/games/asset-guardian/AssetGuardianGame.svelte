@@ -1,12 +1,24 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { Shield, Clock, Trophy, Zap, Play, Pause, RotateCcw, Settings } from 'lucide-svelte';
+	import { Shield, Clock, Trophy, Zap, Play, Pause, RotateCcw, Settings, BarChart3, Award } from 'lucide-svelte';
 	import { Button, Counter, Badge, GameLayout } from '$lib';
-	import { assetGuardianStore, assetGuardianSelectors } from './gameState';
+	import { assetGuardianStore, assetGuardianSelectors, scoringStore, scoringSelectors } from './gameState';
 	import { GAME_CONFIG, BALL_CONFIG, BANKING_PRODUCTS } from './constants';
 	import type { LevelConfig } from './types';
 	import { createGyroscopeManager, createFallbackInputManager, throttle } from './gyroscope';
 	import type { GyroscopeManager, FallbackInputManager } from './gyroscope';
+	import { AssetGuardianGameEngine } from './gameEngine';
+	import type { GameEngineConfig } from './gameEngine';
+	import { createVisualEffectsManager, convertTiltToNormalized } from './visual-effects';
+	import type { VisualEffectsManager } from './visual-effects';
+	import {
+		LEVELS,
+		getLevelById,
+		getNextLevel,
+		getTotalLevels,
+		isLastLevel
+	} from './levelData';
+	import { validateLevel, parseLevel } from './levelParser';
 
 	interface Props {
 		onexit?: () => void;
@@ -17,16 +29,32 @@
 	let mounted = $state(false);
 	let gameState = $state($assetGuardianStore);
 	let selectors = $state($assetGuardianSelectors);
+	let scoringState = $state($scoringSelectors);
 	let gameCanvas: HTMLCanvasElement | undefined = $state();
 	let showInstructions = $state(true);
+	let showStatsModal = $state(false);
+	let showSettingsModal = $state(false);
 	let gyroscopeManager: GyroscopeManager;
 	let fallbackInputManager: FallbackInputManager;
+	let gameEngine: AssetGuardianGameEngine | null = $state(null);
+	let gameEngineReady = $state(false);
 	let calibrationInProgress = $state(false);
 	let gyroscopeStatus = $state('checking');
+	let visualEffectsManager: VisualEffectsManager | null = $state(null);
+	let gameCanvasWrapper: HTMLElement | undefined = $state();
+
+	// Settings state
+	let settings = $state({
+		hapticFeedback: true,
+		visualEffectsIntensity: 'medium' as 'low' | 'medium' | 'high',
+		perspectiveEffects: true,
+		gyroscopeSensitivity: 1.0
+	});
 
 	$effect(() => {
 		gameState = $assetGuardianStore;
 		selectors = $assetGuardianSelectors;
+		scoringState = $scoringSelectors;
 	});
 
 	$effect(() => {
@@ -35,35 +63,50 @@
 		}
 	});
 
-	const mockLevel: LevelConfig = {
-		id: 1,
-		name: 'Первые Шаги',
-		difficulty: 'easy',
-		grid: [
-			['wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall'],
-			['wall', 'start', 'empty', 'empty', 'cashback', 'empty', 'empty', 'empty', 'empty', 'wall'],
-			['wall', 'empty', 'wall', 'empty', 'empty', 'empty', 'wall', 'deposit', 'empty', 'wall'],
-			['wall', 'empty', 'empty', 'empty', 'trap_phishing', 'empty', 'empty', 'empty', 'empty', 'wall'],
-			['wall', 'cashback', 'empty', 'wall', 'empty', 'empty', 'wall', 'empty', 'deposit', 'wall'],
-			['wall', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'wall'],
-			['wall', 'empty', 'trap_fraud', 'empty', 'empty', 'wall', 'empty', 'empty', 'empty', 'wall'],
-			['wall', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'cashback', 'empty', 'wall'],
-			['wall', 'empty', 'empty', 'deposit', 'empty', 'empty', 'empty', 'empty', 'finish', 'wall'],
-			['wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall', 'wall']
-		],
-		timeLimit: 120,
-		targetScore: 500,
-		startPosition: { row: 1, col: 1 },
-		finishPosition: { row: 8, col: 8 },
-		bankingTheme: {
-			product: 'Защита от мошенничества',
-			lesson: 'Избегайте подозрительных ссылок и сохраняйте свои активы'
+	$effect(() => {
+		if (gameCanvas && !gameEngine) {
+			initializeGameEngine();
 		}
-	};
+	});
+
+	$effect(() => {
+		if (gameEngine && gameEngineReady && selectors.currentGravity) {
+			assetGuardianStore.updateGameEngineGravity(gameEngine, selectors.currentGravity);
+			gameEngine.updateVisualEffects(selectors.currentGravity);
+		}
+	});
+
+	let currentLevelId = $state(1);
+
+	function loadCurrentLevel(): LevelConfig {
+		const level = getLevelById(currentLevelId);
+		if (!level) {
+			console.error(`Level ${currentLevelId} not found, falling back to level 1`);
+			currentLevelId = 1;
+			return LEVELS[0];
+		}
+
+		const validation = validateLevel(level);
+		if (!validation.isValid) {
+			console.error(`Level ${currentLevelId} validation failed:`, validation.error);
+			if (validation.suggestions) {
+				console.warn('Suggestions:', validation.suggestions);
+			}
+		}
+
+		return level;
+	}
 
 	onMount(async () => {
 		mounted = true;
-		assetGuardianStore.initialize(mockLevel);
+		const level = loadCurrentLevel();
+		assetGuardianStore.initialize(level);
+		assetGuardianStore.initializeCollisionSystem();
+
+		if (gameCanvasWrapper) {
+			visualEffectsManager = createVisualEffectsManager();
+			visualEffectsManager.initialize(gameCanvasWrapper);
+		}
 
 		setTimeout(() => {
 			showInstructions = false;
@@ -131,32 +174,153 @@
 		}
 	}
 
+	async function initializeGameEngine() {
+		if (!gameCanvas) {
+			console.warn('🎮 [GAME] Canvas not ready for game engine initialization');
+			return;
+		}
+
+		try {
+			console.log('🎮 [GAME] Initializing game engine...');
+
+			const config: GameEngineConfig = {
+				width: GAME_CONFIG.WORLD_WIDTH,
+				height: GAME_CONFIG.WORLD_HEIGHT,
+				backgroundColor: 0x2C3E50,
+				antialias: true,
+				resolution: globalThis.window?.devicePixelRatio || 1
+			};
+
+			gameEngine = new AssetGuardianGameEngine(config);
+			await assetGuardianStore.initializeGameEngine(gameEngine, gameCanvas);
+
+			assetGuardianStore.setGameEngineForCollisionHandler(gameEngine);
+
+			const physics = gameEngine.getPhysicsEngine();
+			physics.addCollisionHandler('cashback', (result) => {
+				assetGuardianStore.handlePhysicsCollision(result, gameEngine || undefined);
+			});
+
+			physics.addCollisionHandler('deposit', (result) => {
+				assetGuardianStore.handlePhysicsCollision(result, gameEngine || undefined);
+			});
+
+			physics.addCollisionHandler('trap_phishing', (result) => {
+				assetGuardianStore.handlePhysicsCollision(result, gameEngine || undefined);
+			});
+
+			physics.addCollisionHandler('trap_fraud', (result) => {
+				assetGuardianStore.handlePhysicsCollision(result, gameEngine || undefined);
+			});
+
+			physics.addCollisionHandler('finish', (result) => {
+				assetGuardianStore.handlePhysicsCollision(result, gameEngine || undefined);
+			});
+
+			const level = loadCurrentLevel();
+			assetGuardianStore.loadGameLevel(gameEngine, level);
+
+			gameEngineReady = true;
+			console.log('🎮 [GAME] Game engine initialized successfully');
+		} catch (error) {
+			console.error('🎮 [GAME] Failed to initialize game engine:', error);
+		}
+	}
+
 	onDestroy(() => {
+		if (gameEngine) {
+			assetGuardianStore.destroyGameEngine(gameEngine);
+			gameEngine = null;
+		}
 		if (gyroscopeManager) {
 			gyroscopeManager.cleanup();
 		}
 		if (fallbackInputManager) {
 			fallbackInputManager.cleanup();
 		}
+		if (visualEffectsManager) {
+			visualEffectsManager.destroy();
+		}
+		assetGuardianStore.destroyCollisionSystem();
 		assetGuardianStore.reset();
 	});
 
+	function handleShowSettings() {
+		showSettingsModal = true;
+	}
+
+	function handleCloseSettings() {
+		showSettingsModal = false;
+	}
+
+	function handleToggleSetting(setting: keyof typeof settings) {
+		if (setting === 'visualEffectsIntensity') {
+			const intensityMap = { low: 'medium', medium: 'high', high: 'low' } as const;
+			settings.visualEffectsIntensity = intensityMap[settings.visualEffectsIntensity];
+		} else if (typeof settings[setting] === 'boolean') {
+			(settings[setting] as boolean) = !(settings[setting] as boolean);
+		}
+	}
+
+	function handleGyroscopeSensitivityChange(delta: number) {
+		settings.gyroscopeSensitivity = Math.max(0.5, Math.min(2.0, settings.gyroscopeSensitivity + delta));
+		if (gyroscopeManager && gyroscopeManager.isActive) {
+			gyroscopeManager.setSensitivity?.(settings.gyroscopeSensitivity);
+		}
+	}
+
 	function handleStartGame() {
+		if (!gameEngine || !gameEngineReady) {
+			console.warn('Game engine not ready');
+			return;
+		}
+
 		showInstructions = false;
-		assetGuardianStore.startGame();
+		assetGuardianStore.startGameEngines(gameEngine);
 	}
 
 	function handlePauseGame() {
-		assetGuardianStore.pauseGame();
+		if (!gameEngine) return;
+		assetGuardianStore.stopGameEngines(gameEngine);
 	}
 
 	function handleResumeGame() {
-		assetGuardianStore.resumeGame();
+		if (!gameEngine) return;
+		assetGuardianStore.startGameEngines(gameEngine);
 	}
 
 	function handleRestartGame() {
 		assetGuardianStore.reset();
-		assetGuardianStore.initialize(mockLevel);
+		const level = loadCurrentLevel();
+		assetGuardianStore.initialize(level);
+		if (gameEngine) {
+			assetGuardianStore.loadGameLevel(gameEngine, level);
+		}
+	}
+
+	function handleNextLevel() {
+		const nextLevel = getNextLevel(currentLevelId);
+		if (nextLevel) {
+			currentLevelId = nextLevel.id;
+			const level = loadCurrentLevel();
+			assetGuardianStore.reset();
+			assetGuardianStore.initialize(level);
+			if (gameEngine) {
+				assetGuardianStore.loadGameLevel(gameEngine, level);
+			}
+		}
+	}
+
+	function handlePrevLevel() {
+		if (currentLevelId > 1) {
+			currentLevelId = currentLevelId - 1;
+			const level = loadCurrentLevel();
+			assetGuardianStore.reset();
+			assetGuardianStore.initialize(level);
+			if (gameEngine) {
+				assetGuardianStore.loadGameLevel(gameEngine, level);
+			}
+		}
 	}
 
 	async function handleCalibrateGyroscope() {
@@ -179,6 +343,35 @@
 		}
 	}
 
+	function handleShowStats() {
+		showStatsModal = true;
+	}
+
+	function handleCloseStats() {
+		showStatsModal = false;
+	}
+
+	function handleActivateBonus(productId: string) {
+		assetGuardianStore.activateBonus(productId);
+
+		// Show confirmation effect
+		if (gameEngine) {
+			gameEngine.triggerEffect({
+				position: { x: 50, y: 50 },
+				type: 'achievement',
+				intensity: 'high',
+				metadata: { achievementName: 'Банковский бонус активирован!' }
+			});
+		}
+
+		// Continue to next level if not last
+		if (!isLastLevel(currentLevelId)) {
+			setTimeout(() => {
+				handleNextLevel();
+			}, 1500);
+		}
+	}
+
 	function handleExit() {
 		onexit?.();
 	}
@@ -190,7 +383,7 @@
 	}
 </script>
 
-<GameLayout gameName="Хранитель Активов" background="gradient-brand-hero" showScore={true}>
+<GameLayout gameName="Хранитель Активов" background="gradient-electric" showScore={true}>
 	<div class="asset-guardian-container">
 		<!-- Game Header -->
 		<div class="game-header p-4">
@@ -239,6 +432,57 @@
 						</div>
 					</div>
 				</div>
+
+				<!-- Progress Bars -->
+				<div class="progress-bars-container mt-4">
+					<!-- Score Progress -->
+					<div class="progress-bar-item">
+						<div class="progress-bar-label">
+							<span class="text-xs text-gpb-gray-600">Счет к цели</span>
+							<span class="text-xs text-gpb-gray-500">
+								{selectors.currentScore}/{gameState.currentLevel?.targetScore || 0}
+							</span>
+						</div>
+						<div class="progress-bar score-progress">
+							<div
+								class="progress-fill score-fill"
+								style="width: {Math.min(100, (selectors.currentScore / (gameState.currentLevel?.targetScore || 1)) * 100)}%"
+							></div>
+						</div>
+					</div>
+
+					<!-- Time Progress -->
+					<div class="progress-bar-item">
+						<div class="progress-bar-label">
+							<span class="text-xs text-gpb-gray-600">Время</span>
+							<span class="text-xs text-gpb-gray-500">
+								{formatTime(selectors.timeRemaining)}
+							</span>
+						</div>
+						<div class="progress-bar time-progress">
+							<div
+								class="progress-fill time-fill"
+								style="width: {Math.min(100, (selectors.timeRemaining / (gameState.currentLevel?.timeLimit || 1)) * 100)}%"
+							></div>
+						</div>
+					</div>
+
+					<!-- Level Progress -->
+					<div class="progress-bar-item">
+						<div class="progress-bar-label">
+							<span class="text-xs text-gpb-gray-600">Прогресс уровней</span>
+							<span class="text-xs text-gpb-gray-500">
+								{currentLevelId}/{getTotalLevels()}
+							</span>
+						</div>
+						<div class="progress-bar level-progress">
+							<div
+								class="progress-fill level-fill"
+								style="width: {(currentLevelId / getTotalLevels()) * 100}%"
+							></div>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			<!-- Level Info -->
@@ -255,6 +499,31 @@
 						<span>Сложность: {gameState.currentLevel?.difficulty}</span>
 						<span>Цель: {gameState.currentLevel?.targetScore} очков</span>
 					</div>
+					<div class="flex items-center gap-2">
+						<Button
+							variant="secondary"
+							size="sm"
+							disabled={currentLevelId <= 1}
+							onclick={handlePrevLevel}
+							class="px-2 py-1 text-xs"
+						>
+							← Назад
+						</Button>
+						<div class="text-xs text-gpb-gray-500 px-2">
+							{currentLevelId}/{getTotalLevels()}
+						</div>
+						<Button
+							variant="secondary"
+							size="sm"
+							disabled={isLastLevel(currentLevelId)}
+							onclick={handleNextLevel}
+							class="px-2 py-1 text-xs"
+						>
+							Вперед →
+						</Button>
+					</div>
+				</div>
+				<div class="flex gap-2">
 					{#if gyroscopeStatus === 'active'}
 						<Button
 							size="sm"
@@ -266,13 +535,31 @@
 							{calibrationInProgress ? 'Калибровка...' : 'Калибровка'}
 						</Button>
 					{/if}
+					<Button
+						size="sm"
+						variant="secondary"
+						onclick={handleShowStats}
+						class="text-xs"
+					>
+						<BarChart3 size={14} class="mr-1" />
+						Статистика
+					</Button>
+					<Button
+						size="sm"
+						variant="secondary"
+						onclick={handleShowSettings}
+						class="text-xs"
+					>
+						<Settings size={14} class="mr-1" />
+						Настройки
+					</Button>
 				</div>
 			</div>
 		</div>
 
 		<!-- Game Canvas Area -->
-		<div class="game-canvas-wrapper">
-			<div class="game-canvas-container">
+		<div class="game-canvas-wrapper perspective-active" bind:this={gameCanvasWrapper}>
+			<div class="game-canvas-container bank-vault-glow">
 				<canvas
 					bind:this={gameCanvas}
 					class="game-canvas"
@@ -362,16 +649,39 @@
 								Изучите банковские продукты для получения бонусов!
 							</p>
 							<div class="banking-products mb-6">
+								<p class="text-white/80 mb-4 text-sm text-center">
+									Выберите банковский продукт для активации бонуса:
+								</p>
 								{#each Object.values(BANKING_PRODUCTS) as product}
-									<div class="product-card glass-effect rounded-xl p-3 mb-2">
+									{@const isActive = selectors.activeBonuses.some(b => b.id === product.id)}
+									<button
+										class="product-card interactive-product {isActive ? 'product-active' : ''}"
+										disabled={isActive}
+										onclick={() => !isActive && handleActivateBonus(product.id)}
+									>
 										<div class="flex items-center gap-3">
 											<span class="text-2xl">{product.icon}</span>
-											<div>
+											<div class="flex-1 text-left">
 												<h4 class="font-semibold text-white text-sm">{product.name}</h4>
-												<p class="text-white/70 text-xs">Игровой бонус: {product.gameBonus.type}</p>
+												<p class="text-white/70 text-xs mb-1">
+													{product.gameBonus.type === 'shield' ? '🛡️ Защита от ловушек' :
+													 product.gameBonus.type === 'multiplier' ? '📈 Очки x2' :
+													 product.gameBonus.type === 'extra_life' ? '❤️ +1 жизнь' :
+													 product.gameBonus.type === 'slow_time' ? '⏰ Замедление времени' : 'Бонус'}
+												</p>
+												<p class="text-white/50 text-xs">
+													{product.gameBonus.duration > 0 ? `${product.gameBonus.duration / 1000}с` : 'Мгновенно'}
+												</p>
+											</div>
+											<div class="activation-status">
+												{#if isActive}
+													<span class="text-gpb-emerald text-xs">✅ Активен</span>
+												{:else}
+													<span class="text-gpb-accent text-xs">👆 Активировать</span>
+												{/if}
 											</div>
 										</div>
-									</div>
+									</button>
 								{/each}
 							</div>
 							<Button
@@ -413,6 +723,252 @@
 						</div>
 					</div>
 				{/if}
+
+				<!-- Statistics Modal -->
+				{#if showStatsModal}
+					<div class="game-overlay stats-overlay">
+						<div class="overlay-content max-w-md max-h-[80vh] overflow-y-auto">
+							<div class="flex items-center justify-between mb-4">
+								<h2 class="text-2xl font-bold text-white flex items-center gap-2">
+									<BarChart3 size={24} class="text-gpb-mint" />
+									Статистика
+								</h2>
+								<Button
+									variant="secondary"
+									size="sm"
+									onclick={handleCloseStats}
+									class="text-xs"
+								>
+									✕
+								</Button>
+							</div>
+
+							<!-- Player Stats -->
+							<div class="stats-section mb-6">
+								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+									<Trophy size={18} class="text-gpb-gold" />
+									Общая статистика
+								</h3>
+								<div class="stats-grid">
+									<div class="stat-card">
+										<div class="stat-value text-gpb-mint">{scoringState.playerStats.totalScore.toLocaleString()}</div>
+										<div class="stat-label">Общий счет</div>
+									</div>
+									<div class="stat-card">
+										<div class="stat-value text-gpb-gold">{scoringState.bestScore.toLocaleString()}</div>
+										<div class="stat-label">Лучший результат</div>
+									</div>
+									<div class="stat-card">
+										<div class="stat-value text-gpb-emerald">{scoringState.playerStats.levelsCompleted}</div>
+										<div class="stat-label">Пройдено уровней</div>
+									</div>
+									<div class="stat-card">
+										<div class="stat-value text-gpb-blue">{scoringState.playerStats.perfectRuns}</div>
+										<div class="stat-label">Идеальные прохождения</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Achievements -->
+							<div class="stats-section mb-6">
+								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+									<Award size={18} class="text-gpb-amber" />
+									Достижения ({scoringState.unlockedAchievements.length}/{Object.keys(scoringState.achievements).length})
+								</h3>
+								<div class="achievements-grid">
+									{#each Object.values(scoringState.achievements).slice(0, 6) as achievement}
+										<div class="achievement-card {achievement.isUnlocked ? 'unlocked' : 'locked'}">
+											<div class="achievement-icon">{achievement.icon}</div>
+											<div class="achievement-info">
+												<div class="achievement-name">{achievement.name}</div>
+												<div class="achievement-desc">{achievement.description}</div>
+												{#if !achievement.isUnlocked}
+													<div class="achievement-progress">
+														{achievement.progress}/{achievement.maxProgress}
+													</div>
+												{/if}
+											</div>
+										</div>
+									{/each}
+								</div>
+							</div>
+
+							<!-- High Scores -->
+							<div class="stats-section mb-4">
+								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+									<Trophy size={18} class="text-gpb-gold" />
+									Лучшие результаты
+								</h3>
+								<div class="high-scores-list">
+									{#each scoringState.highScores.overall.slice(0, 5) as score, index}
+										<div class="high-score-item">
+											<div class="score-rank">{index + 1}</div>
+											<div class="score-details">
+												<div class="score-value">{score.score.toLocaleString()} очков</div>
+												<div class="score-meta">
+													Уровень {score.level} • {new Date(score.date).toLocaleDateString()}
+													{#if score.perfectRun}
+														<span class="perfect-badge">💎</span>
+													{/if}
+												</div>
+											</div>
+										</div>
+									{/each}
+									{#if scoringState.highScores.overall.length === 0}
+										<div class="text-white/60 text-center py-4">
+											Пока нет рекордов. Начните играть!
+										</div>
+									{/if}
+								</div>
+							</div>
+
+							<!-- Banking Expertise -->
+							<div class="stats-section">
+								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+									<Shield size={18} class="text-gpb-blue" />
+									Банковские знания
+								</h3>
+								<div class="banking-stats">
+									<div class="expertise-level">
+										<div class="expertise-label">Изучено продуктов</div>
+										<div class="expertise-value">{scoringState.bankingExpertise}/4</div>
+									</div>
+									<div class="expertise-level">
+										<div class="expertise-label">Эффективность</div>
+										<div class="expertise-value">{scoringState.efficiency}%</div>
+									</div>
+									<div class="expertise-level">
+										<div class="expertise-label">Лучшая серия</div>
+										<div class="expertise-value">{scoringState.bestStreak} уровней</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				{/if}
+
+				<!-- Settings Modal -->
+				{#if showSettingsModal}
+					<div class="game-overlay settings-overlay">
+						<div class="overlay-content max-w-md max-h-[80vh] overflow-y-auto">
+							<div class="flex items-center justify-between mb-4">
+								<h2 class="text-2xl font-bold text-white flex items-center gap-2">
+									<Settings size={24} class="text-gpb-mint" />
+									Настройки
+								</h2>
+								<Button
+									variant="secondary"
+									size="sm"
+									onclick={handleCloseSettings}
+									class="text-xs"
+								>
+									✕
+								</Button>
+							</div>
+
+							<!-- Haptic Feedback -->
+							<div class="settings-section mb-6">
+								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+									📳 Тактильная отдача
+								</h3>
+								<div class="setting-item">
+									<div class="setting-info">
+										<div class="setting-name">Вибрация при касаниях</div>
+										<div class="setting-desc">Тактильная обратная связь через Telegram</div>
+									</div>
+									<Button
+										variant={settings.hapticFeedback ? "primary" : "secondary"}
+										size="sm"
+										onclick={() => handleToggleSetting('hapticFeedback')}
+									>
+										{settings.hapticFeedback ? 'Вкл' : 'Выкл'}
+									</Button>
+								</div>
+							</div>
+
+							<!-- Visual Effects -->
+							<div class="settings-section mb-6">
+								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+									✨ Визуальные эффекты
+								</h3>
+								<div class="setting-item">
+									<div class="setting-info">
+										<div class="setting-name">Интенсивность эффектов</div>
+										<div class="setting-desc">Низкая/Средняя/Высокая</div>
+									</div>
+									<Button
+										variant="accent"
+										size="sm"
+										onclick={() => handleToggleSetting('visualEffectsIntensity')}
+									>
+										{settings.visualEffectsIntensity === 'low' ? 'Низкая' :
+										 settings.visualEffectsIntensity === 'medium' ? 'Средняя' : 'Высокая'}
+									</Button>
+								</div>
+								<div class="setting-item">
+									<div class="setting-info">
+										<div class="setting-name">3D перспектива</div>
+										<div class="setting-desc">Эффект наклона игрового поля</div>
+									</div>
+									<Button
+										variant={settings.perspectiveEffects ? "primary" : "secondary"}
+										size="sm"
+										onclick={() => handleToggleSetting('perspectiveEffects')}
+									>
+										{settings.perspectiveEffects ? 'Вкл' : 'Выкл'}
+									</Button>
+								</div>
+							</div>
+
+							<!-- Gyroscope Settings -->
+							<div class="settings-section mb-4">
+								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+									🔄 Гироскоп
+								</h3>
+								<div class="setting-item">
+									<div class="setting-info">
+										<div class="setting-name">Чувствительность</div>
+										<div class="setting-desc">Сила реакции на наклоны ({settings.gyroscopeSensitivity.toFixed(1)}x)</div>
+									</div>
+									<div class="flex gap-2">
+										<Button
+											variant="secondary"
+											size="sm"
+											onclick={() => handleGyroscopeSensitivityChange(-0.1)}
+											disabled={settings.gyroscopeSensitivity <= 0.5}
+										>
+											−
+										</Button>
+										<Button
+											variant="secondary"
+											size="sm"
+											onclick={() => handleGyroscopeSensitivityChange(0.1)}
+											disabled={settings.gyroscopeSensitivity >= 2.0}
+										>
+											+
+										</Button>
+									</div>
+								</div>
+								{#if gyroscopeStatus === 'active'}
+									<div class="setting-item">
+										<div class="setting-info">
+											<div class="setting-name">Калибровка</div>
+											<div class="setting-desc">Перенастроить нулевое положение</div>
+										</div>
+										<Button
+											variant="accent"
+											size="sm"
+											onclick={handleCalibrateGyroscope}
+											disabled={calibrationInProgress}
+										>
+											{calibrationInProgress ? 'Калибровка...' : 'Калибровать'}
+										</Button>
+									</div>
+								{/if}
+							</div>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 
@@ -440,14 +996,6 @@
 				</div>
 			{/if}
 
-			<div class="development-info glass-effect rounded-xl p-4 text-center text-gpb-gray-700">
-				<p class="text-sm mb-2">
-					<strong>Итерация 2:</strong> Базовые компоненты и типизация ✅
-				</p>
-				<div class="text-xs text-gpb-gray-600">
-					Создана архитектура игры: types.ts, constants.ts, gameState.ts, основной компонент
-				</div>
-			</div>
 		</div>
 	</div>
 </GameLayout>
@@ -508,23 +1056,81 @@
 		justify-content: center;
 		padding: 1rem;
 		position: relative;
+		perspective: 800px;
+		perspective-origin: center center;
 	}
 
 	.game-canvas-container {
 		position: relative;
-		background: rgba(255, 255, 255, 0.1);
+		background:
+			radial-gradient(ellipse at center,
+				rgba(15, 169, 194, 0.1) 0%,
+				rgba(0, 107, 165, 0.2) 30%,
+				rgba(44, 62, 80, 0.4) 60%,
+				rgba(44, 62, 80, 0.8) 100%),
+			linear-gradient(135deg,
+				rgba(44, 62, 80, 0.9) 0%,
+				rgba(52, 73, 94, 0.9) 25%,
+				rgba(44, 62, 80, 0.9) 50%,
+				rgba(52, 73, 94, 0.9) 75%,
+				rgba(44, 62, 80, 0.9) 100%);
 		border-radius: 1rem;
-		padding: 1rem;
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		padding: 1.5rem;
+		backdrop-filter: blur(12px);
+		border: 2px solid rgba(243, 156, 18, 0.3);
+		box-shadow:
+			0 0 30px rgba(243, 156, 18, 0.2),
+			inset 0 0 20px rgba(243, 156, 18, 0.1),
+			0 8px 32px rgba(0, 0, 0, 0.3);
+		transform-style: preserve-3d;
+		transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		overflow: hidden;
+	}
+
+	.game-canvas-container::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background:
+			repeating-linear-gradient(45deg,
+				transparent,
+				transparent 2px,
+				rgba(255,255,255,0.03) 2px,
+				rgba(255,255,255,0.03) 4px),
+			repeating-linear-gradient(-45deg,
+				transparent,
+				transparent 8px,
+				rgba(26, 188, 156, 0.05) 8px,
+				rgba(26, 188, 156, 0.05) 10px);
+		border-radius: 1rem;
+		pointer-events: none;
+		z-index: 1;
 	}
 
 	.game-canvas {
 		display: block;
-		border-radius: 0.5rem;
-		background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
-		box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.3);
+		border-radius: 0.75rem;
+		background:
+			radial-gradient(circle at 30% 30%,
+				rgba(26, 188, 156, 0.15) 0%,
+				rgba(52, 152, 219, 0.1) 30%,
+				rgba(44, 62, 80, 1) 60%,
+				rgba(52, 73, 94, 1) 100%),
+			linear-gradient(45deg,
+				rgba(255,255,255,0.05) 0%,
+				transparent 50%,
+				rgba(0,0,0,0.1) 100%);
+		box-shadow:
+			inset 0 0 30px rgba(0, 0, 0, 0.5),
+			inset 0 4px 15px rgba(26, 188, 156, 0.1),
+			0 0 20px rgba(26, 188, 156, 0.1);
+		border: 1px solid rgba(26, 188, 156, 0.2);
+		transform: translateZ(10px);
+		position: relative;
+		z-index: 2;
 	}
 
 	.game-overlay {
@@ -584,6 +1190,44 @@
 		border: 1px solid rgba(255, 255, 255, 0.2);
 	}
 
+	.interactive-product {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 0.75rem;
+		padding: 0.75rem;
+		margin-bottom: 0.5rem;
+		width: 100%;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		text-align: left;
+	}
+
+	.interactive-product:hover:not(:disabled) {
+		background: rgba(26, 188, 156, 0.2);
+		border-color: rgba(26, 188, 156, 0.4);
+		transform: translateY(-2px);
+		box-shadow: 0 4px 16px rgba(26, 188, 156, 0.3);
+	}
+
+	.interactive-product:active:not(:disabled) {
+		transform: translateY(0);
+		box-shadow: 0 2px 8px rgba(26, 188, 156, 0.4);
+	}
+
+	.product-active {
+		background: rgba(34, 197, 94, 0.2);
+		border-color: rgba(34, 197, 94, 0.4);
+		cursor: not-allowed;
+		opacity: 0.7;
+	}
+
+	.activation-status {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
 	.game-controls {
 		flex-shrink: 0;
 	}
@@ -609,6 +1253,373 @@
 	@media (prefers-reduced-motion: reduce) {
 		.start-game-btn {
 			animation: none;
+		}
+
+		.game-canvas-container {
+			transition: none;
+		}
+
+		.parallax-layer {
+			transition: none !important;
+		}
+	}
+
+	.parallax-layer {
+		position: absolute;
+		top: -10%;
+		left: -10%;
+		width: 120%;
+		height: 120%;
+		pointer-events: none;
+		border-radius: 1rem;
+		transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	}
+
+	.parallax-layer-0 {
+		background: radial-gradient(ellipse at center,
+			rgba(15, 169, 194, 0.08) 0%,
+			rgba(0, 107, 165, 0.05) 50%,
+			transparent 100%);
+		z-index: -3;
+	}
+
+	.parallax-layer-1 {
+		background: radial-gradient(ellipse at 60% 40%,
+			rgba(26, 188, 156, 0.06) 0%,
+			rgba(52, 152, 219, 0.04) 40%,
+			transparent 80%);
+		z-index: -2;
+	}
+
+	.parallax-layer-2 {
+		background: radial-gradient(ellipse at 40% 60%,
+			rgba(243, 156, 18, 0.04) 0%,
+			rgba(230, 126, 34, 0.02) 30%,
+			transparent 70%);
+		z-index: -1;
+	}
+
+	.game-canvas-wrapper.perspective-active .game-canvas-container {
+		transform-style: preserve-3d;
+	}
+
+	.bank-vault-glow {
+		animation: vault-pulse 3s ease-in-out infinite;
+	}
+
+	@keyframes vault-pulse {
+		0%, 100% {
+			box-shadow:
+				0 0 30px rgba(243, 156, 18, 0.2),
+				inset 0 0 20px rgba(243, 156, 18, 0.1),
+				0 8px 32px rgba(0, 0, 0, 0.3);
+		}
+		50% {
+			box-shadow:
+				0 0 40px rgba(243, 156, 18, 0.3),
+				inset 0 0 25px rgba(243, 156, 18, 0.15),
+				0 12px 40px rgba(0, 0, 0, 0.4);
+		}
+	}
+
+	/* Statistics Modal Styles */
+	.stats-overlay .overlay-content {
+		background: rgba(44, 62, 80, 0.95);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 1rem;
+		padding: 1.5rem;
+		text-align: left;
+	}
+
+	.stats-section {
+		margin-bottom: 1.5rem;
+	}
+
+	.stats-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 0.75rem;
+	}
+
+	.stat-card {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 0.75rem;
+		padding: 1rem;
+		text-align: center;
+	}
+
+	.stat-card .stat-value {
+		font-size: 1.5rem;
+		font-weight: 700;
+		line-height: 1;
+		margin-bottom: 0.25rem;
+	}
+
+	.stat-card .stat-label {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.7);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.achievements-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 0.5rem;
+	}
+
+	.achievement-card {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 0.5rem;
+		padding: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		transition: all 0.2s ease;
+	}
+
+	.achievement-card.unlocked {
+		background: rgba(26, 188, 156, 0.2);
+		border-color: rgba(26, 188, 156, 0.4);
+	}
+
+	.achievement-card.locked {
+		opacity: 0.6;
+	}
+
+	.achievement-icon {
+		font-size: 1.5rem;
+		flex-shrink: 0;
+	}
+
+	.achievement-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.achievement-name {
+		font-weight: 600;
+		color: white;
+		font-size: 0.875rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.achievement-desc {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.7);
+		line-height: 1.2;
+	}
+
+	.achievement-progress {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.6);
+		margin-top: 0.25rem;
+	}
+
+	.high-scores-list {
+		space-y: 0.5rem;
+	}
+
+	.high-score-item {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 0.5rem;
+		padding: 0.75rem;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+	}
+
+	.score-rank {
+		background: rgba(243, 156, 18, 0.3);
+		color: white;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 700;
+		font-size: 0.875rem;
+		flex-shrink: 0;
+	}
+
+	.score-details {
+		flex: 1;
+	}
+
+	.score-value {
+		font-weight: 600;
+		color: white;
+		font-size: 0.875rem;
+	}
+
+	.score-meta {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.7);
+		margin-top: 0.25rem;
+	}
+
+	.perfect-badge {
+		margin-left: 0.5rem;
+	}
+
+	.banking-stats {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+
+	.expertise-level {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 0.5rem;
+		padding: 0.75rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.expertise-label {
+		font-size: 0.875rem;
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	.expertise-value {
+		font-weight: 700;
+		color: white;
+		font-size: 0.875rem;
+	}
+
+	/* Settings Modal Styles */
+	.settings-overlay .overlay-content {
+		background: rgba(44, 62, 80, 0.95);
+		backdrop-filter: blur(12px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 1rem;
+		padding: 1.5rem;
+		text-align: left;
+	}
+
+	.settings-section {
+		margin-bottom: 1.5rem;
+	}
+
+	.setting-item {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(8px);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 0.75rem;
+		padding: 1rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.75rem;
+		transition: all 0.2s ease;
+	}
+
+	.setting-item:hover {
+		background: rgba(255, 255, 255, 0.15);
+		border-color: rgba(26, 188, 156, 0.3);
+	}
+
+	.setting-info {
+		flex: 1;
+		margin-right: 1rem;
+	}
+
+	.setting-name {
+		font-weight: 600;
+		color: white;
+		font-size: 0.875rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.setting-desc {
+		font-size: 0.75rem;
+		color: rgba(255, 255, 255, 0.7);
+		line-height: 1.2;
+	}
+
+	/* Progress Bars Styles */
+	.progress-bars-container {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 0.75rem;
+	}
+
+	.progress-bar-item {
+		flex: 1;
+	}
+
+	.progress-bar-label {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.375rem;
+	}
+
+	.progress-bar {
+		height: 6px;
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 3px;
+		overflow: hidden;
+		backdrop-filter: blur(4px);
+		position: relative;
+	}
+
+	.progress-fill {
+		height: 100%;
+		transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		border-radius: 3px;
+		position: relative;
+	}
+
+	.score-fill {
+		background: linear-gradient(90deg, var(--color-accent-500) 0%, var(--color-accent-400) 100%);
+		box-shadow: 0 0 8px rgba(26, 188, 156, 0.4);
+	}
+
+	.time-fill {
+		background: linear-gradient(90deg, var(--color-state-success) 0%, var(--color-state-warning) 50%, var(--color-state-danger) 100%);
+		transition: background 0.3s ease, width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	}
+
+	.time-fill[style*="width: 5"] {
+		background: linear-gradient(90deg, var(--color-state-danger) 0%, var(--color-state-danger) 100%);
+		box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+		animation: time-warning 1s ease-in-out infinite alternate;
+	}
+
+	.time-fill[style*="width: 2"] {
+		background: linear-gradient(90deg, var(--color-state-warning) 0%, var(--color-state-danger) 100%);
+		box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+	}
+
+	.level-fill {
+		background: linear-gradient(90deg, var(--color-brand-600) 0%, var(--color-brand-400) 100%);
+		box-shadow: 0 0 8px rgba(0, 107, 165, 0.4);
+	}
+
+	@keyframes time-warning {
+		0% {
+			box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+		}
+		100% {
+			box-shadow: 0 0 16px rgba(239, 68, 68, 0.9);
+		}
+	}
+
+	@media (min-width: 400px) {
+		.progress-bars-container {
+			grid-template-columns: repeat(3, 1fr);
 		}
 	}
 </style>

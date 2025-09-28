@@ -18,6 +18,7 @@
 		"@sveltejs/vite-plugin-svelte": "^6.0.0",
 		"@tailwindcss/vite": "^4.0.0",
 		"@types/canvas-confetti": "^1.9.0",
+		"@types/matter-js": "^0.20.2",
 		"@types/node": "^24.5.2",
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
@@ -29,6 +30,7 @@
 		"canvas-confetti": "^1.9.3",
 		"cross-env": "^10.0.0",
 		"lucide-svelte": "^0.460.0",
+		"matter-js": "^0.20.0",
 		"pixi.js": "^8.13.2",
 		"vite-plugin-mkcert": "^1.17.8"
 	}

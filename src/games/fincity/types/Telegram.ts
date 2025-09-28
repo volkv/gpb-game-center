@@ -138,10 +138,4 @@ export interface TelegramWebApp {
   requestContact(callback?: (contactShared: boolean) => void): void;
 }
 
-declare global {
-  interface Window {
-    Telegram?: {
-      WebApp: TelegramWebApp;
-    };
-  }
-}
+// Global Telegram interface declared in src/lib/types/Telegram.ts

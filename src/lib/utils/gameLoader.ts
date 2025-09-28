@@ -99,6 +99,8 @@ class GameLoaderService {
 				return import('../../games/anti-fraud-hunter/AntiFraudGame.svelte');
 			case '/games/code-to-success/CodeToSuccessGame.svelte':
 				return import('../../games/code-to-success/CodeToSuccessGame.svelte');
+			case '/games/asset-guardian/AssetGuardianGame.svelte':
+				return import('../../games/asset-guardian/AssetGuardianGame.svelte');
 			default:
 				throw new Error(`Unknown game component path: ${path}`);
 		}

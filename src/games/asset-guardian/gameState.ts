@@ -10,7 +10,9 @@ import type {
 	GyroscopeData,
 	CollisionResult,
 	VisualEffects,
-	BankingProduct
+	BankingProduct,
+	LevelResult,
+	ActiveBonus
 } from './types';
 import {
 	GAME_CONFIG,
@@ -21,6 +23,11 @@ import {
 	BANKING_PRODUCTS
 } from './constants';
 import type { GyroscopeManager, FallbackInputManager } from './gyroscope';
+import type { AssetGuardianGameEngine } from './gameEngine';
+import type { PhysicsEngine } from './physics';
+import { createCollisionHandler } from './collisionHandler';
+import type { CollisionHandler, CollisionContext, CollisionEffectResult } from './collisionHandler';
+import { scoringStore } from './scoring';
 
 function createAssetGuardianStore() {
 	const createInitialSession = (): GameSession => ({
@@ -63,6 +70,7 @@ function createAssetGuardianStore() {
 			perfectLevels: 0
 		},
 		visualEffects: createInitialVisualEffects(),
+		activeBonuses: new Map<string, ActiveBonus>(),
 		gyroscope: {
 			isSupported: false,
 			isActive: false,
@@ -88,6 +96,14 @@ function createAssetGuardianStore() {
 	};
 
 	const { subscribe, set, update } = writable<AssetGuardianGameState>(initialState);
+
+	let collisionHandler: CollisionHandler | null = null;
+
+	function initializeCollisionHandler() {
+		if (!collisionHandler) {
+			collisionHandler = createCollisionHandler();
+		}
+	}
 
 	function syncWithMainStore(assetGuardianState: AssetGuardianGameState) {
 		gameStore.updateGameState((gameState: GameState) => ({
@@ -367,6 +383,21 @@ function createAssetGuardianStore() {
 					pointsStore.addPoints(perfectBonus, 'Хранитель Активов: Идеальное прохождение!', 'asset-guardian');
 				}
 
+				const timeUsed = (state.currentLevel?.timeLimit || 120) - state.progress.timeRemaining;
+				const levelResult: LevelResult = {
+					completed: true,
+					score: state.progress.score + timeBonus + perfectBonus,
+					timeUsed,
+					bonusesCollected: state.progress.bonusesCollected,
+					trapsHit: state.progress.trapsHit,
+					rating: perfectLevel ? 3 : state.progress.trapsHit <= 2 ? 2 : 1,
+					bankingLessonLearned: state.ui.selectedBankingProduct !== undefined
+				};
+
+				scoringStore.updatePlayerStats(state.session, levelResult);
+				scoringStore.addHighScore(state.session, levelResult);
+				scoringStore.checkAchievements(state.session, levelResult);
+
 				const newState = {
 					...state,
 					status: 'ready' as const,
@@ -405,6 +436,23 @@ function createAssetGuardianStore() {
 					trapsHit: state.progress.trapsHit,
 					isCompleted: state.status === 'completed'
 				};
+
+				if (state.status === 'failed') {
+					const timeUsed = state.currentLevel?.timeLimit ?
+						state.currentLevel.timeLimit - state.progress.timeRemaining : 0;
+					const levelResult: LevelResult = {
+						completed: false,
+						score: state.progress.score,
+						timeUsed,
+						bonusesCollected: state.progress.bonusesCollected,
+						trapsHit: state.progress.trapsHit,
+						rating: 1,
+						bankingLessonLearned: state.ui.selectedBankingProduct !== undefined
+					};
+
+					scoringStore.updatePlayerStats(completedSession, levelResult);
+					scoringStore.checkAchievements(completedSession, levelResult);
+				}
 
 				gameStore.updateGameState((gameState: GameState) => ({
 					...gameState,
@@ -511,7 +559,316 @@ function createAssetGuardianStore() {
 			});
 		},
 
+		initializeGameEngine: async (gameEngine: AssetGuardianGameEngine, canvas: HTMLCanvasElement) => {
+			update(state => {
+				const newState = {
+					...state,
+					status: 'loading' as const
+				};
+				syncWithMainStore(newState);
+				return newState;
+			});
+
+			try {
+				await gameEngine.initialize(canvas);
+
+				update(state => {
+					const newState = {
+						...state,
+						status: 'ready' as const
+					};
+					syncWithMainStore(newState);
+					return newState;
+				});
+			} catch (error) {
+				console.error('Failed to initialize game engine:', error);
+				update(state => {
+					const newState = {
+						...state,
+						status: 'failed' as const
+					};
+					syncWithMainStore(newState);
+					return newState;
+				});
+			}
+		},
+
+		startGameEngines: (gameEngine: AssetGuardianGameEngine) => {
+			update(state => {
+				gameEngine.start();
+
+				const newState = {
+					...state,
+					status: 'playing' as const
+				};
+				syncWithMainStore(newState);
+				return newState;
+			});
+		},
+
+		stopGameEngines: (gameEngine: AssetGuardianGameEngine) => {
+			update(state => {
+				gameEngine.stop();
+
+				const newState = {
+					...state,
+					status: 'paused' as const
+				};
+				syncWithMainStore(newState);
+				return newState;
+			});
+		},
+
+		loadGameLevel: (gameEngine: AssetGuardianGameEngine, level: LevelConfig) => {
+			update(state => {
+				gameEngine.loadLevel(level);
+
+				const newState = {
+					...state,
+					currentLevel: level,
+					progress: {
+						...state.progress,
+						currentLevel: level.id,
+						timeRemaining: level.timeLimit
+					}
+				};
+				syncWithMainStore(newState);
+				return newState;
+			});
+		},
+
+		updateGameEngineGravity: (gameEngine: AssetGuardianGameEngine, gravity: { x: number; y: number }) => {
+			gameEngine.updateGravity(gravity);
+		},
+
+		updateGameEngineVisualEffects: (gameEngine: AssetGuardianGameEngine, effects: { x: number; y: number }) => {
+			gameEngine.updateVisualEffects(effects);
+		},
+
+		handlePhysicsCollision: (result: CollisionResult, gameEngine?: AssetGuardianGameEngine) => {
+			if (!collisionHandler) {
+				initializeCollisionHandler();
+			}
+
+			update(state => {
+				const context: CollisionContext = {
+					currentScore: state.progress.score,
+					currentLives: state.progress.lives,
+					timeRemaining: state.progress.timeRemaining,
+					bonusesCollected: state.progress.bonusesCollected,
+					trapsHit: state.progress.trapsHit,
+					comboCount: 0,
+					hasActiveShield: false,
+					currentLevel: state.progress.currentLevel
+				};
+
+				const collisionResult = collisionHandler!.processCollision(result, context);
+
+				if (collisionResult.shouldRemoveObject && gameEngine) {
+					const objectId = `cell-${Math.floor(result.position.y / 40)}-${Math.floor(result.position.x / 40)}`;
+					gameEngine.markObjectForRemoval(objectId);
+				}
+
+				const newScore = Math.max(0, state.progress.score + collisionResult.scoreChange);
+				const newLives = Math.max(0, state.progress.lives + collisionResult.livesChange);
+				const newTimeRemaining = Math.max(0, state.progress.timeRemaining + collisionResult.timeChange);
+
+				if (collisionResult.scoreChange > 0) {
+					pointsStore.addPoints(
+						collisionResult.scoreChange,
+						`Хранитель Активов: ${result.type === 'bonus' ? 'Бонус' : 'Завершение уровня'}${
+							collisionResult.specialEffect ? ` (${collisionResult.specialEffect.message})` : ''
+						}`,
+						'asset-guardian'
+					);
+				}
+
+				const newState = {
+					...state,
+					progress: {
+						...state.progress,
+						score: newScore,
+						lives: newLives,
+						timeRemaining: newTimeRemaining,
+						bonusesCollected: collisionResult.bonusesCollected,
+						trapsHit: collisionResult.trapsHit
+					}
+				};
+
+				if (collisionResult.gameCompleted) {
+					newState.status = 'completed';
+					newState.ui.showLevelComplete = true;
+				} else if (collisionResult.gameFailed) {
+					newState.status = 'failed';
+					newState.ui.showGameOver = true;
+				}
+
+				if (collisionResult.bankingBonus) {
+					console.log('🏦 [COLLISION] Banking bonus triggered:', collisionResult.bankingBonus);
+				}
+
+				if (collisionResult.specialEffect) {
+					console.log('✨ [COLLISION] Special effect:', collisionResult.specialEffect);
+				}
+
+				syncWithMainStore(newState);
+				return newState;
+			});
+		},
+
+		destroyGameEngine: (gameEngine: AssetGuardianGameEngine) => {
+			gameEngine.destroy();
+		},
+
+		initializeCollisionSystem: () => {
+			initializeCollisionHandler();
+		},
+
+		setGameEngineForCollisionHandler: (gameEngine: AssetGuardianGameEngine) => {
+			if (!collisionHandler) {
+				initializeCollisionHandler();
+			}
+			collisionHandler?.setGameEngine(gameEngine);
+		},
+
+		getCollisionStats: () => {
+			return collisionHandler?.getCollisionStats() || null;
+		},
+
+		resetCollisionSystem: () => {
+			if (collisionHandler) {
+				collisionHandler.reset();
+			}
+		},
+
+		// Active Bonuses Management
+		activateBonus: (productId: string) => {
+			update(state => {
+				const product = Object.values(BANKING_PRODUCTS).find(p => p.id === productId);
+				if (!product) return state;
+
+				const bonus: ActiveBonus = {
+					id: productId,
+					type: product.gameBonus.type,
+					name: product.name,
+					icon: product.icon,
+					duration: product.gameBonus.duration,
+					startTime: Date.now(),
+					value: product.gameBonus.value,
+					isActive: true,
+					remainingTime: product.gameBonus.duration
+				};
+
+				const newActiveBonuses = new Map(state.activeBonuses);
+				newActiveBonuses.set(productId, bonus);
+
+				// Apply bonus effect
+				let newState = { ...state, activeBonuses: newActiveBonuses };
+
+				if (bonus.type === 'extra_life') {
+					newState.progress = {
+						...newState.progress,
+						lives: newState.progress.lives + bonus.value
+					};
+				}
+
+				syncWithMainStore(newState);
+				return newState;
+			});
+		},
+
+		updateActiveBonuses: () => {
+			update(state => {
+				const currentTime = Date.now();
+				const newActiveBonuses = new Map<string, ActiveBonus>();
+				let hasExpiredBonuses = false;
+
+				for (const [id, bonus] of state.activeBonuses) {
+					const timeElapsed = currentTime - bonus.startTime;
+					const remainingTime = Math.max(0, bonus.duration - timeElapsed);
+
+					if (remainingTime > 0) {
+						newActiveBonuses.set(id, {
+							...bonus,
+							remainingTime,
+							isActive: true
+						});
+					} else {
+						hasExpiredBonuses = true;
+					}
+				}
+
+				if (hasExpiredBonuses || newActiveBonuses.size !== state.activeBonuses.size) {
+					const newState = { ...state, activeBonuses: newActiveBonuses };
+					syncWithMainStore(newState);
+					return newState;
+				}
+
+				return state;
+			});
+		},
+
+		clearActiveBonuses: () => {
+			update(state => {
+				const newState = { ...state, activeBonuses: new Map<string, ActiveBonus>() };
+				syncWithMainStore(newState);
+				return newState;
+			});
+		},
+
+		hasActiveBonus: (type: 'shield' | 'multiplier' | 'extra_life' | 'slow_time'): boolean => {
+			let hasBonus = false;
+			update(state => {
+				for (const bonus of state.activeBonuses.values()) {
+					if (bonus.type === type && bonus.isActive) {
+						hasBonus = true;
+						break;
+					}
+				}
+				return state;
+			});
+			return hasBonus;
+		},
+
+		getScoreMultiplier: (): number => {
+			let multiplier = 1;
+			update(state => {
+				for (const bonus of state.activeBonuses.values()) {
+					if (bonus.type === 'multiplier' && bonus.isActive) {
+						multiplier = bonus.value;
+						break;
+					}
+				}
+				return state;
+			});
+			return multiplier;
+		},
+
+		getTimeMultiplier: (): number => {
+			let multiplier = 1;
+			update(state => {
+				for (const bonus of state.activeBonuses.values()) {
+					if (bonus.type === 'slow_time' && bonus.isActive) {
+						multiplier = bonus.value;
+						break;
+					}
+				}
+				return state;
+			});
+			return multiplier;
+		},
+
+		destroyCollisionSystem: () => {
+			if (collisionHandler) {
+				collisionHandler.destroy();
+				collisionHandler = null;
+			}
+		},
+
 		reset: () => {
+			if (collisionHandler) {
+				collisionHandler.reset();
+			}
 			const newState = { ...initialState, session: createInitialSession() };
 			set(newState);
 			syncWithMainStore(newState);
@@ -520,6 +877,8 @@ function createAssetGuardianStore() {
 }
 
 export const assetGuardianStore = createAssetGuardianStore();
+
+export { scoringStore, scoringSelectors } from './scoring';
 
 export const assetGuardianSelectors = derived(
 	assetGuardianStore,
@@ -548,6 +907,10 @@ export const assetGuardianSelectors = derived(
 		showPauseMenu: $assetGuardian.ui.showPauseMenu,
 		showLevelComplete: $assetGuardian.ui.showLevelComplete,
 		showGameOver: $assetGuardian.ui.showGameOver,
+		activeBonuses: Array.from($assetGuardian.activeBonuses.values()),
+		hasShield: Array.from($assetGuardian.activeBonuses.values()).some(b => b.type === 'shield' && b.isActive),
+		scoreMultiplier: Array.from($assetGuardian.activeBonuses.values()).find(b => b.type === 'multiplier' && b.isActive)?.value || 1,
+		timeMultiplier: Array.from($assetGuardian.activeBonuses.values()).find(b => b.type === 'slow_time' && b.isActive)?.value || 1,
 
 		sessionId: $assetGuardian.session.sessionId,
 		sessionDuration: $assetGuardian.session.duration,

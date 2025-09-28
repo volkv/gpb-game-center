@@ -2,10 +2,10 @@ import type { CellType } from './types';
 
 export const GAME_CONFIG = {
 	WORLD_WIDTH: 400,
-	WORLD_HEIGHT: 600,
+	WORLD_HEIGHT: 400,
 	CELL_SIZE: 40,
 	GRID_WIDTH: 10,
-	GRID_HEIGHT: 15,
+	GRID_HEIGHT: 10,
 	INITIAL_LIVES: 3,
 	LEVEL_TIME_LIMIT: 120,
 	MAX_LEVELS: 10
@@ -13,22 +13,29 @@ export const GAME_CONFIG = {
 
 export const BALL_CONFIG = {
 	RADIUS: 12,
-	MASS: 1.0,
+	MASS: 1.2,
 	INITIAL_ENERGY: 100,
-	MAX_VELOCITY: 200,
-	MIN_VELOCITY: 0.1,
-	FRICTION_COEFFICIENT: 0.985,
-	RESTITUTION: 0.7
+	MAX_VELOCITY: 180,
+	MIN_VELOCITY: 0.5,
+	FRICTION_COEFFICIENT: 0.988,
+	RESTITUTION: 0.65,
+	COLLISION_DAMPENING: 0.85
 } as const;
 
 export const PHYSICS_CONFIG = {
-	GRAVITY_STRENGTH: 150,
-	MAX_GRAVITY: 300,
-	AIR_RESISTANCE: 0.999,
-	WALL_RESTITUTION: 0.8,
-	WALL_FRICTION: 0.3,
-	COLLISION_TOLERANCE: 2,
-	PHYSICS_STEP: 1/60
+	GRAVITY_STRENGTH: 180,
+	MAX_GRAVITY: 350,
+	AIR_RESISTANCE: 0.9985,
+	WALL_RESTITUTION: 0.75,
+	WALL_FRICTION: 0.4,
+	COLLISION_TOLERANCE: 3,
+	PHYSICS_STEP: 1/60,
+	BOUNCE_ENERGY_LOSS: 0.15,
+	SURFACE_FRICTION: {
+		SMOOTH: 0.1,
+		NORMAL: 0.3,
+		ROUGH: 0.6
+	}
 } as const;
 
 export const GYROSCOPE_CONFIG = {
@@ -87,6 +94,7 @@ export const ANIMATION_DURATIONS = {
 	PERSPECTIVE_TILT: 150,
 	SHADOW_UPDATE: 100,
 	HIGHLIGHT_PULSE: 1000,
+	OBJECT_REMOVAL: 300,
 	HAPTIC_FEEDBACK: 50
 } as const;
 
@@ -105,44 +113,58 @@ export const BANKING_PRODUCTS = {
 	FRAUD_PROTECTION: {
 		id: 'fraud_protection',
 		name: 'Защита от Мошенничества',
+		description: 'Комплексная защита от финансового мошенничества',
+		category: 'fraud_protection' as const,
 		icon: '🛡️',
 		gameBonus: {
-			type: 'shield',
+			type: 'shield' as const,
 			duration: 10000,
-			value: 1
+			value: 1,
+			triggerCondition: 'trap_hit' as const
 		}
 	},
 	INVESTMENT_PORTFOLIO: {
 		id: 'investment_portfolio',
 		name: 'Инвестиционный Портфель',
+		description: 'Диверсифицированные инвестиционные решения',
+		category: 'investment' as const,
 		icon: '📈',
 		gameBonus: {
-			type: 'multiplier',
+			type: 'multiplier' as const,
 			duration: 15000,
-			value: 2
+			value: 2,
+			triggerCondition: 'combo' as const
 		}
 	},
 	DEPOSIT_ACCOUNT: {
 		id: 'deposit_account',
 		name: 'Депозитный Счет',
+		description: 'Надежные сбережения с гарантированным доходом',
+		category: 'deposit' as const,
 		icon: '🏦',
 		gameBonus: {
-			type: 'extra_life',
+			type: 'extra_life' as const,
 			duration: 0,
-			value: 1
+			value: 1,
+			triggerCondition: 'level_complete' as const
 		}
 	},
 	CASHBACK_CARD: {
 		id: 'cashback_card',
 		name: 'Карта с Кэшбэком',
+		description: 'Возврат части средств от покупок',
+		category: 'cashback' as const,
 		icon: '💳',
 		gameBonus: {
-			type: 'slow_time',
+			type: 'slow_time' as const,
 			duration: 20000,
-			value: 0.5
+			value: 0.5,
+			triggerCondition: 'time_low' as const
 		}
 	}
 } as const;
+
+export type BankingProductsRecord = typeof BANKING_PRODUCTS;
 
 export const HAPTIC_PATTERNS = {
 	LIGHT: { type: 'light' as const, pattern: 'single' as const },
