@@ -192,13 +192,13 @@
 	}
 
 	.games-grid {
-		display: grid;
+		display: flex;
+		flex-direction: column;
 		gap: 1rem;
-		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	}
 
 	.games-grid--compact {
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 0.875rem;
 	}
 
 	.games-grid__item {

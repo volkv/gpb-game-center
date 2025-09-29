@@ -5,7 +5,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.QUIZ_SHIELD_RUBLE,
 		name: 'Щит и Рубль',
-		description: 'Интерактивный квиз по финансовой безопасности. Научитесь распознавать мошенников и защищать свои деньги.',
+		description: 'Научитесь распознавать фишинг, мошеннические звонки и SMS за 5 минут игры. Реальные сценарии + советы экспертов банка.',
 		shortDescription: 'Квиз по безопасности',
 		category: GAME_CATEGORIES.QUIZ,
 		status: GAME_STATUS.ACTIVE,
@@ -48,7 +48,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.MATCH3_GOLDEN_RESERVE,
 		name: 'Золотой Запас',
-		description: 'Головоломка в стиле "три в ряд" с финансовыми символами. Собирайте комбинации и изучайте инвестиционные инструменты.',
+		description: 'Собирайте финансовые символы три в ряд и открывайте банковские бонусы. Игровые бустеры = реальные продукты банка.',
 		shortDescription: 'Головоломка',
 		category: GAME_CATEGORIES.MATCH3,
 		status: GAME_STATUS.ACTIVE,
@@ -91,7 +91,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.CROSSWORD_FINANCIAL,
 		name: 'Финансовый Кроссворд',
-		description: 'Интеллектуальная игра в стиле Wordle с финансовыми терминами. Развивайте финансовую грамотность играя.',
+		description: 'Разгадывайте финансовые термины в стиле Wordle. ИИС, депозиты, инвестиции — осваивайте язык банкинга играя.',
 		shortDescription: 'Интеллектуальная игра',
 		category: GAME_CATEGORIES.CROSSWORD,
 		status: GAME_STATUS.ACTIVE,
@@ -134,7 +134,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.DETECTIVE_BANKING,
 		name: 'Банковский Детектив',
-		description: 'Расследование финансовых дел. Изучайте банковские операции, раскрывайте схемы мошенничества и становитесь экспертом.',
+		description: 'Расследуйте финансовые инциденты: анализируйте операции, собирайте улики, раскрывайте схемы мошенников.',
 		shortDescription: 'Расследование',
 		category: GAME_CATEGORIES.EDUCATIONAL,
 		status: GAME_STATUS.COMING_SOON,
@@ -177,7 +177,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.INVESTMENT_STRATEGY,
 		name: 'Инвестиционная Стратегия',
-		description: 'Экономическая стратегия для изучения инвестиционных инструментов. Управляйте портфелем и достигайте финансовых целей.',
+		description: 'Управляйте инвестиционным портфелем: балансируйте риск и доходность, изучайте рыночные условия и достигайте целей.',
 		shortDescription: 'Экономическая игра',
 		category: GAME_CATEGORIES.EDUCATIONAL,
 		status: GAME_STATUS.COMING_SOON,
@@ -220,7 +220,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.FINCITY,
 		name: 'FinCity',
-		description: 'Стройте и развивайте финансовый город. Изучайте банковские продукты через игровой процесс и создавайте процветающую финансовую экосистему.',
+		description: 'Постройте свой финансовый город: вклады, инвестиции, бизнес-решения. Экономика игры = ваше финансовое будущее.',
 		shortDescription: 'Городской симулятор',
 		category: GAME_CATEGORIES.EDUCATIONAL,
 		status: GAME_STATUS.ACTIVE,
@@ -277,7 +277,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.ANTI_FRAUD_HUNTER,
 		name: 'Охотник за мошенниками',
-		description: 'Реакционная игра по распознаванию мошеннических SMS. Научитесь быстро отличать опасные сообщения от безопасных уведомлений банка.',
+		description: 'Реагируйте молниеносно: отличайте настоящие SMS банка от фальшивых. Прокачайте рефлексы финансовой безопасности.',
 		shortDescription: 'Анти-фрод аркада',
 		category: GAME_CATEGORIES.ACTION,
 		status: GAME_STATUS.ACTIVE,
@@ -334,7 +334,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.CODE_TO_SUCCESS,
 		name: 'Код к Успеху',
-		description: 'Интерактивная визуальная новелла о кибербезопасности и защите от мошенничества. Проживите историю героини Анны и научитесь распознавать мошеннические схемы.',
+		description: 'Проживите историю Анны: принимайте решения в реальных ситуациях с мошенниками. Ваши выборы — ваши последствия.',
 		shortDescription: 'Визуальная новелла',
 		category: GAME_CATEGORIES.VISUAL_NOVEL,
 		status: GAME_STATUS.ACTIVE,
@@ -384,7 +384,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.TOWER_SAVINGS,
 		name: 'Башня Сбережений',
-		description: 'Аркадная головоломка в стиле Stacker. Стройте башню из блоков доходов и расходов, создавая устойчивый финансовый фундамент.',
+		description: 'Стройте башню из блоков доходов и расходов. Найдите баланс, создайте устойчивый финансовый фундамент.',
 		shortDescription: 'Аркадная головоломка',
 		category: GAME_CATEGORIES.STACKER,
 		status: GAME_STATUS.COMING_SOON,
@@ -441,7 +441,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.BUSINESS_DRIVE,
 		name: 'Бизнес-Драйв',
-		description: 'Карточный симулятор с swipe-механикой для предпринимателей. Принимайте решения в бизнес-ситуациях и изучайте банковские инструменты для МСБ.',
+		description: 'Swipe-симулятор предпринимателя: факторинг, лизинг, кредиты. Принимайте бизнес-решения свайпом влево-вправо.',
 		shortDescription: 'Карточный симулятор',
 		category: GAME_CATEGORIES.CARD,
 		status: GAME_STATUS.COMING_SOON,
@@ -505,7 +505,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.DREAM_PATH,
 		name: 'Путь к Мечте',
-		description: 'Map-ранер стратегия для достижения финансовых целей. За 3-4 хода дойдите до цели, выбирая оптимальные инвестиционные инструменты.',
+		description: 'За 3-4 хода дойдите до финансовой цели: выбирайте вклады, ИИС, страхование. Найдите оптимальный путь.',
 		shortDescription: 'Стратегический ранер',
 		category: GAME_CATEGORIES.RUNNER,
 		status: GAME_STATUS.COMING_SOON,
@@ -562,7 +562,7 @@ export const GAMES_DATA: Game[] = [
 	{
 		id: GAME_TYPES.ASSET_GUARDIAN,
 		name: 'Хранитель Активов',
-		description: 'Классический лабиринт с шариком, управляемый гироскопом. Проведите активы клиента через финансовые ловушки к безопасному сейфу.',
+		description: 'Управляйте гироскопом: проведите активы через финансовые ловушки к сейфу. Физика + финансовая безопасность.',
 		shortDescription: 'Гироскоп лабиринт',
 		category: GAME_CATEGORIES.PUZZLE,
 		status: GAME_STATUS.ACTIVE,

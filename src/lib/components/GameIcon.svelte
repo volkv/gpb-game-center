@@ -68,6 +68,10 @@
 				<IconComponent size={28} stroke-width={1.8} />
 			{/if}
 		</div>
+		<div class="game-card__header-content">
+			<h3 class="game-card__title">{game.name}</h3>
+			<p class="game-card__subtitle">{game.shortDescription}</p>
+		</div>
 		{#if isComingSoon}
 			<span class="game-card__badge game-card__badge--muted">Скоро</span>
 		{:else if game.name === 'Щит и Рубль'}
@@ -80,8 +84,7 @@
 	</div>
 
 	<div class="game-card__body">
-		<h3 class="game-card__title">{game.name}</h3>
-		<p class="game-card__subtitle">{game.shortDescription}</p>
+		<p class="game-card__description">{game.description}</p>
 	</div>
 
 	<div class="game-card__footer">
@@ -149,14 +152,14 @@
 
 	.game-card__header {
 		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 1rem;
+		align-items: flex-start;
+		gap: 0.85rem;
 	}
 
 	.game-card__icon {
 		width: 48px;
 		height: 48px;
+		flex-shrink: 0;
 		border-radius: var(--radius-lg);
 		display: flex;
 		align-items: center;
@@ -169,9 +172,19 @@
 		color: inherit;
 	}
 
+	.game-card__header-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.25rem;
+		flex: 1;
+		min-width: 0;
+	}
+
 	.game-card__badge {
 		display: inline-flex;
 		align-items: center;
+		align-self: flex-start;
+		flex-shrink: 0;
 		gap: 0.35rem;
 		padding: 0.25rem 0.65rem;
 		border-radius: var(--radius-full);
@@ -193,24 +206,32 @@
 		color: var(--color-fg-secondary);
 	}
 
-	.game-card__body {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
 	.game-card__title {
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: 1.1rem;
+		font-size: 1.05rem;
 		font-weight: 600;
+		line-height: 1.3;
 		color: var(--color-fg-primary);
 	}
 
 	.game-card__subtitle {
 		margin: 0;
-		font-size: 0.9rem;
+		font-size: 0.8rem;
+		line-height: 1.4;
 		color: var(--color-fg-muted);
+	}
+
+	.game-card__body {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.game-card__description {
+		margin: 0;
+		font-size: 0.875rem;
+		line-height: 1.5;
+		color: var(--color-fg-secondary);
 	}
 
 	.game-card__footer {
