@@ -279,58 +279,17 @@ class TouchFallbackManager implements FallbackInputManager {
 	private element: HTMLElement | null = null;
 	private inputCallback: ((gravity: Gravity) => void) | null = null;
 	private currentTouch: { x: number; y: number } | null = null;
+	private lastMoveTime = 0;
+	private moveThrottleMs = 16;
+	private lastGravity: { x: number; y: number } = { x: 0, y: 0 };
+	private smoothingFactor = 0.85;
 
-	private touchStartHandler = (event: TouchEvent) => {
-		event.preventDefault();
-		const touch = event.touches[0];
-		if (!touch || !this.element) return;
-
-		const rect = this.element.getBoundingClientRect();
-		this.touchStart = {
-			x: touch.clientX - rect.left - rect.width / 2,
-			y: touch.clientY - rect.top - rect.height / 2
-		};
-
-		this.currentTouch = { ...this.touchStart };
-	};
-
-	private touchMoveHandler = (event: TouchEvent) => {
-		event.preventDefault();
-		if (!this.touchStart || !this.element) return;
-
-		const touch = event.touches[0];
-		if (!touch) return;
-
-		const rect = this.element.getBoundingClientRect();
-		this.currentTouch = {
-			x: touch.clientX - rect.left - rect.width / 2,
-			y: touch.clientY - rect.top - rect.height / 2
-		};
-
-		const deltaX = this.currentTouch.x - this.touchStart.x;
-		const deltaY = this.currentTouch.y - this.touchStart.y;
-
-		const gravity = this.convertToGravity({ x: deltaX, y: deltaY });
-
-		if (this.inputCallback) {
-			this.inputCallback(gravity);
-		}
-	};
-
-	private touchEndHandler = (event: TouchEvent) => {
-		event.preventDefault();
-		this.touchStart = null;
-		this.currentTouch = null;
-
-		if (this.inputCallback) {
-			this.inputCallback({ x: 0, y: 0, intensity: 0 });
-		}
-	};
-
-	private mouseDownHandler = (event: MouseEvent) => {
+	private pointerDownHandler = (event: PointerEvent) => {
 		event.preventDefault();
 		if (!this.element) return;
 
+		this.element.setPointerCapture(event.pointerId);
+
 		const rect = this.element.getBoundingClientRect();
 		this.touchStart = {
 			x: event.clientX - rect.left - rect.width / 2,
@@ -338,11 +297,26 @@ class TouchFallbackManager implements FallbackInputManager {
 		};
 
 		this.currentTouch = { ...this.touchStart };
+		if (import.meta.env.DEV) {
+			console.log('🎮 [POINTER] pointerDown:', JSON.stringify({
+				pointerId: event.pointerId,
+				pointerType: event.pointerType,
+				clientX: event.clientX,
+				clientY: event.clientY,
+				rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+				touchStart: this.touchStart,
+				currentTouch: this.currentTouch
+			}, null, 2));
+		}
 	};
 
-	private mouseMoveHandler = (event: MouseEvent) => {
+	private pointerMoveHandler = (event: PointerEvent) => {
 		event.preventDefault();
 		if (!this.touchStart || !this.element) return;
+
+		const now = Date.now();
+		if (now - this.lastMoveTime < this.moveThrottleMs) return;
+		this.lastMoveTime = now;
 
 		const rect = this.element.getBoundingClientRect();
 		this.currentTouch = {
@@ -355,67 +329,115 @@ class TouchFallbackManager implements FallbackInputManager {
 
 		const gravity = this.convertToGravity({ x: deltaX, y: deltaY });
 
+		if (import.meta.env.DEV) {
+			console.log('🎮 [POINTER] pointerMove:', JSON.stringify({
+				pointerId: event.pointerId,
+				pointerType: event.pointerType,
+				currentTouch: this.currentTouch,
+				delta: { x: deltaX, y: deltaY },
+				gravity,
+				callbackExists: !!this.inputCallback
+			}, null, 2));
+		}
+
 		if (this.inputCallback) {
 			this.inputCallback(gravity);
 		}
 	};
 
-	private mouseUpHandler = (event: MouseEvent) => {
+	private pointerUpHandler = (event: PointerEvent) => {
 		event.preventDefault();
+		if (this.element) {
+			this.element.releasePointerCapture(event.pointerId);
+		}
+
 		this.touchStart = null;
 		this.currentTouch = null;
+		this.lastGravity = { x: 0, y: 0 };
+
+		if (import.meta.env.DEV) {
+			console.log('🎮 [POINTER] pointerUp - resetting gravity to zero', {
+				pointerId: event.pointerId,
+				pointerType: event.pointerType
+			});
+		}
 
 		if (this.inputCallback) {
 			this.inputCallback({ x: 0, y: 0, intensity: 0 });
 		}
 	};
+
 
 	start(element: HTMLElement): void {
 		this.element = element;
 		this.isActive = true;
 
-		element.addEventListener('touchstart', this.touchStartHandler, { passive: false });
-		element.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
-		element.addEventListener('touchend', this.touchEndHandler, { passive: false });
+		element.addEventListener('pointerdown', this.pointerDownHandler, { passive: false });
+		element.addEventListener('pointermove', this.pointerMoveHandler, { passive: false });
+		element.addEventListener('pointerup', this.pointerUpHandler, { passive: false });
+		element.addEventListener('pointercancel', this.pointerUpHandler, { passive: false });
+		element.addEventListener('pointerleave', this.pointerUpHandler, { passive: false });
 
-		element.addEventListener('mousedown', this.mouseDownHandler);
-		document.addEventListener('mousemove', this.mouseMoveHandler);
-		document.addEventListener('mouseup', this.mouseUpHandler);
-
+		element.style.touchAction = 'none';
+		element.style.userSelect = 'none';
+		element.style.webkitUserSelect = 'none';
+		element.style.webkitTouchCallout = 'none';
+		element.style.overscrollBehavior = 'none';
 	}
 
 	stop(): void {
 		if (this.element) {
-			this.element.removeEventListener('touchstart', this.touchStartHandler);
-			this.element.removeEventListener('touchmove', this.touchMoveHandler);
-			this.element.removeEventListener('touchend', this.touchEndHandler);
-
-			this.element.removeEventListener('mousedown', this.mouseDownHandler);
-			document.removeEventListener('mousemove', this.mouseMoveHandler);
-			document.removeEventListener('mouseup', this.mouseUpHandler);
+			this.element.removeEventListener('pointerdown', this.pointerDownHandler);
+			this.element.removeEventListener('pointermove', this.pointerMoveHandler);
+			this.element.removeEventListener('pointerup', this.pointerUpHandler);
+			this.element.removeEventListener('pointercancel', this.pointerUpHandler);
+			this.element.removeEventListener('pointerleave', this.pointerUpHandler);
 		}
 
 		this.isActive = false;
 		this.element = null;
 		this.touchStart = null;
 		this.currentTouch = null;
-
 	}
 
 	convertToGravity(input: { x: number; y: number }): Gravity {
 		const sensitivity = GYROSCOPE_CONFIG.FALLBACK_TOUCH_SENSITIVITY;
-		const maxDistance = 100;
+		const maxDistance = 200;
+		const deadZone = 10;
 
-		const normalizedX = Math.max(-1, Math.min(1, input.x / maxDistance)) * sensitivity;
-		const normalizedY = Math.max(-1, Math.min(1, input.y / maxDistance)) * sensitivity;
+		const adjustedX = Math.abs(input.x) > deadZone ? input.x : 0;
+		const adjustedY = Math.abs(input.y) > deadZone ? input.y : 0;
 
-		const gravityX = normalizedX * PHYSICS_CONFIG.MAX_GRAVITY;
-		const gravityY = normalizedY * PHYSICS_CONFIG.MAX_GRAVITY;
+		const normalizedX = Math.max(-1, Math.min(1, adjustedX / maxDistance)) * sensitivity;
+		const normalizedY = Math.max(-1, Math.min(1, adjustedY / maxDistance)) * sensitivity;
+
+		const rawGravityX = normalizedX * PHYSICS_CONFIG.MAX_GRAVITY;
+		const rawGravityY = normalizedY * PHYSICS_CONFIG.MAX_GRAVITY;
+
+		const smoothedGravityX = this.lastGravity.x * this.smoothingFactor + rawGravityX * (1 - this.smoothingFactor);
+		const smoothedGravityY = this.lastGravity.y * this.smoothingFactor + rawGravityY * (1 - this.smoothingFactor);
+
+		this.lastGravity.x = smoothedGravityX;
+		this.lastGravity.y = smoothedGravityY;
+
+		if (import.meta.env.DEV) {
+			console.log('🎮 [GRAVITY] convertToGravity:', JSON.stringify({
+				input,
+				adjusted: { x: adjustedX, y: adjustedY },
+				sensitivity,
+				maxDistance,
+				deadZone,
+				normalized: { x: normalizedX, y: normalizedY },
+				rawGravity: { x: rawGravityX, y: rawGravityY },
+				smoothedGravity: { x: smoothedGravityX, y: smoothedGravityY },
+				intensity: Math.sqrt(smoothedGravityX * smoothedGravityX + smoothedGravityY * smoothedGravityY)
+			}, null, 2));
+		}
 
 		return {
-			x: gravityX,
-			y: gravityY,
-			intensity: Math.sqrt(gravityX * gravityX + gravityY * gravityY)
+			x: smoothedGravityX,
+			y: smoothedGravityY,
+			intensity: Math.sqrt(smoothedGravityX * smoothedGravityX + smoothedGravityY * smoothedGravityY)
 		};
 	}
 

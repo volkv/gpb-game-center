@@ -73,11 +73,6 @@
 							{$gameStatusState.gameName}
 						</div>
 					{/if}
-
-					<div class="player-line">
-						<User size={16} aria-hidden="true" />
-						<span class="player-name">{$gameStatusState.playerName}</span>
-					</div>
 				</div>
 
 				{#if $shouldShowScore}
@@ -122,7 +117,7 @@
 	.status-bar {
 		position: relative;
 		z-index: 1;
-		margin: 0 -1.5rem;
+
 		padding-block: 0.75rem;
 		background: rgba(242, 244, 249, 0.75);
 		backdrop-filter: blur(12px);
@@ -194,36 +189,21 @@
 		font-weight: 600;
 		letter-spacing: -0.01em;
 		color: var(--color-brand-600);
-		white-space: nowrap;
-		
-		text-overflow: ellipsis;
+		word-wrap: break-word;
+		hyphens: auto;
+		line-height: 1.2;
 	}
 
 	.status-bar.game-mode .game-name {
 		color: var(--color-brand-600);
 	}
 
-	.player-line {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		justify-content: center;
-		color: var(--color-brand-600);
-		font-size: 0.8125rem;
-	}
-
-	.player-name {
-		max-width: 8rem;
-		white-space: nowrap;
-		
-		text-overflow: ellipsis;
-	}
 
 	.score-card {
 		display: flex;
 		gap: 0.25rem;
-		padding: 0.5rem 0.75rem;
-		border-radius: var(--radius-lg);
+		padding: 0.25rem 0.5rem;
+		border-radius: var(--radius-md);
 		border: 1px solid var(--layer-brand-150);
 		background: var(--layer-brand-050);
 		color: var(--color-brand-600);
@@ -232,15 +212,15 @@
 	.score-card__label {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
-		font-size: 0.75rem;
+		gap: 0.25rem;
+		font-size: 0.625rem;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
 	}
 
 	.score-card__value {
 		font-family: var(--font-display);
-		font-size: 1.1rem;
+		font-size: 0.9rem;
 		font-weight: 600;
 	}
 

@@ -467,8 +467,10 @@ export class AssetGuardianGameEngine {
 	}
 
 	private updatePerspective(perspective: VisualEffects['perspective']): void {
-		const containerElement = this.app.canvas.parentElement;
-		if (containerElement) {
+		const canvasElement = this.app.canvas;
+		const containerElement = canvasElement?.parentElement;
+
+		if (containerElement && containerElement.classList.contains('game-canvas-container')) {
 			const rotateX = perspective.y * VISUAL_EFFECTS.MAX_TILT_ANGLE;
 			const rotateY = -perspective.x * VISUAL_EFFECTS.MAX_TILT_ANGLE;
 

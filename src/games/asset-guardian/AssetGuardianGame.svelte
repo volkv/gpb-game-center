@@ -435,11 +435,11 @@
 <GameLayout gameName="Хранитель Активов" background="gradient-electric" showScore={true}>
 	<div class="asset-guardian-container">
 		<!-- Game Header -->
-		<div class="game-header p-4">
-			<div class="stats-bar glass-effect rounded-2xl p-4 text-gpb-gray-900 mb-4">
+		<div class="game-header p-2">
+			<div class="stats-bar glass-effect rounded-2xl p-3 text-gpb-gray-900 mb-2">
 				<div class="flex justify-between items-center">
 					<div class="stat-item">
-						<Trophy size={20} class="text-gpb-gold" />
+						<Trophy size={16} class="text-gpb-gold" />
 						<div class="stat-content">
 							<div class="stat-value">
 								<Counter value={selectors.currentScore} target={selectors.currentScore} duration={500} animated={true} />
@@ -449,7 +449,7 @@
 					</div>
 
 					<div class="stat-item">
-						<Shield size={20} class="text-gpb-emerald" />
+						<Shield size={16} class="text-gpb-emerald" />
 						<div class="stat-content">
 							<div class="stat-value">{selectors.livesRemaining}</div>
 							<div class="stat-label">Жизни</div>
@@ -457,7 +457,7 @@
 					</div>
 
 					<div class="stat-item">
-						<Clock size={20} class="text-gpb-blue" />
+						<Clock size={16} class="text-gpb-blue" />
 						<div class="stat-content">
 							<div class="stat-value">{formatTime(selectors.timeRemaining)}</div>
 							<div class="stat-label">Время</div>
@@ -466,7 +466,7 @@
 
 					<div class="stat-item">
 						<Zap
-							size={20}
+							size={16}
 							class={gyroscopeStatus === 'active' ? 'text-gpb-emerald' :
 								   gyroscopeStatus === 'fallback' ? 'text-gpb-amber' :
 								   'text-gpb-gray-400'}
@@ -483,7 +483,7 @@
 				</div>
 
 				<!-- Progress Bars -->
-				<div class="progress-bars-container mt-4">
+				<div class="progress-bars-container mt-2">
 					<!-- Score Progress -->
 					<div class="progress-bar-item">
 						<div class="progress-bar-label">
@@ -535,12 +535,12 @@
 			</div>
 
 			<!-- Level Info -->
-			<div class="level-info glass-effect rounded-2xl p-4 text-gpb-gray-900 mb-4">
-				<h3 class="font-card-title mb-2 flex items-center gap-2">
-					<Zap size={20} class="text-gpb-mint" />
+			<div class="level-info glass-effect rounded-2xl p-3 text-gpb-gray-900 mb-2">
+				<h3 class="font-card-title mb-1 flex items-center gap-2">
+					<Zap size={16} class="text-gpb-mint" />
 					Уровень {selectors.currentLevel}: {gameState.currentLevel?.name}
 				</h3>
-				<p class="text-sm text-gpb-gray-600 mb-3">
+				<p class="text-sm text-gpb-gray-600 mb-2">
 					{gameState.currentLevel?.bankingTheme.lesson}
 				</p>
 				<div class="flex items-center justify-between">
@@ -579,7 +579,7 @@
 							variant="accent"
 							onclick={handleCalibrateGyroscope}
 							disabled={calibrationInProgress}
-							class="text-xs"
+							class="text-xs px-2 py-1"
 						>
 							{calibrationInProgress ? 'Калибровка...' : 'Калибровка'}
 						</Button>
@@ -590,7 +590,7 @@
 						onclick={handleShowStats}
 						class="text-xs"
 					>
-						<BarChart3 size={14} class="mr-1" />
+						<BarChart3 size={12} class="mr-1" />
 						Статистика
 					</Button>
 					<Button
@@ -599,7 +599,7 @@
 						onclick={handleShowSettings}
 						class="text-xs"
 					>
-						<Settings size={14} class="mr-1" />
+						<Settings size={12} class="mr-1" />
 						Настройки
 					</Button>
 				</div>
@@ -607,8 +607,9 @@
 		</div>
 
 		<!-- Game Canvas Area -->
-		<div class="game-canvas-wrapper perspective-active" bind:this={gameCanvasWrapper}>
-			<div class="game-canvas-container bank-vault-glow">
+		<div class="game-canvas-wrapper perspective-active no-scroll" bind:this={gameCanvasWrapper}>
+			<!-- Canvas Layer (will be transformed) -->
+			<div class="game-canvas-container bank-vault-glow no-scroll">
 				<canvas
 					bind:this={gameCanvas}
 					class="game-canvas"
@@ -616,16 +617,19 @@
 					height={canvasSize.height}
 					style="touch-action: none; user-select: none; max-width: 100%; max-height: 100%; object-fit: contain;"
 				></canvas>
+			</div>
 
+			<!-- UI Layer (remains flat over the game) -->
+			<div class="game-ui-layer">
 				<!-- Game State Overlays -->
 				{#if showInstructions || selectors.isReady}
 					<div class="game-overlay instructions-overlay">
 						<div class="overlay-content">
-							<h2 class="text-2xl font-bold text-white mb-4">🛡️ Хранитель Активов</h2>
-							<p class="text-white/90 mb-6 text-center">
+							<h2 class="text-xl font-bold text-white mb-3">🛡️ Хранитель Активов</h2>
+							<p class="text-white/90 mb-4 text-center text-sm">
 								Наклоняйте телефон, чтобы провести шарик от старта к банковскому сейфу
 							</p>
-							<div class="instruction-list mb-6">
+							<div class="instruction-list mb-4">
 								<div class="instruction-item">
 									<span class="instruction-icon">🟢</span>
 									<span>Собирайте бонусы: Кэшбэк, Проценты по вкладу</span>
@@ -641,11 +645,11 @@
 							</div>
 							<Button
 								variant="primary"
-								size="lg"
+								size="md"
 								onclick={handleStartGame}
 								class="start-game-btn"
 							>
-								<Play size={20} class="mr-2" />
+								<Play size={16} class="mr-1" />
 								Начать Игру
 							</Button>
 						</div>
@@ -655,29 +659,27 @@
 				{#if selectors.isPaused}
 					<div class="game-overlay pause-overlay">
 						<div class="overlay-content">
-							<h2 class="text-2xl font-bold text-white mb-4">⏸️ Пауза</h2>
+							<h2 class="text-xl font-bold text-white mb-3">⏸️ Пауза</h2>
 							<div class="pause-actions">
 								<Button
 									variant="primary"
-									size="lg"
+									size="md"
 									onclick={handleResumeGame}
-									class="mb-3"
 								>
-									<Play size={20} class="mr-2" />
+									<Play size={16} class="mr-2" />
 									Продолжить
 								</Button>
 								<Button
 									variant="secondary"
-									size="md"
+									size="sm"
 									onclick={handleRestartGame}
-									class="mb-3"
 								>
-									<RotateCcw size={18} class="mr-2" />
+									<RotateCcw size={16} class="mr-2" />
 									Начать заново
 								</Button>
 								<Button
 									variant="secondary"
-									size="md"
+									size="sm"
 									onclick={handleExit}
 								>
 									Выйти
@@ -690,15 +692,15 @@
 				{#if selectors.isCompleted}
 					<div class="game-overlay success-overlay">
 						<div class="overlay-content">
-							<h2 class="text-2xl font-bold text-white mb-4">🎉 Уровень пройден!</h2>
-							<p class="text-white/90 mb-4">
+							<h2 class="text-xl font-bold text-white mb-3">🎉 Уровень пройден!</h2>
+							<p class="text-white/90 mb-3 text-sm">
 								Ваш счет: <strong>{selectors.currentScore}</strong>
 							</p>
-							<p class="text-white/80 mb-6 text-sm">
+							<p class="text-white/80 mb-4 text-xs">
 								Изучите банковские продукты для получения бонусов!
 							</p>
-							<div class="banking-products mb-6">
-								<p class="text-white/80 mb-4 text-sm text-center">
+							<div class="banking-products mb-4">
+								<p class="text-white/80 mb-3 text-xs text-center">
 									Выберите банковский продукт для активации бонуса:
 								</p>
 								{#each Object.values(BANKING_PRODUCTS) as product}
@@ -735,7 +737,7 @@
 							</div>
 							<Button
 								variant="primary"
-								size="lg"
+								size="md"
 								onclick={handleExit}
 							>
 								Завершить
@@ -747,23 +749,22 @@
 				{#if selectors.isFailed}
 					<div class="game-overlay failure-overlay">
 						<div class="overlay-content">
-							<h2 class="text-2xl font-bold text-white mb-4">💔 Игра окончена</h2>
-							<p class="text-white/90 mb-6">
+							<h2 class="text-xl font-bold text-white mb-3">💔 Игра окончена</h2>
+							<p class="text-white/90 mb-4 text-sm">
 								{selectors.livesRemaining <= 0 ? 'У вас закончились жизни' : 'Время истекло'}
 							</p>
 							<div class="failure-actions">
 								<Button
 									variant="primary"
-									size="lg"
+									size="md"
 									onclick={handleRestartGame}
-									class="mb-3"
 								>
-									<RotateCcw size={20} class="mr-2" />
+									<RotateCcw size={16} class="mr-2" />
 									Попробовать снова
 								</Button>
 								<Button
 									variant="secondary"
-									size="md"
+									size="sm"
 									onclick={handleExit}
 								>
 									Выйти
@@ -786,7 +787,7 @@
 									variant="secondary"
 									size="sm"
 									onclick={handleCloseStats}
-									class="text-xs"
+									class="text-xs px-2 py-1"
 								>
 									✕
 								</Button>
@@ -909,7 +910,7 @@
 									variant="secondary"
 									size="sm"
 									onclick={handleCloseSettings}
-									class="text-xs"
+									class="text-xs px-2 py-1"
 								>
 									✕
 								</Button>
@@ -1076,7 +1077,7 @@
 	.stat-item {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.375rem;
 	}
 
 	.stat-content {
@@ -1084,11 +1085,11 @@
 	}
 
 	.stat-value {
-		font-size: 1.25rem;
+		font-size: 1rem;
 		font-weight: 700;
 		color: var(--color-gpb-gray-900);
 		line-height: 1;
-		margin-bottom: 0.25rem;
+		margin-bottom: 0.125rem;
 	}
 
 	.stat-label {
@@ -1141,6 +1142,16 @@
 		transform-style: preserve-3d;
 		transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 		overflow: hidden;
+	}
+
+	.game-ui-layer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		pointer-events: none;
+		z-index: 10;
 	}
 
 	.game-canvas-container::before {
@@ -1206,13 +1217,16 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 1rem;
-		z-index: 10;
+		z-index: 20;
+		pointer-events: auto;
 	}
 
 	.overlay-content {
 		text-align: center;
-		max-width: 320px;
-		padding: 2rem;
+		max-width: 300px;
+		padding: 1rem;
+		max-height: 80vh;
+		overflow-y: auto;
 	}
 
 	.instruction-list {
@@ -1220,16 +1234,16 @@
 	}
 
 	.instruction-list > * + * {
-		margin-top: 0.75rem;
+		margin-top: 0.5rem;
 	}
 
 	.instruction-item {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 0.5rem 0;
+		gap: 0.5rem;
+		padding: 0.25rem 0;
 		color: white;
-		font-size: 0.875rem;
+		font-size: 0.8rem;
 	}
 
 	.instruction-icon {
@@ -1241,11 +1255,11 @@
 	.failure-actions {
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
+		gap: 0.5rem;
 	}
 
 	.banking-products {
-		max-height: 200px;
+		max-height: 150px;
 		overflow-y: auto;
 	}
 
@@ -1258,9 +1272,9 @@
 		background: rgba(255, 255, 255, 0.1);
 		backdrop-filter: blur(8px);
 		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.75rem;
-		padding: 0.75rem;
-		margin-bottom: 0.5rem;
+		border-radius: 0.5rem;
+		padding: 0.5rem;
+		margin-bottom: 0.25rem;
 		width: 100%;
 		cursor: pointer;
 		transition: all 0.3s ease;
@@ -1562,7 +1576,7 @@
 	.progress-bars-container {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 0.75rem;
+		gap: 0.5rem;
 	}
 
 	.progress-bar-item {
@@ -1573,7 +1587,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 0.375rem;
+		margin-bottom: 0.25rem;
 	}
 
 	.progress-bar {
@@ -1630,6 +1644,62 @@
 	@media (min-width: 400px) {
 		.progress-bars-container {
 			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	.no-scroll {
+		touch-action: none !important;
+		user-select: none !important;
+		-webkit-user-select: none !important;
+		-webkit-touch-callout: none !important;
+		-webkit-tap-highlight-color: transparent !important;
+		overscroll-behavior: none !important;
+		overflow: hidden !important;
+	}
+
+	.no-scroll * {
+		touch-action: none !important;
+		user-select: none !important;
+		-webkit-user-select: none !important;
+		-webkit-touch-callout: none !important;
+		-webkit-tap-highlight-color: transparent !important;
+	}
+
+	@media (max-width: 380px) {
+		.game-header {
+			padding: 0.375rem;
+		}
+
+		.stats-bar {
+			padding: 0.5rem;
+			margin-bottom: 0.375rem;
+		}
+
+		.level-info {
+			padding: 0.5rem;
+			margin-bottom: 0.375rem;
+		}
+
+		.progress-bars-container {
+			margin-top: 0.375rem;
+			gap: 0.375rem;
+		}
+
+		.progress-bar-label {
+			margin-bottom: 0.125rem;
+		}
+
+		.stat-item {
+			gap: 0.25rem;
+		}
+
+		.stat-value {
+			font-size: 0.875rem;
+			margin-bottom: 0.0625rem;
+		}
+
+		.stat-label {
+			font-size: 0.625rem;
 		}
 	}
 </style>

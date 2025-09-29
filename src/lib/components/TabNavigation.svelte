@@ -71,7 +71,7 @@
 <style>
 	.tab-navigation {
 		position: fixed;
-		bottom: 16px;
+		bottom: 0;
 		left: 0;
 		right: 0;
 		margin-inline: auto;
@@ -80,7 +80,8 @@
 		padding: 0.5rem;
 		display: flex;
 		gap: 0.5rem;
-		border-radius: var(--radius-xl);
+		border-top-left-radius: var(--radius-xl);
+		border-top-right-radius: var(--radius-xl);
 		background-color: rgba(255, 255, 255, 0.9);
 		border: 1px solid var(--color-border-muted);
 		box-shadow: var(--shadow-soft);
