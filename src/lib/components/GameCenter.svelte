@@ -8,6 +8,7 @@
 	import { Clock, Trophy, Star } from 'lucide-svelte';
 	import type { Game } from '$lib/types/Game.js';
 	import StatsSection from './StatsSection.svelte';
+	import SectionHeading from './SectionHeading.svelte';
 
 	const dispatch = createEventDispatcher<{ gameSelected: { game: Game } }>();
 
@@ -74,10 +75,7 @@
 		<StatsSection ariaLabel="Статистика игрока" metrics={statsMetrics} columns={3} />
 
 		<section class="section" aria-labelledby="active-games-heading">
-			<div class="section-heading">
-				<p class="section-heading__eyebrow">Коллекция</p>
-				<h2 class="section-heading__title" id="active-games-heading">Доступны сейчас</h2>
-			</div>
+			<SectionHeading eyebrow="Коллекция" title="Доступны сейчас" id="active-games-heading" />
 			<div class="games-grid" role="list">
 				{#each activeGames as game (game.id)}
 					<div class="games-grid__item" role="listitem">
@@ -89,10 +87,7 @@
 
 		{#if comingSoonGames.length}
 			<section class="section" aria-labelledby="coming-soon-heading">
-				<div class="section-heading">
-					<p class="section-heading__eyebrow">Скоро</p>
-					<h2 class="section-heading__title" id="coming-soon-heading">В разработке</h2>
-				</div>
+				<SectionHeading eyebrow="Скоро" title="В разработке" id="coming-soon-heading" />
 				<div class="games-grid games-grid--compact" role="list">
 					{#each comingSoonGames as game (game.id)}
 						<div class="games-grid__item" role="listitem">

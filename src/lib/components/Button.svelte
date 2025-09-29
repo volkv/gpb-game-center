@@ -28,9 +28,7 @@
     ...restProps
   }: Props = $props();
 
-  const baseClass = variant === 'primary' ? 'btn-game-primary' :
-                    variant === 'secondary' ? 'btn-game-secondary' :
-                    variant === 'accent' ? 'btn-game-primary' : 'btn-game-primary';
+  const baseClass = variant === 'secondary' ? 'btn-game-secondary' : 'btn-game-primary';
   const sizeClass = size !== 'md' ? 'btn-' + size : '';
   const classes = [baseClass, sizeClass, className].filter(Boolean).join(' ');
 

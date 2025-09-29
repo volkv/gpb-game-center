@@ -3,6 +3,8 @@
 	import SkeletonCard from './SkeletonCard.svelte';
 	import SkeletonSection from './SkeletonSection.svelte';
 	import { telegramUserName } from '$lib/stores/telegramStore';
+	import SectionHeading from './SectionHeading.svelte';
+	import Skeleton from './Skeleton.svelte';
 </script>
 
 <main class="bank-home">
@@ -22,15 +24,13 @@
 	</section>
 
 	<section class="product-section surface-card" aria-labelledby="cards-heading">
-		<div class="section-heading">
-			<p class="section-heading__eyebrow">Карты</p>
-			<div class="section-heading__title-row">
-				<h2 class="section-heading__title" id="cards-heading">Ваши продукты</h2>
+		<SectionHeading eyebrow="Карты" title="Ваши продукты" id="cards-heading">
+			{#snippet action()}
 				<button class="ghost-action" type="button" disabled aria-disabled="true" title="Добавление пока недоступно">
 					Добавить
 				</button>
-			</div>
-		</div>
+			{/snippet}
+		</SectionHeading>
 		<div class="cards-grid" role="group" aria-label="Скелетные карточки продуктов">
 			<SkeletonCard width="100%" height="124px" hasIcon={true} hasText={true} textLines={2} />
 			<SkeletonCard width="100%" height="124px" hasIcon={true} hasText={true} textLines={2} />
@@ -39,11 +39,11 @@
 			<div class="card-info">
 				<div class="card-icon" aria-hidden="true">💳</div>
 				<div class="card-details">
-					<div class="skeleton-line skeleton-line-small"></div>
-					<div class="skeleton-line skeleton-line-mini"></div>
+					<Skeleton variant="line" width="140px" height="0.75rem" />
+					<Skeleton variant="line" width="96px" height="0.6rem" />
 				</div>
 			</div>
-			<div class="skeleton-line skeleton-amount"></div>
+			<Skeleton variant="line" width="110px" height="0.8rem" />
 		</div>
 	</section>
 
@@ -118,13 +118,6 @@
 		gap: 1.25rem;
 	}
 
-	.section-heading__title-row {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
 	.ghost-action {
 		background: var(--color-surface-muted);
 		border: 1px solid var(--color-border-muted);
@@ -167,26 +160,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.4rem;
-	}
-
-	.skeleton-line {
-		border-radius: 999px;
-		background: rgba(26, 37, 54, 0.08);
-	}
-
-	.skeleton-line-small {
-		width: 140px;
-		height: 0.75rem;
-	}
-
-	.skeleton-line-mini {
-		width: 96px;
-		height: 0.6rem;
-	}
-
-	.skeleton-amount {
-		width: 110px;
-		height: 0.8rem;
 	}
 
 </style>

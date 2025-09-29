@@ -1,5 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import type { PointsState, PurchaseTransaction, PointsHistory } from '$lib/types/Points';
+import { getStoreValue } from '$lib/utils/storeHelpers';
 
 function createPointsStore() {
 	const initialState: PointsState = {
@@ -46,13 +47,9 @@ function createPointsStore() {
 		},
 
 		spendPoints: (amount: number, rewardId: string, rewardTitle: string): boolean => {
-			let currentPoints: number;
-			const unsubscribe = subscribe(state => {
-				currentPoints = state.totalPoints;
-			});
-			unsubscribe();
+			const currentPoints = getStoreValue(pointsStore).totalPoints;
 
-			if (currentPoints! < amount) {
+			if (currentPoints < amount) {
 				return false;
 			}
 
@@ -87,12 +84,8 @@ function createPointsStore() {
 		},
 
 		canAfford: (amount: number): boolean => {
-			let currentPoints: number;
-			const unsubscribe = subscribe(state => {
-				currentPoints = state.totalPoints;
-			});
-			unsubscribe();
-			return currentPoints! >= amount;
+			const currentPoints = getStoreValue(pointsStore).totalPoints;
+			return currentPoints >= amount;
 		},
 
 		reset: () => {

@@ -517,50 +517,7 @@
 </Modal>
 
 <style>
-	/* Force dark theme for modal */
-	:global(.modal-backdrop) {
-		background: rgba(0, 0, 0, 0.9) !important;
-	}
 
-	:global(.modal-content) {
-		background: rgba(44, 62, 80, 0.98) !important;
-		backdrop-filter: blur(12px) !important;
-		border: 2px solid rgba(26, 188, 156, 0.3) !important;
-		color: white !important;
-		max-height: 90vh !important;
-		box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
-	}
-
-	:global(.modal-body) {
-		background: transparent !important;
-		color: white !important;
-	}
-
-	:global(.modal-header) {
-		background: transparent !important;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-	}
-
-	/* Force all text to be white */
-	:global(.modal-content *) {
-		color: white !important;
-	}
-
-	/* Override button styles */
-	:global(.modal-content button) {
-		color: inherit !important;
-	}
-
-	:global(.modal-content .close-button) {
-		color: rgba(255, 255, 255, 0.8) !important;
-		border: 1px solid rgba(255, 255, 255, 0.2) !important;
-		background: rgba(255, 255, 255, 0.1) !important;
-	}
-
-	:global(.modal-content .close-button:hover) {
-		color: white !important;
-		background: rgba(255, 255, 255, 0.2) !important;
-	}
 
 	.modal-content-wrapper {
 		text-align: center;

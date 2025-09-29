@@ -8,6 +8,7 @@
 	import TaskModal from './TaskModal.svelte';
 	import StatsSection from './StatsSection.svelte';
 	import type { Task } from '$lib/types/Tasks';
+	import SectionHeading from './SectionHeading.svelte';
 
 	let mounted = $state(false);
 	let selectedTask = $state<Task | null>(null);
@@ -80,12 +81,7 @@
 		<StatsSection ariaLabel="Результаты" metrics={statsMetrics} columns={2} />
 
 		<section class="section" aria-labelledby="tasks-list-heading">
-			<div class="section-heading section-heading--split">
-				<div>
-					<p class="section-heading__eyebrow">Список</p>
-					<h2 class="section-heading__title" id="tasks-list-heading">Доступные задания</h2>
-				</div>
-			</div>
+			<SectionHeading eyebrow="Список" title="Доступные задания" id="tasks-list-heading" />
 
 			<div class="tasks-grid" role="list">
 				{#each filteredTasks() as task (task.id)}
@@ -170,14 +166,6 @@
 		flex-direction: column;
 		gap: 1.5rem;
 	}
-
-	.section-heading--split {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: space-between;
-		gap: 1rem;
-	}
-
 
 	.tasks-grid {
 		display: grid;

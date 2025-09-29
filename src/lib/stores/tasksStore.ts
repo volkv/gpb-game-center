@@ -1,5 +1,6 @@
 import { writable, derived } from 'svelte/store';
 import { pointsStore } from './pointsStore';
+import { getStoreValue } from '$lib/utils/storeHelpers';
 import type { TasksState, Task, DailyReward, TaskStatus } from '$lib/types/Tasks';
 
 function createTasksStore() {
@@ -104,13 +105,9 @@ function createTasksStore() {
 		},
 
 		canClaimDailyReward: (day: number) => {
-			let canClaim = false;
-			const unsubscribe = subscribe(state => {
-				const reward = state.dailyRewards.find(r => r.day === day);
-				canClaim = day === state.currentDay && !!reward && !reward.claimed;
-			});
-			unsubscribe();
-			return canClaim;
+			const state = getStoreValue(tasksStore);
+			const reward = state.dailyRewards.find(r => r.day === day);
+			return day === state.currentDay && !!reward && !reward.claimed;
 		},
 
 		updateTaskStatus: (taskId: string, status: TaskStatus) => {
@@ -126,30 +123,18 @@ function createTasksStore() {
 		},
 
 		getTasksByCategory: (category: string) => {
-			let tasks: Task[] = [];
-			const unsubscribe = subscribe(state => {
-				tasks = state.tasks.filter(task => task.category === category);
-			});
-			unsubscribe();
-			return tasks;
+			const state = getStoreValue(tasksStore);
+			return state.tasks.filter(task => task.category === category);
 		},
 
 		getAvailableTasks: () => {
-			let tasks: Task[] = [];
-			const unsubscribe = subscribe(state => {
-				tasks = state.tasks.filter(task => task.status === 'available');
-			});
-			unsubscribe();
-			return tasks;
+			const state = getStoreValue(tasksStore);
+			return state.tasks.filter(task => task.status === 'available');
 		},
 
 		getCompletedTasks: () => {
-			let tasks: Task[] = [];
-			const unsubscribe = subscribe(state => {
-				tasks = state.tasks.filter(task => task.status === 'completed');
-			});
-			unsubscribe();
-			return tasks;
+			const state = getStoreValue(tasksStore);
+			return state.tasks.filter(task => task.status === 'completed');
 		},
 
 		resetDailyRewards: () => {

@@ -1,6 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import type { Game, GameStatus } from '$lib/types/Game';
 import type { GameState, GameSessionStatus, LoadingState } from '$lib/types/GameState';
+import { getStoreValue } from '$lib/utils/storeHelpers';
 
 export interface GameCenterState {
 	games: Game[];
@@ -170,7 +171,7 @@ function createGameStore() {
 }
 
 async function getGameById(gameId: string): Promise<Game | null> {
-	const store = get(gameStore);
+	const store = getStoreValue(gameStore);
 	return store.games.find(game => game.id === gameId) || null;
 }
 
@@ -202,26 +203,27 @@ function generateSessionId(): string {
 
 export const gameStore = createGameStore();
 
-export const gameStoreSelectors = derived(
+export const activeGames = derived(
 	gameStore,
-	($gameStore) => ({
-		activeGames: $gameStore.games.filter(game => game.status === 'active'),
-		comingSoonGames: $gameStore.games.filter(game => game.status === 'coming_soon'),
-		currentGameState: $gameStore.gameState,
-		isGameLoading: $gameStore.loadingState === 'loading',
-		isGameActive: $gameStore.gameState?.status === 'playing'
-	})
+	($gameStore) => $gameStore.games.filter(game => game.status === 'active')
 );
 
-// Backward compatibility exports
-export const activeGames = derived(gameStoreSelectors, ($selectors) => $selectors.activeGames);
-export const comingSoonGames = derived(gameStoreSelectors, ($selectors) => $selectors.comingSoonGames);
-export const currentGameState = derived(gameStoreSelectors, ($selectors) => $selectors.currentGameState);
-export const isGameLoading = derived(gameStoreSelectors, ($selectors) => $selectors.isGameLoading);
-export const isGameActive = derived(gameStoreSelectors, ($selectors) => $selectors.isGameActive);
+export const comingSoonGames = derived(
+	gameStore,
+	($gameStore) => $gameStore.games.filter(game => game.status === 'coming_soon')
+);
 
-function get<T>(store: { subscribe: (run: (value: T) => void) => () => void }): T {
-	let value: T;
-	store.subscribe((v) => value = v)();
-	return value!;
-}
+export const currentGameState = derived(
+	gameStore,
+	($gameStore) => $gameStore.gameState
+);
+
+export const isGameLoading = derived(
+	gameStore,
+	($gameStore) => $gameStore.loadingState === 'loading'
+);
+
+export const isGameActive = derived(
+	gameStore,
+	($gameStore) => $gameStore.gameState?.status === 'playing'
+);

@@ -1,4 +1,3 @@
-// Компоненты UI
 export { default as Button } from './components/Button.svelte';
 export { default as Card } from './components/Card.svelte';
 export { default as LoadingSpinner } from './components/LoadingSpinner.svelte';
@@ -14,7 +13,6 @@ export { default as Badge } from './components/Badge.svelte';
 export { default as ProgressBar } from './components/ProgressBar.svelte';
 export { default as Counter } from './components/Counter.svelte';
 
-// Типы
 export type {
   Game,
   GameDifficulty,
@@ -41,7 +39,6 @@ export type {
   StateTransition
 } from './types/GameState.js';
 
-// Stores
 export {
   gameStore,
   activeGames,
@@ -74,26 +71,12 @@ export type {
   NavigationOptions
 } from './stores/navigationStore.js';
 
-// Game Loader
 export {
-  gameLoader,
   loadGameComponent,
-  preloadGameComponent,
-  isGameComponentLoaded,
-  isGameComponentLoading,
   getGameLoadError,
-  canRetryGameLoad,
-  retryGameLoad,
-  clearGameCache,
-  getGameLoaderStats
+  canRetryGameLoad
 } from './utils/gameLoader.js';
 
-export type {
-  LoadedGameComponent,
-  GameLoadError
-} from './utils/gameLoader.js';
-
-// Constants
 export {
   APP_CONFIG,
   GAMES_CONFIG,
@@ -125,8 +108,6 @@ export type {
   EventType
 } from './utils/constants.js';
 
-
-// Данные игр
 export {
   GAMES_DATA,
   getActiveGames,
@@ -135,5 +116,4 @@ export {
   getGamesByCategory
 } from './data/games.js';
 
-// Offline utils
 export { isOnline, NetworkError, createRetryHandler, createOfflineQueue } from './utils/offline.js';

@@ -132,15 +132,6 @@ function createNavigationStore() {
 
 		reset: () => {
 			set(initialState);
-		},
-
-		getCurrentScreen: () => {
-			let currentScreen: Screen;
-			const unsubscribe = subscribe(state => {
-				currentScreen = state.currentScreen;
-			});
-			unsubscribe();
-			return currentScreen!;
 		}
 	};
 }
@@ -180,16 +171,6 @@ export const isGameScreen = derived(
 export const isGameCenterScreen = derived(
 	navigationStore,
 	($nav) => $nav.currentScreen === 'game-center'
-);
-
-export const isRewardsShopScreen = derived(
-	navigationStore,
-	($nav) => $nav.currentScreen === 'rewards-shop'
-);
-
-export const isTasksScreen = derived(
-	navigationStore,
-	($nav) => $nav.currentScreen === 'tasks'
 );
 
 export const navigationHistory = derived(

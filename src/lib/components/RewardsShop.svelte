@@ -6,6 +6,7 @@
 	import RewardCard from './RewardCard.svelte';
 	import PurchaseModal from './PurchaseModal.svelte';
 	import type { Reward } from '$lib/types/Points';
+	import SectionHeading from './SectionHeading.svelte';
 
 	let mounted = $state(false);
 	let rewards = $state<Reward[]>([]);
@@ -57,16 +58,14 @@
 		</section>
 
 		<section class="section" aria-labelledby="rewards-list-heading">
-			<div class="section-heading">
-				<p class="section-heading__eyebrow">Выбор</p>
-				<div class="section-heading__title-row">
-					<h2 class="section-heading__title" id="rewards-list-heading">Каталог призов</h2>
+			<SectionHeading eyebrow="Выбор" title="Каталог призов" id="rewards-list-heading">
+				{#snippet action()}
 					<div class="section-heading__chip">
 						<Gift size={18} aria-hidden="true" />
 						<span>{rewards.length}</span>
 					</div>
-				</div>
-			</div>
+				{/snippet}
+			</SectionHeading>
 
 			<div class="rewards-grid" role="list">
 				{#each rewards as reward (reward.id)}
@@ -181,13 +180,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.25rem;
-	}
-
-	.section-heading__title-row {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		flex-wrap: wrap;
 	}
 
 	.section-heading__chip {

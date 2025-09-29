@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { Gamepad2, Gift, CheckSquare } from 'lucide-svelte';
 	import {
-		currentScreen,
+		navigationStore,
 		isGameCenterScreen,
-		isRewardsShopScreen,
-		isTasksScreen,
 		navigateToGameCenter,
 		navigateToRewardsShop,
 		navigateToTasks
 	} from '$lib/stores/navigationStore';
+	import { createScreenDerivedStore } from '$lib/utils/storeHelpers';
+	import type { Screen } from '$lib/stores/navigationStore';
+
+	const isRewardsShopScreen = createScreenDerivedStore(navigationStore, 'rewards-shop' as Screen);
+	const isTasksScreen = createScreenDerivedStore(navigationStore, 'tasks' as Screen);
 
 	const tabs = [
 		{

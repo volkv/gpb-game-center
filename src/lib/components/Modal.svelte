@@ -190,27 +190,10 @@
   }
 
   .modal-footer {
-    padding: 1.25rem 1.5rem 1.5rem;
+    padding: 1rem;
     border-top: 1px solid var(--color-border-subtle);
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-    padding: 1rem;
-  }
-
-  .modal-backdrop {
-    padding: 0.5rem;
-  }
-
-  .modal-content {
-    border-radius: 1rem;
-  }
-
-  .modal-header {
-    padding: 1rem;
-  }
-
-  .modal-body {
-    padding: 1rem;
   }
 </style>
