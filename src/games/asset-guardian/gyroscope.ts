@@ -358,8 +358,11 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		const sensitivity = GYROSCOPE_CONFIG.SENSITIVITY;
 		const maxTilt = GYROSCOPE_CONFIG.MAX_TILT;
 
-		let x = Math.abs(calibrated.gamma) > deadZone ? calibrated.gamma : 0;
-		let y = Math.abs(calibrated.beta) > deadZone ? calibrated.beta : 0;
+		// Swapped beta and gamma to fix landscape mode controls.
+		// Left-right tilt (gamma) now controls vertical movement (y-axis).
+		// Forward-backward tilt (beta) now controls horizontal movement (x-axis).
+		let x = Math.abs(calibrated.beta) > deadZone ? calibrated.beta : 0;
+		let y = Math.abs(calibrated.gamma) > deadZone ? calibrated.gamma : 0;
 
 		const significantMovementThreshold = GYROSCOPE_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD;
 		const beforeSignificantFilter = { x, y };
@@ -367,7 +370,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		if (Math.abs(y) < significantMovementThreshold) y = 0;
 
 		const beforeInversion = { x, y };
-		x = -x * sensitivity;
+		x = x * sensitivity;
 		y = y * sensitivity;
 
 		const beforeClamp = { x, y };
