@@ -145,18 +145,26 @@ export class PhysicsEngine {
 		const walls = [
 			Bodies.rectangle(bounds.width / 2, -thickness / 2, bounds.width, thickness, {
 				isStatic: true,
+				restitution: PHYSICS_CONFIG.WALL_RESTITUTION,
+				friction: PHYSICS_CONFIG.WALL_FRICTION,
 				collisionFilter: { category: COLLISION_CATEGORIES.BOUNDARY }
 			}),
 			Bodies.rectangle(bounds.width / 2, bounds.height + thickness / 2, bounds.width, thickness, {
 				isStatic: true,
+				restitution: PHYSICS_CONFIG.WALL_RESTITUTION,
+				friction: PHYSICS_CONFIG.WALL_FRICTION,
 				collisionFilter: { category: COLLISION_CATEGORIES.BOUNDARY }
 			}),
 			Bodies.rectangle(-thickness / 2, bounds.height / 2, thickness, bounds.height, {
 				isStatic: true,
+				restitution: PHYSICS_CONFIG.WALL_RESTITUTION,
+				friction: PHYSICS_CONFIG.WALL_FRICTION,
 				collisionFilter: { category: COLLISION_CATEGORIES.BOUNDARY }
 			}),
 			Bodies.rectangle(bounds.width + thickness / 2, bounds.height / 2, thickness, bounds.height, {
 				isStatic: true,
+				restitution: PHYSICS_CONFIG.WALL_RESTITUTION,
+				friction: PHYSICS_CONFIG.WALL_FRICTION,
 				collisionFilter: { category: COLLISION_CATEGORIES.BOUNDARY }
 			})
 		];
@@ -193,7 +201,11 @@ export class PhysicsEngine {
 
 				switch (cellType) {
 					case 'wall':
-						body = Bodies.rectangle(x, y, cellWidth, cellHeight, { isStatic: true });
+						body = Bodies.rectangle(x, y, cellWidth, cellHeight, {
+							isStatic: true,
+							restitution: PHYSICS_CONFIG.WALL_RESTITUTION,
+							friction: PHYSICS_CONFIG.WALL_FRICTION
+						});
 						collisionCategory = COLLISION_CATEGORIES.WALL;
 						break;
 
@@ -334,7 +346,8 @@ export class PhysicsEngine {
 			Body.setPosition(this.ballBody, correctedPosition);
 
 			const velocity = this.ballBody.velocity;
-			const bounceVelocity = Vector.mult(velocity, -PHYSICS_CONFIG.BOUNCE_ENERGY_LOSS);
+			const dampedVelocity = Vector.mult(velocity, 1 - PHYSICS_CONFIG.BOUNCE_ENERGY_LOSS);
+			const bounceVelocity = Vector.mult(dampedVelocity, -1);
 			Body.setVelocity(this.ballBody, bounceVelocity);
 		}
 	}

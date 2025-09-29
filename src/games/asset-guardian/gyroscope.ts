@@ -7,6 +7,7 @@ export interface GyroscopeManager {
 	isSupported: boolean;
 	isActive: boolean;
 	calibration: GyroscopeData | null;
+	isDebugLogging: boolean;
 
 	start(): Promise<boolean>;
 	stop(): void;
@@ -14,11 +15,23 @@ export interface GyroscopeManager {
 	convertToGravity(data: GyroscopeData): Gravity;
 	setSensitivity?(sensitivity: number): void;
 
+	startDebugLogging(): void;
+	stopDebugLogging(): DebugLogData[];
+
 	onGyroscopeChanged: (callback: (data: GyroscopeData) => void) => void;
 	onGyroscopeStarted: (callback: () => void) => void;
 	onGyroscopeFailed: (callback: (error: string) => void) => void;
 
 	cleanup(): void;
+}
+
+export interface DebugLogData {
+	timestamp: number;
+	rawTelegramData: { x: number; y: number; z: number };
+	convertedDegrees: GyroscopeData;
+	smoothedData: GyroscopeData;
+	gravity: Gravity;
+	processingSteps: any;
 }
 
 export interface FallbackInputManager {
@@ -38,6 +51,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	public isSupported = false;
 	public isActive = false;
 	public calibration: GyroscopeData | null = null;
+	public isDebugLogging = false;
 
 	private webApp = getTelegramWebApp();
 	private changeCallback: ((data: GyroscopeData) => void) | null = null;
@@ -47,6 +61,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	private gyroThrottleMs = 100;
 	private dataBuffer: GyroscopeData[] = [];
 	private bufferSize = 6;
+	private debugLogs: DebugLogData[] = [];
 
 	private gyroscopeChangedHandler = (...args: any[]) => {
 		try {
@@ -63,32 +78,12 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 				z: telegramGyro.z || 0
 			};
 
-			if (import.meta.env.DEV) {
-				console.log('🎯 [GYRO] Raw Telegram data:', JSON.stringify({
-					x: actualData.x,
-					y: actualData.y,
-					z: actualData.z,
-					magnitude: Math.sqrt(actualData.x * actualData.x + actualData.y * actualData.y + actualData.z * actualData.z)
-				}, null, 2));
-			}
-
 			const rawData: GyroscopeData = {
 				alpha: actualData.z * 180 / Math.PI,
 				beta: actualData.y * 180 / Math.PI,
 				gamma: actualData.x * 180 / Math.PI,
 				timestamp: now
 			};
-
-			if (import.meta.env.DEV) {
-				console.log('🔄 [GYRO] Converted to degrees:', JSON.stringify({
-					alpha: rawData.alpha,
-					beta: rawData.beta,
-					gamma: rawData.gamma,
-					alphaMag: Math.abs(rawData.alpha),
-					betaMag: Math.abs(rawData.beta),
-					gammaMag: Math.abs(rawData.gamma)
-				}, null, 2));
-			}
 
 			this.dataBuffer.push(rawData);
 			if (this.dataBuffer.length > this.bufferSize) {
@@ -97,7 +92,48 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 			if (this.dataBuffer.length >= this.bufferSize) {
 				const smoothedData = this.getSmoothedData();
-				if (import.meta.env.DEV) {
+				const gravity = this.convertToGravity(smoothedData);
+
+				if (this.isDebugLogging) {
+					const debugLogEntry: DebugLogData = {
+						timestamp: now,
+						rawTelegramData: actualData,
+						convertedDegrees: rawData,
+						smoothedData: smoothedData,
+						gravity: gravity,
+						processingSteps: {
+							bufferSize: this.dataBuffer.length,
+							bufferRange: {
+								alphaMin: Math.min(...this.dataBuffer.map(d => d.alpha)),
+								alphaMax: Math.max(...this.dataBuffer.map(d => d.alpha)),
+								betaMin: Math.min(...this.dataBuffer.map(d => d.beta)),
+								betaMax: Math.max(...this.dataBuffer.map(d => d.beta)),
+								gammaMin: Math.min(...this.dataBuffer.map(d => d.gamma)),
+								gammaMax: Math.max(...this.dataBuffer.map(d => d.gamma))
+							},
+							calibration: this.calibration
+						}
+					};
+
+					this.debugLogs.push(debugLogEntry);
+					console.log('📝 [DEBUG-GYRO]', debugLogEntry);
+				}
+
+				if (import.meta.env.DEV && !this.isDebugLogging) {
+					console.log('🎯 [GYRO] Raw Telegram data:', JSON.stringify({
+						x: actualData.x,
+						y: actualData.y,
+						z: actualData.z,
+						magnitude: Math.sqrt(actualData.x * actualData.x + actualData.y * actualData.y + actualData.z * actualData.z)
+					}, null, 2));
+					console.log('🔄 [GYRO] Converted to degrees:', JSON.stringify({
+						alpha: rawData.alpha,
+						beta: rawData.beta,
+						gamma: rawData.gamma,
+						alphaMag: Math.abs(rawData.alpha),
+						betaMag: Math.abs(rawData.beta),
+						gammaMag: Math.abs(rawData.gamma)
+					}, null, 2));
 					console.log('🎭 [GYRO] Smoothed data:', JSON.stringify({
 						alpha: smoothedData.alpha,
 						beta: smoothedData.beta,
@@ -113,6 +149,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 						}
 					}, null, 2));
 				}
+
 				if (this.changeCallback) {
 					this.changeCallback(smoothedData);
 				}
@@ -134,7 +171,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 			return { ...this.dataBuffer[0] };
 		}
 
-		const weights = [0.5, 0.3, 0.2];
+		const weights = [0.4, 0.35, 0.25];
 		const recent = this.dataBuffer.slice(-3);
 
 		let alpha = 0, beta = 0, gamma = 0, totalWeight = 0;
@@ -151,7 +188,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		const smoothedBeta = beta / totalWeight;
 		const smoothedGamma = gamma / totalWeight;
 
-		const basicNoiseThreshold = 3.0;
+		const basicNoiseThreshold = GYROSCOPE_CONFIG.DEAD_ZONE;
 
 		return {
 			alpha: Math.abs(smoothedAlpha) < basicNoiseThreshold ? 0 : smoothedAlpha,
@@ -324,7 +361,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		let x = Math.abs(calibrated.gamma) > deadZone ? calibrated.gamma : 0;
 		let y = Math.abs(calibrated.beta) > deadZone ? calibrated.beta : 0;
 
-		const significantMovementThreshold = 10.0;
+		const significantMovementThreshold = GYROSCOPE_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD;
 		const beforeSignificantFilter = { x, y };
 		if (Math.abs(x) < significantMovementThreshold) x = 0;
 		if (Math.abs(y) < significantMovementThreshold) y = 0;
@@ -337,7 +374,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		x = Math.max(-maxTilt, Math.min(maxTilt, x));
 		y = Math.max(-maxTilt, Math.min(maxTilt, y));
 
-		const microMovementThreshold = 0.005;
+		const microMovementThreshold = GYROSCOPE_CONFIG.MICRO_MOVEMENT_THRESHOLD;
 		const beforeMicroFilter = { x, y };
 		if (Math.abs(x) < microMovementThreshold) x = 0;
 		if (Math.abs(y) < microMovementThreshold) y = 0;
@@ -402,6 +439,84 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 	onGyroscopeFailed(callback: (error: string) => void): void {
 		this.failedCallback = callback;
+	}
+
+	startDebugLogging(): void {
+		console.log('🔥 [DEBUG-GYRO] Started debug logging');
+		this.debugLogs = [];
+		this.isDebugLogging = true;
+	}
+
+	stopDebugLogging(): DebugLogData[] {
+		console.log(`🛑 [DEBUG-GYRO] Stopped debug logging. Collected ${this.debugLogs.length} samples`);
+
+		if (this.debugLogs.length > 0) {
+			console.log('📊 [DEBUG-GYRO] Summary statistics:');
+
+			const rawDataRanges = {
+				x: {
+					min: Math.min(...this.debugLogs.map(d => d.rawTelegramData.x)),
+					max: Math.max(...this.debugLogs.map(d => d.rawTelegramData.x))
+				},
+				y: {
+					min: Math.min(...this.debugLogs.map(d => d.rawTelegramData.y)),
+					max: Math.max(...this.debugLogs.map(d => d.rawTelegramData.y))
+				},
+				z: {
+					min: Math.min(...this.debugLogs.map(d => d.rawTelegramData.z)),
+					max: Math.max(...this.debugLogs.map(d => d.rawTelegramData.z))
+				}
+			};
+
+			const degreesRanges = {
+				alpha: {
+					min: Math.min(...this.debugLogs.map(d => d.convertedDegrees.alpha)),
+					max: Math.max(...this.debugLogs.map(d => d.convertedDegrees.alpha))
+				},
+				beta: {
+					min: Math.min(...this.debugLogs.map(d => d.convertedDegrees.beta)),
+					max: Math.max(...this.debugLogs.map(d => d.convertedDegrees.beta))
+				},
+				gamma: {
+					min: Math.min(...this.debugLogs.map(d => d.convertedDegrees.gamma)),
+					max: Math.max(...this.debugLogs.map(d => d.convertedDegrees.gamma))
+				}
+			};
+
+			const gravityRanges = {
+				x: {
+					min: Math.min(...this.debugLogs.map(d => d.gravity.x)),
+					max: Math.max(...this.debugLogs.map(d => d.gravity.x))
+				},
+				y: {
+					min: Math.min(...this.debugLogs.map(d => d.gravity.y)),
+					max: Math.max(...this.debugLogs.map(d => d.gravity.y))
+				},
+				intensity: {
+					min: Math.min(...this.debugLogs.map(d => d.gravity.intensity)),
+					max: Math.max(...this.debugLogs.map(d => d.gravity.intensity))
+				}
+			};
+
+			console.log('📈 [DEBUG-GYRO] Raw Telegram data ranges (radians):');
+			console.table(rawDataRanges);
+
+			console.log('📐 [DEBUG-GYRO] Converted degrees ranges:');
+			console.table(degreesRanges);
+
+			console.log('🎮 [DEBUG-GYRO] Final gravity ranges:');
+			console.table(gravityRanges);
+
+			console.log('🎯 [DEBUG-GYRO] Calibration data:');
+			console.log(this.calibration);
+
+			console.log('📋 [DEBUG-GYRO] Full debug log array:', this.debugLogs);
+		}
+
+		this.isDebugLogging = false;
+		const logs = [...this.debugLogs];
+		this.debugLogs = [];
+		return logs;
 	}
 
 	cleanup(): void {
@@ -552,8 +667,8 @@ class TouchFallbackManager implements FallbackInputManager {
 
 	convertToGravity(input: { x: number; y: number }): Gravity {
 		const sensitivity = GYROSCOPE_CONFIG.FALLBACK_TOUCH_SENSITIVITY;
-		const maxDistance = 300;
-		const deadZone = 20;
+		const maxDistance = 250;
+		const deadZone = 15;
 
 		const adjustedX = Math.abs(input.x) > deadZone ? input.x : 0;
 		const adjustedY = Math.abs(input.y) > deadZone ? input.y : 0;
@@ -564,8 +679,9 @@ class TouchFallbackManager implements FallbackInputManager {
 		const rawGravityX = normalizedX * PHYSICS_CONFIG.MAX_GRAVITY;
 		const rawGravityY = normalizedY * PHYSICS_CONFIG.MAX_GRAVITY;
 
-		const smoothedGravityX = this.lastGravity.x * this.smoothingFactor + rawGravityX * (1 - this.smoothingFactor);
-		const smoothedGravityY = this.lastGravity.y * this.smoothingFactor + rawGravityY * (1 - this.smoothingFactor);
+		const smoothingFactor = GYROSCOPE_CONFIG.SMOOTHING_FACTOR;
+		const smoothedGravityX = this.lastGravity.x * smoothingFactor + rawGravityX * (1 - smoothingFactor);
+		const smoothedGravityY = this.lastGravity.y * smoothingFactor + rawGravityY * (1 - smoothingFactor);
 
 		this.lastGravity.x = smoothedGravityX;
 		this.lastGravity.y = smoothedGravityY;

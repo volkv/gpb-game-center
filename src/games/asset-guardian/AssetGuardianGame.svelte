@@ -11,6 +11,7 @@
 	import type { GameEngineConfig } from './gameEngine';
 	import { createVisualEffectsManager, convertTiltToNormalized } from './visual-effects';
 	import type { VisualEffectsManager } from './visual-effects';
+	import AssetGuardianModal from './AssetGuardianModal.svelte';
 	import {
 		LEVELS,
 		getLevelById,
@@ -42,6 +43,7 @@
 	let gyroscopeStatus = $state('checking');
 	let visualEffectsManager: VisualEffectsManager | null = $state(null);
 	let gameCanvasWrapper: HTMLElement | undefined = $state();
+	let isDebugLogging = $state(false);
 
 	// Canvas adaptive sizing
 	let canvasSize = $state({ width: 400, height: 400 });
@@ -392,6 +394,29 @@
 		}
 	}
 
+	function handleStartDebugLogging() {
+		if (!gyroscopeManager || !gyroscopeManager.isSupported || !gyroscopeManager.isActive) {
+			console.warn('🔄 [GAME] Cannot start debug logging: gyroscope not available');
+			return;
+		}
+
+		gyroscopeManager.startDebugLogging();
+		isDebugLogging = true;
+		console.log('🔥 [GAME] Debug logging started. Rotate your phone to record gyroscope data.');
+	}
+
+	function handleStopDebugLogging() {
+		if (!gyroscopeManager) {
+			console.warn('🔄 [GAME] Cannot stop debug logging: gyroscope manager not available');
+			return;
+		}
+
+		const debugLogs = gyroscopeManager.stopDebugLogging();
+		isDebugLogging = false;
+		console.log(`🛑 [GAME] Debug logging stopped. Collected ${debugLogs.length} samples.`);
+		console.log('📊 [GAME] Use these data to calibrate gyroscope ranges and sensitivity.');
+	}
+
 	function handleShowStats() {
 		showStatsModal = true;
 	}
@@ -473,7 +498,7 @@
 						/>
 						<div class="stat-content">
 							<div class="stat-value text-xs">
-								{gyroscopeStatus === 'active' ? 'ГИРО' :
+								{gyroscopeStatus === 'active' ? (isDebugLogging ? '📝 ЛОГ' : 'ГИРО') :
 								 gyroscopeStatus === 'fallback' ? 'TOUCH' :
 								 gyroscopeStatus === 'initializing' ? '...' : 'OFF'}
 							</div>
@@ -619,406 +644,9 @@
 				></canvas>
 			</div>
 
-			<!-- UI Layer (remains flat over the game) -->
+			<!-- UI Layer (now empty, UI moved to modal) -->
 			<div class="game-ui-layer">
-				<!-- Game State Overlays -->
-				{#if showInstructions || selectors.isReady}
-					<div class="game-overlay instructions-overlay">
-						<div class="overlay-content">
-							<h2 class="text-xl font-bold text-white mb-3">🛡️ Хранитель Активов</h2>
-							<p class="text-white/90 mb-4 text-center text-sm">
-								Наклоняйте телефон, чтобы провести шарик от старта к банковскому сейфу
-							</p>
-							<div class="instruction-list mb-4">
-								<div class="instruction-item">
-									<span class="instruction-icon">🟢</span>
-									<span>Собирайте бонусы: Кэшбэк, Проценты по вкладу</span>
-								</div>
-								<div class="instruction-item">
-									<span class="instruction-icon">🔴</span>
-									<span>Избегайте ловушек: Мошенники, Фишинговые ссылки</span>
-								</div>
-								<div class="instruction-item">
-									<span class="instruction-icon">🏁</span>
-									<span>Доберитесь до банковского сейфа</span>
-								</div>
-							</div>
-							<Button
-								variant="primary"
-								size="md"
-								onclick={handleStartGame}
-								class="start-game-btn"
-							>
-								<Play size={16} class="mr-1" />
-								Начать Игру
-							</Button>
-						</div>
-					</div>
-				{/if}
-
-				{#if selectors.isPaused}
-					<div class="game-overlay pause-overlay">
-						<div class="overlay-content">
-							<h2 class="text-xl font-bold text-white mb-3">⏸️ Пауза</h2>
-							<div class="pause-actions">
-								<Button
-									variant="primary"
-									size="md"
-									onclick={handleResumeGame}
-								>
-									<Play size={16} class="mr-2" />
-									Продолжить
-								</Button>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleRestartGame}
-								>
-									<RotateCcw size={16} class="mr-2" />
-									Начать заново
-								</Button>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleExit}
-								>
-									Выйти
-								</Button>
-							</div>
-						</div>
-					</div>
-				{/if}
-
-				{#if selectors.isCompleted}
-					<div class="game-overlay success-overlay">
-						<div class="overlay-content">
-							<h2 class="text-xl font-bold text-white mb-3">🎉 Уровень пройден!</h2>
-							<p class="text-white/90 mb-3 text-sm">
-								Ваш счет: <strong>{selectors.currentScore}</strong>
-							</p>
-							<p class="text-white/80 mb-4 text-xs">
-								Изучите банковские продукты для получения бонусов!
-							</p>
-							<div class="banking-products mb-4">
-								<p class="text-white/80 mb-3 text-xs text-center">
-									Выберите банковский продукт для активации бонуса:
-								</p>
-								{#each Object.values(BANKING_PRODUCTS) as product}
-									{@const isActive = selectors.activeBonuses.some(b => b.id === product.id)}
-									<button
-										class="product-card interactive-product {isActive ? 'product-active' : ''}"
-										disabled={isActive}
-										onclick={() => !isActive && handleActivateBonus(product.id)}
-									>
-										<div class="flex items-center gap-3">
-											<span class="text-2xl">{product.icon}</span>
-											<div class="flex-1 text-left">
-												<h4 class="font-semibold text-white text-sm">{product.name}</h4>
-												<p class="text-white/70 text-xs mb-1">
-													{product.gameBonus.type === 'shield' ? '🛡️ Защита от ловушек' :
-													 product.gameBonus.type === 'multiplier' ? '📈 Очки x2' :
-													 product.gameBonus.type === 'extra_life' ? '❤️ +1 жизнь' :
-													 product.gameBonus.type === 'slow_time' ? '⏰ Замедление времени' : 'Бонус'}
-												</p>
-												<p class="text-white/50 text-xs">
-													{product.gameBonus.duration > 0 ? `${product.gameBonus.duration / 1000}с` : 'Мгновенно'}
-												</p>
-											</div>
-											<div class="activation-status">
-												{#if isActive}
-													<span class="text-gpb-emerald text-xs">✅ Активен</span>
-												{:else}
-													<span class="text-gpb-accent text-xs">👆 Активировать</span>
-												{/if}
-											</div>
-										</div>
-									</button>
-								{/each}
-							</div>
-							<Button
-								variant="primary"
-								size="md"
-								onclick={handleExit}
-							>
-								Завершить
-							</Button>
-						</div>
-					</div>
-				{/if}
-
-				{#if selectors.isFailed}
-					<div class="game-overlay failure-overlay">
-						<div class="overlay-content">
-							<h2 class="text-xl font-bold text-white mb-3">💔 Игра окончена</h2>
-							<p class="text-white/90 mb-4 text-sm">
-								{selectors.livesRemaining <= 0 ? 'У вас закончились жизни' : 'Время истекло'}
-							</p>
-							<div class="failure-actions">
-								<Button
-									variant="primary"
-									size="md"
-									onclick={handleRestartGame}
-								>
-									<RotateCcw size={16} class="mr-2" />
-									Попробовать снова
-								</Button>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleExit}
-								>
-									Выйти
-								</Button>
-							</div>
-						</div>
-					</div>
-				{/if}
-
-				<!-- Statistics Modal -->
-				{#if showStatsModal}
-					<div class="game-overlay stats-overlay">
-						<div class="overlay-content max-w-md max-h-[80vh] overflow-y-auto">
-							<div class="flex items-center justify-between mb-4">
-								<h2 class="text-2xl font-bold text-white flex items-center gap-2">
-									<BarChart3 size={24} class="text-gpb-mint" />
-									Статистика
-								</h2>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleCloseStats}
-									class="text-xs px-2 py-1"
-								>
-									✕
-								</Button>
-							</div>
-
-							<!-- Player Stats -->
-							<div class="stats-section mb-6">
-								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-									<Trophy size={18} class="text-gpb-gold" />
-									Общая статистика
-								</h3>
-								<div class="stats-grid">
-									<div class="stat-card">
-										<div class="stat-value text-gpb-mint">{scoringState.playerStats.totalScore.toLocaleString()}</div>
-										<div class="stat-label">Общий счет</div>
-									</div>
-									<div class="stat-card">
-										<div class="stat-value text-gpb-gold">{scoringState.bestScore.toLocaleString()}</div>
-										<div class="stat-label">Лучший результат</div>
-									</div>
-									<div class="stat-card">
-										<div class="stat-value text-gpb-emerald">{scoringState.playerStats.levelsCompleted}</div>
-										<div class="stat-label">Пройдено уровней</div>
-									</div>
-									<div class="stat-card">
-										<div class="stat-value text-gpb-blue">{scoringState.playerStats.perfectRuns}</div>
-										<div class="stat-label">Идеальные прохождения</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Achievements -->
-							<div class="stats-section mb-6">
-								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-									<Award size={18} class="text-gpb-amber" />
-									Достижения ({scoringState.unlockedAchievements.length}/{Object.keys(scoringState.achievements).length})
-								</h3>
-								<div class="achievements-grid">
-									{#each Object.values(scoringState.achievements).slice(0, 6) as achievement}
-										<div class="achievement-card {achievement.isUnlocked ? 'unlocked' : 'locked'}">
-											<div class="achievement-icon">{achievement.icon}</div>
-											<div class="achievement-info">
-												<div class="achievement-name">{achievement.name}</div>
-												<div class="achievement-desc">{achievement.description}</div>
-												{#if !achievement.isUnlocked}
-													<div class="achievement-progress">
-														{achievement.progress}/{achievement.maxProgress}
-													</div>
-												{/if}
-											</div>
-										</div>
-									{/each}
-								</div>
-							</div>
-
-							<!-- High Scores -->
-							<div class="stats-section mb-4">
-								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-									<Trophy size={18} class="text-gpb-gold" />
-									Лучшие результаты
-								</h3>
-								<div class="high-scores-list">
-									{#each scoringState.highScores.overall.slice(0, 5) as score, index}
-										<div class="high-score-item">
-											<div class="score-rank">{index + 1}</div>
-											<div class="score-details">
-												<div class="score-value">{score.score.toLocaleString()} очков</div>
-												<div class="score-meta">
-													Уровень {score.level} • {new Date(score.date).toLocaleDateString()}
-													{#if score.perfectRun}
-														<span class="perfect-badge">💎</span>
-													{/if}
-												</div>
-											</div>
-										</div>
-									{/each}
-									{#if scoringState.highScores.overall.length === 0}
-										<div class="text-white/60 text-center py-4">
-											Пока нет рекордов. Начните играть!
-										</div>
-									{/if}
-								</div>
-							</div>
-
-							<!-- Banking Expertise -->
-							<div class="stats-section">
-								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-									<Shield size={18} class="text-gpb-blue" />
-									Банковские знания
-								</h3>
-								<div class="banking-stats">
-									<div class="expertise-level">
-										<div class="expertise-label">Изучено продуктов</div>
-										<div class="expertise-value">{scoringState.bankingExpertise}/4</div>
-									</div>
-									<div class="expertise-level">
-										<div class="expertise-label">Эффективность</div>
-										<div class="expertise-value">{scoringState.efficiency}%</div>
-									</div>
-									<div class="expertise-level">
-										<div class="expertise-label">Лучшая серия</div>
-										<div class="expertise-value">{scoringState.bestStreak} уровней</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				{/if}
-
-				<!-- Settings Modal -->
-				{#if showSettingsModal}
-					<div class="game-overlay settings-overlay">
-						<div class="overlay-content max-w-md max-h-[80vh] overflow-y-auto">
-							<div class="flex items-center justify-between mb-4">
-								<h2 class="text-2xl font-bold text-white flex items-center gap-2">
-									<Settings size={24} class="text-gpb-mint" />
-									Настройки
-								</h2>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleCloseSettings}
-									class="text-xs px-2 py-1"
-								>
-									✕
-								</Button>
-							</div>
-
-							<!-- Haptic Feedback -->
-							<div class="settings-section mb-6">
-								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-									📳 Тактильная отдача
-								</h3>
-								<div class="setting-item">
-									<div class="setting-info">
-										<div class="setting-name">Вибрация при касаниях</div>
-										<div class="setting-desc">Тактильная обратная связь через Telegram</div>
-									</div>
-									<Button
-										variant={settings.hapticFeedback ? "primary" : "secondary"}
-										size="sm"
-										onclick={() => handleToggleSetting('hapticFeedback')}
-									>
-										{settings.hapticFeedback ? 'Вкл' : 'Выкл'}
-									</Button>
-								</div>
-							</div>
-
-							<!-- Visual Effects -->
-							<div class="settings-section mb-6">
-								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-									✨ Визуальные эффекты
-								</h3>
-								<div class="setting-item">
-									<div class="setting-info">
-										<div class="setting-name">Интенсивность эффектов</div>
-										<div class="setting-desc">Низкая/Средняя/Высокая</div>
-									</div>
-									<Button
-										variant="accent"
-										size="sm"
-										onclick={() => handleToggleSetting('visualEffectsIntensity')}
-									>
-										{settings.visualEffectsIntensity === 'low' ? 'Низкая' :
-										 settings.visualEffectsIntensity === 'medium' ? 'Средняя' : 'Высокая'}
-									</Button>
-								</div>
-								<div class="setting-item">
-									<div class="setting-info">
-										<div class="setting-name">3D перспектива</div>
-										<div class="setting-desc">Эффект наклона игрового поля</div>
-									</div>
-									<Button
-										variant={settings.perspectiveEffects ? "primary" : "secondary"}
-										size="sm"
-										onclick={() => handleToggleSetting('perspectiveEffects')}
-									>
-										{settings.perspectiveEffects ? 'Вкл' : 'Выкл'}
-									</Button>
-								</div>
-							</div>
-
-							<!-- Gyroscope Settings -->
-							<div class="settings-section mb-4">
-								<h3 class="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-									🔄 Гироскоп
-								</h3>
-								<div class="setting-item">
-									<div class="setting-info">
-										<div class="setting-name">Чувствительность</div>
-										<div class="setting-desc">Сила реакции на наклоны ({settings.gyroscopeSensitivity.toFixed(1)}x)</div>
-									</div>
-									<div class="flex gap-2">
-										<Button
-											variant="secondary"
-											size="sm"
-											onclick={() => handleGyroscopeSensitivityChange(-0.1)}
-											disabled={settings.gyroscopeSensitivity <= 0.5}
-										>
-											−
-										</Button>
-										<Button
-											variant="secondary"
-											size="sm"
-											onclick={() => handleGyroscopeSensitivityChange(0.1)}
-											disabled={settings.gyroscopeSensitivity >= 2.0}
-										>
-											+
-										</Button>
-									</div>
-								</div>
-								{#if gyroscopeStatus === 'active'}
-									<div class="setting-item">
-										<div class="setting-info">
-											<div class="setting-name">Калибровка</div>
-											<div class="setting-desc">Перенастроить нулевое положение</div>
-										</div>
-										<Button
-											variant="accent"
-											size="sm"
-											onclick={handleCalibrateGyroscope}
-											disabled={calibrationInProgress}
-										>
-											{calibrationInProgress ? 'Калибровка...' : 'Калибровать'}
-										</Button>
-									</div>
-								{/if}
-							</div>
-						</div>
-					</div>
-				{/if}
+				<!-- UI elements moved to AssetGuardianModal -->
 			</div>
 		</div>
 
@@ -1047,6 +675,37 @@
 			{/if}
 
 		</div>
+
+		<!-- Full-screen Modal UI -->
+		<AssetGuardianModal
+			showInstructions={showInstructions}
+			showStatsModal={showStatsModal}
+			showSettingsModal={showSettingsModal}
+			selectors={selectors}
+			gameState={gameState}
+			scoringState={scoringState}
+			currentLevelId={currentLevelId}
+			settings={settings}
+			gyroscopeStatus={gyroscopeStatus}
+			calibrationInProgress={calibrationInProgress}
+			isDebugLogging={isDebugLogging}
+			onStartGame={handleStartGame}
+			onResumeGame={handleResumeGame}
+			onPauseGame={handlePauseGame}
+			onRestartGame={handleRestartGame}
+			onExit={handleExit}
+			onShowStats={handleShowStats}
+			onCloseStats={handleCloseStats}
+			onShowSettings={handleShowSettings}
+			onCloseSettings={handleCloseSettings}
+			onToggleSetting={handleToggleSetting}
+			onGyroscopeSensitivityChange={handleGyroscopeSensitivityChange}
+			onCalibrateGyroscope={handleCalibrateGyroscope}
+			onStartDebugLogging={handleStartDebugLogging}
+			onStopDebugLogging={handleStopDebugLogging}
+			onActivateBonus={handleActivateBonus}
+			formatTime={formatTime}
+		/>
 	</div>
 </GameLayout>
 
@@ -1152,6 +811,7 @@
 		bottom: 0;
 		pointer-events: none;
 		z-index: 10;
+		/* UI moved to AssetGuardianModal */
 	}
 
 	.game-canvas-container::before {
@@ -1205,106 +865,7 @@
 		z-index: 2;
 	}
 
-	.game-overlay {
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0, 0, 0, 0.8);
-		backdrop-filter: blur(4px);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		border-radius: 1rem;
-		z-index: 20;
-		pointer-events: auto;
-	}
-
-	.overlay-content {
-		text-align: center;
-		max-width: 300px;
-		padding: 1rem;
-		max-height: 80vh;
-		overflow-y: auto;
-	}
-
-	.instruction-list {
-		text-align: left;
-	}
-
-	.instruction-list > * + * {
-		margin-top: 0.5rem;
-	}
-
-	.instruction-item {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		padding: 0.25rem 0;
-		color: white;
-		font-size: 0.8rem;
-	}
-
-	.instruction-icon {
-		font-size: 1.25rem;
-		flex-shrink: 0;
-	}
-
-	.pause-actions,
-	.failure-actions {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.banking-products {
-		max-height: 150px;
-		overflow-y: auto;
-	}
-
-	.product-card {
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-	}
-
-	.interactive-product {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.5rem;
-		padding: 0.5rem;
-		margin-bottom: 0.25rem;
-		width: 100%;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		text-align: left;
-	}
-
-	.interactive-product:hover:not(:disabled) {
-		background: rgba(26, 188, 156, 0.2);
-		border-color: rgba(26, 188, 156, 0.4);
-		transform: translateY(-2px);
-		box-shadow: 0 4px 16px rgba(26, 188, 156, 0.3);
-	}
-
-	.interactive-product:active:not(:disabled) {
-		transform: translateY(0);
-		box-shadow: 0 2px 8px rgba(26, 188, 156, 0.4);
-	}
-
-	.product-active {
-		background: rgba(34, 197, 94, 0.2);
-		border-color: rgba(34, 197, 94, 0.4);
-		cursor: not-allowed;
-		opacity: 0.7;
-	}
-
-	.activation-status {
-		display: flex;
-		align-items: center;
-		flex-shrink: 0;
-	}
+	/* Game overlay styles moved to AssetGuardianModal.svelte */
 
 	.game-controls {
 		flex-shrink: 0;
@@ -1346,231 +907,7 @@
 		}
 	}
 
-	/* Statistics Modal Styles */
-	.stats-overlay .overlay-content {
-		background: rgba(44, 62, 80, 0.95);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 1rem;
-		padding: 1.5rem;
-		text-align: left;
-	}
-
-	.stats-section {
-		margin-bottom: 1.5rem;
-	}
-
-	.stats-grid {
-		display: grid;
-		grid-template-columns: repeat(2, 1fr);
-		gap: 0.75rem;
-	}
-
-	.stat-card {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.75rem;
-		padding: 1rem;
-		text-align: center;
-	}
-
-	.stat-card .stat-value {
-		font-size: 1.5rem;
-		font-weight: 700;
-		line-height: 1;
-		margin-bottom: 0.25rem;
-	}
-
-	.stat-card .stat-label {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.7);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.achievements-grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 0.5rem;
-	}
-
-	.achievement-card {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.5rem;
-		padding: 0.75rem;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		transition: all 0.2s ease;
-	}
-
-	.achievement-card.unlocked {
-		background: rgba(26, 188, 156, 0.2);
-		border-color: rgba(26, 188, 156, 0.4);
-	}
-
-	.achievement-card.locked {
-		opacity: 0.6;
-	}
-
-	.achievement-icon {
-		font-size: 1.5rem;
-		flex-shrink: 0;
-	}
-
-	.achievement-info {
-		flex: 1;
-		min-width: 0;
-	}
-
-	.achievement-name {
-		font-weight: 600;
-		color: white;
-		font-size: 0.875rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.achievement-desc {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.7);
-		line-height: 1.2;
-	}
-
-	.achievement-progress {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.6);
-		margin-top: 0.25rem;
-	}
-
-	.high-scores-list > * + * {
-		margin-top: 0.5rem;
-	}
-
-	.high-score-item {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.5rem;
-		padding: 0.75rem;
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-	}
-
-	.score-rank {
-		background: rgba(243, 156, 18, 0.3);
-		color: white;
-		width: 2rem;
-		height: 2rem;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 700;
-		font-size: 0.875rem;
-		flex-shrink: 0;
-	}
-
-	.score-details {
-		flex: 1;
-	}
-
-	.score-value {
-		font-weight: 600;
-		color: white;
-		font-size: 0.875rem;
-	}
-
-	.score-meta {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.7);
-		margin-top: 0.25rem;
-	}
-
-	.perfect-badge {
-		margin-left: 0.5rem;
-	}
-
-	.banking-stats {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 0.75rem;
-	}
-
-	.expertise-level {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.5rem;
-		padding: 0.75rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.expertise-label {
-		font-size: 0.875rem;
-		color: rgba(255, 255, 255, 0.8);
-	}
-
-	.expertise-value {
-		font-weight: 700;
-		color: white;
-		font-size: 0.875rem;
-	}
-
-	/* Settings Modal Styles */
-	.settings-overlay .overlay-content {
-		background: rgba(44, 62, 80, 0.95);
-		backdrop-filter: blur(12px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 1rem;
-		padding: 1.5rem;
-		text-align: left;
-	}
-
-	.settings-section {
-		margin-bottom: 1.5rem;
-	}
-
-	.setting-item {
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 0.75rem;
-		padding: 1rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 0.75rem;
-		transition: all 0.2s ease;
-	}
-
-	.setting-item:hover {
-		background: rgba(255, 255, 255, 0.15);
-		border-color: rgba(26, 188, 156, 0.3);
-	}
-
-	.setting-info {
-		flex: 1;
-		margin-right: 1rem;
-	}
-
-	.setting-name {
-		font-weight: 600;
-		color: white;
-		font-size: 0.875rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.setting-desc {
-		font-size: 0.75rem;
-		color: rgba(255, 255, 255, 0.7);
-		line-height: 1.2;
-	}
+	/* Modal styles moved to AssetGuardianModal.svelte */
 
 	/* Progress Bars Styles */
 	.progress-bars-container {
