@@ -311,7 +311,7 @@ export class PhysicsEngine {
 			Body.setVelocity(this.ballBody, { x: 0, y: 0 });
 		}
 
-		this.applyVelocityDampening();
+		// this.applyVelocityDampening(); // Removed due to excessive damping, it was making the ball feel sluggish.
 	}
 
 	private applyVelocityDampening(): void {

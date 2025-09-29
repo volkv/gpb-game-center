@@ -188,12 +188,10 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		const smoothedBeta = beta / totalWeight;
 		const smoothedGamma = gamma / totalWeight;
 
-		const basicNoiseThreshold = GYROSCOPE_CONFIG.DEAD_ZONE;
-
 		return {
-			alpha: Math.abs(smoothedAlpha) < basicNoiseThreshold ? 0 : smoothedAlpha,
-			beta: Math.abs(smoothedBeta) < basicNoiseThreshold ? 0 : smoothedBeta,
-			gamma: Math.abs(smoothedGamma) < basicNoiseThreshold ? 0 : smoothedGamma,
+			alpha: smoothedAlpha,
+			beta: smoothedBeta,
+			gamma: smoothedGamma,
 			timestamp: Date.now()
 		};
 	};
@@ -348,85 +346,60 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	}
 
 	convertToGravity(data: GyroscopeData): Gravity {
-		const calibrated = this.calibration ? {
-			alpha: data.alpha - this.calibration.alpha,
-			beta: data.beta - this.calibration.beta,
-			gamma: data.gamma - this.calibration.gamma
-		} : data;
+		// The data from the Telegram API is a gravity vector, but it was incorrectly
+		// converted to degrees by multiplying by (180 / Math.PI).
+		// This function reverses that conversion and implements a simpler, more direct
+		// pipeline from the gravity vector to the physics engine's gravity.
 
-		const deadZone = GYROSCOPE_CONFIG.DEAD_ZONE;
-		const sensitivity = GYROSCOPE_CONFIG.SENSITIVITY;
-		const maxTilt = GYROSCOPE_CONFIG.MAX_TILT;
+		// 1. Undo the incorrect degree conversion to get the raw gravity vector components.
+		const rawVecX = data.gamma / (180 / Math.PI);
+		const rawVecY = data.beta / (180 / Math.PI);
 
-		// Swapped beta and gamma to fix landscape mode controls.
-		// Left-right tilt (gamma) now controls vertical movement (y-axis).
-		// Forward-backward tilt (beta) now controls horizontal movement (x-axis).
-		let x = Math.abs(calibrated.beta) > deadZone ? calibrated.beta : 0;
-		let y = Math.abs(calibrated.gamma) > deadZone ? calibrated.gamma : 0;
+		// 2. Apply calibration. The calibration data is also in the incorrect "degree" format, so we convert it back.
+		const calibVecX = this.calibration ? this.calibration.gamma / (180 / Math.PI) : 0;
+		const calibVecY = this.calibration ? this.calibration.beta / (180 / Math.PI) : 0;
 
-		const significantMovementThreshold = GYROSCOPE_CONFIG.SIGNIFICANT_MOVEMENT_THRESHOLD;
-		const beforeSignificantFilter = { x, y };
-		if (Math.abs(x) < significantMovementThreshold) x = 0;
-		if (Math.abs(y) < significantMovementThreshold) y = 0;
+		const calibratedVecX = rawVecX - calibVecX;
+		const calibratedVecY = rawVecY - calibVecY;
 
-		const beforeInversion = { x, y };
-		x = x * sensitivity;
-		y = y * sensitivity;
+		// 3. Swap axes to match landscape orientation and user feedback.
+		// - Tilting device right (positive raw X) should move the ball down (positive Y gravity).
+		// - Tilting device forward (positive raw Y) should move the ball right (positive X gravity).
+		const forceX = calibratedVecY;
+		const forceY = calibratedVecX;
 
-		const beforeClamp = { x, y };
-		x = Math.max(-maxTilt, Math.min(maxTilt, x));
-		y = Math.max(-maxTilt, Math.min(maxTilt, y));
+		// 4. Apply sensitivity and scale to the physics engine's gravity range.
+		// A lower sensitivity value provides finer control.
+		const sensitivity = 20; // Drastically reduced for finer control
 
-		const microMovementThreshold = GYROSCOPE_CONFIG.MICRO_MOVEMENT_THRESHOLD;
-		const beforeMicroFilter = { x, y };
-		if (Math.abs(x) < microMovementThreshold) x = 0;
-		if (Math.abs(y) < microMovementThreshold) y = 0;
+		let finalX = forceX * sensitivity;
+		let finalY = forceY * sensitivity;
 
-		const normalizedX = (x / maxTilt) * PHYSICS_CONFIG.MAX_GRAVITY;
-		const normalizedY = (y / maxTilt) * PHYSICS_CONFIG.MAX_GRAVITY;
+		// 5. Apply a dead zone to prevent drift from minor sensor noise.
+		// A threshold of 0.1 on the raw vector corresponds to about 5.7 degrees of tilt.
+		const deadZoneThreshold = 0.1; // Increased from 0.08 to reduce twitching
+		if (Math.abs(forceX) < deadZoneThreshold) finalX = 0;
+		if (Math.abs(forceY) < deadZoneThreshold) finalY = 0;
+
+		// 6. Clamp the final gravity values to the maximum allowed value.
+		finalX = Math.max(-PHYSICS_CONFIG.MAX_GRAVITY, Math.min(PHYSICS_CONFIG.MAX_GRAVITY, finalX));
+		finalY = Math.max(-PHYSICS_CONFIG.MAX_GRAVITY, Math.min(PHYSICS_CONFIG.MAX_GRAVITY, finalY));
 
 		const result = {
-			x: normalizedX,
-			y: normalizedY,
-			intensity: Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY)
+			x: finalX,
+			y: finalY,
+			intensity: Math.sqrt(finalX * finalX + finalY * finalY)
 		};
 
 		if (import.meta.env.DEV) {
-			console.log('🔄 [GYRO] COMPLETE PIPELINE:', JSON.stringify({
-				step1_input: { alpha: data.alpha, beta: data.beta, gamma: data.gamma },
-				step2_calibrated: { alpha: calibrated.alpha, beta: calibrated.beta, gamma: calibrated.gamma },
-				step3_deadzone: {
-					deadZoneThreshold: deadZone,
-					beforeDeadzone: { gamma: calibrated.gamma, beta: calibrated.beta },
-					afterDeadzone: { x: Math.abs(calibrated.gamma) > deadZone ? calibrated.gamma : 0, y: Math.abs(calibrated.beta) > deadZone ? calibrated.beta : 0 }
-				},
-				step4_significantFilter: {
-					threshold: significantMovementThreshold,
-					before: beforeSignificantFilter,
-					after: { x, y: Math.abs(beforeSignificantFilter.y) < significantMovementThreshold ? 0 : beforeSignificantFilter.y }
-				},
-				step5_inversion: {
-					sensitivity,
-					before: beforeInversion,
-					after: { x: -beforeInversion.x * sensitivity, y: beforeInversion.y * sensitivity }
-				},
-				step6_clamp: {
-					maxTilt,
-					before: beforeClamp,
-					after: { x, y }
-				},
-				step7_microFilter: {
-					threshold: microMovementThreshold,
-					before: beforeMicroFilter,
-					after: { x, y }
-				},
-				step8_normalize: {
-					maxGravity: PHYSICS_CONFIG.MAX_GRAVITY,
-					normalized: { x: normalizedX, y: normalizedY },
-					final: result
-				},
+			console.log('🔄 [GYRO] NEW PIPELINE:', JSON.stringify({
+				step1_inputDegrees: { beta: data.beta, gamma: data.gamma },
+				step2_rawVector: { x: rawVecX, y: rawVecY },
+				step3_calibratedVector: { x: calibratedVecX, y: calibratedVecY },
+				step4_axisSwap: { forceX, forceY },
+				step5_finalGravity: result,
 				WILL_MOVE: result.intensity > 0 ? 'YES' : 'NO'
-			}, null, 2));
+			}, (key, value) => typeof value === 'number' ? Number(value.toFixed(3)) : value));
 		}
 
 		return result;
