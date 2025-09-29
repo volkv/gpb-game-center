@@ -136,6 +136,9 @@ export interface TelegramWebApp {
   readTextFromClipboard(callback?: (clipboardText: string) => void): void;
   requestWriteAccess(callback?: (accessGranted: boolean) => void): void;
   requestContact(callback?: (contactShared: boolean) => void): void;
+  lockOrientation(): void;
+  unlockOrientation(): void;
+  isOrientationLocked: boolean;
 
   // Legacy gyroscope methods (pre v7.0)
   startGyroscope?: () => void;

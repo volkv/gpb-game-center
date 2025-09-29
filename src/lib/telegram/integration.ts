@@ -176,11 +176,12 @@ export function lockOrientation(): void {
   try {
     console.log('📱 [TELEGRAM] Locking screen orientation');
 
-    if (webApp.postEvent) {
-      webApp.postEvent('web_app_toggle_orientation_lock', { locked: true });
+    if (webApp.lockOrientation) {
+      webApp.lockOrientation();
+      console.log('📱 [TELEGRAM] Screen orientation locked successfully');
+    } else {
+      console.warn('📱 [TELEGRAM] lockOrientation method not available - may require Bot API 8.0+');
     }
-
-    console.log('📱 [TELEGRAM] Screen orientation locked');
   } catch (error) {
     console.warn('📱 [TELEGRAM] Failed to lock orientation:', error);
   }
@@ -196,14 +197,24 @@ export function unlockOrientation(): void {
   try {
     console.log('📱 [TELEGRAM] Unlocking screen orientation');
 
-    if (webApp.postEvent) {
-      webApp.postEvent('web_app_toggle_orientation_lock', { locked: false });
+    if (webApp.unlockOrientation) {
+      webApp.unlockOrientation();
+      console.log('📱 [TELEGRAM] Screen orientation unlocked successfully');
+    } else {
+      console.warn('📱 [TELEGRAM] unlockOrientation method not available - may require Bot API 8.0+');
     }
-
-    console.log('📱 [TELEGRAM] Screen orientation unlocked');
   } catch (error) {
     console.warn('📱 [TELEGRAM] Failed to unlock orientation:', error);
   }
+}
+
+export function isOrientationLocked(): boolean {
+  const webApp = getTelegramWebApp();
+  if (!webApp) {
+    return false;
+  }
+
+  return webApp.isOrientationLocked || false;
 }
 
 export function getTelegramUserInfo() {

@@ -43,36 +43,131 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	private changeCallback: ((data: GyroscopeData) => void) | null = null;
 	private startedCallback: (() => void) | null = null;
 	private failedCallback: ((error: string) => void) | null = null;
+	private lastProcessTime = 0;
+	private gyroThrottleMs = 100;
+	private dataBuffer: GyroscopeData[] = [];
+	private bufferSize = 6;
 
 	private gyroscopeChangedHandler = (...args: any[]) => {
 		try {
+			const now = Date.now();
+			if (now - this.lastProcessTime < this.gyroThrottleMs) return;
+			this.lastProcessTime = now;
+
 			const telegramGyro = this.webApp?.Gyroscope;
-			if (!telegramGyro || !telegramGyro.x || !telegramGyro.y || !telegramGyro.z) return;
+			if (!telegramGyro) return;
 
-			// Получаем данные из отдельных полей x, y, z
-			const actualData = { x: telegramGyro.x, y: telegramGyro.y, z: telegramGyro.z };
+			const actualData = {
+				x: telegramGyro.x || 0,
+				y: telegramGyro.y || 0,
+				z: telegramGyro.z || 0
+			};
 
-			if (!actualData || typeof actualData !== 'object') {
-				return;
+			if (import.meta.env.DEV) {
+				console.log('🎯 [GYRO] Raw Telegram data:', JSON.stringify({
+					x: actualData.x,
+					y: actualData.y,
+					z: actualData.z,
+					magnitude: Math.sqrt(actualData.x * actualData.x + actualData.y * actualData.y + actualData.z * actualData.z)
+				}, null, 2));
 			}
 
-			// Modern API: convert x,y,z to alpha,beta,gamma
-			const data: GyroscopeData = {
+			const rawData: GyroscopeData = {
 				alpha: actualData.z * 180 / Math.PI,
 				beta: actualData.y * 180 / Math.PI,
 				gamma: actualData.x * 180 / Math.PI,
-				timestamp: Date.now()
+				timestamp: now
 			};
 
-			if (this.changeCallback) {
-				this.changeCallback(data);
+			if (import.meta.env.DEV) {
+				console.log('🔄 [GYRO] Converted to degrees:', JSON.stringify({
+					alpha: rawData.alpha,
+					beta: rawData.beta,
+					gamma: rawData.gamma,
+					alphaMag: Math.abs(rawData.alpha),
+					betaMag: Math.abs(rawData.beta),
+					gammaMag: Math.abs(rawData.gamma)
+				}, null, 2));
+			}
+
+			this.dataBuffer.push(rawData);
+			if (this.dataBuffer.length > this.bufferSize) {
+				this.dataBuffer.shift();
+			}
+
+			if (this.dataBuffer.length >= this.bufferSize) {
+				const smoothedData = this.getSmoothedData();
+				if (import.meta.env.DEV) {
+					console.log('🎭 [GYRO] Smoothed data:', JSON.stringify({
+						alpha: smoothedData.alpha,
+						beta: smoothedData.beta,
+						gamma: smoothedData.gamma,
+						bufferSize: this.dataBuffer.length,
+						bufferRange: {
+							alphaMin: Math.min(...this.dataBuffer.map(d => d.alpha)),
+							alphaMax: Math.max(...this.dataBuffer.map(d => d.alpha)),
+							betaMin: Math.min(...this.dataBuffer.map(d => d.beta)),
+							betaMax: Math.max(...this.dataBuffer.map(d => d.beta)),
+							gammaMin: Math.min(...this.dataBuffer.map(d => d.gamma)),
+							gammaMax: Math.max(...this.dataBuffer.map(d => d.gamma))
+						}
+					}, null, 2));
+				}
+				if (this.changeCallback) {
+					this.changeCallback(smoothedData);
+				}
 			}
 		} catch (error) {
+			console.error('❌ [GYRO] Processing error:', error);
 			if (this.failedCallback) {
 				this.failedCallback('Failed to process gyroscope data');
 			}
 		}
 	};
+
+	private getSmoothedData(): GyroscopeData {
+		if (this.dataBuffer.length === 0) {
+			return { alpha: 0, beta: 0, gamma: 0, timestamp: Date.now() };
+		}
+
+		if (this.dataBuffer.length === 1) {
+			return { ...this.dataBuffer[0] };
+		}
+
+		const weights = [0.5, 0.3, 0.2];
+		const recent = this.dataBuffer.slice(-3);
+
+		let alpha = 0, beta = 0, gamma = 0, totalWeight = 0;
+
+		recent.forEach((data, index) => {
+			const weight = weights[index] || 0.1;
+			alpha += data.alpha * weight;
+			beta += data.beta * weight;
+			gamma += data.gamma * weight;
+			totalWeight += weight;
+		});
+
+		const smoothedAlpha = alpha / totalWeight;
+		const smoothedBeta = beta / totalWeight;
+		const smoothedGamma = gamma / totalWeight;
+
+		const basicNoiseThreshold = 3.0;
+
+		return {
+			alpha: Math.abs(smoothedAlpha) < basicNoiseThreshold ? 0 : smoothedAlpha,
+			beta: Math.abs(smoothedBeta) < basicNoiseThreshold ? 0 : smoothedBeta,
+			gamma: Math.abs(smoothedGamma) < basicNoiseThreshold ? 0 : smoothedGamma,
+			timestamp: Date.now()
+		};
+	};
+
+	private getMedian(values: number[]): number {
+		const sorted = [...values].sort((a, b) => a - b);
+		const mid = Math.floor(sorted.length / 2);
+		return sorted.length % 2 === 0
+			? (sorted[mid - 1] + sorted[mid]) / 2
+			: sorted[mid];
+	}
 
 	private gyroscopeStartedHandler = () => {
 		this.isActive = true;
@@ -229,17 +324,72 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		let x = Math.abs(calibrated.gamma) > deadZone ? calibrated.gamma : 0;
 		let y = Math.abs(calibrated.beta) > deadZone ? calibrated.beta : 0;
 
-		x = Math.max(-maxTilt, Math.min(maxTilt, x * sensitivity));
-		y = Math.max(-maxTilt, Math.min(maxTilt, y * sensitivity));
+		const significantMovementThreshold = 10.0;
+		const beforeSignificantFilter = { x, y };
+		if (Math.abs(x) < significantMovementThreshold) x = 0;
+		if (Math.abs(y) < significantMovementThreshold) y = 0;
+
+		const beforeInversion = { x, y };
+		x = -x * sensitivity;
+		y = y * sensitivity;
+
+		const beforeClamp = { x, y };
+		x = Math.max(-maxTilt, Math.min(maxTilt, x));
+		y = Math.max(-maxTilt, Math.min(maxTilt, y));
+
+		const microMovementThreshold = 0.005;
+		const beforeMicroFilter = { x, y };
+		if (Math.abs(x) < microMovementThreshold) x = 0;
+		if (Math.abs(y) < microMovementThreshold) y = 0;
 
 		const normalizedX = (x / maxTilt) * PHYSICS_CONFIG.MAX_GRAVITY;
 		const normalizedY = (y / maxTilt) * PHYSICS_CONFIG.MAX_GRAVITY;
 
-		return {
+		const result = {
 			x: normalizedX,
 			y: normalizedY,
 			intensity: Math.sqrt(normalizedX * normalizedX + normalizedY * normalizedY)
 		};
+
+		if (import.meta.env.DEV) {
+			console.log('🔄 [GYRO] COMPLETE PIPELINE:', JSON.stringify({
+				step1_input: { alpha: data.alpha, beta: data.beta, gamma: data.gamma },
+				step2_calibrated: { alpha: calibrated.alpha, beta: calibrated.beta, gamma: calibrated.gamma },
+				step3_deadzone: {
+					deadZoneThreshold: deadZone,
+					beforeDeadzone: { gamma: calibrated.gamma, beta: calibrated.beta },
+					afterDeadzone: { x: Math.abs(calibrated.gamma) > deadZone ? calibrated.gamma : 0, y: Math.abs(calibrated.beta) > deadZone ? calibrated.beta : 0 }
+				},
+				step4_significantFilter: {
+					threshold: significantMovementThreshold,
+					before: beforeSignificantFilter,
+					after: { x, y: Math.abs(beforeSignificantFilter.y) < significantMovementThreshold ? 0 : beforeSignificantFilter.y }
+				},
+				step5_inversion: {
+					sensitivity,
+					before: beforeInversion,
+					after: { x: -beforeInversion.x * sensitivity, y: beforeInversion.y * sensitivity }
+				},
+				step6_clamp: {
+					maxTilt,
+					before: beforeClamp,
+					after: { x, y }
+				},
+				step7_microFilter: {
+					threshold: microMovementThreshold,
+					before: beforeMicroFilter,
+					after: { x, y }
+				},
+				step8_normalize: {
+					maxGravity: PHYSICS_CONFIG.MAX_GRAVITY,
+					normalized: { x: normalizedX, y: normalizedY },
+					final: result
+				},
+				WILL_MOVE: result.intensity > 0 ? 'YES' : 'NO'
+			}, null, 2));
+		}
+
+		return result;
 	}
 
 	onGyroscopeChanged(callback: (data: GyroscopeData) => void): void {
@@ -282,7 +432,7 @@ class TouchFallbackManager implements FallbackInputManager {
 	private lastMoveTime = 0;
 	private moveThrottleMs = 16;
 	private lastGravity: { x: number; y: number } = { x: 0, y: 0 };
-	private smoothingFactor = 0.85;
+	private smoothingFactor = 0.95;
 
 	private pointerDownHandler = (event: PointerEvent) => {
 		event.preventDefault();
@@ -381,7 +531,7 @@ class TouchFallbackManager implements FallbackInputManager {
 		element.style.touchAction = 'none';
 		element.style.userSelect = 'none';
 		element.style.webkitUserSelect = 'none';
-		element.style.webkitTouchCallout = 'none';
+		(element.style as any).webkitTouchCallout = 'none';
 		element.style.overscrollBehavior = 'none';
 	}
 
@@ -402,8 +552,8 @@ class TouchFallbackManager implements FallbackInputManager {
 
 	convertToGravity(input: { x: number; y: number }): Gravity {
 		const sensitivity = GYROSCOPE_CONFIG.FALLBACK_TOUCH_SENSITIVITY;
-		const maxDistance = 200;
-		const deadZone = 10;
+		const maxDistance = 300;
+		const deadZone = 20;
 
 		const adjustedX = Math.abs(input.x) > deadZone ? input.x : 0;
 		const adjustedY = Math.abs(input.y) > deadZone ? input.y : 0;
