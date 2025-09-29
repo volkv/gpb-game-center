@@ -89,22 +89,6 @@
 		return null;
 	});
 
-	// Debug logging
-	$effect(() => {
-		console.log('Modal state:', {
-			modalOpen,
-			modalType,
-			showInstructions,
-			showStatsModal,
-			showSettingsModal,
-			selectors: {
-				isReady: selectors?.isReady,
-				isPaused: selectors?.isPaused,
-				isCompleted: selectors?.isCompleted,
-				isFailed: selectors?.isFailed
-			}
-		});
-	});
 
 	function handleModalClose() {
 		if (showStatsModal) {
