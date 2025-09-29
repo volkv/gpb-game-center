@@ -53,17 +53,6 @@
 				</div>
 				<span class="resources-bar__meta">{energyPercent}%</span>
 			</div>
-
-			<div class="resources-bar__item resources-bar__item--meter" data-variant="xp" role="listitem">
-				<Star size={16} />
-				<div class="resources-bar__meter">
-					<span class="resources-bar__label">Опыт</span>
-					<span class="resources-bar__track">
-						<span class="resources-bar__fill" style={`width: ${experiencePercent}%`}></span>
-					</span>
-				</div>
-				<span class="resources-bar__meta">{experiencePercent}%</span>
-			</div>
 		</div>
 	</div>
 </div>
@@ -81,8 +70,8 @@
 		width: min(var(--game-shell-max-width, 840px), 100%);
 		display: flex;
 		align-items: center;
-		gap: clamp(0.75rem, 1.6vw, 1.5rem);
-		padding: 0.65rem 0.85rem;
+		gap: 0.5rem;
+		padding: 0.4rem 0.5rem;
 		border-radius: var(--radius-full);
 		border: 1px solid var(--color-border-muted);
 		background: color-mix(in srgb, var(--color-surface-card) 92%, white 8%);
@@ -92,7 +81,7 @@
 	.resources-bar__level {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.6rem;
+		gap: 0.4rem;
 		white-space: nowrap;
 	}
 
@@ -100,11 +89,11 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.35rem;
-		padding: 0.3rem 0.8rem;
+		padding: 0.25rem 0.6rem;
 		border-radius: var(--radius-full);
 		background: var(--layer-brand-150);
 		color: var(--color-brand-700);
-		font-size: 0.72rem;
+		font-size: 0.65rem;
 		font-weight: 600;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
@@ -119,7 +108,7 @@
 		flex: 1;
 		display: flex;
 		align-items: center;
-		gap: 0.65rem;
+		gap: 0.45rem;
 		overflow-x: auto;
 		scrollbar-width: none;
 	}
@@ -131,19 +120,19 @@
 	.resources-bar__item {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.45rem;
-		padding: 0.45rem 0.75rem;
+		gap: 0.35rem;
+		padding: 0.35rem 0.6rem;
 		border-radius: var(--radius-full);
 		border: 1px solid var(--color-border-subtle);
 		background: color-mix(in srgb, var(--color-neutral-50) 80%, white 20%);
 		color: var(--color-fg-primary);
-		font-size: 0.85rem;
+		font-size: 0.75rem;
 		font-weight: 600;
 		white-space: nowrap;
 	}
 
 	.resources-bar__item--meter {
-		gap: 0.6rem;
+		gap: 0.45rem;
 	}
 
 	.resources-bar__value {
@@ -158,7 +147,7 @@
 	}
 
 	.resources-bar__label {
-		font-size: 0.6rem;
+		font-size: 0.55rem;
 		letter-spacing: 0.12em;
 		text-transform: uppercase;
 		color: var(--color-fg-muted);
@@ -166,11 +155,11 @@
 
 	.resources-bar__track {
 		position: relative;
-		width: 120px;
-		height: 6px;
+		width: 70px;
+		height: 5px;
 		border-radius: var(--radius-full);
 		background: var(--color-neutral-100);
-		
+
 	}
 
 	.resources-bar__fill {
@@ -213,22 +202,17 @@
 
 	.resources-bar__meta {
 		font-family: var(--font-display);
-		font-size: 0.85rem;
+		font-size: 0.75rem;
 		color: var(--color-fg-primary);
-	}
-
-	.resources-bar__container {
-		gap: 0.75rem;
-		padding: 0.55rem 0.75rem;
-		padding-inline: 0.6rem;
-	}
-
-	.resources-bar__track {
-		width: 88px;
 	}
 
 	.resources-bar__hint {
 		display: none;
+	}
+
+	.resources-bar__item :global(svg) {
+		width: 14px;
+		height: 14px;
 	}
 
 </style>

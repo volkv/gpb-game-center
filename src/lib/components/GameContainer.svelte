@@ -239,15 +239,26 @@
 <style>
 	.game-container {
 		width: 100%;
+		height: 100%;
+		min-height: 0;
 		opacity: 0;
 		transform: translateY(20px);
 		transition: all 0.6s ease-out;
 		position: relative;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.game-container.mounted {
 		opacity: 1;
 		transform: translateY(0);
+	}
+
+	.game-container > :global(*) {
+		flex: 1;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
 	}
 
 	.loading-screen {

@@ -359,7 +359,6 @@
 		width: 100%;
 		height: 100%;
 		border-radius: inherit;
-		border: 1px solid var(--color-border-subtle);
 		background:
 			radial-gradient(120% 120% at 50% 20%, rgba(68, 80, 255, 0.14) 0%, rgba(31, 196, 217, 0.12) 40%, rgba(255, 255, 255, 0.92) 100%);
 		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -489,7 +488,6 @@
 		gap: 0.5rem;
 		padding: 0.75rem 1.4rem;
 		border-radius: var(--radius-lg);
-		border: 1px solid transparent;
 		background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
 		color: var(--color-fg-inverse);
 		font-weight: 600;
@@ -505,11 +503,6 @@
 	@keyframes spin {
 		0% { transform: rotate(0deg); }
 		100% { transform: rotate(360deg); }
-	}
-
-	:global(.game-zoom-controls) {
-		bottom: 1rem !important;
-		right: 1rem !important;
 	}
 
 </style>

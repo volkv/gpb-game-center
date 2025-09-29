@@ -95,47 +95,30 @@
 	}
 </script>
 
-<div class="fincity-wrapper">
-	{#if !gameLoaded}
-		<GameLayout gameName="FinCity" background="gradient-wealth" showScore={false} showBackButton={true}>
-			<div class="loading-content">
-				<div class="game-preview">
-					<div class="preview-icon">
-						<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-							<path d="M12 2L13.09 5.26L16 4L14.74 7.09L18 8L16.91 11.26L20 12L16.91 12.74L18 16L14.74 16.91L16 20L12.91 18.74L12 22L11.09 18.74L8 20L9.26 16.91L6 16L7.09 12.74L4 12L7.09 11.26L6 8L9.26 7.09L8 4L11.09 5.26L12 2Z"/>
-						</svg>
-					</div>
-					<h2 class="font-heading text-h3 text-white mb-2">FinCity</h2>
-					<p class="font-body text-body text-white/80">Загрузка игрового движка...</p>
+{#if !gameLoaded}
+	<GameLayout gameName="FinCity" background="gradient-wealth" showScore={false} showBackButton={true}>
+		<div class="loading-content">
+			<div class="game-preview">
+				<div class="preview-icon">
+					<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M12 2L13.09 5.26L16 4L14.74 7.09L18 8L16.91 11.26L20 12L16.91 12.74L18 16L14.74 16.91L16 20L12.91 18.74L12 22L11.09 18.74L8 20L9.26 16.91L6 16L7.09 12.74L4 12L7.09 11.26L6 8L9.26 7.09L8 4L11.09 5.26L12 2Z"/>
+					</svg>
 				</div>
-
-				<div class="loading-bar">
-					<div class="loading-fill"></div>
-				</div>
+				<h2 class="font-heading text-h3 text-white mb-2">FinCity</h2>
+				<p class="font-body text-body text-white/80">Загрузка игрового движка...</p>
 			</div>
-		</GameLayout>
-	{:else if FincityApp}
-		<div class="game-container fincity-game" class:mounted>
-			{#if FincityApp}
-				{@const GameApp = FincityApp}
-				<GameApp onexit={handleGameExit} />
-			{/if}
+
+			<div class="loading-bar">
+				<div class="loading-fill"></div>
+			</div>
 		</div>
-	{/if}
-</div>
+	</GameLayout>
+{:else if FincityApp}
+	{@const GameApp = FincityApp}
+	<GameApp onexit={handleGameExit} />
+{/if}
 
 <style>
-	.fincity-wrapper {
-		width: 100%;
-		position: relative;
-		display: flex;
-		flex-direction: column;
-		flex: 1;
-		height: 100%;
-		min-height: 0;
-		
-	}
-
 	.loading-content {
 		max-width: 400px;
 		width: 100%;
@@ -156,8 +139,8 @@
 	}
 
 	.preview-icon {
-		width: 80px;
-		height: 80px;
+		width: 64px;
+		height: 64px;
 		background: rgba(255, 255, 255, 0.2);
 		border-radius: 20px;
 		display: flex;
@@ -174,7 +157,6 @@
 		height: 8px;
 		background: rgba(255, 255, 255, 0.2);
 		border-radius: 4px;
-		
 		margin-bottom: 2rem;
 		position: relative;
 	}
@@ -187,31 +169,6 @@
 		animation: loadingProgress 2s ease-in-out infinite;
 	}
 
-
-	.game-container {
-		width: 100%;
-		height: 100%;
-		min-height: 0;
-		position: relative;
-		opacity: 0;
-		transform: translateY(20px);
-		transition: all 0.6s ease-out;
-	}
-
-	.game-container.mounted {
-		opacity: 1;
-		transform: translateY(0);
-	}
-
-
-	:global(.fincity-wrapper .app) {
-		width: 100%;
-		height: 100%;
-		min-height: 0;
-		
-	}
-
-
 	@keyframes loadingProgress {
 		0% {
 			width: 0%;
@@ -222,10 +179,5 @@
 		100% {
 			width: 100%;
 		}
-	}
-
-	.preview-icon {
-		width: 64px;
-		height: 64px;
 	}
 </style>

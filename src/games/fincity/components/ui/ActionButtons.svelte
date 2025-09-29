@@ -31,7 +31,7 @@
 		<div class="action-toolbar__actions">
 			<Button
 				variant="primary"
-				size="lg"
+				size="sm"
 				onclick={openBuildMenu}
 				disabled={!canBuild}
 				class="action-toolbar__button action-toolbar__button--primary"
@@ -42,7 +42,7 @@
 
 			<Button
 				variant="secondary"
-				size="lg"
+				size="sm"
 				onclick={openQuestLog}
 				class="action-toolbar__button action-toolbar__button--secondary"
 			>
@@ -52,12 +52,12 @@
 
 			<Button
 				variant="secondary"
-				size="lg"
+				size="sm"
 				onclick={openAchievements}
 				class="action-toolbar__button action-toolbar__button--secondary"
 			>
 				<Icon name="star" size="sm" class="action-toolbar__icon action-toolbar__icon--gold" />
-				<span>Достижения</span>
+				<span>Награды</span>
 			</Button>
 		</div>
 
@@ -83,8 +83,8 @@
 		width: min(var(--game-shell-max-width, 680px), 100%);
 		display: flex;
 		flex-direction: column;
-		gap: 0.75rem;
-		padding: clamp(0.75rem, 1.4vw, 1.2rem);
+		gap: 0.5rem;
+		padding: 0.5rem;
 		border-radius: var(--radius-full);
 		border: 1px solid var(--color-border-muted);
 		background: color-mix(in srgb, var(--color-surface-card) 94%, white 6%);
@@ -94,30 +94,24 @@
 	.action-toolbar__actions {
 		display: flex;
 		flex-wrap: nowrap;
-		gap: clamp(0.45rem, 1vw, 0.75rem);
-		justify-content: flex-start;
-		overflow-x: auto;
-		scrollbar-width: none;
-		padding-bottom: 0.2rem;
-		scroll-snap-type: x proximity;
-	}
-
-	.action-toolbar__actions::-webkit-scrollbar {
-		display: none;
+		gap: 0.35rem;
+		justify-content: space-between;
+		width: 100%;
 	}
 
 	.action-toolbar__button {
 		display: inline-flex !important;
 		align-items: center !important;
 		justify-content: center !important;
-		gap: 0.5rem !important;
-		flex: 0 0 auto;
-		min-width: 150px;
+		flex-direction: column !important;
+		gap: 0.25rem !important;
+		flex: 1;
+		min-width: 0;
 		font-family: var(--font-display) !important;
-		font-size: 0.9rem !important;
+		font-size: 0.65rem !important;
 		letter-spacing: -0.01em;
-		padding-inline: clamp(0.9rem, 1.4vw, 1.25rem) !important;
-		scroll-snap-align: center;
+		padding: 0.45rem 0.35rem !important;
+		white-space: nowrap;
 	}
 
 	.action-toolbar__button--primary {
@@ -152,6 +146,12 @@
 		align-items: center;
 		justify-content: center;
 		color: inherit;
+		flex-shrink: 0;
+	}
+
+	.action-toolbar__icon :global(svg) {
+		width: 18px;
+		height: 18px;
 	}
 
 	.action-toolbar__icon--accent {
@@ -165,25 +165,18 @@
 	.action-toolbar__hint {
 		display: flex;
 		align-items: center;
-		gap: 0.6rem;
-		padding: 0.75rem 1rem;
+		gap: 0.4rem;
+		padding: 0.5rem 0.75rem;
 		border-radius: var(--radius-lg);
 		border: 1px dashed var(--color-brand-200);
 		background: color-mix(in srgb, var(--color-brand-50) 40%, white 60%);
 		color: var(--color-brand-700);
-		font-size: 0.85rem;
+		font-size: 0.7rem;
 		font-weight: 500;
 	}
 
 	.action-toolbar__hint-icon {
 		color: var(--color-brand-600);
 	}
-		.action-toolbar__card {
-			padding: 0.75rem;
-		}
-
-		.action-toolbar__button {
-			min-width: 140px;
-		}
 
 </style>

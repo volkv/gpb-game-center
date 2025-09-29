@@ -284,8 +284,8 @@ export class CameraManager {
     if (newZoom !== oldZoom) {
       const zoomRatio = newZoom / oldZoom;
 
-      this.camera.x = worldPoint.x - (worldPoint.x - this.camera.x) * zoomRatio;
-      this.camera.y = worldPoint.y - (worldPoint.y - this.camera.y) * zoomRatio;
+      this.camera.x += worldPoint.x * (1 - zoomRatio);
+      this.camera.y += worldPoint.y * (1 - zoomRatio);
       this.camera.zoom = newZoom;
 
       this.constrainCamera();

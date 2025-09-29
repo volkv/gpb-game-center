@@ -21,7 +21,7 @@
 <div class="zoom-controls {className}">
 	<Button
 		variant="secondary"
-		size="lg"
+		size="sm"
 		onclick={onZoomIn}
 		disabled={!canZoomIn}
 		class="zoom-controls__button"
@@ -31,7 +31,7 @@
 
 	<Button
 		variant="secondary"
-		size="lg"
+		size="sm"
 		onclick={onZoomOut}
 		disabled={!canZoomOut}
 		class="zoom-controls__button"
@@ -44,12 +44,12 @@
 	.zoom-controls {
 		position: absolute;
 		z-index: 50;
-	bottom: calc(200px + clamp(0.85rem, 2vw, 1.5rem));
-		right: clamp(0.85rem, 2vw, 1.5rem);
+		bottom: calc(140px + 0.5rem);
+		right: 0.5rem;
 		display: flex;
 		flex-direction: column;
-		gap: 0.4rem;
-		padding: 0.35rem;
+		gap: 0.3rem;
+		padding: 0.3rem;
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-muted);
 		background: color-mix(in srgb, var(--color-surface-card) 92%, white 8%);
@@ -59,10 +59,10 @@
 
 	.zoom-controls__button {
 		min-width: 0 !important;
-		width: 2.75rem !important;
-		height: 2.75rem !important;
+		width: 2.25rem !important;
+		height: 2.25rem !important;
 		padding: 0 !important;
-		border-radius: var(--radius-lg) !important;
+		border-radius: var(--radius-md) !important;
 		border: 1px solid var(--color-border-subtle) !important;
 		background: color-mix(in srgb, var(--color-neutral-50) 90%, white 10%) !important;
 		color: var(--color-brand-600) !important;
@@ -93,7 +93,7 @@
 	}
 
 	.zoom-controls__icon {
-		font-size: 1.15rem;
+		font-size: 1rem;
 		font-weight: 700;
 		line-height: 1;
 	}

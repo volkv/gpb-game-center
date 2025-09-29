@@ -97,13 +97,14 @@
 		height: 100%;
 		background: var(--color-surface-page);
 		color: var(--color-fg-primary);
-		
+		display: flex;
+		flex-direction: column;
+
 		--game-shell-max-width: 500px;
 	}
 
 	.app__background {
 		position: absolute;
-		inset: -20% -10%;
 		background: var(--gradient-brand-hero);
 		opacity: 0.78;
 		filter: blur(40px);
@@ -126,7 +127,7 @@
 		position: relative;
 		z-index: 0;
 		width: 100%;
-		height: 100%;
+		flex: 1;
 		min-height: 0;
 		display: flex;
 		justify-content: center;
@@ -137,11 +138,9 @@
 	.app__canvas-frame {
 		position: relative;
 		flex: 1;
-		max-width: var(--game-shell-max-width, 1120px);
-		border-radius: var(--radius-xl);
-		border: 1px solid var(--color-border-muted);
+
 		background: var(--color-surface-elevated);
-		box-shadow: var(--shadow-hard);
+
 		
 		display: flex;
 	}
@@ -168,11 +167,11 @@
 	}
 
 	.app__overlay-top {
-		top: calc(100px + clamp(0.6rem, 1.8vw, 1.5rem));
+	    top: 10px;
 	}
 
 	.app__overlay-bottom {
-		bottom: clamp(0.6rem, 1.8vw, 1.5rem);
+		bottom: 0.5rem;
 	}
 
 	.app__canvas-frame {
