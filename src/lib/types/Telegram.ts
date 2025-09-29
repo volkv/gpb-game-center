@@ -112,8 +112,8 @@ export interface TelegramWebApp {
   ready(): void;
   expand(): void;
   close(): void;
-  onEvent(eventType: string, eventHandler: () => void): void;
-  offEvent(eventType: string, eventHandler: () => void): void;
+  onEvent(eventType: string, eventHandler: (event?: any) => void): void;
+  offEvent(eventType: string, eventHandler: (event?: any) => void): void;
   sendData(data: string): void;
   postEvent(eventType: string, data?: unknown): void;
   switchInlineQuery(query: string, chooseChatTypes?: string[]): void;
@@ -136,8 +136,20 @@ export interface TelegramWebApp {
   readTextFromClipboard(callback?: (clipboardText: string) => void): void;
   requestWriteAccess(callback?: (accessGranted: boolean) => void): void;
   requestContact(callback?: (contactShared: boolean) => void): void;
-  startGyroscope(): void;
-  stopGyroscope(): void;
+
+  // Legacy gyroscope methods (pre v7.0)
+  startGyroscope?: () => void;
+  stopGyroscope?: () => void;
+
+  // Modern gyroscope API (v7.0+)
+  Gyroscope?: {
+    isStarted: boolean;
+    x?: number;
+    y?: number;
+    z?: number;
+    start(params?: { refresh_rate?: number }): void;
+    stop(): void;
+  };
 }
 
 export interface TelegramGyroscopeData {

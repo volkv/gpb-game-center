@@ -31,6 +31,7 @@ export default defineConfig({
 	},
 	server: {
 		host: true,
+		allowedHosts: ['thankful-trusting-jaguar.ngrok-free.app'],
 		fs: {
 			allow: ['..']
 		}

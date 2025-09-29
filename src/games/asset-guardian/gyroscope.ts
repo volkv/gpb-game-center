@@ -44,12 +44,23 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	private startedCallback: (() => void) | null = null;
 	private failedCallback: ((error: string) => void) | null = null;
 
-	private gyroscopeChangedHandler = (event: any) => {
+	private gyroscopeChangedHandler = (...args: any[]) => {
 		try {
+			const telegramGyro = this.webApp?.Gyroscope;
+			if (!telegramGyro || !telegramGyro.x || !telegramGyro.y || !telegramGyro.z) return;
+
+			// Получаем данные из отдельных полей x, y, z
+			const actualData = { x: telegramGyro.x, y: telegramGyro.y, z: telegramGyro.z };
+
+			if (!actualData || typeof actualData !== 'object') {
+				return;
+			}
+
+			// Modern API: convert x,y,z to alpha,beta,gamma
 			const data: GyroscopeData = {
-				alpha: event.alpha || 0,
-				beta: event.beta || 0,
-				gamma: event.gamma || 0,
+				alpha: actualData.z * 180 / Math.PI,
+				beta: actualData.y * 180 / Math.PI,
+				gamma: actualData.x * 180 / Math.PI,
 				timestamp: Date.now()
 			};
 
@@ -57,7 +68,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 				this.changeCallback(data);
 			}
 		} catch (error) {
-			console.error('🔄 [GYROSCOPE] Error processing gyroscope data:', error);
 			if (this.failedCallback) {
 				this.failedCallback('Failed to process gyroscope data');
 			}
@@ -65,7 +75,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	};
 
 	private gyroscopeStartedHandler = () => {
-		console.log('🔄 [GYROSCOPE] Gyroscope started successfully');
 		this.isActive = true;
 		if (this.startedCallback) {
 			this.startedCallback();
@@ -74,7 +83,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 	private gyroscopeFailedHandler = (event: any) => {
 		const error = event?.error || 'Unknown gyroscope error';
-		console.error('🔄 [GYROSCOPE] Gyroscope failed:', error);
 		this.isActive = false;
 		if (this.failedCallback) {
 			this.failedCallback(error);
@@ -88,68 +96,53 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 	private checkSupport(): boolean {
 		if (!browser || !isTelegramEnvironment() || !this.webApp) {
-			console.log('🔄 [GYROSCOPE] Not in Telegram environment or no WebApp API');
 			return false;
 		}
 
 		try {
-			// According to official docs, use postEvent for gyroscope control
-			if (typeof this.webApp.postEvent === 'function' && typeof this.webApp.onEvent === 'function') {
-				console.log('🔄 [GYROSCOPE] Telegram WebApp API supports gyroscope via postEvent');
-				console.log('🔄 [GYROSCOPE] WebApp version:', this.webApp.version);
-				console.log('🔄 [GYROSCOPE] Platform:', this.webApp.platform);
-				return true;
-			}
-		} catch (error) {
-			console.warn('🔄 [GYROSCOPE] Error checking gyroscope support:', error);
-		}
+			const hasOnEvent = typeof this.webApp.onEvent === 'function';
+			const hasModernGyroscope = this.webApp.Gyroscope && typeof this.webApp.Gyroscope.start === 'function';
 
-		console.warn('🔄 [GYROSCOPE] No gyroscope support detected');
-		return false;
+			if (!hasOnEvent || !hasModernGyroscope) {
+				return false;
+			}
+
+			// Check version compatibility (need 7.0+ for modern API)
+			const version = this.webApp.version || '0.0';
+			const majorVersion = parseInt(version.split('.')[0]) || 0;
+
+			return majorVersion >= 7;
+		} catch (error) {
+			return false;
+		}
 	}
 
 	private setupEventHandlers(): void {
 		if (!this.webApp || !this.isSupported) return;
 
 		try {
-			// Register event handlers correctly by passing the handler function directly
 			this.webApp.onEvent('gyroscopeChanged', this.gyroscopeChangedHandler);
 			this.webApp.onEvent('gyroscopeStarted', this.gyroscopeStartedHandler);
 			this.webApp.onEvent('gyroscopeFailed', this.gyroscopeFailedHandler);
-
-			console.log('🔄 [GYROSCOPE] Event handlers registered successfully');
-			console.log('🔄 [GYROSCOPE] WebApp API version:', this.webApp.version);
-			console.log('🔄 [GYROSCOPE] Platform:', this.webApp.platform);
 		} catch (error) {
-			console.error('🔄 [GYROSCOPE] Failed to setup event handlers:', error);
 			this.isSupported = false;
 		}
 	}
 
 	async start(): Promise<boolean> {
 		if (!this.isSupported || !this.webApp) {
-			console.warn('🔄 [GYROSCOPE] Cannot start: not supported or no WebApp');
 			return false;
 		}
 
 		try {
-			console.log('🔄 [GYROSCOPE] Starting gyroscope via postEvent...');
-			console.log('🔄 [GYROSCOPE] WebApp API available:', {
-				postEvent: typeof this.webApp.postEvent,
-				onEvent: typeof this.webApp.onEvent,
-				version: this.webApp.version,
-				platform: this.webApp.platform
-			});
-
-			// Use postEvent as per official documentation
-			this.webApp.postEvent('web_app_start_gyroscope');
-			console.log('🔄 [GYROSCOPE] postEvent("web_app_start_gyroscope") sent');
+			if (this.webApp.Gyroscope && typeof this.webApp.Gyroscope.start === 'function') {
+				this.webApp.Gyroscope.start({ refresh_rate: 60 });
+			} else {
+				return false;
+			}
 
 			return new Promise((resolve) => {
-				const timeout = setTimeout(() => {
-					console.warn('🔄 [GYROSCOPE] Start timeout after 5 seconds - gyroscope may not be supported on this device');
-					resolve(false);
-				}, 5000);
+				const timeout = setTimeout(() => resolve(false), 5000);
 
 				const originalStartedCallback = this.startedCallback;
 				this.startedCallback = () => {
@@ -166,7 +159,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 				};
 			});
 		} catch (error) {
-			console.error('🔄 [GYROSCOPE] Failed to start gyroscope:', error);
 			return false;
 		}
 	}
@@ -175,26 +167,20 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		if (!this.isSupported || !this.webApp) return;
 
 		try {
-			console.log('🔄 [GYROSCOPE] Stopping gyroscope via postEvent...');
-
-			// Use postEvent as per official documentation
-			this.webApp.postEvent('web_app_stop_gyroscope');
-			console.log('🔄 [GYROSCOPE] postEvent("web_app_stop_gyroscope") sent');
-
+			if (this.webApp.Gyroscope && typeof this.webApp.Gyroscope.stop === 'function') {
+				this.webApp.Gyroscope.stop();
+			}
 			this.isActive = false;
-			console.log('🔄 [GYROSCOPE] Gyroscope stopped successfully');
 		} catch (error) {
-			console.error('🔄 [GYROSCOPE] Failed to stop gyroscope:', error);
+			// Silent fail
 		}
 	}
 
 	async calibrate(): Promise<GyroscopeData | null> {
 		if (!this.isActive) {
-			console.warn('🔄 [GYROSCOPE] Cannot calibrate: gyroscope not active');
 			return null;
 		}
 
-		console.log('🔄 [GYROSCOPE] Starting calibration...');
 		const calibrationSamples: GyroscopeData[] = [];
 
 		return new Promise((resolve) => {
@@ -209,7 +195,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 				this.changeCallback = originalCallback;
 
 				if (calibrationSamples.length === 0) {
-					console.warn('🔄 [GYROSCOPE] No calibration samples collected');
 					resolve(null);
 					return;
 				}
@@ -225,7 +210,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 					timestamp: Date.now()
 				};
 
-				console.log('🔄 [GYROSCOPE] Calibration completed:', this.calibration);
 				resolve(this.calibration);
 			}, GYROSCOPE_CONFIG.CALIBRATION_TIME);
 		});
@@ -273,13 +257,11 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 	cleanup(): void {
 		if (this.webApp && this.isSupported) {
 			try {
-				// Remove event handlers correctly by passing the same handler function
 				this.webApp.offEvent('gyroscopeChanged', this.gyroscopeChangedHandler);
 				this.webApp.offEvent('gyroscopeStarted', this.gyroscopeStartedHandler);
 				this.webApp.offEvent('gyroscopeFailed', this.gyroscopeFailedHandler);
-				console.log('🔄 [GYROSCOPE] Event handlers removed successfully');
 			} catch (error) {
-				console.warn('🔄 [GYROSCOPE] Error during cleanup:', error);
+				// Silent fail
 			}
 		}
 
@@ -287,7 +269,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		this.changeCallback = null;
 		this.startedCallback = null;
 		this.failedCallback = null;
-		console.log('🔄 [GYROSCOPE] Cleanup completed');
 	}
 }
 
@@ -401,7 +382,6 @@ class TouchFallbackManager implements FallbackInputManager {
 		document.addEventListener('mousemove', this.mouseMoveHandler);
 		document.addEventListener('mouseup', this.mouseUpHandler);
 
-		console.log('🔄 [FALLBACK] Touch/mouse fallback started');
 	}
 
 	stop(): void {
@@ -420,7 +400,6 @@ class TouchFallbackManager implements FallbackInputManager {
 		this.touchStart = null;
 		this.currentTouch = null;
 
-		console.log('🔄 [FALLBACK] Touch/mouse fallback stopped');
 	}
 
 	convertToGravity(input: { x: number; y: number }): Gravity {

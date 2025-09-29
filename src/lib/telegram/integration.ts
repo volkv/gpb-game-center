@@ -113,6 +113,7 @@ export function initializeTelegramApp(): boolean {
     }
 
     enableFullscreen();
+    lockOrientation();
 
     return true;
   } catch (error) {
@@ -162,6 +163,46 @@ export function triggerHapticFeedback(): void {
     } catch (error) {
       console.warn('📱 [TELEGRAM] Failed to trigger haptic feedback:', error);
     }
+  }
+}
+
+export function lockOrientation(): void {
+  const webApp = getTelegramWebApp();
+  if (!webApp) {
+    console.log('📱 [TELEGRAM] Cannot lock orientation: not in Telegram environment');
+    return;
+  }
+
+  try {
+    console.log('📱 [TELEGRAM] Locking screen orientation');
+
+    if (webApp.postEvent) {
+      webApp.postEvent('web_app_toggle_orientation_lock', { locked: true });
+    }
+
+    console.log('📱 [TELEGRAM] Screen orientation locked');
+  } catch (error) {
+    console.warn('📱 [TELEGRAM] Failed to lock orientation:', error);
+  }
+}
+
+export function unlockOrientation(): void {
+  const webApp = getTelegramWebApp();
+  if (!webApp) {
+    console.log('📱 [TELEGRAM] Cannot unlock orientation: not in Telegram environment');
+    return;
+  }
+
+  try {
+    console.log('📱 [TELEGRAM] Unlocking screen orientation');
+
+    if (webApp.postEvent) {
+      webApp.postEvent('web_app_toggle_orientation_lock', { locked: false });
+    }
+
+    console.log('📱 [TELEGRAM] Screen orientation unlocked');
+  } catch (error) {
+    console.warn('📱 [TELEGRAM] Failed to unlock orientation:', error);
   }
 }
 
