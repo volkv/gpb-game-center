@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { NovellaGameState, EducationScreen as EducationScreenData } from '../types';
-  import { codeToSuccessScenario } from '../data/scenario';
+  import { CompletionPath } from '../types';
+  import { scenes, goodEducationScreen, badEducationScreen } from '../data/scenario';
 
   interface Props {
     gameState: NovellaGameState;
@@ -10,7 +11,17 @@
 
   let { gameState, onRewardClaim, onExit }: Props = $props();
 
-  const educationData = codeToSuccessScenario.educationScreen;
+  const educationData = $derived(
+    gameState.completionPath === CompletionPath.GOOD
+      ? goodEducationScreen
+      : badEducationScreen
+  );
+
+  const finalScene = $derived(() => {
+    return scenes.find(scene => scene.id === gameState.currentSceneId);
+  });
+
+  const backgroundImage = $derived(finalScene()?.backgroundImage || '');
 
   const handleRewardClaim = () => {
     onRewardClaim();
@@ -31,7 +42,7 @@
   };
 </script>
 
-<div class="education-screen" role="main">
+<div class="education-screen" role="main" style="background-image: url({backgroundImage})">
   <div class="education-content">
     <div class="success-badge" role="banner">
       <div class="badge-icon" aria-hidden="true">🛡️</div>
@@ -131,12 +142,28 @@
 
   .education-screen {
     flex: 1;
-    background: var(--gradient-brand-muted);
+    background-color: var(--color-neutral-900);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow-y: auto;
+    position: relative;
+  }
+
+  .education-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg,
+      rgba(5, 7, 19, 0.75) 0%,
+      rgba(5, 7, 19, 0.85) 50%,
+      rgba(5, 7, 19, 0.9) 100%
+    );
+    pointer-events: none;
   }
 
 
@@ -146,6 +173,8 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    position: relative;
+    z-index: 1;
   }
 
   .success-badge {

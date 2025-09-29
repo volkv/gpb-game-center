@@ -244,12 +244,27 @@ const badEndingScene: Scene = {
   isEducational: false
 };
 
-const educationScreen: EducationScreen = {
-  id: 'education-main',
+const goodEducationScreen: EducationScreen = {
+  id: 'education-good',
   title: 'Отличная работа! Вы распознали мошенника!',
   summary: 'Перепроверять информацию и никогда не диктовать коды из СМС – золотые правила безопасности. Помните: сотрудники банка НИКОГДА не просят эти данные по телефону!',
-  correctDecision: 'Правильным решением было положить трубку и самостоятельно перезвонить в банк по официальному номеру или использовать знания об услугах защиты от мошенничества.',
+  correctDecision: 'Вы приняли правильное решение — положили трубку и самостоятельно перезвонили в банк по официальному номеру. Это лучший способ защитить свои средства от мошенников.',
   rewardPoints: 100,
+  productIntegration: {
+    title: 'Защита от мошенничества',
+    description: 'Узнайте больше о том, как защитить свои финансы от мошенников с помощью современных банковских технологий.',
+    buttonText: 'Узнать подробнее об услуге',
+    url: undefined,
+    isActive: false
+  }
+};
+
+const badEducationScreen: EducationScreen = {
+  id: 'education-bad',
+  title: 'К сожалению, вы попались на уловку мошенников',
+  summary: 'Перепроверять информацию и никогда не диктовать коды из СМС – золотые правила безопасности. Помните: сотрудники банка НИКОГДА не просят эти данные по телефону!',
+  correctDecision: 'Правильным решением было бы положить трубку и самостоятельно перезвонить в банк по официальному номеру или использовать знания об услугах защиты от мошенничества. Никогда не сообщайте коды из СМС незнакомцам.',
+  rewardPoints: 0,
   productIntegration: {
     title: 'Защита от мошенничества',
     description: 'Узнайте больше о том, как защитить свои финансы от мошенников с помощью современных банковских технологий.',
@@ -274,7 +289,7 @@ export const codeToSuccessScenario: NovellaScenario = {
   version: '1.0.0',
   characters,
   scenes,
-  educationScreen,
+  educationScreen: goodEducationScreen,
   metadata: {
     estimatedDuration: 180,
     difficulty: 'easy',
@@ -282,3 +297,5 @@ export const codeToSuccessScenario: NovellaScenario = {
     tags: ['мошенничество', 'безопасность', 'банковские услуги', 'финансовая грамотность']
   }
 };
+
+export { goodEducationScreen, badEducationScreen };

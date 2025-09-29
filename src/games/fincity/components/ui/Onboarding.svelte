@@ -1,10 +1,11 @@
 <script lang="ts" module>
-  // Type declaration for DOM API
   declare const getComputedStyle: (element: globalThis.Element) => globalThis.CSSStyleDeclaration;
 </script>
 
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { fade, scale } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
   import { isTutorialActive } from '../../stores/ui';
   import { tutorialManager } from '../../lib/TutorialManager';
   import { playerData } from '../../stores/playerData';
@@ -18,60 +19,8 @@
   let totalSteps = $state(tutorialManager.getTotalSteps());
 
   onMount(() => {
-    console.log('🎬 [ONBOARDING] Onboarding.svelte onMount() called');
-    
-    const data = $playerData;
-    console.log('📊 [ONBOARDING] Current playerData in component:', {
-      tutorialCompleted: data.tutorialCompleted,
-      buildingsCount: data.buildings.length,
-      cityName: data.cityName
-    });
-    
-    isFirstTime = !data.tutorialCompleted && data.buildings.length === 0;
-    console.log('🔍 [ONBOARDING] Component isFirstTime check:', isFirstTime);
-
-    if (isFirstTime) {
-      console.log('✨ [ONBOARDING] Showing welcome screen');
-      showWelcomeScreen = true;
-      
-      // Добавляем небольшую задержку для отладки
-      setTimeout(() => {
-        console.log('🔍 [ONBOARDING] showWelcomeScreen state after timeout:', showWelcomeScreen);
-        const element = document.querySelector('.onboarding-welcome');
-        console.log('🎭 [ONBOARDING] DOM element found:', !!element);
-        if (element) {
-          const styles = getComputedStyle(element);
-          const rect = element.getBoundingClientRect();
-          console.log('🎨 [ONBOARDING] Element styles:', {
-            position: styles.position,
-            zIndex: styles.zIndex,
-            display: styles.display,
-            opacity: styles.opacity,
-            visibility: styles.visibility,
-            width: styles.width,
-            minWidth: styles.minWidth,
-            maxWidth: styles.maxWidth,
-            actualWidth: rect.width,
-            actualHeight: rect.height
-          });
-          
-          const contentCard = element.querySelector('.content-card');
-          if (contentCard) {
-            const cardStyles = getComputedStyle(contentCard);
-            const cardRect = contentCard.getBoundingClientRect();
-            console.log('📦 [ONBOARDING] Content card styles:', {
-              width: cardStyles.width,
-              minWidth: cardStyles.minWidth,
-              maxWidth: cardStyles.maxWidth,
-              actualWidth: cardRect.width,
-              actualHeight: cardRect.height
-            });
-          }
-        }
-      }, 100);
-    } else {
-      console.log('👤 [ONBOARDING] Not showing welcome screen - returning user');
-    }
+    isFirstTime = true;
+    showWelcomeScreen = true;
 
     updateProgress();
 
@@ -92,11 +41,14 @@
   }
 
   function startTutorial() {
+    console.log('🎯 [ONBOARDING] Start Tutorial button clicked');
     showWelcomeScreen = false;
+    console.log('📱 [ONBOARDING] Welcome screen hidden, calling tutorialManager.startTutorial()');
     tutorialManager.startTutorial();
   }
 
   function skipTutorial() {
+    console.log('⏭️ [ONBOARDING] Skip Tutorial button clicked');
     showWelcomeScreen = false;
     tutorialManager.skipTutorial();
   }
@@ -113,34 +65,38 @@
 </script>
 
 {#if showWelcomeScreen}
-  {(() => {
-    console.log('🎭 [ONBOARDING] Rendering welcome screen - showWelcomeScreen:', showWelcomeScreen);
-    return '';
-  })()}
-  <div class="onboarding-welcome">
-    <div class="background-media"></div>
-    <div class="content-card">
-      <div class="header-section p-lg mb-lg">
-        <div class="flex items-center gap: 1rem mb-md">
-          <Icon name="building" size="xl" class="text-mint" />
-          <div>
-            <h1 class="text-lg text-gray-900">Добро пожаловать в FinCity!</h1>
-            <p class="text-body text-gray-600">Ваш финансовый город ждёт</p>
-          </div>
+  <div
+    class="onboarding-overlay"
+    transition:fade={{ duration: 300 }}
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="onboarding-title"
+  >
+    <div
+      class="onboarding-modal"
+      transition:scale={{ duration: 400, easing: quintOut, start: 0.9 }}
+    >
+      <div class="onboarding-header">
+        <div class="header-icon">
+          <Icon name="building" size="xl" />
+        </div>
+        <div>
+          <h1 id="onboarding-title" class="header-title">Добро пожаловать в FinCity!</h1>
+          <p class="header-subtitle">Ваш финансовый город ждёт</p>
         </div>
       </div>
 
-      <div class="content-section p-6 space-y-6">
-        <div class="space-y-4">
-          <h2 class="text-heading-md text-gray-900">Создайте свой финансовый мегаполис</h2>
-          <p class="text-body-sm text-gray-600 leading-relaxed">
+      <div class="onboarding-content">
+        <div class="content-section">
+          <h2 class="section-title">Создайте свой финансовый мегаполис</h2>
+          <p class="section-text">
             FinCity поможет вам изучить банковские продукты Газпромбанка через увлекательную игру.
             Стройте здания, выполняйте квесты и развивайте финансовую грамотность!
           </p>
         </div>
 
-        <div class="gap: 0.5rem">
-          <label for="cityName" class="block text-ui-label text-gray-900">
+        <div class="input-group">
+          <label for="cityName" class="input-label">
             Как назовём ваш город?
           </label>
           <input
@@ -149,43 +105,43 @@
             value={$playerData.cityName}
             oninput={handleCityNameChange}
             placeholder="Введите название города"
-            class="w-full px-md py-sm border-2 border-gray-300 rounded-[var(--radius-lg)] background: white text-gray-900 placeholder:text-gray-500 focus:ring-2 focus:ring-violet focus:border-violet transition-all duration-[var(--duration-fast)]"
+            class="city-input"
             maxlength="20"
           />
         </div>
 
-        <div class="space-y-4">
-          <h3 class="text-ui-label text-gray-900">Что вас ждёт:</h3>
-          <div class="grid grid-cols-1 gap-2">
-            <div class="bubble-info bg-mint-20 border-mint-30">
-              <Icon name="building" class="text-mint" />
+        <div class="features-section">
+          <h3 class="features-title">Что вас ждёт:</h3>
+          <div class="features-grid">
+            <div class="feature-card feature-card--building">
+              <Icon name="building" size="md" />
               <div>
-                <div class="text-ui-label text-gray-900">Строительство зданий</div>
-                <div class="text-ui-caption text-gray-600">Каждое здание - банковский продукт</div>
+                <div class="feature-title">Строительство зданий</div>
+                <div class="feature-text">Каждое здание - банковский продукт</div>
               </div>
             </div>
-            <div class="bubble-info bg-gpb-emerald/20 border-gpb-emerald/30">
-              <Icon name="quest" class="text-gpb-emerald" />
+            <div class="feature-card feature-card--quest">
+              <Icon name="quest" size="md" />
               <div>
-                <div class="text-ui-label text-gray-900">Обучающие квесты</div>
-                <div class="text-ui-caption text-gray-600">Изучайте финансы играя</div>
+                <div class="feature-title">Обучающие квесты</div>
+                <div class="feature-text">Изучайте финансы играя</div>
               </div>
             </div>
-            <div class="bubble-info bg-gpb-raspberry-light/20 border-gpb-raspberry-light/30">
-              <Icon name="crystal" class="text-gpb-raspberry-light" />
+            <div class="feature-card feature-card--reward">
+              <Icon name="crystal" size="md" />
               <div>
-                <div class="text-ui-label text-gray-900">Система наград</div>
-                <div class="text-ui-caption text-gray-600">Получайте достижения и бонусы</div>
+                <div class="feature-title">Система наград</div>
+                <div class="feature-text">Получайте достижения и бонусы</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="flex gapadding: 1rem pt-6">
-          <Button variant="secondary" class="flex-1" onclick={skipTutorial}>
+        <div class="button-group">
+          <Button variant="secondary" class="action-button" onclick={skipTutorial}>
             Пропустить обучение
           </Button>
-          <Button variant="primary" class="flex-1" onclick={startTutorial}>
+          <Button variant="primary" class="action-button" onclick={startTutorial}>
             Начать обучение
           </Button>
         </div>
@@ -195,14 +151,14 @@
 {/if}
 
 {#if $isTutorialActive && currentStep}
-  <div class="onboarding-progress bubble-info fixed top: 1rem left-1/2 transform -translate-x-1/2 z-40 shadow-xl">
-    <div class="flex items-center gap-sm min-w-48">
-      <Icon name="book" size="sm" class="text-violet" />
-      <div class="flex-1">
-        <div class="text-ui-caption text-henbane mb-xs">Обучение</div>
+  <div class="tutorial-progress">
+    <div class="progress-content">
+      <Icon name="book" size="sm" />
+      <div class="progress-info">
+        <div class="progress-label">Обучение</div>
         <ProgressBar value={progress} size="sm" />
       </div>
-      <div class="text-ui-caption text-henbane">
+      <div class="progress-counter">
         {currentStepIndex + 1}/{totalSteps}
       </div>
     </div>
@@ -210,61 +166,248 @@
 {/if}
 
 <style>
-  .onboarding-welcome {
+  .onboarding-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 9999;
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
-    animation: fadeIn 0.3s ease-out;
-    box-sizing: border-box;
-  }
-
-  .onboarding-welcome .content-card {
-    min-width: 400px !important;
-    max-width: 500px !important;
-    width: 90vw !important;
-    max-height: 90vh;
+    padding: clamp(1rem, 3vw, 2rem);
+    background: color-mix(in srgb, var(--color-neutral-900) 74%, transparent 26%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 9999;
     overflow-y: auto;
-    box-sizing: border-box;
-    margin: 0 !important;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .onboarding-modal {
+    position: relative;
+    width: min(560px, 100%);
+    max-height: calc(100vh - clamp(2rem, 6vh, 4rem));
+    display: flex;
+    flex-direction: column;
+    border-radius: calc(var(--radius-xl) + 4px);
+    border: 1px solid var(--color-border-muted);
+    background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
+    box-shadow: var(--shadow-hard);
+    overflow: hidden;
+  }
+
+  .onboarding-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: clamp(1.25rem, 2vw, 1.75rem);
+    border-bottom: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-neutral-50) 68%, white 32%);
+  }
+
+  .header-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
     border-radius: var(--radius-lg);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    background: color-mix(in srgb, var(--color-accent-100) 65%, white 35%);
+    color: var(--color-accent-600);
   }
 
-  /* Мобильная адаптация */
-
-  .onboarding-welcome .background-media {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    background: linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-raspberry-light) 100%);
+  .header-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-fg-primary);
+    margin: 0 0 0.25rem 0;
   }
 
-  .onboarding-progress {
+  .header-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-fg-secondary);
+    margin: 0;
+  }
+
+  .onboarding-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: clamp(1.25rem, 2vw, 1.75rem);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.25rem, 2vw, 1.75rem);
+    background: color-mix(in srgb, var(--color-surface-card) 92%, white 8%);
+  }
+
+  .content-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-fg-primary);
+    margin: 0;
+  }
+
+  .section-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-fg-secondary);
+    margin: 0;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
+  }
+
+  .city-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-muted);
+    background: var(--color-surface-card);
+    color: var(--color-fg-primary);
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+  }
+
+  .city-input::placeholder {
+    color: var(--color-fg-muted);
+  }
+
+  .city-input:focus {
+    outline: none;
+    border-color: var(--color-accent-500);
+    box-shadow: var(--shadow-focus);
+  }
+
+  .features-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .features-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
+    margin: 0;
+  }
+
+  .features-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .feature-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .feature-card--building {
+    background: color-mix(in srgb, var(--color-accent-100) 65%, white 35%);
+    border-color: rgba(31, 196, 217, 0.28);
+    color: var(--color-accent-600);
+  }
+
+  .feature-card--quest {
+    background: color-mix(in srgb, rgba(43, 180, 138, 0.12) 40%, white 60%);
+    border-color: rgba(43, 180, 138, 0.28);
+    color: var(--color-accent-600);
+  }
+
+  .feature-card--reward {
+    background: color-mix(in srgb, rgba(232, 137, 181, 0.12) 40%, white 60%);
+    border-color: rgba(232, 137, 181, 0.28);
+    color: rgba(209, 60, 106, 0.85);
+  }
+
+  .feature-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-fg-primary);
+  }
+
+  .feature-text {
+    font-size: 0.8rem;
+    color: var(--color-fg-secondary);
+  }
+
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+
+  .button-group :global(.action-button) {
+    flex: 1 1 auto;
+    min-width: 140px;
+  }
+
+  .tutorial-progress {
+    position: fixed;
+    top: 4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-subtle);
+    background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
+    box-shadow: var(--shadow-medium);
     animation: slideDown 0.3s ease-out;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+  .progress-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 200px;
+  }
+
+  .progress-content :global(svg) {
+    color: var(--color-brand-600);
+    flex-shrink: 0;
+  }
+
+  .progress-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .progress-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-fg-secondary);
+  }
+
+  .progress-counter {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-fg-secondary);
+    white-space: nowrap;
   }
 
   @keyframes slideDown {
@@ -278,7 +421,36 @@
     }
   }
 
-  input:focus {
-    outline: none;
+  @media (max-width: 480px) {
+    .onboarding-overlay {
+      padding: 0.75rem;
+    }
+
+    .onboarding-modal {
+      width: 100%;
+    }
+
+    .onboarding-header {
+      padding: 1rem;
+    }
+
+    .header-icon {
+      width: 3rem;
+      height: 3rem;
+    }
+
+    .onboarding-content {
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+
+    .button-group :global(.action-button) {
+      width: 100%;
+      min-width: 0;
+    }
   }
 </style>

@@ -50,9 +50,10 @@
 
 	// Экранная клавиатура
 	const keyboardLayout = [
-		['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З'],
-		['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж'],
-		['ENTER', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', '⌫']
+		['Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ'],
+		['Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э'],
+		['Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю'],
+		['ENTER', '⌫']
 	];
 
 	let keyStatuses = $state<Record<string, LetterStatus>>({});
@@ -575,24 +576,24 @@
 		margin: 1rem 0 0.5rem 0;
 		display: flex;
 		flex-direction: column;
-		gap: 0.375rem;
+		gap: 0.5rem;
 	}
 
 	.keyboard-row {
 		display: flex;
 		justify-content: center;
-		gap: 0.25rem;
+		gap: 0.3rem;
 	}
 
 	.keyboard-key {
-		min-width: 30px;
-		height: 42px;
-		padding: 0 5px;
+		min-width: 26px;
+		height: 48px;
+		padding: 0 6px;
 		background: rgba(255, 255, 255, 0.9);
 		border: 1px solid rgba(255, 255, 255, 0.3);
-		border-radius: 5px;
+		border-radius: 6px;
 		font-family: var(--font-heading);
-		font-size: 0.8rem;
+		font-size: 0.95rem;
 		font-weight: 600;
 		color: var(--color-gpb-black);
 		cursor: pointer;
@@ -619,8 +620,9 @@
 	}
 
 	.keyboard-key-wide {
-		min-width: 44px;
-		font-size: 0.7rem;
+		flex: 1;
+		max-width: 160px;
+		font-size: 0.85rem;
 	}
 
 	.keyboard-key-correct {

@@ -243,3 +243,20 @@ export function playBuildingUpgradeEffects(buildingId: string) {
     console.warn('BuildingRenderer not available for effects');
   }
 }
+
+export function updateBuildingLabelText(buildingId: string, name: string, level: number) {
+  const engine = get(gameEngine);
+  if (!engine || !engine.buildingManager) {
+    if (import.meta.env.DEV) {
+      console.warn('GameEngine or BuildingSystem not available for label update');
+    }
+    return;
+  }
+
+  const buildingRenderer = engine.buildingManager.getBuildingRenderer();
+  if (buildingRenderer) {
+    buildingRenderer.updateBuildingLabel(buildingId, name, level);
+  } else if (import.meta.env.DEV) {
+    console.warn('BuildingRenderer not available for label update');
+  }
+}

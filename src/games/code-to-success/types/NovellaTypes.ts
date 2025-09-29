@@ -3,6 +3,7 @@ export enum NovellaScreen {
   CHARACTER_SELECTION = 'character-selection',
   DIALOGUE = 'dialogue',
   CHOICE = 'choice',
+  FINAL_SCENE = 'final-scene',
   EDUCATION = 'education',
   COMPLETED = 'completed'
 }

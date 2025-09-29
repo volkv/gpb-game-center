@@ -633,16 +633,16 @@
   }
 
   .intro-panel {
-    padding: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
+    padding: clamp(1.5rem, 1rem + 2vw, 2rem);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
     align-items: center;
   }
 
   .intro-panel__icon {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     border-radius: var(--radius-full);
     background: var(--gradient-brand-soft);
     color: var(--color-fg-on-brand);
@@ -658,21 +658,23 @@
   .intro-panel__title {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 1.25rem + 1vw, 2.1rem);
+    font-size: clamp(1.5rem, 1.2rem + 1vw, 1.85rem);
     color: var(--color-fg-primary);
   }
 
   .intro-panel__subtitle {
     margin: 0;
-    max-width: 36ch;
+    max-width: 40ch;
     color: var(--color-fg-muted);
-    font-size: 0.98rem;
+    font-size: 0.95rem;
   }
 
   .intro-panel__metrics {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
     gap: 0.75rem;
   }
 
@@ -680,10 +682,16 @@
     background: var(--color-surface-muted);
     border-color: var(--color-border-subtle);
     text-align: center;
+    padding: 0.75rem 1rem;
+    gap: 0.2rem;
+  }
+
+  .intro-panel__metrics .metric-tile__label {
+    font-size: 0.7rem;
   }
 
   .intro-panel__metrics .metric-tile__value {
-    font-size: 1.35rem;
+    font-size: 1.15rem;
   }
 
   .intro-panel__actions {
@@ -853,20 +861,18 @@
   }
 
   .decision-button {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.65rem;
-    padding: 0.9rem 1.25rem;
+    gap: 0.5rem;
+    padding: 0.85rem 1.5rem;
     border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border-muted);
-    background: var(--color-surface-card);
-    color: var(--color-fg-primary);
+    border: 1px solid transparent;
     font-family: var(--font-display);
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+    transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
   }
 
   .decision-button:hover {
@@ -880,25 +886,21 @@
   }
 
   .decision-button--fraud {
-    border-color: color-mix(in srgb, var(--color-state-danger) 45%, transparent);
-    background: color-mix(in srgb, var(--color-state-danger) 12%, transparent);
-    color: var(--color-state-danger);
+    background: linear-gradient(135deg, #d13c6a 0%, #c73360 100%);
+    color: var(--color-fg-inverse);
   }
 
   .decision-button--fraud:hover {
-    border-color: var(--color-state-danger);
-    background: color-mix(in srgb, var(--color-state-danger) 18%, transparent);
+    background: linear-gradient(135deg, #c73360 0%, #b82c56 100%);
   }
 
   .decision-button--safe {
-    border-color: color-mix(in srgb, var(--color-accent-500) 45%, transparent);
-    background: color-mix(in srgb, var(--color-accent-500) 12%, transparent);
-    color: var(--color-accent-600);
+    background: linear-gradient(135deg, #0fa9c2 0%, #1fc4d9 100%);
+    color: var(--color-fg-inverse);
   }
 
   .decision-button--safe:hover {
-    border-color: var(--color-accent-500);
-    background: color-mix(in srgb, var(--color-accent-500) 18%, transparent);
+    background: linear-gradient(135deg, #0e98ad 0%, #1caebd 100%);
   }
 
   .feedback-panel {

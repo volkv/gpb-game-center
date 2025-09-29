@@ -76,7 +76,7 @@
     const success = startBuildingUpgrade(buildingId);
 
     if (success) {
-      showToast('success', 'Прокачка началась!', 'Здание будет улучшено через 10 секунд');
+      showToast('success', 'Прокачка началась!', 'Здание будет улучшено через 3 секунды');
       startProgressTracking();
     } else {
       showToast('error', 'Ошибка прокачки', 'Не удалось начать улучшение здания');

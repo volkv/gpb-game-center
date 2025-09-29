@@ -258,7 +258,7 @@ export function startBuildingUpgrade(buildingId: string): boolean {
 
   spendResources(cost);
 
-  const upgradeEndTime = Date.now() + 10000;
+  const upgradeEndTime = Date.now() + 3000;
 
   playerData.update(data => ({
     ...data,
@@ -271,29 +271,41 @@ export function startBuildingUpgrade(buildingId: string): boolean {
 
   setTimeout(() => {
     completeBuildingUpgrade(buildingId);
-  }, 10000);
+  }, 3000);
 
   return true;
 }
 
 export function completeBuildingUpgrade(buildingId: string): void {
+  const buildingsList = get(buildings);
+  const building = buildingsList.find(b => b.id === buildingId);
+  const config = building ? buildingConfigs[building.type] : null;
+  const newLevel = building ? building.level + 1 : 1;
+
   playerData.update(data => ({
     ...data,
-    buildings: data.buildings.map(building => {
-      if (building.id === buildingId && building.isUpgrading) {
+    buildings: data.buildings.map(b => {
+      if (b.id === buildingId && b.isUpgrading) {
         return {
-          ...building,
-          level: building.level + 1,
+          ...b,
+          level: b.level + 1,
           isUpgrading: false,
           upgradeEndTime: undefined
         };
       }
-      return building;
+      return b;
     })
   }));
 
-  import('./gameState').then(({ playBuildingUpgradeEffects }) => {
+  import('./gameState').then(({ playBuildingUpgradeEffects, updateBuildingLabelText }) => {
     playBuildingUpgradeEffects(buildingId);
+    if (config) {
+      updateBuildingLabelText(buildingId, config.name, newLevel);
+    }
+  });
+
+  import('$lib/utils/confetti').then(({ confettiEffects }) => {
+    confettiEffects.simpleSuccess();
   });
 }
 
@@ -329,9 +341,9 @@ export function getUpgradeProgress(buildingId: string): number {
   }
 
   const now = Date.now();
-  const startTime = building.upgradeEndTime - 10000;
+  const startTime = building.upgradeEndTime - 3000;
   const elapsed = now - startTime;
-  const progress = Math.min(elapsed / 10000, 1);
+  const progress = Math.min(elapsed / 3000, 1);
 
   return Math.max(0, progress);
 }

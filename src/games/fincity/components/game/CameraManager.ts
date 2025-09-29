@@ -272,20 +272,24 @@ export class CameraManager {
   }
 
   public zoomBy(delta: number): void {
-    const newZoom = this.camera.zoom + delta;
-    this.setZoom(newZoom);
+    const screenCenter = { x: this.app.screen.width / 2, y: this.app.screen.height / 2 };
+    const worldCenter = this.screenToWorld(screenCenter);
+    this.zoomAt(worldCenter, delta);
   }
 
   public zoomAt(worldPoint: Vector2D, delta: number): void {
     const oldZoom = this.camera.zoom;
-    const newZoom = Math.max(this.camera.bounds.minZoom,
-      Math.min(this.camera.bounds.maxZoom, oldZoom + delta));
+    const newZoom = Math.max(
+      this.camera.bounds.minZoom,
+      Math.min(this.camera.bounds.maxZoom, oldZoom + delta)
+    );
 
     if (newZoom !== oldZoom) {
-      const zoomRatio = newZoom / oldZoom;
+      const oldCamX = this.camera.x;
+      const oldCamY = this.camera.y;
 
-      this.camera.x += worldPoint.x * (1 - zoomRatio);
-      this.camera.y += worldPoint.y * (1 - zoomRatio);
+      this.camera.x = worldPoint.x + (oldCamX - worldPoint.x) * (oldZoom / newZoom);
+      this.camera.y = worldPoint.y + (oldCamY - worldPoint.y) * (oldZoom / newZoom);
       this.camera.zoom = newZoom;
 
       this.constrainCamera();

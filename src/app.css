@@ -423,6 +423,177 @@
   .neon-glow {
     filter: drop-shadow(0 0 8px rgba(0, 122, 195, 0.28));
   }
+
+  .tutorial-overlay {
+    position: fixed;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-neutral-900) 60%, transparent 40%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    pointer-events: none;
+  }
+
+  .tutorial-highlight {
+    position: fixed;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--color-accent-500);
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+    animation: tutorialPulse 2s ease-in-out infinite;
+  }
+
+  .tutorial-tooltip {
+    position: fixed;
+    padding: 1.25rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-muted);
+    background: color-mix(in srgb, var(--color-surface-card) 98%, white 2%);
+    box-shadow: var(--shadow-hard);
+    z-index: 10001;
+  }
+
+  .tutorial-tooltip h3 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-fg-primary);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .tutorial-tooltip p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-fg-secondary);
+    margin: 0;
+  }
+
+  .tutorial-tooltip .tutorial-next,
+  .tutorial-tooltip .tutorial-skip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.1rem;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    border: 1px solid transparent;
+  }
+
+  .tutorial-tooltip .tutorial-next {
+    background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
+    color: var(--color-fg-inverse);
+  }
+
+  .tutorial-tooltip .tutorial-next:hover {
+    background: linear-gradient(135deg, var(--color-brand-700) 0%, var(--color-brand-500) 100%);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+  }
+
+  .tutorial-tooltip .tutorial-skip {
+    background: color-mix(in srgb, var(--color-neutral-100) 92%, white 8%);
+    color: var(--color-fg-primary);
+    border-color: var(--color-border-muted);
+  }
+
+  .tutorial-tooltip .tutorial-skip:hover {
+    border-color: var(--layer-brand-150);
+    background: color-mix(in srgb, var(--color-neutral-50) 80%, white 20%);
+    transform: translateY(-1px);
+  }
+
+  .tutorial-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: color-mix(in srgb, var(--color-neutral-900) 74%, transparent 26%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .tutorial-modal > div {
+    position: relative;
+    width: min(560px, 100%);
+    padding: 1.75rem;
+    border-radius: calc(var(--radius-xl) + 4px);
+    border: 1px solid var(--color-border-muted);
+    background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
+    box-shadow: var(--shadow-hard);
+  }
+
+  .tutorial-modal h2 {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: var(--color-fg-primary);
+    margin: 0 0 1rem 0;
+  }
+
+  .tutorial-modal p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-fg-secondary);
+    margin: 0 0 1.5rem 0;
+  }
+
+  .tutorial-modal button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    border: 1px solid transparent;
+  }
+
+  .tutorial-modal .tutorial-next {
+    background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
+    color: var(--color-fg-inverse);
+  }
+
+  .tutorial-modal .tutorial-next:hover {
+    background: linear-gradient(135deg, var(--color-brand-700) 0%, var(--color-brand-500) 100%);
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-1px);
+  }
+
+  .tutorial-modal .tutorial-skip {
+    background: color-mix(in srgb, var(--color-neutral-100) 92%, white 8%);
+    color: var(--color-fg-primary);
+    border-color: var(--color-border-muted);
+  }
+
+  .tutorial-modal .tutorial-skip:hover {
+    border-color: var(--layer-brand-150);
+    background: color-mix(in srgb, var(--color-neutral-50) 80%, white 20%);
+    transform: translateY(-1px);
+  }
+
+  @keyframes tutorialPulse {
+    0%, 100% {
+      opacity: 0.8;
+      box-shadow: 0 0 0 0 rgba(31, 196, 217, 0.4);
+    }
+    50% {
+      opacity: 1;
+      box-shadow: 0 0 0 8px rgba(31, 196, 217, 0);
+    }
+  }
 }
 
 @layer utilities {

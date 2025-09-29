@@ -124,7 +124,7 @@
   }
 
   .character-selection {
-    padding: 2rem 1rem;
+    padding: 1.25rem 1rem;
     max-width: 480px;
     margin: 0 auto;
     flex: 1;
@@ -136,22 +136,22 @@
 
   .character-selection__header {
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .character-selection__title {
     font-family: var(--font-heading);
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    color: var(--color-fg-inverse);
-    margin: 0 0 0.75rem 0;
+    color: var(--color-fg-primary);
+    margin: 0 0 0.5rem 0;
     line-height: 1.2;
   }
 
   .character-selection__subtitle {
     font-family: var(--font-body);
-    font-size: 1rem;
-    color: var(--color-accent-200);
+    font-size: 0.9rem;
+    color: var(--color-fg-secondary);
     line-height: 1.5;
     opacity: 0.9;
     margin: 0;
@@ -160,16 +160,16 @@
   .character-selection__grid {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
   }
 
   .character-card {
     background: var(--color-surface-card);
-    border-radius: var(--radius-xl);
-    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    padding: 1rem;
     box-shadow: var(--shadow-soft);
     transition: all 0.2s ease;
-    border: 2px solid transparent;
+    border: 1px solid var(--color-border-subtle);
     position: relative;
   }
 
@@ -181,7 +181,7 @@
   .character-card--available:focus-visible {
     transform: translateY(-2px);
     box-shadow: var(--shadow-medium);
-    border-color: var(--color-brand-300);
+    border-color: var(--color-brand-400);
     outline: none;
   }
 
@@ -197,9 +197,9 @@
 
   .character-card__image {
     position: relative;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 1rem;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 0.75rem;
     border-radius: var(--radius-full);
     background: var(--color-neutral-100);
     box-shadow: var(--shadow-soft);
@@ -222,10 +222,11 @@
     align-items: center;
     justify-content: center;
     background: var(--gradient-brand-soft);
+    border-radius: var(--radius-full);
   }
 
   .character-card__placeholder-icon {
-    font-size: 2rem;
+    font-size: 1.75rem;
     font-weight: 700;
     color: var(--color-fg-inverse);
     font-family: var(--font-heading);
@@ -237,7 +238,7 @@
 
   .character-card__name {
     font-family: var(--font-heading);
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 700;
     color: var(--color-fg-primary);
     margin: 0 0 0.25rem 0;
@@ -245,18 +246,18 @@
 
   .character-card__profession {
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     color: var(--color-brand-600);
     font-weight: 500;
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 0.5rem 0;
   }
 
   .character-card__description {
     font-family: var(--font-body);
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     color: var(--color-fg-secondary);
     line-height: 1.5;
-    margin: 0 0 1.25rem 0;
+    margin: 0 0 1rem 0;
   }
 
 

@@ -10,9 +10,11 @@
 	import Settings from './components/ui/Settings.svelte';
 	import Toast from './components/ui/Toast.svelte';
 	import ResourcesBar from './components/ui/ResourcesBar.svelte';
+	import Onboarding from './components/ui/Onboarding.svelte';
 	import { gameStatusStore } from '$lib/stores/gameStatusStore';
 	import { modal } from './stores/ui';
 	import type { GameEngine } from './components/game/GameEngine';
+	import { initializeAutoSave, stopAutoSave } from './lib/autoSave';
 
 	interface Props {
 		onexit?: () => void;
@@ -23,6 +25,8 @@
 	let gameEngine = $state<GameEngine | null>(null);
 
 	onMount(() => {
+		initializeAutoSave();
+
 		gameStatusStore.show({
 			gameName: 'FinCity',
 			showScore: false,
@@ -31,6 +35,7 @@
 	});
 
 	onDestroy(() => {
+		stopAutoSave();
 		gameStatusStore.hide();
 	});
 
@@ -88,6 +93,7 @@
 	{/if}
 
 	<Toast />
+	<Onboarding />
 </div>
 
 <style>

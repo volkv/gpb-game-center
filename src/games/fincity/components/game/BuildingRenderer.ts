@@ -61,14 +61,14 @@ export class BuildingRenderer {
 
     const sprite = this.createBuildingSprite(config, false);
     if (sprite) {
-      sprite.anchor.set(0.5, 1);  // Тот же anchor что у ландшафтных тайлов
+      sprite.anchor.set(0.5, 1);
       spriteContainer.addChild(sprite);
     } else {
       const graphics = this.createBuildingGraphics(config, false);
       spriteContainer.addChild(graphics);
     }
 
-    const nameText = this.createBuildingLabel(config.name);
+    const nameText = this.createBuildingLabel(config.name, building.level, false);
     nameText.x = 0;
     nameText.y = -20;
     textContainer.addChild(nameText);
@@ -138,7 +138,7 @@ export class BuildingRenderer {
       spriteContainer.addChild(graphics);
     }
 
-    const nameText = this.createBuildingLabel(config.name, true);
+    const nameText = this.createBuildingLabel(config.name, 1, true);
     nameText.x = 0;
     nameText.y = -20;
     textContainer.addChild(nameText);
@@ -282,17 +282,18 @@ export class BuildingRenderer {
     return graphics;
   }
 
-  private createBuildingLabel(name: string, isPreview: boolean = false): Text {
+  private createBuildingLabel(name: string, level: number, isPreview: boolean = false): Text {
     const style = new TextStyle({
       fontFamily: 'Gazprombank Sans, sans-serif',
-      fontSize: isPreview ? 14 : 12,
+      fontSize: isPreview ? 55 : 55,
       fontWeight: 'bold',
       fill: isPreview ? 0xffffff : 0x333333,
-      stroke: isPreview ? { color: 0x000000, width: 2 } : { color: 0xffffff, width: 1 },
+      stroke: isPreview ? { color: 0x000000, width: 2 } : { color: 0xffffff, width: 2 },
       align: 'center'
     });
 
-    const text = new Text({ text: name, style });
+    const displayText = `${name} Ур.${level}`;
+    const text = new Text({ text: displayText, style });
     text.anchor.set(0.5, 1);
 
     if (isPreview) {
@@ -558,6 +559,13 @@ export class BuildingRenderer {
       }
     };
     return configs[buildingType] || null;
+  }
+
+  updateBuildingLabel(buildingId: string, name: string, level: number): void {
+    const visual = this.buildings.get(buildingId);
+    if (!visual || !visual.nameText) return;
+
+    visual.nameText.text = `${name} Ур.${level}`;
   }
 
   playUpgradeEffects(buildingId: string): void {

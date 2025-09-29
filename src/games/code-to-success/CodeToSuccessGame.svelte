@@ -5,6 +5,7 @@
   import CharacterSelection from './components/CharacterSelection.svelte';
   import DialogueInterface from './components/DialogueInterface.svelte';
   import ChoiceInterface from './components/ChoiceInterface.svelte';
+  import FinalSceneDisplay from './components/FinalSceneDisplay.svelte';
   import EducationScreen from './components/EducationScreen.svelte';
   import GameResultsModal from './components/GameResultsModal.svelte';
   import { codeToSuccessScenario, scenes } from './data/scenario';
@@ -105,12 +106,16 @@
 
     if (currentScene?.choices && currentScene.choices.length > 0) {
       gameState.currentScreen = NovellaScreen.CHOICE;
-    } else if (currentScene?.nextSceneId === 'education' ||
-               (currentScene?.id === 'good-ending' || currentScene?.id === 'bad-ending')) {
-      gameState.currentScreen = NovellaScreen.EDUCATION;
+    } else if (currentScene?.id === 'good-ending' || currentScene?.id === 'bad-ending') {
+      gameState.currentScreen = NovellaScreen.FINAL_SCENE;
     } else {
       gameState.currentScreen = NovellaScreen.CHOICE;
     }
+    updateGameProgress();
+  };
+
+  const handleFinalSceneComplete = () => {
+    gameState.currentScreen = NovellaScreen.EDUCATION;
     updateGameProgress();
   };
 
@@ -205,6 +210,13 @@
         onChoiceSelect={handleChoiceSelect}
       />
     </div>
+  {:else if gameState.currentScreen === NovellaScreen.FINAL_SCENE}
+    {#key gameState.currentSceneId}
+      <FinalSceneDisplay
+        backgroundImage={scenes.find(s => s.id === gameState.currentSceneId)?.backgroundImage || ''}
+        onComplete={handleFinalSceneComplete}
+      />
+    {/key}
   {:else if gameState.currentScreen === NovellaScreen.EDUCATION}
     <div class="screen-wrapper" in:screenEnter out:screenExit>
       <EducationScreen

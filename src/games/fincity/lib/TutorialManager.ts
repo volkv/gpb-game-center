@@ -30,7 +30,7 @@ const tutorialSteps: TutorialStep[] = [
     id: 'interface_overview',
     title: 'Знакомство с интерфейсом',
     message: 'В верхней части экрана вы видите ваши ресурсы: монеты, кристаллы, энергию и опыт. Они нужны для развития города.',
-    target: '.top-bar',
+    target: '.resources-bar',
     position: 'bottom',
     action: 'highlight',
     nextTrigger: 'click',
@@ -39,8 +39,8 @@ const tutorialSteps: TutorialStep[] = [
   {
     id: 'city_name',
     title: 'Ваш город',
-    message: 'Здесь отображается название вашего города и ваш текущий уровень мэра.',
-    target: '.city-info',
+    message: 'Здесь отображается ваш текущий уровень мэра.',
+    target: '.resources-bar__level',
     position: 'bottom',
     action: 'highlight',
     nextTrigger: 'click',
@@ -57,60 +57,11 @@ const tutorialSteps: TutorialStep[] = [
     skipable: true
   },
   {
-    id: 'build_button',
-    title: 'Кнопка строительства',
-    message: 'Нажмите эту кнопку, чтобы открыть каталог зданий. Каждое здание представляет банковский продукт.',
-    target: '.build-button',
+    id: 'action_buttons',
+    title: 'Панель действий',
+    message: 'Здесь расположены основные действия: кнопка "Строить" для постройки зданий, "Квесты" для заданий и "Награды" для достижений.',
+    target: '.action-toolbar',
     position: 'top',
-    action: 'highlight',
-    nextTrigger: 'click',
-    skipable: false
-  },
-  {
-    id: 'first_building',
-    title: 'Первое здание',
-    message: 'Отлично! Выберите "Центральный банк" - это основа любого финансового города. Нажмите на него.',
-    target: '.building-card[data-type="central_bank"]',
-    position: 'right',
-    action: 'highlight',
-    nextTrigger: 'manual',
-    skipable: false
-  },
-  {
-    id: 'placement',
-    title: 'Размещение здания',
-    message: 'Теперь выберите место для постройки. Наведите курсор на свободную клетку и кликните для размещения.',
-    target: '.game-canvas',
-    position: 'top',
-    action: 'highlight',
-    nextTrigger: 'manual',
-    skipable: false
-  },
-  {
-    id: 'building_placed',
-    title: 'Поздравляем!',
-    message: 'Вы построили своё первое здание! Теперь оно будет приносить вам доход в виде монет.',
-    position: 'center',
-    action: 'modal',
-    nextTrigger: 'click',
-    skipable: false
-  },
-  {
-    id: 'quest_button',
-    title: 'Система квестов',
-    message: 'Нажмите на эту кнопку, чтобы открыть журнал квестов. Квесты помогают изучать банковские продукты.',
-    target: '.quest-button',
-    position: 'top',
-    action: 'highlight',
-    nextTrigger: 'click',
-    skipable: true
-  },
-  {
-    id: 'quest_system',
-    title: 'Журнал квестов',
-    message: 'Здесь вы найдете задания, которые помогут освоить финансовые инструменты и получить награды.',
-    target: '.quest-log',
-    position: 'left',
     action: 'highlight',
     nextTrigger: 'click',
     skipable: true
@@ -137,6 +88,7 @@ export class TutorialManager {
   }
 
   startTutorial() {
+    console.log('🎓 [TUTORIAL] startTutorial() called');
     this.isActive = true;
     this.currentStepIndex = 0;
     startTutorial();
@@ -145,34 +97,42 @@ export class TutorialManager {
   }
 
   private showStep(stepIndex: number) {
+    console.log('📖 [TUTORIAL] showStep:', stepIndex, '/ Total steps:', tutorialSteps.length);
     if (stepIndex >= tutorialSteps.length) {
+      console.log('✅ [TUTORIAL] All steps completed, calling completeTutorial()');
       this.completeTutorial();
       return;
     }
 
     const step = tutorialSteps[stepIndex];
+    console.log('📄 [TUTORIAL] Current step:', step.id, 'action:', step.action, 'nextTrigger:', step.nextTrigger);
     this.currentStepIndex = stepIndex;
 
     this.clearHighlight();
 
     switch (step.action) {
       case 'modal':
+        console.log('🎭 [TUTORIAL] Showing modal');
         this.showModal(step);
         break;
       case 'highlight':
+        console.log('✨ [TUTORIAL] Highlighting element:', step.target);
         this.highlightElementMethod(step);
         break;
       case 'wait':
+        console.log('⏳ [TUTORIAL] Waiting');
         this.waitForDuration(step);
         break;
     }
 
     if (step.nextTrigger === 'auto') {
+      console.log('⏰ [TUTORIAL] Auto-advancing in', step.duration || 3000, 'ms');
       globalThis.setTimeout(() => this.nextStep(), step.duration || 3000);
     }
   }
 
   private showModal(step: TutorialStep) {
+    console.log('🎭 [TUTORIAL] showModal called with step:', step.title);
     const modalContent = {
       title: step.title,
       message: step.message,
@@ -182,6 +142,7 @@ export class TutorialManager {
     };
 
     this.createTutorialModal(modalContent);
+    console.log('✅ [TUTORIAL] Modal created');
   }
 
   private highlightElementMethod(step: TutorialStep) {
@@ -189,19 +150,20 @@ export class TutorialManager {
 
     const element = globalThis.document.querySelector(step.target) as globalThis.HTMLElement;
     if (!element) {
+      console.warn('⚠️ [TUTORIAL] Element not found:', step.target);
       globalThis.setTimeout(() => this.highlightElementMethod(step), 500);
       return;
     }
 
-    this.createOverlay();
+    console.log('✅ [TUTORIAL] Element found, highlighting:', step.target);
     this.createHighlight(element, step);
     this.showTooltip(element, step);
   }
 
   private createOverlay() {
     this.overlay = globalThis.document.createElement('div');
-    this.overlay.className = 'tutorial-overlay fixed inset-0 bg-black/50 pointer-events-none';
-    this.overlay.style.zIndex = '20';
+    this.overlay.className = 'tutorial-overlay';
+    this.overlay.style.zIndex = '9998';
     globalThis.document.body.appendChild(this.overlay);
   }
 
@@ -210,17 +172,17 @@ export class TutorialManager {
     const padding = 8;
 
     this.highlightElement = globalThis.document.createElement('div');
-    this.highlightElement.className = 'tutorial-highlight fixed bg-white/20 border-2 border-gpb-blue rounded-lg pointer-events-none animate-pulse';
+    this.highlightElement.className = 'tutorial-highlight';
     this.highlightElement.style.left = `${rect.left - padding}px`;
     this.highlightElement.style.top = `${rect.top - padding}px`;
     this.highlightElement.style.width = `${rect.width + padding * 2}px`;
     this.highlightElement.style.height = `${rect.height + padding * 2}px`;
-    this.highlightElement.style.zIndex = '25';
+    this.highlightElement.style.zIndex = '10000';
 
     globalThis.document.body.appendChild(this.highlightElement);
 
     element.style.position = 'relative';
-    element.style.zIndex = '35';
+    element.style.zIndex = '10001';
   }
 
   private showTooltip(element: globalThis.HTMLElement, step: TutorialStep) {
@@ -230,25 +192,27 @@ export class TutorialManager {
     const padding = 12;
 
     const tooltip = globalThis.document.createElement('div');
+    tooltip.className = 'tutorial-tooltip';
 
-    // Адаптивные стили для разных размеров экрана
     if (windowWidth < 480) {
-      tooltip.className = 'tutorial-tooltip fixed z-[9999] max-w-[95vw] min-w-[280px] p-4 bg-white rounded-lg shadow-xl border text-sm';
+      tooltip.style.maxWidth = '95vw';
+      tooltip.style.minWidth = '280px';
     } else if (windowWidth < 768) {
-      tooltip.className = 'tutorial-tooltip fixed z-[9999] max-w-[90vw] min-w-[320px] p-5 bg-white rounded-lg shadow-xl border';
+      tooltip.style.maxWidth = '90vw';
+      tooltip.style.minWidth = '320px';
     } else {
-      tooltip.className = 'tutorial-tooltip fixed z-[9999] max-w-md min-w-80 p-6 bg-white rounded-lg shadow-xl border';
+      tooltip.style.maxWidth = '420px';
+      tooltip.style.minWidth = '320px';
     }
 
-    // Создаем контент тултипа для определения размеров
     tooltip.innerHTML = `
-      <div class="mb-4">
-        <h3 class="text-xl font-bold text-gray-900 mb-2">${step.title}</h3>
-        <p class="text-gray-700 leading-relaxed">${step.message}</p>
+      <div style="margin-bottom: 1rem;">
+        <h3>${step.title}</h3>
+        <p>${step.message}</p>
       </div>
-      <div class="flex gap-3 justify-end">
-        ${step.skipable ? '<button class="tutorial-skip px-4 py-2 text-gray-600 hover:text-gray-800 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">Пропустить</button>' : ''}
-        <button class="tutorial-next px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">Далее</button>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        ${step.skipable ? '<button class="tutorial-skip">Пропустить</button>' : ''}
+        <button class="tutorial-next">Далее</button>
       </div>
     `;
 
@@ -284,13 +248,13 @@ export class TutorialManager {
     tooltip.style.visibility = 'visible';
 
     tooltip.innerHTML = `
-      <div class="mb-4">
-        <h3 class="text-xl font-bold text-gray-900 mb-2">${step.title}</h3>
-        <p class="text-gray-700 leading-relaxed">${step.message}</p>
+      <div style="margin-bottom: 1rem;">
+        <h3>${step.title}</h3>
+        <p>${step.message}</p>
       </div>
-      <div class="flex gap-3 justify-end">
-        ${step.skipable ? '<button class="tutorial-skip px-4 py-2 text-gray-600 hover:text-gray-800 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">Пропустить</button>' : ''}
-        <button class="tutorial-next px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">Далее</button>
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+        ${step.skipable ? '<button class="tutorial-skip">Пропустить</button>' : ''}
+        <button class="tutorial-next">Далее</button>
       </div>
     `;
 
@@ -436,66 +400,67 @@ export class TutorialManager {
     onNext: () => void;
     onSkip: () => void;
   }) {
+    console.log('🏗️ [TUTORIAL] createTutorialModal:', content.title);
+
+    if (!globalThis.document || !globalThis.document.body) {
+      console.error('❌ [TUTORIAL] document.body is not available');
+      return;
+    }
+
     const modal = globalThis.document.createElement('div');
-    modal.className = 'tutorial-modal fixed inset-0 z-50 flex items-center justify-center p-4';
+    modal.className = 'tutorial-modal';
+    console.log('✅ [TUTORIAL] Modal element created with class:', modal.className);
 
     const windowWidth = globalThis.window.innerWidth;
-    const isMobile = windowWidth < 768;
     const isSmallMobile = windowWidth < 480;
 
-    // Адаптивные стили для модального окна
-    const modalContentClass = isSmallMobile
-      ? 'bg-white rounded-lg shadow-xl p-6 max-w-[95vw] min-w-[300px] w-full mx-2 relative'
-      : isMobile
-        ? 'bg-white rounded-lg shadow-xl p-7 max-w-[90vw] min-w-[320px] w-full mx-3 relative'
-        : 'bg-white rounded-lg shadow-xl p-8 max-w-lg min-w-96 w-full mx-4 relative';
+    const buttonContainerStyle = isSmallMobile
+      ? 'display: flex; flex-direction: column; gap: 0.75rem;'
+      : 'display: flex; gap: 0.75rem; justify-content: flex-end;';
 
-    const titleClass = isSmallMobile
-      ? 'text-xl font-bold text-gray-900 mb-3'
-      : 'text-2xl font-bold text-gray-900 mb-4';
-
-    const textClass = isSmallMobile
-      ? 'text-gray-700 mb-5 leading-relaxed text-base'
-      : 'text-gray-700 mb-6 leading-relaxed text-lg';
-
-    const buttonContainerClass = isSmallMobile
-      ? 'flex flex-col gap-3'
-      : 'flex gap-3 justify-end';
-
-    const skipButtonClass = isSmallMobile
-      ? 'px-6 py-3 text-gray-600 hover:text-gray-800 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors w-full'
-      : 'px-6 py-3 text-gray-600 hover:text-gray-800 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors';
-
-    const nextButtonClass = isSmallMobile
-      ? 'px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium w-full'
-      : 'px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium';
+    const buttonStyle = isSmallMobile ? 'width: 100%;' : '';
 
     modal.innerHTML = `
-      <div class="bg-black/50 absolute inset-0"></div>
-      <div class="${modalContentClass}">
-        <h2 class="${titleClass}">${content.title}</h2>
-        <p class="${textClass}">${content.message}</p>
-        <div class="${buttonContainerClass}">
-          ${content.skipable ? `<button class="tutorial-skip ${skipButtonClass}">Пропустить обучение</button>` : ''}
-          <button class="tutorial-next ${nextButtonClass}">Понятно</button>
+      <div>
+        <h2>${content.title}</h2>
+        <p>${content.message}</p>
+        <div style="${buttonContainerStyle}">
+          ${content.skipable ? `<button class="tutorial-skip" style="${buttonStyle}">Пропустить обучение</button>` : ''}
+          <button class="tutorial-next" style="${buttonStyle}">Понятно</button>
         </div>
       </div>
     `;
+    console.log('📝 [TUTORIAL] Modal HTML set');
 
     const nextButton = modal.querySelector('.tutorial-next') as globalThis.HTMLElement;
     const skipButton = modal.querySelector('.tutorial-skip') as globalThis.HTMLElement;
 
-    nextButton?.addEventListener('click', () => {
-      globalThis.document.body.removeChild(modal);
+    console.log('🔘 [TUTORIAL] Buttons found:', { next: !!nextButton, skip: !!skipButton });
+
+    nextButton?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      console.log('➡️ [TUTORIAL] Next button clicked');
+      if (modal.parentNode) {
+        globalThis.document.body.removeChild(modal);
+      }
       content.onNext();
     });
 
-    skipButton?.addEventListener('click', () => {
-      globalThis.document.body.removeChild(modal);
+    skipButton?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      console.log('⏭️ [TUTORIAL] Skip button clicked');
+      if (modal.parentNode) {
+        globalThis.document.body.removeChild(modal);
+      }
       content.onSkip();
     });
 
     globalThis.document.body.appendChild(modal);
+    console.log('📌 [TUTORIAL] Modal appended to body');
+    console.log('🔍 [TUTORIAL] Modal in DOM:', globalThis.document.body.contains(modal));
+    console.log('🎨 [TUTORIAL] Modal computed style:', globalThis.getComputedStyle(modal).display);
   }
 
   private waitForDuration(step: TutorialStep) {
@@ -504,8 +469,10 @@ export class TutorialManager {
   }
 
   nextStep() {
+    console.log('⏭️ [TUTORIAL] nextStep() called, current:', this.currentStepIndex);
     this.clearHighlight();
     this.currentStepIndex++;
+    console.log('➡️ [TUTORIAL] Moving to step:', this.currentStepIndex);
     nextTutorialStep();
     this.showStep(this.currentStepIndex);
   }
@@ -516,12 +483,7 @@ export class TutorialManager {
     completeTutorial();
     setGameMode('normal' as GameMode);
 
-    playerData.update(data => ({
-      ...data,
-      tutorialCompleted: true
-    }));
-
-    showInfoToast('Обучение пропущено', 'Вы всегда можете вернуться к обучению в настройках');
+    showInfoToast('Обучение пропущено', 'Вы можете начать строить свой город');
   }
 
   completeTutorial() {
@@ -529,11 +491,6 @@ export class TutorialManager {
     this.clearHighlight();
     completeTutorial();
     setGameMode('normal' as GameMode);
-
-    playerData.update(data => ({
-      ...data,
-      tutorialCompleted: true
-    }));
 
     completeQuest('tutorial_welcome');
     showInfoToast('Обучение завершено!', 'Поздравляем! Теперь вы готовы строить свой финансовый город.');
