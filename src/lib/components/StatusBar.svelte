@@ -131,6 +131,10 @@
 		border-bottom: 1px solid var(--color-border-muted);
 	}
 
+	.game-mode .status-content {
+		padding: 0;
+	}
+
 	.status-content {
 		padding: 0 1.5rem;
 		display: flex;
