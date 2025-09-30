@@ -31,12 +31,14 @@ export default defineConfig({
 	},
 	server: {
 		host: true,
-		allowedHosts: ['thankful-trusting-jaguar.ngrok-free.app'],
+		allowedHosts: true,
 		fs: {
 			allow: ['..']
 		}
 	},
 	preview: {
+		host: true,
+		allowedHosts: true,
 		port: 4173,
 		strictPort: true
 	}

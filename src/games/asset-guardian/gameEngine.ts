@@ -13,6 +13,7 @@ import { createVisualEffectsManager, convertTiltToNormalized, smoothTiltTransiti
 import type { VisualEffectsManager } from './visual-effects';
 import { createEffectsManager } from './effects';
 import type { EffectsManager } from './effects';
+import { triggerHapticFeedback } from '$lib/telegram/integration';
 
 export interface GameEngineConfig {
 	width: number;
@@ -104,6 +105,16 @@ export class AssetGuardianGameEngine {
 			height: this.config.height
 		});
 
+		this.physics.addCollisionHandler('wall', (result) => {
+			triggerHapticFeedback();
+			this.createWallHitEffect(result.position);
+		});
+
+		this.physics.addCollisionHandler('boundary', (result) => {
+			triggerHapticFeedback();
+			this.createWallHitEffect(result.position);
+		});
+
 		this.physics.addCollisionHandler('cashback', (result) => {
 			this.createBonusEffect(result.position, 'cashback');
 		});
@@ -113,10 +124,12 @@ export class AssetGuardianGameEngine {
 		});
 
 		this.physics.addCollisionHandler('trap_phishing', (result) => {
+			triggerHapticFeedback();
 			this.createTrapEffect(result.position, 'trap_phishing');
 		});
 
 		this.physics.addCollisionHandler('trap_fraud', (result) => {
+			triggerHapticFeedback();
 			this.createTrapEffect(result.position, 'trap_fraud');
 		});
 
@@ -477,6 +490,7 @@ export class AssetGuardianGameEngine {
 			containerElement.style.transform =
 				`perspective(${perspective.intensity}px) ` +
 				`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
 		}
 	}
 

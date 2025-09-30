@@ -14,33 +14,26 @@ export const GAME_CONFIG = {
 export const BALL_CONFIG = {
 	RADIUS: 12,
 	MASS: 1.2,
-	INITIAL_ENERGY: 100,
-	MAX_VELOCITY: 120,
-	MIN_VELOCITY: 0.5,
-	FRICTION_COEFFICIENT: 0.92,
-	RESTITUTION: 0.2,
-	COLLISION_DAMPENING: 0.75
 } as const;
 
 export const PHYSICS_CONFIG = {
-	GRAVITY_STRENGTH: 180,
-	MAX_GRAVITY: 350,
-	AIR_RESISTANCE: 0.996,
-	WALL_RESTITUTION: 0.3,
-	WALL_FRICTION: 0.6,
-	COLLISION_TOLERANCE: 3,
+	GRAVITY_STRENGTH: 2, // Drastically lowered to create a low natural terminal velocity
+	MAX_GRAVITY: 100,
+	AIR_RESISTANCE: 0.15, // Very high drag for sluggish feel
 	PHYSICS_STEP: 1/60,
-	BOUNCE_ENERGY_LOSS: 0.05,
-	SURFACE_FRICTION: {
-		SMOOTH: 0.1,
-		NORMAL: 0.4,
-		ROUGH: 0.7
-	}
+
+	// Ball properties
+	BALL_FRICTION: 0.01,
+	BALL_FRICTION_STATIC: 0.5, // Increased static friction
+	BALL_RESTITUTION: 0.1, // Lowered bounce
+
+	// Wall properties
+	WALL_FRICTION: 0.01, // Low friction for smooth sliding
+	WALL_RESTITUTION: 0.1, // A little bounce back from walls
 } as const;
 
 export const GYROSCOPE_CONFIG = {
-	CALIBRATION_TIME: 3000,
-	SENSITIVITY: 0.025,
+	SENSITIVITY: 0.015, // Lowered for wider tilt range
 	DEAD_ZONE: 3.0,
 	MAX_TILT: 60,
 	SMOOTHING_FACTOR: 0.8,

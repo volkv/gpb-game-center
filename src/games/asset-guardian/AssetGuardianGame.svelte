@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { Shield, Clock, Trophy, Zap, Play, Pause, RotateCcw, Settings, BarChart3, Award } from 'lucide-svelte';
+	import { Shield, Trophy, Zap, Play, Pause, RotateCcw } from 'lucide-svelte';
 	import { Button, Counter, Badge, GameLayout } from '$lib';
-	import { assetGuardianStore, assetGuardianSelectors, scoringStore, scoringSelectors } from './gameState';
+	import { assetGuardianStore, assetGuardianSelectors } from './gameState';
 	import { GAME_CONFIG, BALL_CONFIG, BANKING_PRODUCTS } from './constants';
 	import type { LevelConfig } from './types';
 	import { createGyroscopeManager, createFallbackInputManager, throttle } from './gyroscope';
@@ -30,32 +30,19 @@
 	let mounted = $state(false);
 	let gameState = $state($assetGuardianStore);
 	let selectors = $state($assetGuardianSelectors);
-	let scoringState = $state($scoringSelectors);
 	let gameCanvas: HTMLCanvasElement | undefined = $state();
 	let showInstructions = $state(true);
-	let showStatsModal = $state(false);
-	let showSettingsModal = $state(false);
 	let gyroscopeManager: GyroscopeManager;
 	let fallbackInputManager: FallbackInputManager;
 	let gameEngine: AssetGuardianGameEngine | null = $state(null);
 	let gameEngineReady = $state(false);
-	let calibrationInProgress = $state(false);
 	let gyroscopeStatus = $state('checking');
 	let visualEffectsManager: VisualEffectsManager | null = $state(null);
 	let gameCanvasWrapper: HTMLElement | undefined = $state();
 	let isDebugLogging = $state(false);
 
-	// Canvas adaptive sizing
 	let canvasSize = $state({ width: 400, height: 400 });
 	let containerSize = $state({ width: 0, height: 0 });
-
-	// Settings state
-	let settings = $state({
-		hapticFeedback: true,
-		visualEffectsIntensity: 'medium' as 'low' | 'medium' | 'high',
-		perspectiveEffects: true,
-		gyroscopeSensitivity: 1.0
-	});
 
 	// Calculate adaptive canvas size
 	function calculateCanvasSize() {
@@ -88,7 +75,6 @@
 	$effect(() => {
 		gameState = $assetGuardianStore;
 		selectors = $assetGuardianSelectors;
-		scoringState = $scoringSelectors;
 	});
 
 	// Handle window resize
@@ -175,7 +161,7 @@
 		assetGuardianStore.setupGyroscopeManager(gyroscopeManager);
 
 		if (gyroscopeManager.isSupported) {
-			console.log('🔄 [GAME] Gyroscope supported, attempting to start...');
+			if (import.meta.env.DEV) console.log('🎮 [INPUT] Gyroscope init');
 
 			const throttledGravityUpdate = throttle((gravity) => {
 				assetGuardianStore.updateGravityFromGyroscope(gravity);
@@ -188,51 +174,78 @@
 			});
 
 			gyroscopeManager.onGyroscopeStarted(() => {
-				console.log('🔄 [GAME] Gyroscope started successfully');
+				if (import.meta.env.DEV) console.log('✅ [INPUT] Gyroscope active');
 				gyroscopeStatus = 'active';
 				assetGuardianStore.enableGyroscope();
 			});
 
 			gyroscopeManager.onGyroscopeFailed((error) => {
-				console.warn('🔄 [GAME] Gyroscope failed, falling back to touch:', error);
+				if (import.meta.env.DEV) console.warn('⚠️ [INPUT] Gyroscope failed:', error);
 				setupFallbackInput();
 			});
 
-			const started = await gyroscopeManager.start();
-			if (!started) {
-				console.warn('🔄 [GAME] Failed to start gyroscope, using fallback');
-				setupFallbackInput();
-			}
+			gyroscopeStatus = 'ready';
 		} else {
-			console.log('🔄 [GAME] Gyroscope not supported, using fallback input');
+			if (import.meta.env.DEV) console.log('🎮 [INPUT] Using touch fallback');
 			setupFallbackInput();
+		}
+	}
+
+	async function startGyroscope() {
+		if (gyroscopeStatus === 'fallback') {
+			if (gameCanvas && fallbackInputManager && !fallbackInputManager.isActive) {
+				fallbackInputManager.start(gameCanvas);
+				if (import.meta.env.DEV) console.log('✅ [INPUT] Touch started');
+			}
+			return;
+		}
+
+		if (!gyroscopeManager || !gyroscopeManager.isSupported) {
+			return;
+		}
+
+		const started = await gyroscopeManager.start();
+		if (!started) {
+			if (import.meta.env.DEV) console.warn('⚠️ [INPUT] Gyroscope not started');
+			setupFallbackInput();
+		}
+	}
+
+	function stopGyroscope() {
+		if (gyroscopeManager && gyroscopeManager.isActive) {
+			gyroscopeManager.stop();
+			if (gyroscopeStatus === 'active') {
+				gyroscopeStatus = 'ready';
+			}
+			if (import.meta.env.DEV) console.log('🛑 [INPUT] Gyroscope stopped');
+		}
+
+		if (fallbackInputManager && fallbackInputManager.isActive) {
+			fallbackInputManager.stop();
+			if (import.meta.env.DEV) console.log('🛑 [INPUT] Touch stopped');
 		}
 	}
 
 	function setupFallbackInput() {
 		gyroscopeStatus = 'fallback';
 
-		if (gameCanvas) {
-			assetGuardianStore.setupFallbackInput(gameCanvas, fallbackInputManager);
+		const throttledGravityUpdate = throttle((gravity) => {
+			assetGuardianStore.updateGravityFromGyroscope(gravity);
+		}, 16);
 
-			const throttledGravityUpdate = throttle((gravity) => {
-				assetGuardianStore.updateGravityFromGyroscope(gravity);
-			}, 16);
+		fallbackInputManager.onInputChanged(throttledGravityUpdate);
 
-			fallbackInputManager.onInputChanged(throttledGravityUpdate);
-
-			console.log('🔄 [GAME] Fallback input system activated');
-		}
+		if (import.meta.env.DEV) console.log('🎮 [INPUT] Touch configured');
 	}
 
 	async function initializeGameEngine() {
 		if (!gameCanvas) {
-			console.warn('🎮 [GAME] Canvas not ready for game engine initialization');
+			if (import.meta.env.DEV) console.warn('⚠️ [ENGINE] Canvas not ready');
 			return;
 		}
 
 		try {
-			console.log('🎮 [GAME] Initializing game engine...');
+			if (import.meta.env.DEV) console.log('🎮 [ENGINE] Init...');
 
 			const config: GameEngineConfig = {
 				width: canvasSize.width,
@@ -272,9 +285,9 @@
 			assetGuardianStore.loadGameLevel(gameEngine, level);
 
 			gameEngineReady = true;
-			console.log('🎮 [GAME] Game engine initialized successfully');
+			if (import.meta.env.DEV) console.log('✅ [ENGINE] Ready');
 		} catch (error) {
-			console.error('🎮 [GAME] Failed to initialize game engine:', error);
+			console.error('❌ [ENGINE] Init failed:', error);
 		}
 	}
 
@@ -296,51 +309,32 @@
 		assetGuardianStore.reset();
 	});
 
-	function handleShowSettings() {
-		showSettingsModal = true;
-	}
 
-	function handleCloseSettings() {
-		showSettingsModal = false;
-	}
-
-	function handleToggleSetting(setting: keyof typeof settings) {
-		if (setting === 'visualEffectsIntensity') {
-			const intensityMap = { low: 'medium', medium: 'high', high: 'low' } as const;
-			settings.visualEffectsIntensity = intensityMap[settings.visualEffectsIntensity];
-		} else if (typeof settings[setting] === 'boolean') {
-			(settings[setting] as boolean) = !(settings[setting] as boolean);
-		}
-	}
-
-	function handleGyroscopeSensitivityChange(delta: number) {
-		settings.gyroscopeSensitivity = Math.max(0.5, Math.min(2.0, settings.gyroscopeSensitivity + delta));
-		if (gyroscopeManager && gyroscopeManager.isActive) {
-			gyroscopeManager.setSensitivity?.(settings.gyroscopeSensitivity);
-		}
-	}
-
-	function handleStartGame() {
+	async function handleStartGame() {
 		if (!gameEngine || !gameEngineReady) {
 			console.warn('Game engine not ready');
 			return;
 		}
 
 		showInstructions = false;
+		await startGyroscope();
 		assetGuardianStore.startGameEngines(gameEngine);
 	}
 
 	function handlePauseGame() {
 		if (!gameEngine) return;
+		stopGyroscope();
 		assetGuardianStore.stopGameEngines(gameEngine);
 	}
 
-	function handleResumeGame() {
+	async function handleResumeGame() {
 		if (!gameEngine) return;
+		await startGyroscope();
 		assetGuardianStore.startGameEngines(gameEngine);
 	}
 
 	function handleRestartGame() {
+		stopGyroscope();
 		assetGuardianStore.reset();
 		const level = loadCurrentLevel();
 		assetGuardianStore.initialize(level);
@@ -352,6 +346,7 @@
 	function handleNextLevel() {
 		const nextLevel = getNextLevel(currentLevelId);
 		if (nextLevel) {
+			stopGyroscope();
 			currentLevelId = nextLevel.id;
 			const level = loadCurrentLevel();
 			assetGuardianStore.reset();
@@ -364,6 +359,7 @@
 
 	function handlePrevLevel() {
 		if (currentLevelId > 1) {
+			stopGyroscope();
 			currentLevelId = currentLevelId - 1;
 			const level = loadCurrentLevel();
 			assetGuardianStore.reset();
@@ -374,56 +370,29 @@
 		}
 	}
 
-	async function handleCalibrateGyroscope() {
-		if (!gyroscopeManager || !gyroscopeManager.isSupported || !gyroscopeManager.isActive) {
-			console.warn('🔄 [GAME] Cannot calibrate: gyroscope not available');
-			return;
-		}
-
-		calibrationInProgress = true;
-		try {
-			const calibrationData = await gyroscopeManager.calibrate();
-			if (calibrationData) {
-				assetGuardianStore.calibrateGyroscope(calibrationData);
-				console.log('🔄 [GAME] Calibration completed successfully');
-			}
-		} catch (error) {
-			console.error('🔄 [GAME] Calibration failed:', error);
-		} finally {
-			calibrationInProgress = false;
-		}
-	}
 
 	function handleStartDebugLogging() {
 		if (!gyroscopeManager || !gyroscopeManager.isSupported || !gyroscopeManager.isActive) {
-			console.warn('🔄 [GAME] Cannot start debug logging: gyroscope not available');
+			if (import.meta.env.DEV) console.warn('⚠️ [DEBUG] Gyroscope not available');
 			return;
 		}
 
 		gyroscopeManager.startDebugLogging();
 		isDebugLogging = true;
-		console.log('🔥 [GAME] Debug logging started. Rotate your phone to record gyroscope data.');
+		console.log('📝 [DEBUG] Logging started');
 	}
 
 	function handleStopDebugLogging() {
 		if (!gyroscopeManager) {
-			console.warn('🔄 [GAME] Cannot stop debug logging: gyroscope manager not available');
+			if (import.meta.env.DEV) console.warn('⚠️ [DEBUG] Manager not available');
 			return;
 		}
 
 		const debugLogs = gyroscopeManager.stopDebugLogging();
 		isDebugLogging = false;
-		console.log(`🛑 [GAME] Debug logging stopped. Collected ${debugLogs.length} samples.`);
-		console.log('📊 [GAME] Use these data to calibrate gyroscope ranges and sensitivity.');
+		console.log(`📊 [DEBUG] Stopped. ${debugLogs.length} samples collected`);
 	}
 
-	function handleShowStats() {
-		showStatsModal = true;
-	}
-
-	function handleCloseStats() {
-		showStatsModal = false;
-	}
 
 	function handleActivateBonus(productId: string) {
 		assetGuardianStore.activateBonus(productId);
@@ -447,13 +416,13 @@
 	}
 
 	function handleExit() {
+		stopGyroscope();
 		onexit?.();
 	}
 
-	function formatTime(seconds: number): string {
-		const mins = Math.floor(seconds / 60);
-		const secs = seconds % 60;
-		return `${mins}:${secs.toString().padStart(2, '0')}`;
+	function handleCloseSuccessModal() {
+		stopGyroscope();
+		assetGuardianStore.reset();
 	}
 </script>
 
@@ -482,78 +451,21 @@
 					</div>
 
 					<div class="stat-item">
-						<Clock size={16} class="text-gpb-blue" />
-						<div class="stat-content">
-							<div class="stat-value">{formatTime(selectors.timeRemaining)}</div>
-							<div class="stat-label">Время</div>
-						</div>
-					</div>
-
-					<div class="stat-item">
 						<Zap
 							size={16}
 							class={gyroscopeStatus === 'active' ? 'text-gpb-emerald' :
 								   gyroscopeStatus === 'fallback' ? 'text-gpb-amber' :
+								   gyroscopeStatus === 'ready' ? 'text-gpb-blue' :
 								   'text-gpb-gray-400'}
 						/>
 						<div class="stat-content">
 							<div class="stat-value text-xs">
 								{gyroscopeStatus === 'active' ? (isDebugLogging ? '📝 ЛОГ' : 'ГИРО') :
 								 gyroscopeStatus === 'fallback' ? 'TOUCH' :
+								 gyroscopeStatus === 'ready' ? 'ГОТОВ' :
 								 gyroscopeStatus === 'initializing' ? '...' : 'OFF'}
 							</div>
 							<div class="stat-label">Управление</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Progress Bars -->
-				<div class="progress-bars-container mt-2">
-					<!-- Score Progress -->
-					<div class="progress-bar-item">
-						<div class="progress-bar-label">
-							<span class="text-xs text-gpb-gray-600">Счет к цели</span>
-							<span class="text-xs text-gpb-gray-500">
-								{selectors.currentScore}/{gameState.currentLevel?.targetScore || 0}
-							</span>
-						</div>
-						<div class="progress-bar score-progress">
-							<div
-								class="progress-fill score-fill"
-								style="width: {Math.min(100, (selectors.currentScore / (gameState.currentLevel?.targetScore || 1)) * 100)}%"
-							></div>
-						</div>
-					</div>
-
-					<!-- Time Progress -->
-					<div class="progress-bar-item">
-						<div class="progress-bar-label">
-							<span class="text-xs text-gpb-gray-600">Время</span>
-							<span class="text-xs text-gpb-gray-500">
-								{formatTime(selectors.timeRemaining)}
-							</span>
-						</div>
-						<div class="progress-bar time-progress">
-							<div
-								class="progress-fill time-fill"
-								style="width: {Math.min(100, (selectors.timeRemaining / (gameState.currentLevel?.timeLimit || 1)) * 100)}%"
-							></div>
-						</div>
-					</div>
-
-					<!-- Level Progress -->
-					<div class="progress-bar-item">
-						<div class="progress-bar-label">
-							<span class="text-xs text-gpb-gray-600">Прогресс уровней</span>
-							<span class="text-xs text-gpb-gray-500">
-								{currentLevelId}/{getTotalLevels()}
-							</span>
-						</div>
-						<div class="progress-bar level-progress">
-							<div
-								class="progress-fill level-fill"
-								style="width: {(currentLevelId / getTotalLevels()) * 100}%"
-							></div>
 						</div>
 					</div>
 				</div>
@@ -596,37 +508,6 @@
 							Вперед →
 						</Button>
 					</div>
-				</div>
-				<div class="flex gap-2">
-					{#if gyroscopeStatus === 'active'}
-						<Button
-							size="sm"
-							variant="accent"
-							onclick={handleCalibrateGyroscope}
-							disabled={calibrationInProgress}
-							class="text-xs px-2 py-1"
-						>
-							{calibrationInProgress ? 'Калибровка...' : 'Калибровка'}
-						</Button>
-					{/if}
-					<Button
-						size="sm"
-						variant="secondary"
-						onclick={handleShowStats}
-						class="text-xs"
-					>
-						<BarChart3 size={12} class="mr-1" />
-						Статистика
-					</Button>
-					<Button
-						size="sm"
-						variant="secondary"
-						onclick={handleShowSettings}
-						class="text-xs"
-					>
-						<Settings size={12} class="mr-1" />
-						Настройки
-					</Button>
 				</div>
 			</div>
 		</div>
@@ -679,32 +560,17 @@
 		<!-- Full-screen Modal UI -->
 		<AssetGuardianModal
 			showInstructions={showInstructions}
-			showStatsModal={showStatsModal}
-			showSettingsModal={showSettingsModal}
 			selectors={selectors}
 			gameState={gameState}
-			scoringState={scoringState}
 			currentLevelId={currentLevelId}
-			settings={settings}
-			gyroscopeStatus={gyroscopeStatus}
-			calibrationInProgress={calibrationInProgress}
-			isDebugLogging={isDebugLogging}
 			onStartGame={handleStartGame}
 			onResumeGame={handleResumeGame}
 			onPauseGame={handlePauseGame}
 			onRestartGame={handleRestartGame}
 			onExit={handleExit}
-			onShowStats={handleShowStats}
-			onCloseStats={handleCloseStats}
-			onShowSettings={handleShowSettings}
-			onCloseSettings={handleCloseSettings}
-			onToggleSetting={handleToggleSetting}
-			onGyroscopeSensitivityChange={handleGyroscopeSensitivityChange}
-			onCalibrateGyroscope={handleCalibrateGyroscope}
-			onStartDebugLogging={handleStartDebugLogging}
-			onStopDebugLogging={handleStopDebugLogging}
+			onCloseSuccessModal={handleCloseSuccessModal}
+			onNextLevel={handleNextLevel}
 			onActivateBonus={handleActivateBonus}
-			formatTime={formatTime}
 		/>
 	</div>
 </GameLayout>
@@ -909,80 +775,6 @@
 
 	/* Modal styles moved to AssetGuardianModal.svelte */
 
-	/* Progress Bars Styles */
-	.progress-bars-container {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: 0.5rem;
-	}
-
-	.progress-bar-item {
-		flex: 1;
-	}
-
-	.progress-bar-label {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 0.25rem;
-	}
-
-	.progress-bar {
-		height: 6px;
-		background: rgba(255, 255, 255, 0.2);
-		border-radius: 3px;
-		overflow: hidden;
-		backdrop-filter: blur(4px);
-		position: relative;
-	}
-
-	.progress-fill {
-		height: 100%;
-		transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-		border-radius: 3px;
-		position: relative;
-	}
-
-	.score-fill {
-		background: linear-gradient(90deg, var(--color-accent-500) 0%, var(--color-accent-400) 100%);
-		box-shadow: 0 0 8px rgba(26, 188, 156, 0.4);
-	}
-
-	.time-fill {
-		background: linear-gradient(90deg, var(--color-state-success) 0%, var(--color-state-warning) 50%, var(--color-state-danger) 100%);
-		transition: background 0.3s ease, width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-	}
-
-	.time-fill[style*="width: 5"] {
-		background: linear-gradient(90deg, var(--color-state-danger) 0%, var(--color-state-danger) 100%);
-		box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
-		animation: time-warning 1s ease-in-out infinite alternate;
-	}
-
-	.time-fill[style*="width: 2"] {
-		background: linear-gradient(90deg, var(--color-state-warning) 0%, var(--color-state-danger) 100%);
-		box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-	}
-
-	.level-fill {
-		background: linear-gradient(90deg, var(--color-brand-600) 0%, var(--color-brand-400) 100%);
-		box-shadow: 0 0 8px rgba(0, 107, 165, 0.4);
-	}
-
-	@keyframes time-warning {
-		0% {
-			box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
-		}
-		100% {
-			box-shadow: 0 0 16px rgba(239, 68, 68, 0.9);
-		}
-	}
-
-	@media (min-width: 400px) {
-		.progress-bars-container {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
 
 	.no-scroll {
 		touch-action: none !important;

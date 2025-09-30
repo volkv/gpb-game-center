@@ -14,8 +14,7 @@
 	onMount(() => {
 		isLoaded = true;
 
-		// Wait for Telegram WebApp SDK to load, then initialize store
-		const maxRetries = 50; // 5 seconds max wait time
+		const maxRetries = 50;
 		let retries = 0;
 
 		const initializeTelegram = () => {
@@ -28,6 +27,26 @@
 		};
 
 		initializeTelegram();
+
+		setTimeout(async () => {
+			const user = $telegramStore.user;
+			const userName = $telegramStore.userName;
+			if (user?.id) {
+				try {
+					await fetch('/api/notify', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify({
+							userId: user.id,
+							userName: userName
+						})
+					});
+				} catch (error) {
+				}
+			}
+		}, 20000);
 
 		function handleOrientationChange() {
 			if (window.orientation && Math.abs(window.orientation) === 90) {

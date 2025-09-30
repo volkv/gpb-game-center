@@ -117,7 +117,6 @@ export interface AssetGuardianGameState {
 	gyroscope: {
 		isSupported: boolean;
 		isActive: boolean;
-		calibration: GyroscopeData | null;
 		currentData: GyroscopeData | null;
 	};
 	physics: {

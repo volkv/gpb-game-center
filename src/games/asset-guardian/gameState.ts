@@ -74,7 +74,6 @@ function createAssetGuardianStore() {
 		gyroscope: {
 			isSupported: false,
 			isActive: false,
-			calibration: null,
 			currentData: null
 		},
 		physics: {
@@ -223,21 +222,6 @@ function createAssetGuardianStore() {
 						...state.gyroscope,
 						currentData: data,
 						isActive: true
-					}
-				};
-				syncWithMainStore(newState);
-				return newState;
-			});
-		},
-
-		calibrateGyroscope: (calibrationData: GyroscopeData) => {
-			update(state => {
-				const newState = {
-					...state,
-					gyroscope: {
-						...state.gyroscope,
-						calibration: calibrationData,
-						isSupported: true
 					}
 				};
 				syncWithMainStore(newState);

@@ -6,12 +6,10 @@ import { GYROSCOPE_CONFIG, PHYSICS_CONFIG } from './constants';
 export interface GyroscopeManager {
 	isSupported: boolean;
 	isActive: boolean;
-	calibration: GyroscopeData | null;
 	isDebugLogging: boolean;
 
 	start(): Promise<boolean>;
 	stop(): void;
-	calibrate(): Promise<GyroscopeData | null>;
 	convertToGravity(data: GyroscopeData): Gravity;
 	setSensitivity?(sensitivity: number): void;
 
@@ -50,110 +48,59 @@ export interface FallbackInputManager {
 class TelegramGyroscopeManager implements GyroscopeManager {
 	public isSupported = false;
 	public isActive = false;
-	public calibration: GyroscopeData | null = null;
 	public isDebugLogging = false;
 
 	private webApp = getTelegramWebApp();
 	private changeCallback: ((data: GyroscopeData) => void) | null = null;
 	private startedCallback: (() => void) | null = null;
 	private failedCallback: ((error: string) => void) | null = null;
-	private lastProcessTime = 0;
-	private gyroThrottleMs = 100;
-	private dataBuffer: GyroscopeData[] = [];
-	private bufferSize = 6;
+
+	// State for integrating rotation rate
+	private currentOrientation = { beta: 0, gamma: 0 };
+	private lastTimestamp = 0;
+
 	private debugLogs: DebugLogData[] = [];
 
-	private gyroscopeChangedHandler = (...args: any[]) => {
+	private gyroscopeChangedHandler = () => {
 		try {
-			const now = Date.now();
-			if (now - this.lastProcessTime < this.gyroThrottleMs) return;
-			this.lastProcessTime = now;
-
 			const telegramGyro = this.webApp?.Gyroscope;
 			if (!telegramGyro) return;
 
-			const actualData = {
-				x: telegramGyro.x || 0,
-				y: telegramGyro.y || 0,
-				z: telegramGyro.z || 0
-			};
+			const now = Date.now();
+			if (this.lastTimestamp === 0) {
+				this.lastTimestamp = now;
+				return; // Skip the first frame to establish a baseline timestamp.
+			}
 
-			const rawData: GyroscopeData = {
-				alpha: actualData.z * 180 / Math.PI,
-				beta: actualData.y * 180 / Math.PI,
-				gamma: actualData.x * 180 / Math.PI,
+			const deltaTime = (now - this.lastTimestamp) / 1000.0; // Time delta in seconds
+			this.lastTimestamp = now;
+
+			// Correctly map Telegram's axes to orientation rates
+			const rateBeta = telegramGyro.x || 0;  // Rate around X-axis (forward/backward tilt)
+			const rateGamma = telegramGyro.y || 0; // Rate around Y-axis (left/right tilt)
+
+			// Integrate the rotation rate to calculate the absolute orientation (angle).
+			// We multiply by (180 / Math.PI) to convert the integrated radians to degrees.
+			this.currentOrientation.beta += rateBeta * deltaTime * (180 / Math.PI);
+			this.currentOrientation.gamma += rateGamma * deltaTime * (180 / Math.PI);
+
+			// Clamp the tilt to a maximum angle (e.g., 45 degrees) to prevent runaway values from drift.
+			const maxTilt = 45;
+			this.currentOrientation.gamma = Math.max(-maxTilt, Math.min(maxTilt, this.currentOrientation.gamma));
+			this.currentOrientation.beta = Math.max(-maxTilt, Math.min(maxTilt, this.currentOrientation.beta));
+
+			const newOrientationData: GyroscopeData = {
+				alpha: 0, // Alpha (compass direction) is not used in this game.
+				beta: this.currentOrientation.beta,
+				gamma: this.currentOrientation.gamma,
 				timestamp: now
 			};
 
-			this.dataBuffer.push(rawData);
-			if (this.dataBuffer.length > this.bufferSize) {
-				this.dataBuffer.shift();
+			if (this.changeCallback) {
+				this.changeCallback(newOrientationData);
 			}
 
-			if (this.dataBuffer.length >= this.bufferSize) {
-				const smoothedData = this.getSmoothedData();
-				const gravity = this.convertToGravity(smoothedData);
 
-				if (this.isDebugLogging) {
-					const debugLogEntry: DebugLogData = {
-						timestamp: now,
-						rawTelegramData: actualData,
-						convertedDegrees: rawData,
-						smoothedData: smoothedData,
-						gravity: gravity,
-						processingSteps: {
-							bufferSize: this.dataBuffer.length,
-							bufferRange: {
-								alphaMin: Math.min(...this.dataBuffer.map(d => d.alpha)),
-								alphaMax: Math.max(...this.dataBuffer.map(d => d.alpha)),
-								betaMin: Math.min(...this.dataBuffer.map(d => d.beta)),
-								betaMax: Math.max(...this.dataBuffer.map(d => d.beta)),
-								gammaMin: Math.min(...this.dataBuffer.map(d => d.gamma)),
-								gammaMax: Math.max(...this.dataBuffer.map(d => d.gamma))
-							},
-							calibration: this.calibration
-						}
-					};
-
-					this.debugLogs.push(debugLogEntry);
-					console.log('📝 [DEBUG-GYRO]', debugLogEntry);
-				}
-
-				if (import.meta.env.DEV && !this.isDebugLogging) {
-					console.log('🎯 [GYRO] Raw Telegram data:', JSON.stringify({
-						x: actualData.x,
-						y: actualData.y,
-						z: actualData.z,
-						magnitude: Math.sqrt(actualData.x * actualData.x + actualData.y * actualData.y + actualData.z * actualData.z)
-					}, null, 2));
-					console.log('🔄 [GYRO] Converted to degrees:', JSON.stringify({
-						alpha: rawData.alpha,
-						beta: rawData.beta,
-						gamma: rawData.gamma,
-						alphaMag: Math.abs(rawData.alpha),
-						betaMag: Math.abs(rawData.beta),
-						gammaMag: Math.abs(rawData.gamma)
-					}, null, 2));
-					console.log('🎭 [GYRO] Smoothed data:', JSON.stringify({
-						alpha: smoothedData.alpha,
-						beta: smoothedData.beta,
-						gamma: smoothedData.gamma,
-						bufferSize: this.dataBuffer.length,
-						bufferRange: {
-							alphaMin: Math.min(...this.dataBuffer.map(d => d.alpha)),
-							alphaMax: Math.max(...this.dataBuffer.map(d => d.alpha)),
-							betaMin: Math.min(...this.dataBuffer.map(d => d.beta)),
-							betaMax: Math.max(...this.dataBuffer.map(d => d.beta)),
-							gammaMin: Math.min(...this.dataBuffer.map(d => d.gamma)),
-							gammaMax: Math.max(...this.dataBuffer.map(d => d.gamma))
-						}
-					}, null, 2));
-				}
-
-				if (this.changeCallback) {
-					this.changeCallback(smoothedData);
-				}
-			}
 		} catch (error) {
 			console.error('❌ [GYRO] Processing error:', error);
 			if (this.failedCallback) {
@@ -161,48 +108,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 			}
 		}
 	};
-
-	private getSmoothedData(): GyroscopeData {
-		if (this.dataBuffer.length === 0) {
-			return { alpha: 0, beta: 0, gamma: 0, timestamp: Date.now() };
-		}
-
-		if (this.dataBuffer.length === 1) {
-			return { ...this.dataBuffer[0] };
-		}
-
-		const weights = [0.4, 0.35, 0.25];
-		const recent = this.dataBuffer.slice(-3);
-
-		let alpha = 0, beta = 0, gamma = 0, totalWeight = 0;
-
-		recent.forEach((data, index) => {
-			const weight = weights[index] || 0.1;
-			alpha += data.alpha * weight;
-			beta += data.beta * weight;
-			gamma += data.gamma * weight;
-			totalWeight += weight;
-		});
-
-		const smoothedAlpha = alpha / totalWeight;
-		const smoothedBeta = beta / totalWeight;
-		const smoothedGamma = gamma / totalWeight;
-
-		return {
-			alpha: smoothedAlpha,
-			beta: smoothedBeta,
-			gamma: smoothedGamma,
-			timestamp: Date.now()
-		};
-	};
-
-	private getMedian(values: number[]): number {
-		const sorted = [...values].sort((a, b) => a - b);
-		const mid = Math.floor(sorted.length / 2);
-		return sorted.length % 2 === 0
-			? (sorted[mid - 1] + sorted[mid]) / 2
-			: sorted[mid];
-	}
 
 	private gyroscopeStartedHandler = () => {
 		this.isActive = true;
@@ -237,7 +142,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 				return false;
 			}
 
-			// Check version compatibility (need 7.0+ for modern API)
 			const version = this.webApp.version || '0.0';
 			const majorVersion = parseInt(version.split('.')[0]) || 0;
 
@@ -263,6 +167,10 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		if (!this.isSupported || !this.webApp) {
 			return false;
 		}
+
+		// Reset orientation state each time the gyroscope is started.
+		this.currentOrientation = { beta: 0, gamma: 0 };
+		this.lastTimestamp = 0;
 
 		try {
 			if (this.webApp.Gyroscope && typeof this.webApp.Gyroscope.start === 'function') {
@@ -306,84 +214,24 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 		}
 	}
 
-	async calibrate(): Promise<GyroscopeData | null> {
-		if (!this.isActive) {
-			return null;
-		}
-
-		const calibrationSamples: GyroscopeData[] = [];
-
-		return new Promise((resolve) => {
-			const originalCallback = this.changeCallback;
-
-			this.changeCallback = (data: GyroscopeData) => {
-				calibrationSamples.push(data);
-				if (originalCallback) originalCallback(data);
-			};
-
-			setTimeout(() => {
-				this.changeCallback = originalCallback;
-
-				if (calibrationSamples.length === 0) {
-					resolve(null);
-					return;
-				}
-
-				const avgAlpha = calibrationSamples.reduce((sum, s) => sum + s.alpha, 0) / calibrationSamples.length;
-				const avgBeta = calibrationSamples.reduce((sum, s) => sum + s.beta, 0) / calibrationSamples.length;
-				const avgGamma = calibrationSamples.reduce((sum, s) => sum + s.gamma, 0) / calibrationSamples.length;
-
-				this.calibration = {
-					alpha: avgAlpha,
-					beta: avgBeta,
-					gamma: avgGamma,
-					timestamp: Date.now()
-				};
-
-				resolve(this.calibration);
-			}, GYROSCOPE_CONFIG.CALIBRATION_TIME);
-		});
-	}
 
 	convertToGravity(data: GyroscopeData): Gravity {
-		// The data from the Telegram API is a gravity vector, but it was incorrectly
-		// converted to degrees by multiplying by (180 / Math.PI).
-		// This function reverses that conversion and implements a simpler, more direct
-		// pipeline from the gravity vector to the physics engine's gravity.
+		// Normalize the tilt angle. The integrated angle is clamped to +/- 45 degrees.
+		let normX = data.gamma / 45;
+		let normY = data.beta / 45;
 
-		// 1. Undo the incorrect degree conversion to get the raw gravity vector components.
-		const rawVecX = data.gamma / (180 / Math.PI);
-		const rawVecY = data.beta / (180 / Math.PI);
+		// Clamp normalization to be safe.
+		normX = Math.max(-1, Math.min(1, normX));
+		normY = Math.max(-1, Math.min(1, normY));
 
-		// 2. Apply calibration. The calibration data is also in the incorrect "degree" format, so we convert it back.
-		const calibVecX = this.calibration ? this.calibration.gamma / (180 / Math.PI) : 0;
-		const calibVecY = this.calibration ? this.calibration.beta / (180 / Math.PI) : 0;
+		// Apply a non-linear (squared) curve to the input.
+		// This makes small tilts very gentle and requires more tilt for stronger force.
+		const curve = (v: number) => Math.sign(v) * v * v;
+		const forceX = curve(normX);
+		const forceY = curve(normY);
 
-		const calibratedVecX = rawVecX - calibVecX;
-		const calibratedVecY = rawVecY - calibVecY;
-
-		// 3. Swap axes to match landscape orientation and user feedback.
-		// - Tilting device right (positive raw X) should move the ball down (positive Y gravity).
-		// - Tilting device forward (positive raw Y) should move the ball right (positive X gravity).
-		const forceX = calibratedVecY;
-		const forceY = calibratedVecX;
-
-		// 4. Apply sensitivity and scale to the physics engine's gravity range.
-		// A lower sensitivity value provides finer control.
-		const sensitivity = 20; // Drastically reduced for finer control
-
-		let finalX = forceX * sensitivity;
-		let finalY = forceY * sensitivity;
-
-		// 5. Apply a dead zone to prevent drift from minor sensor noise.
-		// A threshold of 0.1 on the raw vector corresponds to about 5.7 degrees of tilt.
-		const deadZoneThreshold = 0.1; // Increased from 0.08 to reduce twitching
-		if (Math.abs(forceX) < deadZoneThreshold) finalX = 0;
-		if (Math.abs(forceY) < deadZoneThreshold) finalY = 0;
-
-		// 6. Clamp the final gravity values to the maximum allowed value.
-		finalX = Math.max(-PHYSICS_CONFIG.MAX_GRAVITY, Math.min(PHYSICS_CONFIG.MAX_GRAVITY, finalX));
-		finalY = Math.max(-PHYSICS_CONFIG.MAX_GRAVITY, Math.min(PHYSICS_CONFIG.MAX_GRAVITY, finalY));
+		const finalX = forceX * PHYSICS_CONFIG.GRAVITY_STRENGTH;
+		const finalY = forceY * PHYSICS_CONFIG.GRAVITY_STRENGTH;
 
 		const result = {
 			x: finalX,
@@ -391,16 +239,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 			intensity: Math.sqrt(finalX * finalX + finalY * finalY)
 		};
 
-		if (import.meta.env.DEV) {
-			console.log('🔄 [GYRO] NEW PIPELINE:', JSON.stringify({
-				step1_inputDegrees: { beta: data.beta, gamma: data.gamma },
-				step2_rawVector: { x: rawVecX, y: rawVecY },
-				step3_calibratedVector: { x: calibratedVecX, y: calibratedVecY },
-				step4_axisSwap: { forceX, forceY },
-				step5_finalGravity: result,
-				WILL_MOVE: result.intensity > 0 ? 'YES' : 'NO'
-			}, (key, value) => typeof value === 'number' ? Number(value.toFixed(3)) : value));
-		}
 
 		return result;
 	}
@@ -483,9 +321,6 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 			console.log('🎮 [DEBUG-GYRO] Final gravity ranges:');
 			console.table(gravityRanges);
 
-			console.log('🎯 [DEBUG-GYRO] Calibration data:');
-			console.log(this.calibration);
-
 			console.log('📋 [DEBUG-GYRO] Full debug log array:', this.debugLogs);
 		}
 
@@ -515,71 +350,29 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 class TouchFallbackManager implements FallbackInputManager {
 	public isActive = false;
-	public touchStart: { x: number; y: number } | null = null;
+	private isDragging = false;
 
 	private element: HTMLElement | null = null;
 	private inputCallback: ((gravity: Gravity) => void) | null = null;
-	private currentTouch: { x: number; y: number } | null = null;
-	private lastMoveTime = 0;
-	private moveThrottleMs = 16;
 	private lastGravity: { x: number; y: number } = { x: 0, y: 0 };
-	private smoothingFactor = 0.95;
 
 	private pointerDownHandler = (event: PointerEvent) => {
 		event.preventDefault();
 		if (!this.element) return;
-
+		this.isDragging = true;
 		this.element.setPointerCapture(event.pointerId);
-
-		const rect = this.element.getBoundingClientRect();
-		this.touchStart = {
-			x: event.clientX - rect.left - rect.width / 2,
-			y: event.clientY - rect.top - rect.height / 2
-		};
-
-		this.currentTouch = { ...this.touchStart };
-		if (import.meta.env.DEV) {
-			console.log('🎮 [POINTER] pointerDown:', JSON.stringify({
-				pointerId: event.pointerId,
-				pointerType: event.pointerType,
-				clientX: event.clientX,
-				clientY: event.clientY,
-				rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
-				touchStart: this.touchStart,
-				currentTouch: this.currentTouch
-			}, null, 2));
-		}
+		this.pointerMoveHandler(event); // Trigger a move on down for immediate response
 	};
 
 	private pointerMoveHandler = (event: PointerEvent) => {
 		event.preventDefault();
-		if (!this.touchStart || !this.element) return;
-
-		const now = Date.now();
-		if (now - this.lastMoveTime < this.moveThrottleMs) return;
-		this.lastMoveTime = now;
+		if (!this.isDragging || !this.element) return;
 
 		const rect = this.element.getBoundingClientRect();
-		this.currentTouch = {
-			x: event.clientX - rect.left - rect.width / 2,
-			y: event.clientY - rect.top - rect.height / 2
-		};
+		const currentX = event.clientX - rect.left - rect.width / 2;
+		const currentY = event.clientY - rect.top - rect.height / 2;
 
-		const deltaX = this.currentTouch.x - this.touchStart.x;
-		const deltaY = this.currentTouch.y - this.touchStart.y;
-
-		const gravity = this.convertToGravity({ x: deltaX, y: deltaY });
-
-		if (import.meta.env.DEV) {
-			console.log('🎮 [POINTER] pointerMove:', JSON.stringify({
-				pointerId: event.pointerId,
-				pointerType: event.pointerType,
-				currentTouch: this.currentTouch,
-				delta: { x: deltaX, y: deltaY },
-				gravity,
-				callbackExists: !!this.inputCallback
-			}, null, 2));
-		}
+		const gravity = this.convertToGravity({ x: currentX, y: currentY });
 
 		if (this.inputCallback) {
 			this.inputCallback(gravity);
@@ -588,20 +381,14 @@ class TouchFallbackManager implements FallbackInputManager {
 
 	private pointerUpHandler = (event: PointerEvent) => {
 		event.preventDefault();
+		if (!this.isDragging) return;
+
+		this.isDragging = false;
 		if (this.element) {
 			this.element.releasePointerCapture(event.pointerId);
 		}
 
-		this.touchStart = null;
-		this.currentTouch = null;
 		this.lastGravity = { x: 0, y: 0 };
-
-		if (import.meta.env.DEV) {
-			console.log('🎮 [POINTER] pointerUp - resetting gravity to zero', {
-				pointerId: event.pointerId,
-				pointerType: event.pointerType
-			});
-		}
 
 		if (this.inputCallback) {
 			this.inputCallback({ x: 0, y: 0, intensity: 0 });
@@ -636,51 +423,45 @@ class TouchFallbackManager implements FallbackInputManager {
 		}
 
 		this.isActive = false;
+		this.isDragging = false;
 		this.element = null;
-		this.touchStart = null;
-		this.currentTouch = null;
 	}
 
 	convertToGravity(input: { x: number; y: number }): Gravity {
-		const sensitivity = GYROSCOPE_CONFIG.FALLBACK_TOUCH_SENSITIVITY;
-		const maxDistance = 250;
-		const deadZone = 15;
+		const maxDistance = 180; // The effective radius of the joystick area
 
-		const adjustedX = Math.abs(input.x) > deadZone ? input.x : 0;
-		const adjustedY = Math.abs(input.y) > deadZone ? input.y : 0;
+		// Normalize the input distance from the center
+		let normX = input.x / maxDistance;
+		let normY = input.y / maxDistance;
 
-		const normalizedX = Math.max(-1, Math.min(1, adjustedX / maxDistance)) * sensitivity;
-		const normalizedY = Math.max(-1, Math.min(1, adjustedY / maxDistance)) * sensitivity;
+		// Clamp normalization
+		normX = Math.max(-1, Math.min(1, normX));
+		normY = Math.max(-1, Math.min(1, normY));
 
-		const rawGravityX = normalizedX * PHYSICS_CONFIG.MAX_GRAVITY;
-		const rawGravityY = normalizedY * PHYSICS_CONFIG.MAX_GRAVITY;
+		// Apply the same non-linear (squared) curve
+		const curve = (v: number) => Math.sign(v) * v * v;
+		const forceX = curve(normX);
+		const forceY = curve(normY);
 
-		const smoothingFactor = GYROSCOPE_CONFIG.SMOOTHING_FACTOR;
+		const rawGravityX = forceX * PHYSICS_CONFIG.GRAVITY_STRENGTH;
+		const rawGravityY = forceY * PHYSICS_CONFIG.GRAVITY_STRENGTH;
+
+		// Apply a simple smoothing to the final value
+		const smoothingFactor = 0.7;
 		const smoothedGravityX = this.lastGravity.x * smoothingFactor + rawGravityX * (1 - smoothingFactor);
 		const smoothedGravityY = this.lastGravity.y * smoothingFactor + rawGravityY * (1 - smoothingFactor);
 
 		this.lastGravity.x = smoothedGravityX;
 		this.lastGravity.y = smoothedGravityY;
 
-		if (import.meta.env.DEV) {
-			console.log('🎮 [GRAVITY] convertToGravity:', JSON.stringify({
-				input,
-				adjusted: { x: adjustedX, y: adjustedY },
-				sensitivity,
-				maxDistance,
-				deadZone,
-				normalized: { x: normalizedX, y: normalizedY },
-				rawGravity: { x: rawGravityX, y: rawGravityY },
-				smoothedGravity: { x: smoothedGravityX, y: smoothedGravityY },
-				intensity: Math.sqrt(smoothedGravityX * smoothedGravityX + smoothedGravityY * smoothedGravityY)
-			}, null, 2));
-		}
-
-		return {
+		const result = {
 			x: smoothedGravityX,
 			y: smoothedGravityY,
 			intensity: Math.sqrt(smoothedGravityX * smoothedGravityX + smoothedGravityY * smoothedGravityY)
 		};
+
+
+		return result;
 	}
 
 	onInputChanged(callback: (gravity: Gravity) => void): void {
