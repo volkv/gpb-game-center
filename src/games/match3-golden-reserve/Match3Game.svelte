@@ -860,18 +860,7 @@
 		outline-offset: 2px;
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.game-cell,
-		.charge-progress,
-		.animated-score {
-			animation: none !important;
-			transition: none !important;
-		}
 
-		.game-cell:hover {
-			transform: none;
-		}
-	}
 
 	@media (prefers-contrast: high) {
 		.game-cell {

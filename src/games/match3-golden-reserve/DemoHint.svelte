@@ -270,14 +270,5 @@
 		}
 	}
 
-	@media (prefers-reduced-motion: reduce) {
-		.demo-hint-overlay,
-		.demo-hint-card,
-		.step-dot,
-		.close-button,
-		:global(.hint-next-btn) {
-			animation: none !important;
-			transition: none !important;
-		}
-	}
+
 </style>

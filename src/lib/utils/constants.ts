@@ -205,7 +205,7 @@ export const CROSSWORD_CONFIG = {
 export const ACCESSIBILITY_CONFIG = {
 	minTouchTarget: 44, // pixels
 	maxTextContrast: 7, // WCAG AA
-	reducedMotionSupport: true,
+	reducedMotionSupport: false,
 	screenReaderSupport: true,
 	keyboardNavigation: true
 };

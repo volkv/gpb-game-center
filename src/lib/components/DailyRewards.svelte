@@ -17,7 +17,7 @@
 
 				setTimeout(() => {
 					showRewardClaimed = false;
-				}, 2800);
+				}, 1800);
 			}
 		}
 	}
@@ -268,6 +268,7 @@
 		padding: 0 1rem;
 		pointer-events: none;
 		z-index: 30;
+		top: 50%;
 	}
 
 	.daily-rewards__toast-content {
