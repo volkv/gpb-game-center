@@ -809,14 +809,6 @@
 			margin-bottom: 0.375rem;
 		}
 
-		.progress-bars-container {
-			margin-top: 0.375rem;
-			gap: 0.375rem;
-		}
-
-		.progress-bar-label {
-			margin-bottom: 0.125rem;
-		}
 
 		.stat-item {
 			gap: 0.25rem;

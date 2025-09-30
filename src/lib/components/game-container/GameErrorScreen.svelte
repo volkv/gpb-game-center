@@ -1,11 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib';
-
-	interface GameLoadError {
-		message: string;
-		retryCount: number;
-		timestamp: number;
-	}
+	import type { GameLoadError } from '$lib/utils/gameLoader';
 
 	interface Props {
 		loadingError: string;

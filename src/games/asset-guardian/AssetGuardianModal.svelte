@@ -138,7 +138,7 @@
 						Выберите банковский продукт для активации бонуса:
 					</p>
 					{#each Object.values(BANKING_PRODUCTS) as product}
-						{@const isActive = selectors.activeBonuses.some(b => b.id === product.id)}
+						{@const isActive = selectors.activeBonuses.some((b: { id: string }) => b.id === product.id)}
 						<button
 							class="product-card interactive-product {isActive ? 'product-active' : ''}"
 							disabled={isActive}

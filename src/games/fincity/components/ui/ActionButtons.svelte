@@ -97,11 +97,6 @@
 		gap: 0.35rem;
 		justify-content: space-between;
 		width: 100%;
-
-		button {
-			font-size: .8rem;
-		}
-
 	}
 
 	.action-toolbar__button {

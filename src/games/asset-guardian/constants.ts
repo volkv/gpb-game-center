@@ -14,6 +14,9 @@ export const GAME_CONFIG = {
 export const BALL_CONFIG = {
 	RADIUS: 12,
 	MASS: 1.2,
+	INITIAL_ENERGY: 100,
+	FRICTION_COEFFICIENT: 0.01,
+	RESTITUTION: 0.1,
 } as const;
 
 export const PHYSICS_CONFIG = {

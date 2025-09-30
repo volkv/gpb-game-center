@@ -187,17 +187,8 @@
 		background: rgba(25, 25, 239, 0.12);
 	}
 
-	.resources-bar__item[data-variant='xp'] {
-		border-color: rgba(68, 80, 255, 0.28);
-		background: rgba(68, 80, 255, 0.12);
-	}
-
 	.resources-bar__item[data-variant='energy'] .resources-bar__fill {
 		background: linear-gradient(90deg, var(--color-brand-500) 0%, var(--color-accent-400) 100%);
-	}
-
-	.resources-bar__item[data-variant='xp'] .resources-bar__fill {
-		background: linear-gradient(90deg, var(--color-accent-500) 0%, var(--color-brand-400) 100%);
 	}
 
 	.resources-bar__meta {

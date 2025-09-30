@@ -350,6 +350,7 @@ class TelegramGyroscopeManager implements GyroscopeManager {
 
 class TouchFallbackManager implements FallbackInputManager {
 	public isActive = false;
+	public touchStart: { x: number; y: number } | null = null;
 	private isDragging = false;
 
 	private element: HTMLElement | null = null;
@@ -361,6 +362,14 @@ class TouchFallbackManager implements FallbackInputManager {
 		if (!this.element) return;
 		this.isDragging = true;
 		this.element.setPointerCapture(event.pointerId);
+
+		// Set touchStart position
+		const rect = this.element.getBoundingClientRect();
+		this.touchStart = {
+			x: event.clientX - rect.left - rect.width / 2,
+			y: event.clientY - rect.top - rect.height / 2
+		};
+
 		this.pointerMoveHandler(event); // Trigger a move on down for immediate response
 	};
 
@@ -384,6 +393,7 @@ class TouchFallbackManager implements FallbackInputManager {
 		if (!this.isDragging) return;
 
 		this.isDragging = false;
+		this.touchStart = null; // Reset touchStart position
 		if (this.element) {
 			this.element.releasePointerCapture(event.pointerId);
 		}
