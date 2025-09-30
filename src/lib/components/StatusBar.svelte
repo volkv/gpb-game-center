@@ -10,6 +10,7 @@
 		shouldShowBackButton
 	} from '$lib/stores/gameStatusStore';
 	import { navigateToGameCenter } from '$lib/stores/navigationStore';
+	import { gameStore } from '$lib/stores/gameStore';
 
 	let mounted = false;
 	let statusElement: HTMLElement;
@@ -69,8 +70,19 @@
 
 				<div class="status-center" aria-live="polite">
 					{#if $gameStatusState.gameName}
-						<div class="game-name" title={$gameStatusState.gameName}>
-							{$gameStatusState.gameName}
+						<div class="game-info">
+							{#if $gameStore.currentGame?.icon}
+								<img
+									src={$gameStore.currentGame.icon.url}
+									alt=""
+									class="game-icon-small"
+									width="20"
+									height="20"
+								/>
+							{/if}
+							<div class="game-name" title={$gameStatusState.gameName}>
+								{$gameStatusState.gameName}
+							</div>
 						</div>
 					{/if}
 				</div>
@@ -161,8 +173,24 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
+		align-items: center;
 		text-align: center;
 		min-width: 0;
+	}
+
+	.game-info {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-width: 0;
+	}
+
+	.game-icon-small {
+		flex-shrink: 0;
+		width: 20px;
+		height: 20px;
+		border-radius: 4px;
+		object-fit: contain;
 	}
 
 	.nav-button {
@@ -196,6 +224,7 @@
 		word-wrap: break-word;
 		hyphens: auto;
 		line-height: 1.2;
+		min-width: 0;
 	}
 
 	.status-bar.game-mode .game-name {

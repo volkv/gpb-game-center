@@ -2025,9 +2025,11 @@
 
   .intro-card__metrics {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
   .intro-card__progress {
@@ -2078,20 +2080,19 @@
   }
 
   .intro-metric {
-    padding: 0.7rem 0.6rem;
+    padding: 0.5rem 0.75rem;
     border-radius: var(--radius-lg);
     background: var(--color-surface-muted);
     border: 1px solid var(--color-border-subtle);
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
+    flex-direction: row;
+    gap: 0.4rem;
     align-items: center;
-    text-align: center;
   }
 
   .intro-metric__value {
     font-family: var(--font-display);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: var(--color-fg-primary);
   }
@@ -2101,6 +2102,22 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-fg-muted);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    .intro-metric {
+      padding: 0.4rem 0.6rem;
+      gap: 0.3rem;
+    }
+
+    .intro-metric__value {
+      font-size: 1rem;
+    }
+
+    .intro-metric__label {
+      font-size: 0.65rem;
+    }
   }
 
   .intro-card__actions {

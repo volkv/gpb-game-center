@@ -49,6 +49,7 @@
 	{#if mounted}
 		<section class="hero surface-contrast" aria-labelledby="game-center-title">
 			<div>
+		
 				<div class="hero-copy">
 					<p class="hero-eyebrow">Игровой центр</p>
 					<h1 class="hero-title" id="game-center-title">Газпромбанка</h1>
@@ -114,6 +115,7 @@
 		gap: 1.75rem;
 		padding: 1.5rem;
 	}
+
 
 	.hero-copy {
 		display: flex;

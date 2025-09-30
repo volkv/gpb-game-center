@@ -2,7 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import type { Game } from '$lib/types/Game.js';
 	import { GAME_STATUS } from '$lib/utils/constants.js';
-	import { Shield, Gem, BookOpen, GraduationCap, Building, ChevronRight, Star } from 'lucide-svelte';
+	import { ChevronRight, Star } from 'lucide-svelte';
 
 	interface Props {
 		game: Game;
@@ -17,23 +17,6 @@
 
 	let isActive = $derived(game.status === GAME_STATUS.ACTIVE);
 	let isComingSoon = $derived(game.status === GAME_STATUS.COMING_SOON);
-
-	function getGameIcon(category: string) {
-		switch (category) {
-			case 'quiz':
-				return Shield;
-			case 'match3':
-				return Gem;
-			case 'crossword':
-				return BookOpen;
-			case 'educational':
-				return GraduationCap;
-			default:
-				return Building;
-		}
-	}
-
-	let GameIconComponent = $derived(getGameIcon(game.category));
 
 	function handleClick() {
 		if (isActive) {
@@ -62,10 +45,11 @@
 	onmouseenter={handleMouseEnter}
 >
 	<div class="game-card__header">
-		<div class="game-card__icon" aria-hidden="true">
-			{#if GameIconComponent}
-				{@const IconComponent = GameIconComponent}
-				<IconComponent size={28} stroke-width={1.8} />
+		<div class="game-card__icon" aria-hidden="true" class:game-card__icon--placeholder={isComingSoon}>
+			{#if isComingSoon}
+				<div class="icon-placeholder">?</div>
+			{:else}
+				<img src={game.icon.url} alt={game.icon.alt} width="32" height="32" />
 			{/if}
 		</div>
 		<div class="game-card__header-content">
@@ -164,12 +148,24 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: var(--game-accent);
+		overflow: hidden;
+	}
+
+	.game-card__icon img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+
+	.game-card__icon--placeholder {
 		background: var(--layer-brand-050);
 	}
 
-	.game-card__icon :global(svg) {
-		color: inherit;
+	.icon-placeholder {
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: var(--color-fg-muted);
+		opacity: 0.4;
 	}
 
 	.game-card__header-content {

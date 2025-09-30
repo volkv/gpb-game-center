@@ -11,7 +11,7 @@ export const ACTIVE_GAMES: Game[] = [
 		status: GAME_STATUS.ACTIVE,
 
 		icon: {
-			url: '/games/quiz-shield-ruble/icon.svg',
+			url: '/logos/quiz-shield-ruble.png',
 			alt: 'Иконка Щит и Рубль',
 			width: 64,
 			height: 64
@@ -54,7 +54,7 @@ export const ACTIVE_GAMES: Game[] = [
 		status: GAME_STATUS.ACTIVE,
 
 		icon: {
-			url: '/games/match3-golden-reserve/icon.svg',
+			url: '/logos/match3-golden-reserve.png',
 			alt: 'Иконка Золотой Запас',
 			width: 64,
 			height: 64
@@ -97,7 +97,7 @@ export const ACTIVE_GAMES: Game[] = [
 		status: GAME_STATUS.ACTIVE,
 
 		icon: {
-			url: '/games/crossword-financial/icon.svg',
+			url: '/logos/crossword-financial.png',
 			alt: 'Иконка Финансовый Кроссворд',
 			width: 64,
 			height: 64
@@ -140,7 +140,7 @@ export const ACTIVE_GAMES: Game[] = [
 		status: GAME_STATUS.ACTIVE,
 
 		icon: {
-			url: '/games/fincity/icon.svg',
+			url: '/logos/fincity.png',
 			alt: 'Иконка FinCity',
 			width: 64,
 			height: 64
@@ -197,7 +197,7 @@ export const ACTIVE_GAMES: Game[] = [
 		status: GAME_STATUS.ACTIVE,
 
 		icon: {
-			url: '/games/anti-fraud-hunter/icon.svg',
+			url: '/logos/anti-fraud-hunter.png',
 			alt: 'Иконка Охотник за мошенниками',
 			width: 64,
 			height: 64
@@ -254,7 +254,7 @@ export const ACTIVE_GAMES: Game[] = [
 		status: GAME_STATUS.ACTIVE,
 
 		icon: {
-			url: '/games/code-to-success/icon.svg',
+			url: '/logos/code-to-success.png',
 			alt: 'Иконка Код к Успеху',
 			width: 64,
 			height: 64
@@ -304,7 +304,7 @@ export const ACTIVE_GAMES: Game[] = [
 		status: GAME_STATUS.ACTIVE,
 
 		icon: {
-			url: '/images/games/asset-guardian.svg',
+			url: '/logos/asset-guardian.png',
 			alt: 'Иконка Хранитель Активов',
 			width: 64,
 			height: 64

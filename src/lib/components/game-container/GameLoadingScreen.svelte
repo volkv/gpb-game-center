@@ -16,12 +16,8 @@
 <div class="loading-screen">
 	<div class="loading-content">
 		<div class="game-preview">
-			<div class="preview-icon" style="background: {game.gradient}">
-				<div class="icon-placeholder">
-					<svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24">
-						<path d="M12 2L13.09 5.26L16 4L14.74 7.09L18 8L16.91 11.26L20 12L16.91 12.74L18 16L14.74 16.91L16 20L12.91 18.74L12 22L11.09 18.74L8 20L9.26 16.91L6 16L7.09 12.74L4 12L7.09 11.26L6 8L9.26 7.09L8 4L11.09 5.26L12 2Z"/>
-					</svg>
-				</div>
+			<div class="preview-icon">
+				<img src={game.icon.url} alt={game.icon.alt} width="80" height="80" />
 			</div>
 
 			<div class="preview-info">
@@ -109,13 +105,13 @@
 		justify-content: center;
 		margin-bottom: 1rem;
 		position: relative;
-		box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.2);
+		overflow: hidden;
 	}
 
-	.icon-placeholder {
-		color: white;
-		opacity: 0.9;
-		filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+	.preview-icon img {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
 	}
 
 	.preview-info h2 {
