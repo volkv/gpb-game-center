@@ -165,13 +165,13 @@ export function getDemoNotificationMessage(
 	notifications.sort((a, b) => b.priority - a.priority);
 
 	const primary = notifications[0];
-	const secondary = notifications.slice(1, 3);
+	const rest = notifications.slice(1);
 
 	let message = `<b>${primary.emoji} ${primary.title}</b>\n\n${primary.message}\n\n`;
 
 	message += `<b>━━━━━━━━━━━━━━━━</b>\n\n`;
 
-	secondary.forEach(notif => {
+	rest.forEach(notif => {
 		message += `<b>${notif.emoji} ${notif.title}</b>\n${notif.message}\n\n`;
 	});
 
