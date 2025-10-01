@@ -136,6 +136,83 @@ const initialQuests: Quest[] = [
     rewards: { coins: 1500, crystals: 50, experience: 500 },
     isMainQuest: false,
     order: 12
+  },
+  {
+    id: 'credit_office_build',
+    title: 'Финансовая доступность',
+    description: 'Постройте Кредитный офис и узнайте о кредитных решениях.',
+    type: QuestType.BUILD,
+    status: QuestStatus.LOCKED,
+    requirements: [{ type: 'build', target: 'credit_office', amount: 1 }],
+    rewards: { coins: 700, crystals: 20, experience: 250, unlockBuilding: 'auto_showroom' },
+    isMainQuest: false,
+    order: 13
+  },
+  {
+    id: 'learn_credit_products',
+    title: 'Кредитные программы',
+    description: 'Изучите возможности кредита наличными и рефинансирования.',
+    type: QuestType.EXPLORE,
+    status: QuestStatus.LOCKED,
+    requirements: [{ type: 'learn_product', target: 'credit_loans' }],
+    rewards: { coins: 550, crystals: 15, experience: 220 },
+    isMainQuest: false,
+    order: 14
+  },
+  {
+    id: 'auto_showroom_build',
+    title: 'Автомобильная мечта',
+    description: 'Постройте Автосалон "Драйв" для финансирования транспорта.',
+    type: QuestType.BUILD,
+    status: QuestStatus.LOCKED,
+    requirements: [{ type: 'build', target: 'auto_showroom', amount: 1 }],
+    rewards: { coins: 1100, crystals: 30, experience: 350 },
+    isMainQuest: false,
+    order: 15
+  },
+  {
+    id: 'learn_auto_credit',
+    title: 'Автокредитование',
+    description: 'Изучите программы автокредитования и условия покупки автомобиля.',
+    type: QuestType.EXPLORE,
+    status: QuestStatus.LOCKED,
+    requirements: [{ type: 'learn_product', target: 'auto_credit' }],
+    rewards: { coins: 800, crystals: 22, experience: 300 },
+    isMainQuest: false,
+    order: 16
+  },
+  {
+    id: 'real_estate_agency_build',
+    title: 'Жилищный проект',
+    description: 'Постройте Агентство недвижимости и откройте путь к ипотеке.',
+    type: QuestType.BUILD,
+    status: QuestStatus.LOCKED,
+    requirements: [{ type: 'build', target: 'real_estate_agency', amount: 1 }],
+    rewards: { coins: 1500, crystals: 40, experience: 450 },
+    isMainQuest: false,
+    order: 17
+  },
+  {
+    id: 'learn_mortgage',
+    title: 'Ипотечный эксперт',
+    description: 'Изучите ипотечные программы: семейная, IT-специалисты, новостройки.',
+    type: QuestType.EXPLORE,
+    status: QuestStatus.LOCKED,
+    requirements: [{ type: 'learn_product', target: 'mortgage_programs' }],
+    rewards: { coins: 1200, crystals: 35, experience: 400 },
+    isMainQuest: false,
+    order: 18
+  },
+  {
+    id: 'credit_expansion',
+    title: 'Кредитная экспансия',
+    description: 'Постройте все 3 кредитных здания: офис, автосалон и агентство.',
+    type: QuestType.BUILD,
+    status: QuestStatus.LOCKED,
+    requirements: [{ type: 'building_count', target: 9 }],
+    rewards: { coins: 2500, crystals: 70, experience: 600 },
+    isMainQuest: false,
+    order: 19
   }
 ];
 

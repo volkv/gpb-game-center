@@ -4,7 +4,10 @@ export enum BuildingType {
   CAPITAL_TOWER = 'capital_tower',
   LONGEVITY_PARK = 'longevity_park',
   PARTNER_MALL = 'partner_mall',
-  RESEARCH_INSTITUTE = 'research_institute'
+  RESEARCH_INSTITUTE = 'research_institute',
+  CREDIT_OFFICE = 'credit_office',
+  AUTO_SHOWROOM = 'auto_showroom',
+  REAL_ESTATE_AGENCY = 'real_estate_agency'
 }
 
 export interface Building {

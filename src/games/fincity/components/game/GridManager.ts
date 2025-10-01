@@ -167,7 +167,10 @@ export class GridManager {
       'capital_tower': { size: { width: 2, height: 3 } },
       'longevity_park': { size: { width: 4, height: 3 } },
       'partner_mall': { size: { width: 3, height: 3 } },
-      'research_institute': { size: { width: 2, height: 2 } }
+      'research_institute': { size: { width: 2, height: 2 } },
+      'credit_office': { size: { width: 2, height: 2 } },
+      'auto_showroom': { size: { width: 3, height: 2 } },
+      'real_estate_agency': { size: { width: 3, height: 3 } }
     };
 
     return configs[buildingType] || null;

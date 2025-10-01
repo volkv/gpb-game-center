@@ -94,7 +94,6 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-		padding-top: 1.5rem;
 		padding-bottom: calc(96px + 1.5rem);
 	}
 

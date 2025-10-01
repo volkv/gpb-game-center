@@ -82,6 +82,9 @@
 			</span>
 			<ChevronRight size={16} aria-hidden="true" />
 		</div>
+		<button class="game-card__button" disabled={!isActive} onclick={handleClick}>
+			{isComingSoon ? 'Скоро' : 'Играть'}
+		</button>
 	</div>
 </div>
 
@@ -271,6 +274,29 @@
 
 	.game-card--disabled .progress__fill {
 		background: var(--color-neutral-300);
+	}
+
+	.game-card__button {
+		width: 100%;
+		padding: 0.75rem 1rem;
+		border: none;
+		border-radius: var(--radius-lg);
+		background: var(--game-accent);
+		color: white;
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: opacity 160ms ease, transform 160ms ease;
+	}
+
+	.game-card__button:hover:not(:disabled) {
+		opacity: 0.9;
+		transform: scale(0.98);
+	}
+
+	.game-card__button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 </style>

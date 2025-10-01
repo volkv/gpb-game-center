@@ -72,6 +72,42 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     size: { width: 2, height: 2 },
     unlockLevel: 3,
     bankProduct: 'Финансовая грамотность'
+  },
+  [BuildingType.CREDIT_OFFICE]: {
+    type: BuildingType.CREDIT_OFFICE,
+    name: 'Кредитный офис',
+    description: 'Предоставляет кредитные решения для развития города.',
+    basePrice: { coins: 1200, crystals: 28 },
+    income: { coins: 35, crystals: 3, interval: 70000 },
+    maxLevel: 7,
+    size: { width: 2, height: 2 },
+    unlockLevel: 3,
+    requiresBuilding: BuildingType.CENTRAL_BANK,
+    bankProduct: 'Кредит наличными'
+  },
+  [BuildingType.AUTO_SHOWROOM]: {
+    type: BuildingType.AUTO_SHOWROOM,
+    name: 'Автосалон "Драйв"',
+    description: 'Финансирование автомобилей и транспортных средств.',
+    basePrice: { coins: 1800, crystals: 40 },
+    income: { coins: 45, crystals: 4, interval: 80000 },
+    maxLevel: 6,
+    size: { width: 3, height: 2 },
+    unlockLevel: 5,
+    requiresBuilding: BuildingType.CREDIT_OFFICE,
+    bankProduct: 'Автокредит'
+  },
+  [BuildingType.REAL_ESTATE_AGENCY]: {
+    type: BuildingType.REAL_ESTATE_AGENCY,
+    name: 'Агентство недвижимости',
+    description: 'Ипотечные программы для покупки жилья.',
+    basePrice: { coins: 2500, crystals: 60 },
+    income: { coins: 60, crystals: 6, interval: 100000 },
+    maxLevel: 8,
+    size: { width: 3, height: 3 },
+    unlockLevel: 6,
+    requiresBuilding: BuildingType.CREDIT_OFFICE,
+    bankProduct: 'Ипотека'
   }
 };
 

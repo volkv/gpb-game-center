@@ -72,6 +72,9 @@
 				{task.estimatedTime}
 			</span>
 		</div>
+		<button class="task-card__button" disabled={isCompleted} onclick={handleCardClick}>
+			{isCompleted ? 'Завершено' : 'Выполнить'}
+		</button>
 	</div>
 </div>
 
@@ -223,5 +226,28 @@
 
 	.task-card__meta :global(svg) {
 		color: var(--color-fg-muted);
+	}
+
+	.task-card__button {
+		width: 100%;
+		padding: 0.75rem 1rem;
+		border: none;
+		border-radius: var(--radius-lg);
+		background: var(--task-accent);
+		color: white;
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: opacity 160ms ease, transform 160ms ease;
+	}
+
+	.task-card__button:hover:not(:disabled) {
+		opacity: 0.9;
+		transform: scale(0.98);
+	}
+
+	.task-card__button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 </style>

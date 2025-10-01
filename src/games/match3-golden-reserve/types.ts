@@ -1,4 +1,4 @@
-export type CellType = 'coin' | 'sapphire' | 'emerald' | 'gold';
+export type CellType = 'coin' | 'sapphire' | 'emerald' | 'gold' | 'gazpromneft' | 'zenit' | 'gpb_mobile';
 
 export type GameStatus = 'playing' | 'targeting' | 'completed';
 

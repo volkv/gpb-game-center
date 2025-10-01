@@ -8,7 +8,7 @@ export const GAME_CONFIG = {
 	MIN_MATCH_LENGTH: 3
 } as const;
 
-export const CELL_TYPES: readonly CellType[] = ['coin', 'sapphire', 'emerald', 'gold'] as const;
+export const CELL_TYPES: readonly CellType[] = ['coin', 'sapphire', 'emerald', 'gold', 'gazpromneft', 'zenit', 'gpb_mobile'] as const;
 
 export const SCORE_VALUES = {
 	MATCH_3: 120,
@@ -97,4 +97,49 @@ export const VISUAL_EFFECTS = {
 	GLOW_RADIUS: 20,
 	SHIMMER_SPEED: 1.2,
 	WAVE_AMPLITUDE: 4
+} as const;
+
+export const PARTNER_PRODUCTS = {
+	GAZPROMNEFT: {
+		id: 'gazpromneft',
+		name: 'Карта Газпромбанк-Газпромнефть',
+		description: 'Получайте до 10% кэшбэка на заправках Газпромнефть',
+		bonusPoints: 180,
+		icon: '⛽',
+		color: '#E31E24',
+		url: 'https://www.gazprombank.ru/personal/cards/5275845/',
+		features: [
+			'До 10% кэшбэк на АЗС Газпромнефть',
+			'3% кэшбэк в ресторанах и кафе',
+			'1% на все остальные покупки'
+		]
+	},
+	ZENIT: {
+		id: 'zenit',
+		name: 'Дебетовая карта Газпромбанк-ФК Зенит',
+		description: 'Поддерживайте любимую команду и получайте выгоду!',
+		bonusPoints: 200,
+		icon: '⚽',
+		color: '#0066CC',
+		url: 'https://www.gazprombank.ru/personal/cards/42389/',
+		features: [
+			'До 6% кэшбэк в категориях на выбор',
+			'Специальные предложения от ФК Зенит',
+			'Бесплатное обслуживание'
+		]
+	},
+	GPB_MOBILE: {
+		id: 'gpb_mobile',
+		name: 'Газпромбанк Мобайл',
+		description: 'Мобильная связь со скидкой до 30%',
+		bonusPoints: 150,
+		icon: '📱',
+		color: '#00A3E0',
+		url: 'https://www.gazprombank.ru/personal/cards/6942197/',
+		features: [
+			'Скидка до 30% на мобильную связь',
+			'До 7% кэшбэк на все покупки',
+			'Бесплатные уведомления о расходах'
+		]
+	}
 } as const;

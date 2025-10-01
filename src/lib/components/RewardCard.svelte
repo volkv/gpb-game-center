@@ -64,6 +64,9 @@
 				</span>
 			{/if}
 		</div>
+		<button class="reward-card__button" disabled={isDisabled} onclick={handleCardClick}>
+			Купить
+		</button>
 	</div>
 </div>
 
@@ -215,5 +218,28 @@
 
 	.reward-card__meta :global(svg) {
 		color: var(--color-fg-muted);
+	}
+
+	.reward-card__button {
+		width: 100%;
+		padding: 0.75rem 1rem;
+		border: none;
+		border-radius: var(--radius-lg);
+		background: var(--reward-accent);
+		color: white;
+		font-size: 0.9rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition: opacity 160ms ease, transform 160ms ease;
+	}
+
+	.reward-card__button:hover:not(:disabled) {
+		opacity: 0.9;
+		transform: scale(0.98);
+	}
+
+	.reward-card__button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 </style>

@@ -1142,6 +1142,59 @@
         href: 'https://www.gazprombank.ru/personal/insurance/insurance_cards/',
         external: true
       }
+    },
+    {
+      id: 'credit-rating',
+      triggerQuestionId: 4,
+      name: 'Кредитный рейтинг и мониторинг',
+      tagline: 'Контролируйте свою кредитную историю',
+      description: 'Отслеживайте кредитный рейтинг и получайте уведомления о новых кредитах, оформленных на ваше имя.',
+      features: [
+        'Бесплатная проверка кредитного рейтинга в приложении',
+        'Уведомления о новых кредитах и займах',
+        'Помощь в обнаружении мошеннических кредитов'
+      ],
+      bonusLabel: 'Бонус к защите',
+      bonusValue: 30,
+      icon: BarChart3,
+      contextLabel: 'После сценария «Банкоматы»',
+      cta: {
+        label: 'Проверить рейтинг',
+        href: 'https://www.gazprombank.ru/personal/credit-profile/',
+        external: true
+      }
+    },
+    {
+      id: 'mobile-app-security',
+      triggerQuestionId: 5,
+      name: 'Биометрическая защита приложения',
+      tagline: 'Ваше лицо — ваш пароль',
+      description: 'Защитите мобильное приложение банка с помощью Face ID, Touch ID или отпечатка пальца.',
+      features: [
+        'Быстрый вход без ввода пароля',
+        'Надежная защита от несанкционированного доступа',
+        'Автоблокировка при попытках взлома'
+      ],
+      bonusLabel: 'Бонус к защите',
+      bonusValue: 40,
+      icon: ShieldAlert,
+      contextLabel: 'После сценария «Мобильные приложения»'
+    },
+    {
+      id: 'secure-wifi',
+      triggerQuestionId: 7,
+      name: 'Безопасность в публичных сетях',
+      tagline: 'Защита при любом подключении',
+      description: 'Используйте виртуальную карту и дополнительную аутентификацию при работе в общественных Wi-Fi.',
+      features: [
+        'Рекомендации по безопасному использованию публичных сетей',
+        'Виртуальная карта для онлайн-операций',
+        'Обязательное подтверждение операций через SMS'
+      ],
+      bonusLabel: 'Бонус к защите',
+      bonusValue: 35,
+      icon: MessageCircleWarning,
+      contextLabel: 'После сценария «Общественные сети»'
     }
   ];
 
