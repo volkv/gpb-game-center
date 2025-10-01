@@ -361,7 +361,7 @@
   }
 </script>
 
-<GameLayout gameName="Охотник за мошенниками" background="gradient-mystery">
+<GameLayout gameName="Стоп-мошенник" background="gradient-mystery">
   <div class="anti-fraud-game">
     {#if gameState === 'intro'}
       <section class="game-stage game-stage--intro" aria-labelledby="intro-title">
@@ -370,7 +370,7 @@
             <Shield size={40} />
           </div>
           <span class="chip intro-panel__badge">Финансовая разведка</span>
-          <h1 id="intro-title" class="intro-panel__title">Охотник за мошенниками</h1>
+          <h1 id="intro-title" class="intro-panel__title">Стоп-мошенник</h1>
           <p class="intro-panel__subtitle text-balance">
             Распознавайте мошеннические SMS за секунды. Внимательность и скорость помогут защитить средства.
           </p>

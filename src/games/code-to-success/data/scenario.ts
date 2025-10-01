@@ -284,7 +284,7 @@ export const scenes: Scene[] = [
 
 export const codeToSuccessScenario: NovellaScenario = {
   id: 'code-to-success-main',
-  name: 'Код к Успеху',
+  name: 'Код Безопасности',
   description: 'Интерактивная визуальная новелла о кибербезопасности и защите от мошенничества',
   version: '1.0.0',
   characters,

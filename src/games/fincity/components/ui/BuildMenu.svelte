@@ -107,7 +107,7 @@
       </div>
       <div class="build-menu__heading">
         <h2 class="modal-title-game">Меню строительства</h2>
-        <p class="build-menu__subtitle">Подберите здание для развития FinCity</p>
+        <p class="build-menu__subtitle">Подберите здание для развития ФинСити</p>
       </div>
     </div>
   {/snippet}

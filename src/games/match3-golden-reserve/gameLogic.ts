@@ -94,6 +94,31 @@ export function validateCellSelection(
 	return { isValid: true };
 }
 
+export function markCellsAsSwapping(field: Cell[][], pos1: Position, pos2: Position): Cell[][] {
+	const newField = field.map(row => [...row]);
+
+	newField[pos1.row][pos1.col] = {
+		...newField[pos1.row][pos1.col],
+		isSwapping: true
+	};
+
+	newField[pos2.row][pos2.col] = {
+		...newField[pos2.row][pos2.col],
+		isSwapping: true
+	};
+
+	return newField;
+}
+
+export function clearSwappingFlags(field: Cell[][]): Cell[][] {
+	return field.map(row =>
+		row.map(cell => ({
+			...cell,
+			isSwapping: false
+		}))
+	);
+}
+
 export function swapCells(field: Cell[][], pos1: Position, pos2: Position): Cell[][] {
 	const newField = field.map(row => [...row]);
 

@@ -19,7 +19,7 @@ export interface TutorialStep {
 const tutorialSteps: TutorialStep[] = [
   {
     id: 'welcome',
-    title: 'Добро пожаловать в FinCity!',
+    title: 'Добро пожаловать в ФинСити!',
     message: 'Вас приветствует ваш персональный помощник. Сейчас мы изучим основы управления финансовым городом.',
     position: 'center',
     action: 'modal',
@@ -69,7 +69,7 @@ const tutorialSteps: TutorialStep[] = [
   {
     id: 'tutorial_complete',
     title: 'Обучение завершено!',
-    message: 'Отлично! Теперь вы знаете основы FinCity. Продолжайте строить город, выполнять квесты и изучать банковские продукты!',
+    message: 'Отлично! Теперь вы знаете основы ФинСити. Продолжайте строить город, выполнять квесты и изучать банковские продукты!',
     position: 'center',
     action: 'modal',
     nextTrigger: 'click',

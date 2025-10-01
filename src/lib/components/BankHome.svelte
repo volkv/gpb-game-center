@@ -43,7 +43,7 @@
 					<Skeleton variant="line" width="96px" height="0.6rem" />
 				</div>
 			</div>
-			<Skeleton variant="line" width="110px" height="0.8rem" />
+			
 		</div>
 	</section>
 

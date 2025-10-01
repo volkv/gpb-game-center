@@ -96,7 +96,7 @@
 </script>
 
 {#if !gameLoaded}
-	<GameLayout gameName="FinCity" background="gradient-wealth" showScore={false} showBackButton={true}>
+	<GameLayout gameName="ФинСити" background="gradient-wealth" showScore={false} showBackButton={true}>
 		<div class="loading-content">
 			<div class="game-preview">
 				<div class="preview-icon">
@@ -104,7 +104,7 @@
 						<path d="M12 2L13.09 5.26L16 4L14.74 7.09L18 8L16.91 11.26L20 12L16.91 12.74L18 16L14.74 16.91L16 20L12.91 18.74L12 22L11.09 18.74L8 20L9.26 16.91L6 16L7.09 12.74L4 12L7.09 11.26L6 8L9.26 7.09L8 4L11.09 5.26L12 2Z"/>
 					</svg>
 				</div>
-				<h2 class="font-heading text-h3 text-white mb-2">FinCity</h2>
+				<h2 class="font-heading text-h3 text-white mb-2">ФинСити</h2>
 				<p class="font-body text-body text-white/80">Загрузка игрового движка...</p>
 			</div>
 

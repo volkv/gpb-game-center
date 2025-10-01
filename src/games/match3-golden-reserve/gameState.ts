@@ -3,7 +3,7 @@ import { gameStore } from '$lib/stores/gameStore';
 import { pointsStore } from '$lib/stores/pointsStore';
 import type { GameState } from '$lib/types/GameState';
 import type { Match3GameState, Position, Cell, BoosterState, GameSession } from './types';
-import { GAME_CONFIG, SCORE_VALUES } from './constants';
+import { GAME_CONFIG, SCORE_VALUES, ANIMATION_DURATIONS } from './constants';
 import {
 	isValidSwap,
 	performSwap,
@@ -16,7 +16,9 @@ import {
 	generateDemoField,
 	getDemoRecommendedMove,
 	shouldAllowAction,
-	handleNoMovesAvailable
+	handleNoMovesAvailable,
+	markCellsAsSwapping,
+	clearSwappingFlags
 } from './gameLogic';
 
 function createMatch3Store() {
@@ -266,51 +268,68 @@ function createMatch3Store() {
 					return newState;
 				}
 
-				const swappedField = performSwap(state.field, from, to);
-				const clearedField = clearCellSelection(swappedField);
+				const fieldWithSwappingMarks = markCellsAsSwapping(state.field, from, to);
+				const clearedSelectionField = clearCellSelection(fieldWithSwappingMarks);
 
-				const { field: finalField, totalResult } = cascadeMatches(clearedField);
-
-				if (totalResult.score > 0) {
-					pointsStore.addPoints(totalResult.score, `Золотой Запас: Комбинация (${totalResult.score} очков)`, 'match3-golden-reserve');
-				}
-
-				const checkedField = handleNoMovesAvailable(finalField);
-
-				const newState = {
+				const intermediateState = {
 					...state,
-					field: checkedField,
-					selectedCell: null,
-					score: state.score + totalResult.score,
-					moves: state.moves - 1,
-					booster: {
-						...state.booster,
-						charge: Math.min(GAME_CONFIG.BOOSTER_MAX_CHARGE, state.booster.charge + totalResult.boosterCharge),
-						isReady: (state.booster.charge + totalResult.boosterCharge) >= GAME_CONFIG.BOOSTER_MAX_CHARGE
-					},
-					isAnimating: false,
-					scoreBoost: totalResult.score >= 200 ? {
-						amount: totalResult.score,
-						visible: true
-					} : state.scoreBoost
+					field: clearedSelectionField,
+					isAnimating: true,
+					selectedCell: null
 				};
+				syncWithMainStore(intermediateState);
 
-				if (newState.moves <= 0 && newState.score < newState.targetScore) {
-					newState.status = 'completed';
-				} else if (newState.score >= newState.targetScore) {
-					newState.status = 'completed';
-				}
+				setTimeout(() => {
+					update(currentState => {
+						const swappedField = performSwap(currentState.field, from, to);
+						const fieldWithoutSwappingFlags = clearSwappingFlags(swappedField);
 
-				if (newState.demo.isActive && totalResult.score > 0) {
-					if (newState.demo.currentStep === 1 && newState.booster.charge >= 30) {
-						setTimeout(() => match3Store.nextDemoStep(), 1000);
-					} else if (newState.demo.currentStep === 2 && newState.booster.isReady) {
-						setTimeout(() => match3Store.nextDemoStep(), 1000);
-					}
-				}
+						const { field: finalField, totalResult } = cascadeMatches(fieldWithoutSwappingFlags);
 
-				syncWithMainStore(newState);
-				return newState;
+						if (totalResult.score > 0) {
+							pointsStore.addPoints(totalResult.score, `Золотой Запас: Комбинация (${totalResult.score} очков)`, 'match3-golden-reserve');
+						}
+
+						const checkedField = handleNoMovesAvailable(finalField);
+
+						const newState = {
+							...currentState,
+							field: checkedField,
+							selectedCell: null,
+							score: currentState.score + totalResult.score,
+							moves: currentState.moves - 1,
+							booster: {
+								...currentState.booster,
+								charge: Math.min(GAME_CONFIG.BOOSTER_MAX_CHARGE, currentState.booster.charge + totalResult.boosterCharge),
+								isReady: (currentState.booster.charge + totalResult.boosterCharge) >= GAME_CONFIG.BOOSTER_MAX_CHARGE
+							},
+							isAnimating: false,
+							scoreBoost: totalResult.score >= 200 ? {
+								amount: totalResult.score,
+								visible: true
+							} : currentState.scoreBoost
+						};
+
+						if (newState.moves <= 0 && newState.score < newState.targetScore) {
+							newState.status = 'completed';
+						} else if (newState.score >= newState.targetScore) {
+							newState.status = 'completed';
+						}
+
+						if (newState.demo.isActive && totalResult.score > 0) {
+							if (newState.demo.currentStep === 1 && newState.booster.charge >= 30) {
+								setTimeout(() => match3Store.nextDemoStep(), 1000);
+							} else if (newState.demo.currentStep === 2 && newState.booster.isReady) {
+								setTimeout(() => match3Store.nextDemoStep(), 1000);
+							}
+						}
+
+						syncWithMainStore(newState);
+						return newState;
+					});
+				}, ANIMATION_DURATIONS.CELL_SWAP);
+
+				return intermediateState;
 			});
 		},
 

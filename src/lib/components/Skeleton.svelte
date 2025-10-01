@@ -17,9 +17,8 @@
 
 <style>
   .skeleton {
-    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background:  #f3f4f6 ;
     background-size: 200% 100%;
-    animation: skeleton-loading 1.5s infinite;
   }
 
   .skeleton-line {
@@ -35,8 +34,5 @@
     border-radius: 6px;
   }
 
-  @keyframes skeleton-loading {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
+
 </style>

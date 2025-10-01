@@ -28,7 +28,7 @@
 		initializeAutoSave();
 
 		gameStatusStore.show({
-			gameName: 'FinCity',
+			gameName: 'ФинСити',
 			showScore: false,
 			showBackButton: true
 		});

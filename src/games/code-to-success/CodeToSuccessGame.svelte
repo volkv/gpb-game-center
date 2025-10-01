@@ -186,7 +186,7 @@
 </script>
 
 <GameLayout
-  gameName="Код к Успеху"
+  gameName="Код Безопасности"
   background="gradient-mystery"
   showScore={false}
   showBackButton={true}

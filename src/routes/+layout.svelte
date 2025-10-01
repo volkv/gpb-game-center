@@ -100,7 +100,7 @@
 </svelte:head>
 
 <ErrorBoundary>
-	<main class="app-container" class:loaded={isLoaded} class:game-screen={$currentScreen === 'game'}>
+	<main class="app-container" class:loaded={isLoaded} class:game-screen={$currentScreen === 'game'} class:game-center-screen={$currentScreen === 'game-center'}>
 		{#if $currentScreen !== 'bank-home'}
 			<StatusBar />
 		{/if}
@@ -167,5 +167,9 @@
 
 	.app-container.loaded {
 		will-change: auto;
+	}
+
+	:global(.game-center-screen .status-bar) {
+		margin-inline: -1.5rem;
 	}
 </style>

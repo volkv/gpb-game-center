@@ -7,7 +7,7 @@ import { checkAchievements } from './achievements';
 const initialQuests: Quest[] = [
   {
     id: 'tutorial_welcome',
-    title: 'Добро пожаловать в FinCity!',
+    title: 'Добро пожаловать в ФинСити!',
     description: 'Изучите основы управления своим финансовым городом.',
     type: QuestType.TUTORIAL,
     status: QuestStatus.AVAILABLE,
@@ -128,7 +128,7 @@ const initialQuests: Quest[] = [
   },
   {
     id: 'financial_education_complete',
-    title: 'Выпускник FinCity',
+    title: 'Выпускник ФинСити',
     description: 'Пройдите полный курс финансовой грамотности и станьте экспертом.',
     type: QuestType.EXPLORE,
     status: QuestStatus.LOCKED,

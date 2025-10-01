@@ -22,7 +22,7 @@
 <div class="loading-container">
 	<div class="loading-content">
 		<div class="spinner"></div>
-		<p>Загрузка FinCity...</p>
+		<p>Загрузка ФинСити...</p>
 	</div>
 </div>
 

@@ -81,7 +81,7 @@
           <Icon name="building" size="xl" />
         </div>
         <div>
-          <h1 id="onboarding-title" class="header-title">Добро пожаловать в FinCity!</h1>
+          <h1 id="onboarding-title" class="header-title">Добро пожаловать в ФинСити!</h1>
           <p class="header-subtitle">Ваш финансовый город ждёт</p>
         </div>
       </div>
@@ -90,7 +90,7 @@
         <div class="content-section">
           <h2 class="section-title">Создайте свой финансовый мегаполис</h2>
           <p class="section-text">
-            FinCity поможет вам изучить банковские продукты Газпромбанка через увлекательную игру.
+            ФинСити поможет вам изучить банковские продукты Газпромбанка через увлекательную игру.
             Стройте здания, выполняйте квесты и развивайте финансовую грамотность!
           </p>
         </div>

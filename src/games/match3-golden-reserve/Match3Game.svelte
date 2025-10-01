@@ -24,6 +24,10 @@
 	let currentFocusPosition = $state<Position | null>(null);
 	let announcements = $state('');
 
+	let touchStartPos = $state<{ x: number; y: number } | null>(null);
+	let touchStartCell = $state<Position | null>(null);
+	const MIN_SWIPE_DISTANCE = 30;
+
 	$effect(() => {
 		gameState = $match3Store;
 		selectors = $match3Selectors;
@@ -200,6 +204,62 @@
 		match3Store.hideDemoHint();
 	}
 
+	function handleTouchStart(event: TouchEvent, row: number, col: number) {
+		if (gameState.isAnimating || gameState.status !== 'playing') return;
+
+		const touch = event.touches[0];
+		touchStartPos = { x: touch.clientX, y: touch.clientY };
+		touchStartCell = { row, col };
+
+		match3Store.selectCell({ row, col });
+	}
+
+	function handleTouchMove(event: TouchEvent) {
+		if (!touchStartPos || !touchStartCell) return;
+
+		event.preventDefault();
+	}
+
+	function handleTouchEnd(event: TouchEvent) {
+		if (!touchStartPos || !touchStartCell) return;
+
+		const touch = event.changedTouches[0];
+		const dx = touch.clientX - touchStartPos.x;
+		const dy = touch.clientY - touchStartPos.y;
+
+		const absDx = Math.abs(dx);
+		const absDy = Math.abs(dy);
+
+		if (Math.max(absDx, absDy) < MIN_SWIPE_DISTANCE) {
+			touchStartPos = null;
+			touchStartCell = null;
+			return;
+		}
+
+		let targetCell: Position | null = null;
+
+		if (absDx > absDy) {
+			if (dx > 0) {
+				targetCell = { row: touchStartCell.row, col: touchStartCell.col + 1 };
+			} else {
+				targetCell = { row: touchStartCell.row, col: touchStartCell.col - 1 };
+			}
+		} else {
+			if (dy > 0) {
+				targetCell = { row: touchStartCell.row + 1, col: touchStartCell.col };
+			} else {
+				targetCell = { row: touchStartCell.row - 1, col: touchStartCell.col };
+			}
+		}
+
+		if (targetCell && targetCell.row >= 0 && targetCell.row < 8 && targetCell.col >= 0 && targetCell.col < 8) {
+			match3Store.attemptSwap(touchStartCell, targetCell);
+		}
+
+		touchStartPos = null;
+		touchStartCell = null;
+	}
+
 	const movesUsed = $derived(GAME_CONFIG.INITIAL_MOVES - gameState.moves);
 </script>
 
@@ -288,9 +348,12 @@
 					{#each row as cell, colIndex}
 						{@const IconComponent = iconMap[cell.type]}
 						<div
-							class="game-cell {cell.isSelected ? 'selected' : ''} {cell.isRecommended ? 'recommended' : ''} {cell.isFalling ? 'falling' : ''} {cell.isBouncing ? 'bouncing' : ''} {cell.isFading ? 'fading' : ''} {cell.isAppearing ? 'appearing' : ''} {currentFocusPosition && currentFocusPosition.row === rowIndex && currentFocusPosition.col === colIndex ? 'keyboard-focus' : ''}"
+							class="game-cell {cell.isSelected ? 'selected' : ''} {cell.isRecommended ? 'recommended' : ''} {cell.isFalling ? 'falling' : ''} {cell.isBouncing ? 'bouncing' : ''} {cell.isFading ? 'fading' : ''} {cell.isAppearing ? 'appearing' : ''} {cell.isSwapping ? 'swapping' : ''} {currentFocusPosition && currentFocusPosition.row === rowIndex && currentFocusPosition.col === colIndex ? 'keyboard-focus' : ''}"
 							style="animation-delay: {cell.animationDelay || 0}ms"
 							onclick={() => handleCellClick(rowIndex, colIndex)}
+							ontouchstart={(event) => handleTouchStart(event, rowIndex, colIndex)}
+							ontouchmove={handleTouchMove}
+							ontouchend={handleTouchEnd}
 							onkeydown={(event) => {
 								if (event.key === 'Enter' || event.key === ' ') {
 									event.preventDefault();
@@ -353,11 +416,7 @@
 				</Button>
 			</div>
 
-			<div class="demo-hint glass-effect rounded-xl p-4 mt-4 text-center text-gpb-gray-700">
-				<p class="text-sm">
-					<strong>Итерация 10:</strong> Финальная полировка и интеграция! Оптимизированы алгоритмы, добавлена поддержка скрин-ридеров, клавиатурная навигация и интеграция с системой очков. Улучшен баланс, оптимизированы анимации и добавлена защита от спама. Игра готова к production!
-				</p>
-			</div>
+
 		</div>
 	</div>
 
@@ -398,8 +457,11 @@
 	}
 
 	.stats-bar {
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+		backdrop-filter: blur(16px) saturate(180%);
+		-webkit-backdrop-filter: blur(16px) saturate(180%);
+		border: 1px solid rgba(255, 255, 255, 0.4);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 	}
 
 	.stat-item {
@@ -449,8 +511,11 @@
 	}
 
 	.booster-panel {
-		backdrop-filter: blur(8px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.15) 100%);
+		backdrop-filter: blur(16px) saturate(180%);
+		-webkit-backdrop-filter: blur(16px) saturate(180%);
+		border: 1px solid rgba(255, 255, 255, 0.4);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 	}
 
 	.booster-charge-bar {
@@ -513,9 +578,11 @@
 		backdrop-filter: blur(8px);
 		border: 1px solid rgba(255, 255, 255, 0.2);
 		width: 100%;
-		max-width: 320px;
+
 		aspect-ratio: 1;
 		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		touch-action: none;
+		user-select: none;
 	}
 
 	.game-cell {
@@ -636,15 +703,30 @@
 		}
 	}
 
+	.game-cell.swapping {
+		animation: swap-animation 0.25s cubic-bezier(0.4, 0.0, 0.2, 1);
+		z-index: 10;
+	}
+
 	@keyframes swap-animation {
 		0% {
 			transform: scale(1);
 		}
+		25% {
+			transform: scale(1.15) rotate(3deg);
+			box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+		}
 		50% {
-			transform: scale(1.1) rotate(5deg);
+			transform: scale(1.1) rotate(0deg);
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+		}
+		75% {
+			transform: scale(1.05) rotate(-3deg);
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 		}
 		100% {
-			transform: scale(1);
+			transform: scale(1) rotate(0deg);
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 		}
 	}
 

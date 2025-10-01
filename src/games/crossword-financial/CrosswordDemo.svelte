@@ -226,7 +226,7 @@
 <svelte:window on:keydown={handleKeyPress} />
 
 <GameLayout
-	gameName="Финансовый Кроссворд"
+	gameName="Финансовая Грамота"
 	customBackground="linear-gradient(135deg, var(--color-gpb-violet) 0%, var(--color-gpb-mint) 100%)"
 	showScore={true}
 >
