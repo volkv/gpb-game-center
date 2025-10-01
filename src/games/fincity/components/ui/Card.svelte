@@ -162,55 +162,95 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
-		border-radius: var(--radius-xl);
+		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-subtle);
-		background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
+		background: var(--color-surface-card);
 		box-shadow: var(--shadow-soft);
 		transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
-		
+		overflow: hidden;
 	}
 
 	.game-card--elevated {
 		box-shadow: var(--shadow-medium);
+		border: 1px solid var(--color-border-muted);
 	}
 
 	.game-card--outlined {
 		border: 1px solid var(--color-border-strong);
+		background: color-mix(in srgb, var(--color-surface-card) 98%, var(--color-brand-50) 2%);
 	}
 
 	.game-card--sm {
-		max-width: 420px;
+		max-width: 100%;
 	}
 
 	.game-card--md {
-		max-width: 640px;
+		max-width: 100%;
 	}
 
 	.game-card--lg {
-		max-width: 880px;
+		max-width: 100%;
+	}
+
+	@media (min-width: 640px) {
+		.game-card--sm {
+			max-width: 420px;
+		}
+
+		.game-card--md {
+			max-width: 640px;
+		}
+
+		.game-card--lg {
+			max-width: 880px;
+		}
+
+		.game-card {
+			border-radius: var(--radius-xl);
+		}
 	}
 
 	.game-card--padding-sm {
-		padding: 0.9rem;
+		padding: 0.75rem;
 	}
 
 	.game-card--padding-md {
-		padding: 1.1rem;
+		padding: 1rem;
 	}
 
 	.game-card--padding-lg {
-		padding: 1.5rem;
+		padding: 1.25rem;
+	}
+
+	@media (min-width: 640px) {
+		.game-card--padding-sm {
+			padding: 0.9rem;
+		}
+
+		.game-card--padding-md {
+			padding: 1.1rem;
+		}
+
+		.game-card--padding-lg {
+			padding: 1.5rem;
+		}
 	}
 
 	.game-card--clickable {
 		cursor: pointer;
 		user-select: none;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	.game-card--clickable:hover {
 		transform: translateY(-2px);
 		box-shadow: var(--shadow-medium);
 		border-color: var(--layer-brand-150);
+	}
+
+	.game-card--clickable:active {
+		transform: translateY(0);
+		box-shadow: var(--shadow-soft);
 	}
 
 	.game-card--clickable:focus-visible {
@@ -230,6 +270,14 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	@media (min-width: 640px) {
+		.game-card-header,
+		.game-card-footer {
+			flex-wrap: nowrap;
+		}
 	}
 
 	.game-card-footer {
@@ -240,17 +288,30 @@
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
-		opacity: 0.25;
+		opacity: 0.2;
+		overflow: hidden;
 	}
 
 	.particle {
 		position: absolute;
-		width: 6px;
-		height: 6px;
+		width: 4px;
+		height: 4px;
 		border-radius: 50%;
 		background: var(--color-brand-300);
-		opacity: 0.35;
+		opacity: 0.3;
 		animation: cardParticle 6s ease-in-out infinite;
+	}
+
+	@media (min-width: 640px) {
+		.particle {
+			width: 6px;
+			height: 6px;
+			opacity: 0.35;
+		}
+
+		.particles-container {
+			opacity: 0.25;
+		}
 	}
 
 	.particle:nth-child(2) {
@@ -268,11 +329,22 @@
 	@keyframes cardParticle {
 		0%, 100% {
 			transform: translate3d(0, 0, 0) scale(0.8);
-			opacity: 0.4;
+			opacity: 0.3;
 		}
 		50% {
 			transform: translate3d(12px, -10px, 0) scale(1.1);
-			opacity: 1;
+			opacity: 0.6;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.game-card--clickable:hover {
+			transform: none;
+		}
+
+		.particle {
+			animation: none;
+			opacity: 0.2;
 		}
 	}
 
