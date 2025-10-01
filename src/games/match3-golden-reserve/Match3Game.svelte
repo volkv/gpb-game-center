@@ -205,13 +205,11 @@
 	}
 
 	function handleTouchStart(event: TouchEvent, row: number, col: number) {
-		if (gameState.isAnimating || gameState.status !== 'playing') return;
+		if (gameState.isAnimating) return;
 
 		const touch = event.touches[0];
 		touchStartPos = { x: touch.clientX, y: touch.clientY };
 		touchStartCell = { row, col };
-
-		match3Store.selectCell({ row, col });
 	}
 
 	function handleTouchMove(event: TouchEvent) {
@@ -231,6 +229,13 @@
 		const absDy = Math.abs(dy);
 
 		if (Math.max(absDx, absDy) < MIN_SWIPE_DISTANCE) {
+			handleCellClick(touchStartCell.row, touchStartCell.col);
+			touchStartPos = null;
+			touchStartCell = null;
+			return;
+		}
+
+		if (gameState.status !== 'playing') {
 			touchStartPos = null;
 			touchStartCell = null;
 			return;
