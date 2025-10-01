@@ -1,11 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { sendTelegramMessage } from '$lib/services/telegramBot';
-import { getDemoNotificationMessage } from '$lib/utils/notificationMessages';
+import { getDemoNotificationMessage, type PlayerContext } from '$lib/utils/notificationMessages';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const { userId, userName } = await request.json();
+    const { userId, userName, context } = await request.json();
 
     if (!userId || typeof userId !== 'number') {
       return json(
@@ -15,7 +15,9 @@ export const POST: RequestHandler = async ({ request }) => {
     }
 
     const finalUserName = userName && typeof userName === 'string' ? userName : 'Клиент';
-    const message = getDemoNotificationMessage(finalUserName);
+    const playerContext: Partial<PlayerContext> | undefined = context;
+
+    const message = getDemoNotificationMessage(finalUserName, playerContext);
     const result = await sendTelegramMessage(userId, message, 'HTML');
 
     if (!result.success) {
