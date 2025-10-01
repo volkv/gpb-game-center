@@ -116,6 +116,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.25rem;
+		opacity: .7;
 	}
 
 	.ghost-action {

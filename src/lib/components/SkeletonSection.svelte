@@ -38,6 +38,7 @@
 	.skeleton-section {
 		padding: 20px;
 		border-bottom: 8px solid rgb(248, 248, 248);
+		opacity: .8;
 	}
 
 	.section-header {
