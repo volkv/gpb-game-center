@@ -256,13 +256,6 @@
 		font-weight: 600;
 	}
 
-	.task-info {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		align-items: center;
-	}
 
 	.task-body {
 		display: flex;

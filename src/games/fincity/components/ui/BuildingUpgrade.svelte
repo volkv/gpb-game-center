@@ -247,7 +247,7 @@
                 </Bubble>
                 {#if upgradeCost?.energy}
                   <Bubble
-                    color={canAffordUpgrade || !upgradeCost?.energy ? 'blue' : 'raspberry-light'}
+                    color={canAffordUpgrade || !upgradeCost?.energy ? 'violet' : 'raspberry-light'}
                     size="sm"
                   >
                     <Battery size={14} />

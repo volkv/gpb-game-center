@@ -459,7 +459,7 @@ function createMatch3Store() {
 
 				const nextStep = state.demo.currentStep + 1;
 				let newHint = '';
-				let recommendedMove = null;
+				let recommendedMove: { from: Position; to: Position } | null = null;
 
 				switch (nextStep) {
 					case 2:
@@ -495,8 +495,10 @@ function createMatch3Store() {
 						row.map((cell, colIndex) => ({
 							...cell,
 							isRecommended:
-								(rowIndex === recommendedMove.from.row && colIndex === recommendedMove.from.col) ||
-								(rowIndex === recommendedMove.to.row && colIndex === recommendedMove.to.col)
+								recommendedMove && typeof recommendedMove === 'object' && 'from' in recommendedMove && 'to' in recommendedMove
+									? (rowIndex === (recommendedMove as any).from.row && colIndex === (recommendedMove as any).from.col) ||
+									  (rowIndex === (recommendedMove as any).to.row && colIndex === (recommendedMove as any).to.col)
+									: false
 						}))
 					);
 				}

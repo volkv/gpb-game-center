@@ -80,6 +80,9 @@ export interface Match3GameState {
 	session: GameSession;
 }
 
+export type Match3Status = GameStatus;
+export type Match3State = Match3GameState;
+
 export interface SwapAction {
 	from: Position;
 	to: Position;

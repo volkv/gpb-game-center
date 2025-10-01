@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { gameStore, currentGameState } from '$lib/stores/gameStore';
   import { GameLayout } from '$lib';
+  import { Star, ShieldCheck } from 'lucide-svelte';
   import ProductSpotlight from './components/ProductSpotlight.svelte';
   import ReminderBanner from './components/ReminderBanner.svelte';
   import StatsDashboard from './components/StatsDashboard.svelte';
@@ -227,7 +228,9 @@
       averageAccuracy,
       bestDefense: state.bestDefense,
       totalCorrect: state.totalCorrect,
-      totalQuestions: state.totalQuestions
+      totalQuestions: state.totalQuestions,
+      currentStreak: 0, // TODO: Add current streak calculation
+      bestStreak: 0 // TODO: Add best streak calculation
     };
   }
 
@@ -235,7 +238,11 @@
     const categories = Object.entries(state.categoryStats)
       .filter(([, stats]) => stats.total > 0)
       .map(([name, stats]) => ({
+        id: name,
         name,
+        icon: null as any, // TODO: Add proper icon mapping
+        totalQuestions: stats.total,
+        correctAnswers: stats.correct,
         accuracy: Math.round((stats.correct / stats.total) * 100),
         total: stats.total,
         bestStreak: stats.bestStreak
@@ -260,10 +267,10 @@
     return {
       name: currentStage.name,
       description: currentStage.description,
-      xp: Math.round(state.levelXp),
       progressPercent: Math.round(ratio * 100),
       nextName: nextStage?.name,
-      xpToNext: nextStage ? Math.max(0, Math.ceil(nextStage.minXp - state.levelXp)) : undefined
+      xpToNext: nextStage ? Math.max(0, Math.ceil(nextStage.minXp - state.levelXp)) : undefined,
+      xp: Math.round(state.levelXp)
     };
   }
 
@@ -297,7 +304,7 @@
         icon: definition.icon,
         unlocked: isUnlocked,
         unlockedAt: record?.unlockedAt,
-        progressLabel,
+        progressLabel: progressLabel,
         isNew: newlyUnlocked.includes(definition.id)
       } satisfies AchievementView;
     });
@@ -554,38 +561,35 @@
   const defenseProgress = $derived(
     maxDefenseScore === 0 ? 0 : Math.round((defenseScore / maxDefenseScore) * 100)
   );
-  const finalCtaMessage = $derived(() => {
-    if (defenseProgress >= 80) {
-      return `Вы собрали ${defenseProgress}% защитного потенциала — подключите страхование карт и счетов, чтобы закрепить уровень.`;
-    }
+  const finalCtaMessage = $derived(
+    defenseProgress >= 80
+      ? `Вы собрали ${defenseProgress}% защитного потенциала — подключите страхование карт и счетов, чтобы закрепить уровень.`
+      : defenseProgress >= 40
+        ? `Вы нарастили ${defenseProgress}% защитного потенциала. Страхование карт и счетов добавит компенсацию и сопровождение специалистов.`
+        : 'Начните с надежного щита: страхование карт и счетов поможет возместить потери, даже если атака произойдет неожиданно.'
+  );
 
-    if (defenseProgress >= 40) {
-      return `Вы нарастили ${defenseProgress}% защитного потенциала. Страхование карт и счетов добавит компенсацию и сопровождение специалистов.`;
-    }
-
-    return 'Начните с надежного щита: страхование карт и счетов поможет возместить потери, даже если атака произойдет неожиданно.';
-  });
-
-  const stageInfo = $derived(() => {
-    const currentDifficulty = currentQuestion.difficulty;
-    const stageIndex = difficultyOrder.indexOf(currentDifficulty);
-    const totalStages = difficultyOrder.length;
-
-    const questionsBefore = questions.filter(
-      (question) => difficultyOrder.indexOf(question.difficulty) < stageIndex
-    ).length;
-
-    const questionsInStage = questions.filter((question) => question.difficulty === currentDifficulty).length;
-    const stagePosition = currentQuestionIndex - questionsBefore + 1;
-
-    return {
-      stageLabel: difficultyLabels[currentDifficulty],
-      stageIndex: stageIndex + 1,
-      totalStages,
-      stagePosition,
-      questionsInStage,
-      isStageStart: currentQuestionIndex === questionsBefore
-    };
+  const stageInfo = $derived({
+    stageLabel: difficultyLabels[currentQuestion.difficulty],
+    stageIndex: difficultyOrder.indexOf(currentQuestion.difficulty) + 1,
+    totalStages: difficultyOrder.length,
+    stagePosition: (() => {
+      const currentDifficulty = currentQuestion.difficulty;
+      const stageIndex = difficultyOrder.indexOf(currentDifficulty);
+      const questionsBefore = questions.filter(
+        (question) => difficultyOrder.indexOf(question.difficulty) < stageIndex
+      ).length;
+      return currentQuestionIndex - questionsBefore + 1;
+    })(),
+    questionsInStage: questions.filter((question) => question.difficulty === currentQuestion.difficulty).length,
+    isStageStart: (() => {
+      const currentDifficulty = currentQuestion.difficulty;
+      const stageIndex = difficultyOrder.indexOf(currentDifficulty);
+      const questionsBefore = questions.filter(
+        (question) => difficultyOrder.indexOf(question.difficulty) < stageIndex
+      ).length;
+      return currentQuestionIndex === questionsBefore;
+    })()
   });
 
   const currentMicroLesson = $derived(currentQuestion.microLesson);

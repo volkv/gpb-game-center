@@ -234,9 +234,6 @@
     color: var(--color-fg-muted);
   }
 
-  .intro-progress__bar {
-    width: 100%;
-  }
 
   .intro-progress__next {
     font-size: 0.8rem;

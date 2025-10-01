@@ -418,9 +418,6 @@
     color: var(--color-fg-muted);
   }
 
-  .result-defense__progress {
-    width: 100%;
-  }
 
   .result-defense__percent {
     font-size: 0.85rem;
@@ -460,9 +457,6 @@
     color: var(--color-fg-primary);
   }
 
-  .result-level-progress__bar {
-    width: 100%;
-  }
 
   .result-level-progress__hint {
     font-size: 0.85rem;

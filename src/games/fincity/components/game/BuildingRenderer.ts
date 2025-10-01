@@ -225,7 +225,10 @@ export class BuildingRenderer {
       'capital_tower': 'building-placeholder',
       'longevity_park': 'building-placeholder',
       'partner_mall': 'building-placeholder',
-      'research_institute': 'building-placeholder'
+      'research_institute': 'building-placeholder',
+      'credit_office': 'building-placeholder',
+      'auto_showroom': 'building-placeholder',
+      'real_estate_agency': 'building-placeholder'
     };
     return textureKeys[buildingType] || 'building-placeholder';
   }
@@ -399,7 +402,10 @@ export class BuildingRenderer {
       'capital_tower': 0xf5a623,
       'longevity_park': 0x50c878,
       'partner_mall': 0xff6b6b,
-      'research_institute': 0x9b59b6
+      'research_institute': 0x9b59b6,
+      'credit_office': 0x8b4513,
+      'auto_showroom': 0x2e8b57,
+      'real_estate_agency': 0xd2691e
     };
     return colors[buildingType] || 0x888888;
   }
@@ -411,7 +417,10 @@ export class BuildingRenderer {
       'capital_tower': 0xd4941a,
       'longevity_park': 0x3ea66a,
       'partner_mall': 0xe55555,
-      'research_institute': 0x824a9a
+      'research_institute': 0x824a9a,
+      'credit_office': 0x654321,
+      'auto_showroom': 0x228b22,
+      'real_estate_agency': 0xb8860b
     };
     return colors[buildingType] || 0x666666;
   }

@@ -122,3 +122,48 @@ export type ReminderOrigin = 'restored' | 'scheduled';
 export interface ReminderQueueItem extends ReminderRecord {
   origin: ReminderOrigin;
 }
+
+export interface LevelOverview {
+  name: string;
+  description: string;
+  progressPercent: number;
+  nextName?: string;
+  xpToNext?: number;
+  xp: number;
+}
+
+export interface AchievementView {
+  id: string;
+  title: string;
+  description: string;
+  icon: ComponentType;
+  unlocked: boolean;
+  progress?: number;
+  maxProgress?: number;
+  progressLabel: string;
+  unlockedAt?: string;
+  isNew?: boolean;
+}
+
+export interface FavoriteCategory {
+  id: string;
+  name: string;
+  icon: ComponentType;
+  totalQuestions: number;
+  correctAnswers: number;
+  accuracy: number;
+  total: number;
+  bestStreak: number;
+}
+
+export interface SummaryMetrics {
+  totalSessions: number;
+  totalCorrect: number;
+  totalQuestions: number;
+  bestScore: number;
+  bestAccuracy: number;
+  bestDefense: number;
+  currentStreak: number;
+  bestStreak: number;
+  averageAccuracy: number;
+}

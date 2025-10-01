@@ -93,7 +93,10 @@
       [BuildingType.CAPITAL_TOWER]: '',
       [BuildingType.LONGEVITY_PARK]: '',
       [BuildingType.PARTNER_MALL]: '',
-      [BuildingType.RESEARCH_INSTITUTE]: ''
+      [BuildingType.RESEARCH_INSTITUTE]: '',
+      [BuildingType.CREDIT_OFFICE]: '',
+      [BuildingType.AUTO_SHOWROOM]: '',
+      [BuildingType.REAL_ESTATE_AGENCY]: ''
     };
     return spriteMap[buildingType] || null;
   }
@@ -262,7 +265,7 @@
 
               {#if config.basePrice.energy && config.basePrice.energy > 0}
                 <Bubble
-                  color={$resources.energy >= config.basePrice.energy ? 'blue' : 'raspberry-light'}
+                  color={$resources.energy >= config.basePrice.energy ? 'violet' : 'raspberry-light'}
                   size="sm"
                   class="building-card__price-chip"
                 >
