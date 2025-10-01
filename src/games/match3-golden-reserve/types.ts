@@ -1,4 +1,4 @@
-export type CellType = 'coin' | 'sapphire' | 'emerald' | 'gold' | 'gazpromneft' | 'zenit' | 'gpb_mobile';
+export type CellType = 'coin' | 'gold' | 'sapphire' | 'emerald';
 
 export type GameStatus = 'playing' | 'targeting' | 'completed';
 
@@ -16,11 +16,13 @@ export interface Cell {
 	isHighlighted?: boolean;
 	isRecommended?: boolean;
 	isSwapping?: boolean;
+	swapDirection?: 'up' | 'down' | 'left' | 'right';
 	isAnimating?: boolean;
 	isFalling?: boolean;
 	isBouncing?: boolean;
 	isFading?: boolean;
 	isAppearing?: boolean;
+	isExploding?: boolean;
 	animationDelay?: number;
 }
 

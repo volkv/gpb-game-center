@@ -13,7 +13,7 @@
   import { resources } from '../../stores/playerData';
   import { showToast } from '../../stores/ui';
   import { onMount, onDestroy } from 'svelte';
-  import { Building, Coins, Gem, TrendingUp, Star } from 'lucide-svelte';
+  import { Building, Coins, Gem, TrendingUp, Star, Battery } from 'lucide-svelte';
 
   interface Props {
     class?: string;
@@ -66,7 +66,9 @@
 
   const canAffordUpgrade = $derived(
     upgradeCost ?
-      $resources.coins >= upgradeCost.coins && $resources.crystals >= upgradeCost.crystals
+      $resources.coins >= upgradeCost.coins &&
+      $resources.crystals >= upgradeCost.crystals &&
+      (!upgradeCost.energy || $resources.energy >= upgradeCost.energy)
       : false
   );
 
@@ -129,8 +131,20 @@
   function getReasonDisabled(): string {
     if (!building || !config) return '';
     if (isMaxLevel) return 'Достигнут максимальный уровень';
-    if (!canAffordUpgrade) return 'Недостаточно ресурсов';
     if (isUpgrading) return 'Здание прокачивается';
+
+    if (!canAffordUpgrade && upgradeCost) {
+      const missing = [];
+      if ($resources.coins < upgradeCost.coins) missing.push('монеты');
+      if ($resources.crystals < upgradeCost.crystals) missing.push('кристаллы');
+      if (upgradeCost.energy && $resources.energy < upgradeCost.energy) missing.push('энергия');
+
+      if (missing.length > 0) {
+        return `Недостаточно: ${missing.join(', ')}`;
+      }
+      return 'Недостаточно ресурсов';
+    }
+
     return '';
   }
 </script>
@@ -222,15 +236,24 @@
                   size="sm"
                 >
                   <Coins size={14} />
-                  {upgradeCost?.coins || 0}
+                  {Math.floor(upgradeCost?.coins || 0)}
                 </Bubble>
                 <Bubble
                   color={canAffordUpgrade || !upgradeCost?.crystals ? 'raspberry' : 'raspberry-light'}
                   size="sm"
                 >
                   <Gem size={14} />
-                  {upgradeCost?.crystals || 0}
+                  {Math.floor(upgradeCost?.crystals || 0)}
                 </Bubble>
+                {#if upgradeCost?.energy}
+                  <Bubble
+                    color={canAffordUpgrade || !upgradeCost?.energy ? 'blue' : 'raspberry-light'}
+                    size="sm"
+                  >
+                    <Battery size={14} />
+                    {Math.floor(upgradeCost.energy)}
+                  </Bubble>
+                {/if}
               </div>
             </div>
             <div class="building-upgrade__card">

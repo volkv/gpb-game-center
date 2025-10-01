@@ -101,9 +101,9 @@
 
   function formatRewards(rewards: { coins?: number; crystals?: number; experience?: number }): string {
     const parts = [];
-    if (rewards.coins) parts.push(`${rewards.coins} монет`);
-    if (rewards.crystals) parts.push(`${rewards.crystals} кристаллов`);
-    if (rewards.experience) parts.push(`${rewards.experience} опыта`);
+    if (rewards.coins) parts.push(`${Math.floor(rewards.coins)} монет`);
+    if (rewards.crystals) parts.push(`${Math.floor(rewards.crystals)} кристаллов`);
+    if (rewards.experience) parts.push(`${Math.floor(rewards.experience)} опыта`);
     return parts.join(', ');
   }
 </script>
@@ -190,100 +190,104 @@
         </div>
       </Card>
     {:else}
-      <div class="space-y-4">
+      <div class="space-y-3">
         {#each questsByTab as questTyped, index (questTyped.id)}
           {@const progress = getQuestProgress(questTyped)}
           {@const isCompleted = questTyped.status === QuestStatus.COMPLETED}
           {@const isLocked = questTyped.status === QuestStatus.LOCKED}
           {@const canStart = questTyped.status === QuestStatus.AVAILABLE}
+          {@const isActive = questTyped.status === QuestStatus.IN_PROGRESS}
 
           <Card
-            gradient={isCompleted ? 'wealth' : isLocked ? null : 'electric'}
-            decorative={!isLocked}
-            class="stagger-item {isCompleted ? '' : isLocked ? 'opacity-60' : ''}"
+            gradient={isCompleted ? 'wealth' : null}
+            decorative={isCompleted}
+            class="stagger-item {isCompleted ? 'text-white' : 'bg-white border-2'} {isLocked ? 'opacity-50 border-gpb-gray-200' : isCompleted ? '' : isActive ? 'border-gpb-blue' : 'border-gpb-violet'}"
             style="animation-delay: {index * 0.1}s"
           >
-            <div class="flex items-start gap-4 mb-4">
-              <div class="p-3 rounded-xl bg-white/20 neon-glow">
+            <div class="flex items-center gap-3">
+              <div class="p-2 rounded-xl flex-shrink-0 {isCompleted ? 'bg-black/20' : isLocked ? 'bg-gpb-gray-200' : isActive ? 'bg-gpb-blue/10' : 'bg-gpb-violet/10'}">
                 <Icon
                   name={getQuestTypeIcon(questTyped.type)}
-                  size="lg"
-                  class="text-current"
+                  size="md"
+                  class={isCompleted ? 'text-gpb-gold' : isLocked ? 'text-gpb-gray-500' : isActive ? 'text-gpb-blue' : 'text-gpb-violet'}
                 />
               </div>
 
               <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-2">
-                  <h3 class="font-card-title">{questTyped.title}</h3>
-                  <div class="flex gap-2">
-                    {#if questTyped.isMainQuest}
-                      <Badge variant="hot" size="sm">Основной</Badge>
-                    {/if}
-                    <Badge variant="new" size="sm">{questTyped.type}</Badge>
-                  </div>
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="font-card-title text-sm truncate">{questTyped.title}</h3>
+                  {#if questTyped.isMainQuest}
+                    <Badge variant="hot" size="sm" class="flex-shrink-0">Основной</Badge>
+                  {/if}
                 </div>
 
-                <p class="font-ui-secondary opacity-90 mb-3 line-clamp-2">{questTyped.description}</p>
+                <p class="font-ui-secondary text-xs line-clamp-1 {isCompleted ? 'opacity-90' : 'text-gpb-gray-600'}">
+                  {getRequirementText(questTyped)}
+                </p>
               </div>
 
-              <div class="flex-shrink-0">
-                {#if isCompleted}
-                  <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                    <Icon name="check" color="white" size="sm" />
+              <div class="flex items-center gap-3 flex-shrink-0">
+                {#if !isCompleted && !isLocked}
+                  <div class="flex items-center gap-1 px-2 py-1 rounded-lg {isCompleted ? 'glass-effect' : 'bg-gpb-gray-50'}">
+                    <span class="font-ui-primary {isCompleted ? 'opacity-90' : 'text-gpb-gray-700'} text-xs whitespace-nowrap">
+                      {Math.round(progress)}%
+                    </span>
                   </div>
-                {:else if isLocked}
-                  <div class="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
-                    <Icon name="shield" color="white" size="sm" />
+                {/if}
+
+                {#if questTyped.rewards.coins || questTyped.rewards.crystals}
+                  <div class="flex items-center gap-2 text-xs">
+                    {#if questTyped.rewards.coins}
+                      <div class="flex items-center gap-1">
+                        <Icon name="coin" size="sm" class="text-gpb-gold" />
+                        <span class="font-ui-primary font-semibold">{Math.floor(questTyped.rewards.coins)}</span>
+                      </div>
+                    {/if}
+                    {#if questTyped.rewards.crystals}
+                      <div class="flex items-center gap-1">
+                        <Icon name="crystal" size="sm" class="text-gpb-violet" />
+                        <span class="font-ui-primary font-semibold">{Math.floor(questTyped.rewards.crystals)}</span>
+                      </div>
+                    {/if}
                   </div>
+                {/if}
+
+                {#if canStart}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onclick={() => handleStartQuest(questTyped)}
+                    class="hover-lift flex-shrink-0"
+                  >
+                    Начать
+                  </Button>
+                {:else if isActive && progress === 100}
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onclick={() => completeQuest(questTyped.id)}
+                    class="hover-lift animate-pulse-glow flex-shrink-0"
+                  >
+                    Завершить
+                  </Button>
                 {:else}
-                  <div class="w-10 h-10 rounded-full bg-gpb-raspberry flex items-center justify-center pulse-border">
-                    <Icon name="quest" color="white" size="sm" />
+                  <div class="flex-shrink-0">
+                    {#if isCompleted}
+                      <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                        <Icon name="check" color="white" size="sm" />
+                      </div>
+                    {:else if isLocked}
+                      <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
+                        <Icon name="shield" color="white" size="sm" />
+                      </div>
+                    {:else}
+                      <div class="w-8 h-8 rounded-full bg-gpb-blue flex items-center justify-center pulse-border">
+                        <Icon name="quest" color="white" size="sm" />
+                      </div>
+                    {/if}
                   </div>
                 {/if}
               </div>
-            </div>
-
-            <div class="space-y-3">
-              <div class="flex items-center gap-2 p-2 rounded-lg glass-effect">
-                <Icon name="building" size="sm" class="text-current opacity-80" />
-                <span class="font-ui-primary opacity-90">{getRequirementText(questTyped)}</span>
-              </div>
-
-              {#if !isCompleted && !isLocked}
-                <ProgressBar
-                  value={progress}
-                  color={progress === 100 ? 'emerald' : 'violet'}
-                  showPercentage={true}
-                  animated={true}
-                />
-              {/if}
-            </div>
-
-            <div class="flex items-center justify-between pt-4 border-t border-white/20">
-              <div class="flex items-center gap-2">
-                <Icon name="star" size="sm" class="text-gpb-gold neon-glow" />
-                <span class="font-ui-primary font-semibold">{formatRewards(questTyped.rewards)}</span>
-              </div>
-
-              {#if canStart}
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onclick={() => handleStartQuest(questTyped)}
-                  class="hover-lift"
-                >
-                  Начать
-                </Button>
-              {:else if questTyped.status === QuestStatus.IN_PROGRESS && progress === 100}
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onclick={() => completeQuest(questTyped.id)}
-                  class="hover-lift animate-pulse-glow"
-                >
-                  Завершить
-                </Button>
-              {/if}
             </div>
           </Card>
         {/each}

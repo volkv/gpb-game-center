@@ -45,6 +45,13 @@ function loadSavedData() {
     });
     playerData.set(savedPlayerData);
     console.log('✅ [AUTOSAVE] Player data loaded from storage');
+
+    import('../stores/buildings').then(({ collectOfflineIncome }) => {
+      const offlineReward = collectOfflineIncome();
+      if (offlineReward.coins > 0 || offlineReward.crystals > 0) {
+        console.log('💰 [OFFLINE] Collected offline income:', offlineReward);
+      }
+    });
   } else {
     console.log('❌ [AUTOSAVE] No saved player data found');
   }
@@ -107,7 +114,12 @@ function saveCurrentState(): boolean {
     const currentPlayerData = get(playerData);
     const currentGameState = get(gameState);
 
-    const playerDataSaved = savePlayerData(currentPlayerData);
+    const updatedPlayerData = {
+      ...currentPlayerData,
+      lastSave: Date.now()
+    };
+
+    const playerDataSaved = savePlayerData(updatedPlayerData);
     const gameStateSaved = saveGameState(currentGameState);
 
     if (playerDataSaved && gameStateSaved) {

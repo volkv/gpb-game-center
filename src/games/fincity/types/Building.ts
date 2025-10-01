@@ -29,6 +29,7 @@ export interface BuildingConfig {
   basePrice: {
     coins: number;
     crystals: number;
+    energy?: number;
   };
   income: {
     coins: number;

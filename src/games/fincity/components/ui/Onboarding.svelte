@@ -326,7 +326,7 @@
 
   .tutorial-progress {
     position: fixed;
-    top: 4rem;
+    bottom: 5rem;
     left: 50%;
     transform: translateX(-50%);
     z-index: 40;

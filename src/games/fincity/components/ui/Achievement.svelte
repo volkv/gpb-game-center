@@ -162,7 +162,7 @@
         </div>
       </Card>
     {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-1 gap-3">
         {#each filteredAchievements as achievement, index (achievement.id)}
           {@const isUnlocked = achievement.status === 'unlocked'}
           {@const isLocked = achievement.status === 'locked'}
@@ -171,110 +171,75 @@
           <Card
             gradient={isUnlocked ? rarityGradients[achievement.rarity] : null}
             decorative={isUnlocked}
-            class="stagger-item {isUnlocked ? 'text-white' : ''} {isLocked ? 'opacity-60' : ''}"
+            class="stagger-item {isUnlocked ? 'text-white' : 'bg-white border-2'} {isLocked ? 'opacity-50 border-gpb-gray-200' : isUnlocked ? '' : 'border-gpb-violet'}"
             style="animation-delay: {index * 0.1}s"
           >
-            <div class="flex items-start gap-4 mb-4">
-              <div class="p-3 rounded-xl {isUnlocked ? 'bg-white/20 neon-glow' : 'bg-gpb-gray-100'}">
+            <div class="flex items-center gap-3">
+              <div class="p-2 rounded-xl flex-shrink-0 {isUnlocked ? 'bg-black/20' : isLocked ? 'bg-gpb-gray-200' : 'bg-gpb-violet/10'}">
                 <Icon
                   name={(achievement.icon as IconName) || 'crown'}
-                  size="lg"
-                  class={isUnlocked ? 'text-current' : 'text-gpb-gray-400'}
+                  size="md"
+                  class={isUnlocked ? 'text-gpb-gold' : isLocked ? 'text-gpb-gray-500' : 'text-gpb-violet'}
                 />
               </div>
 
               <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-2">
-                  <h3 class="font-card-title">{achievement.title}</h3>
-                  <Badge variant={rarityVariants[achievement.rarity]} size="sm">
+                <div class="flex items-center gap-2 mb-1">
+                  <h3 class="font-card-title text-sm truncate">{achievement.title}</h3>
+                  <Badge variant={rarityVariants[achievement.rarity]} size="sm" class="flex-shrink-0">
                     {getRarityName(achievement.rarity)}
                   </Badge>
                 </div>
 
-                <p class="font-ui-secondary mb-3 line-clamp-2 {isUnlocked ? 'opacity-90' : 'text-gpb-gray-600'}">
+                <p class="font-ui-secondary text-xs line-clamp-1 {isUnlocked ? 'opacity-90' : 'text-gpb-gray-600'}">
                   {achievement.description}
                 </p>
               </div>
 
-              <div class="flex-shrink-0">
-                {#if isUnlocked}
-                  <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
-                    <Icon name="check" color="white" size="sm" />
-                  </div>
-                {:else if isLocked}
-                  <div class="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center">
-                    <Icon name="shield" color="white" size="sm" />
-                  </div>
-                {:else}
-                  <div class="w-10 h-10 rounded-full bg-gpb-raspberry flex items-center justify-center pulse-border">
-                    <Icon name="crown" color="white" size="sm" />
+              <div class="flex items-center gap-3 flex-shrink-0">
+                {#if achievement.progress && !isUnlocked}
+                  <div class="flex items-center gap-1 px-2 py-1 rounded-lg {isUnlocked ? 'glass-effect' : 'bg-gpb-gray-50'}">
+                    <span class="font-ui-primary {isUnlocked ? 'opacity-90' : 'text-gpb-gray-700'} text-xs whitespace-nowrap">
+                      {achievement.progress}/{achievement.maxProgress}
+                    </span>
                   </div>
                 {/if}
+
+                {#if achievement.rewards?.coins || achievement.rewards?.crystals}
+                  <div class="flex items-center gap-2 text-xs">
+                    {#if achievement.rewards.coins}
+                      <div class="flex items-center gap-1">
+                        <Icon name="coin" size="sm" class="text-gpb-gold" />
+                        <span class="font-ui-primary font-semibold">{Math.floor(achievement.rewards.coins)}</span>
+                      </div>
+                    {/if}
+                    {#if achievement.rewards.crystals}
+                      <div class="flex items-center gap-1">
+                        <Icon name="crystal" size="sm" class="text-gpb-violet" />
+                        <span class="font-ui-primary font-semibold">{Math.floor(achievement.rewards.crystals)}</span>
+                      </div>
+                    {/if}
+                  </div>
+                {/if}
+
+                <div class="flex-shrink-0">
+                  {#if isUnlocked}
+                    <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                      <Icon name="check" color="white" size="sm" />
+                    </div>
+                  {:else if isLocked}
+                    <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
+                      <Icon name="shield" color="white" size="sm" />
+                    </div>
+                  {:else}
+                    <div class="w-8 h-8 rounded-full bg-gpb-raspberry flex items-center justify-center pulse-border">
+                      <Icon name="crown" color="white" size="sm" />
+                    </div>
+                  {/if}
+                </div>
               </div>
             </div>
 
-            {#if achievement.progress && !isUnlocked}
-              <div class="mb-4">
-                <div class="flex items-center gap-2 p-2 rounded-lg {isUnlocked ? 'glass-effect' : 'bg-gpb-gray-50'} mb-2">
-                  <Icon name="building" size="sm" class={isUnlocked ? 'text-current opacity-80' : 'text-gpb-gray-500'} />
-                  <span class="font-ui-primary {isUnlocked ? 'opacity-90' : 'text-gpb-gray-700'} text-sm">
-                    Прогресс: {achievement.progress}/{achievement.maxProgress}
-                  </span>
-                </div>
-                <ProgressBar
-                  value={progress}
-                  color={progress === 100 ? 'emerald' : 'violet'}
-                  showPercentage={true}
-                  animated={true}
-                />
-              </div>
-            {/if}
-
-            {#if isUnlocked && achievement.unlockDate}
-              <div class="flex items-center gap-2 p-2 rounded-lg glass-effect mb-4">
-                <Icon name="check" size="sm" class="text-green-400" />
-                <span class="font-ui-primary opacity-90 text-sm">
-                  Разблокировано {new Date(achievement.unlockDate).toLocaleDateString('ru-RU')}
-                </span>
-              </div>
-            {/if}
-
-            {#if achievement.rewards}
-              <div class="flex items-center justify-between pt-4 border-t {isUnlocked ? 'border-white/20' : 'border-gpb-gray-200'}">
-                <div class="flex items-center gap-2">
-                  <Icon name="star" size="sm" class="text-gpb-gold neon-glow" />
-                  <span class="font-ui-primary font-semibold text-sm">
-                    Награда:
-                  </span>
-                </div>
-                <div class="flex items-center gap-3 text-sm">
-                  {#if achievement.rewards.coins}
-                    <div class="flex items-center gap-1">
-                      <Icon name="coin" size="sm" class="text-gpb-gold" />
-                      <span class="font-ui-primary font-semibold">{achievement.rewards.coins}</span>
-                    </div>
-                  {/if}
-                  {#if achievement.rewards.crystals}
-                    <div class="flex items-center gap-1">
-                      <Icon name="crystal" size="sm" class="text-gpb-violet" />
-                      <span class="font-ui-primary font-semibold">{achievement.rewards.crystals}</span>
-                    </div>
-                  {/if}
-                  {#if achievement.rewards.experience}
-                    <div class="flex items-center gap-1">
-                      <Icon name="star" size="sm" class="text-gpb-gold" />
-                      <span class="font-ui-primary font-semibold">{achievement.rewards.experience} опыта</span>
-                    </div>
-                  {/if}
-                  {#if achievement.rewards.title}
-                    <div class="flex items-center gap-1">
-                      <Icon name="crown" size="sm" class="text-gpb-violet" />
-                      <span class="font-ui-primary font-semibold text-xs">{achievement.rewards.title}</span>
-                    </div>
-                  {/if}
-                </div>
-              </div>
-            {/if}
           </Card>
         {/each}
       </div>

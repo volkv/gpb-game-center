@@ -431,7 +431,7 @@ function giveAchievementRewards(rewards: AchievementReward) {
   }
 
   if (Object.keys(resourceRewards).length > 0) {
-    addResources(resourceRewards);
+    addResources(resourceRewards, true);
   }
 
   if (rewards.title) {

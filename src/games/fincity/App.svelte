@@ -7,7 +7,6 @@
 	import BuildingInfo from './components/ui/BuildingInfo.svelte';
 	import QuestLog from './components/ui/QuestLog.svelte';
 	import Achievement from './components/ui/Achievement.svelte';
-	import Settings from './components/ui/Settings.svelte';
 	import Toast from './components/ui/Toast.svelte';
 	import ResourcesBar from './components/ui/ResourcesBar.svelte';
 	import Onboarding from './components/ui/Onboarding.svelte';
@@ -15,6 +14,7 @@
 	import { modal } from './stores/ui';
 	import type { GameEngine } from './components/game/GameEngine';
 	import { initializeAutoSave, stopAutoSave } from './lib/autoSave';
+	import { startPassiveIncome, stopPassiveIncome } from './stores/buildings';
 
 	interface Props {
 		onexit?: () => void;
@@ -26,6 +26,7 @@
 
 	onMount(() => {
 		initializeAutoSave();
+		startPassiveIncome();
 
 		gameStatusStore.show({
 			gameName: 'ФинСити',
@@ -35,6 +36,7 @@
 	});
 
 	onDestroy(() => {
+		stopPassiveIncome();
 		stopAutoSave();
 		gameStatusStore.hide();
 	});
@@ -88,9 +90,7 @@
 		<Achievement />
 	{/if}
 
-	{#if $modal.isOpen && $modal.type === 'settings'}
-		<Settings />
-	{/if}
+
 
 	<Toast />
 	<Onboarding />

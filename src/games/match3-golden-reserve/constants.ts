@@ -8,7 +8,7 @@ export const GAME_CONFIG = {
 	MIN_MATCH_LENGTH: 3
 } as const;
 
-export const CELL_TYPES: readonly CellType[] = ['coin', 'sapphire', 'emerald', 'gold', 'gazpromneft', 'zenit', 'gpb_mobile'] as const;
+export const CELL_TYPES: readonly CellType[] = ['coin', 'gold', 'sapphire', 'emerald'] as const;
 
 export const SCORE_VALUES = {
 	MATCH_3: 120,

@@ -7,6 +7,7 @@
   import { startBuildingMode } from '../../stores/gameState';
   import { BuildingType } from '../../types/Building';
   import type { GameEngine } from '../game/GameEngine';
+  import { Battery } from 'lucide-svelte';
 
   interface Props {
     class?: string;
@@ -57,7 +58,16 @@
     }
 
     if (!canAfford(config.basePrice)) {
-      showToast('error', 'Недостаточно ресурсов', 'Нужно больше монет или кристаллов');
+      const missing = [];
+      if (config.basePrice.coins && $resources.coins < config.basePrice.coins) missing.push('монет');
+      if (config.basePrice.crystals && $resources.crystals < config.basePrice.crystals) missing.push('кристаллов');
+      if (config.basePrice.energy && $resources.energy < config.basePrice.energy) missing.push('энергии');
+
+      const message = missing.length > 0
+        ? `Недостаточно: ${missing.join(', ')}`
+        : 'Недостаточно ресурсов';
+
+      showToast('error', 'Недостаточно ресурсов', message);
       return;
     }
 
@@ -247,6 +257,17 @@
                 >
                   <Icon name="crystal" size="xs" />
                   {config.basePrice.crystals.toLocaleString('ru-RU')}
+                </Bubble>
+              {/if}
+
+              {#if config.basePrice.energy && config.basePrice.energy > 0}
+                <Bubble
+                  color={$resources.energy >= config.basePrice.energy ? 'blue' : 'raspberry-light'}
+                  size="sm"
+                  class="building-card__price-chip"
+                >
+                  <Battery size={12} />
+                  {Math.floor(config.basePrice.energy)}
                 </Bubble>
               {/if}
             </div>

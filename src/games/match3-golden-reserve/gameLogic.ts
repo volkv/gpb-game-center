@@ -97,17 +97,29 @@ export function validateCellSelection(
 export function markCellsAsSwapping(field: Cell[][], pos1: Position, pos2: Position): Cell[][] {
 	const newField = field.map(row => [...row]);
 
+	const direction1 = getSwapDirection(pos1, pos2);
+	const direction2 = getSwapDirection(pos2, pos1);
+
 	newField[pos1.row][pos1.col] = {
 		...newField[pos1.row][pos1.col],
-		isSwapping: true
+		isSwapping: true,
+		swapDirection: direction1
 	};
 
 	newField[pos2.row][pos2.col] = {
 		...newField[pos2.row][pos2.col],
-		isSwapping: true
+		isSwapping: true,
+		swapDirection: direction2
 	};
 
 	return newField;
+}
+
+function getSwapDirection(from: Position, to: Position): 'up' | 'down' | 'left' | 'right' {
+	if (to.row < from.row) return 'up';
+	if (to.row > from.row) return 'down';
+	if (to.col < from.col) return 'left';
+	return 'right';
 }
 
 export function clearSwappingFlags(field: Cell[][]): Cell[][] {
@@ -584,6 +596,8 @@ export function removeMatches(field: Cell[][], matchPositions: Position[][]): Ce
 		const col = positionIndex % GAME_CONFIG.FIELD_SIZE;
 		if (newField[row] && newField[row][col]) {
 			newField[row][col].isMatched = true;
+			newField[row][col].isExploding = true;
+			newField[row][col].isFading = true;
 		}
 	});
 

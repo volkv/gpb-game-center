@@ -51,7 +51,10 @@ export function updateResources(changes: Partial<PlayerResources>) {
   }));
 }
 
-export function addResources(amount: { coins?: number; crystals?: number; energy?: number; experience?: number }) {
+export function addResources(
+  amount: { coins?: number; crystals?: number; energy?: number; experience?: number },
+  skipAchievementCheck = false
+) {
   playerData.update(data => {
     const newResources = { ...data.resources };
 
@@ -65,7 +68,9 @@ export function addResources(amount: { coins?: number; crystals?: number; energy
     return { ...data, resources: newResources };
   });
 
-  checkAchievements();
+  if (!skipAchievementCheck) {
+    checkAchievements();
+  }
 }
 
 export function spendResources(cost: { coins?: number; crystals?: number; energy?: number }) {
@@ -75,6 +80,14 @@ export function spendResources(cost: { coins?: number; crystals?: number; energy
     if (cost.coins) newResources.coins -= cost.coins;
     if (cost.crystals) newResources.crystals -= cost.crystals;
     if (cost.energy) newResources.energy -= cost.energy;
+
+    if (import.meta.env.DEV) {
+      console.log('[FinCity] spendResources:', {
+        cost,
+        before: data.resources,
+        after: newResources
+      });
+    }
 
     return { ...data, resources: newResources };
   });

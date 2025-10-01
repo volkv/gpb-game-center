@@ -14,7 +14,6 @@ export { default as BuildMenu } from './BuildMenu.svelte';
 export { default as BuildingInfo } from './BuildingInfo.svelte';
 export { default as BuildingUpgrade } from './BuildingUpgrade.svelte';
 export { default as QuestLog } from './QuestLog.svelte';
-export { default as Settings } from './Settings.svelte';
 export { default as Onboarding } from './Onboarding.svelte';
 export { default as Achievement } from './Achievement.svelte';
 export { default as ZoomControls } from './ZoomControls.svelte';

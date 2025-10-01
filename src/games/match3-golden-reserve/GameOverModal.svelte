@@ -27,9 +27,9 @@
 		onExit
 	}: Props = $props();
 
-	const isWin = score >= targetScore;
-	const efficiency = Math.round((score / (movesUsed || 1)) * 10) / 10;
-	const progressPercent = Math.min(100, (score / targetScore) * 100);
+	const isWin = $derived(score >= targetScore);
+	const efficiency = $derived(Math.round((score / (movesUsed || 1)) * 10) / 10);
+	const progressPercent = $derived(Math.min(100, (score / targetScore) * 100));
 
 	const getScoreRating = () => {
 		if (score >= targetScore * 1.5) return { stars: 3, text: 'Превосходно!' };
@@ -38,7 +38,7 @@
 		return { stars: 0, text: 'Попробуйте еще раз!' };
 	};
 
-	const rating = getScoreRating();
+	const rating = $derived(getScoreRating());
 </script>
 
 <Modal

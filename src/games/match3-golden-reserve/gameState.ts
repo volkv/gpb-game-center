@@ -2,7 +2,7 @@ import { writable, derived } from 'svelte/store';
 import { gameStore } from '$lib/stores/gameStore';
 import { pointsStore } from '$lib/stores/pointsStore';
 import type { GameState } from '$lib/types/GameState';
-import type { Match3GameState, Position, Cell, BoosterState, GameSession } from './types';
+import type { Match3GameState, Position, Cell, BoosterState, GameSession, GameStatus } from './types';
 import { GAME_CONFIG, SCORE_VALUES, ANIMATION_DURATIONS } from './constants';
 import {
 	isValidSwap,
@@ -310,10 +310,12 @@ function createMatch3Store() {
 							} : currentState.scoreBoost
 						};
 
-						if (newState.moves <= 0 && newState.score < newState.targetScore) {
-							newState.status = 'completed';
-						} else if (newState.score >= newState.targetScore) {
-							newState.status = 'completed';
+						if (!newState.demo.isActive) {
+							if (newState.moves <= 0 && newState.score < newState.targetScore) {
+								newState.status = 'completed';
+							} else if (newState.score >= newState.targetScore) {
+								newState.status = 'completed';
+							}
 						}
 
 						if (newState.demo.isActive && totalResult.score > 0) {
@@ -371,13 +373,34 @@ function createMatch3Store() {
 
 				const boosterScore = SCORE_VALUES.BOOSTER_USE;
 				const totalScore = boosterScore + totalResult.score;
+				const calculatedScore = state.score + totalScore;
+
+				let finalScore = calculatedScore;
+				let finalStatus: GameStatus = 'playing';
+				let finalDemo = state.demo;
+
+				if (!state.demo.isActive) {
+					if (calculatedScore >= state.targetScore) {
+						finalStatus = 'completed';
+					}
+				} else {
+					finalDemo = {
+						...state.demo,
+						isActive: false,
+						showingHint: false
+					};
+					finalStatus = 'completed';
+					if (calculatedScore < state.targetScore) {
+						finalScore = state.targetScore;
+					}
+				}
 
 				const newState: Match3GameState = {
 					...state,
 					field: finalField,
 					selectedCell: null,
-					status: 'playing',
-					score: state.score + totalScore,
+					status: finalStatus,
+					score: finalScore,
 					booster: {
 						charge: 0,
 						isActive: false,
@@ -387,14 +410,9 @@ function createMatch3Store() {
 					scoreBoost: totalScore >= 200 ? {
 						amount: totalScore,
 						visible: true
-					} : state.scoreBoost
+					} : state.scoreBoost,
+					demo: finalDemo
 				};
-
-				if (newState.score >= newState.targetScore) {
-					newState.status = 'completed';
-				} else if (newState.moves <= 0) {
-					newState.status = 'completed';
-				}
 
 				syncWithMainStore(newState);
 				return newState;
@@ -445,8 +463,8 @@ function createMatch3Store() {
 
 				switch (nextStep) {
 					case 2:
-						newHint = 'Отлично! Теперь найдите комбинацию из 4 сапфиров для полной зарядки бустера!';
-						recommendedMove = getDemoRecommendedMove(2);
+						newHint = 'Отлично! Теперь создайте еще одну большую комбинацию из 4+ элементов для полной зарядки бустера!';
+						recommendedMove = null;
 						break;
 					case 3:
 						newHint = 'Великолепно! Бустер заряжен! Нажмите на кнопку "Газпромбанк Бонус" и выберите цель для взрыва.';
