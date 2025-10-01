@@ -9,6 +9,8 @@ export interface Reward {
 	isAvailable: boolean;
 	validUntil?: Date;
 	terms?: string;
+	gradient?: string;
+	themeColor?: string;
 }
 
 export interface RewardCategory {

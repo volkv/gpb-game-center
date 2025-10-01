@@ -12,10 +12,10 @@
 	let element: HTMLDivElement | undefined = $state();
 
 	const getBoostType = (amount: number) => {
-		if (amount >= 500) return { icon: Star, color: 'gpb-gold', label: 'AMAZING!' };
-		if (amount >= 300) return { icon: Zap, color: 'gpb-mint', label: 'GREAT!' };
-		if (amount >= 200) return { icon: Plus, color: 'gpb-blue', label: 'NICE!' };
-		return { icon: Plus, color: 'gpb-gray-600', label: 'GOOD!' };
+		if (amount >= 500) return { icon: Star, color: 'gpb-gold', label: 'ПОТРЯСАЮЩЕ!' };
+		if (amount >= 300) return { icon: Zap, color: 'gpb-mint', label: 'ОТЛИЧНО!' };
+		if (amount >= 200) return { icon: Plus, color: 'gpb-blue', label: 'ХОРОШО!' };
+		return { icon: Plus, color: 'gpb-gray-600', label: 'НЕПЛОХО!' };
 	};
 
 	const boostType = getBoostType(amount);

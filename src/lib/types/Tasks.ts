@@ -16,6 +16,8 @@ export interface Task {
 	productName?: string;
 	icon: string;
 	requirements: string[];
+	gradient?: string;
+	themeColor?: string;
 }
 
 export interface TaskCategory {

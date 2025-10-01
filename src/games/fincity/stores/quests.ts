@@ -294,3 +294,5 @@ export function trackProductLearning(productId: string) {
 export function resetQuests() {
   quests.set(initialQuests);
 }
+
+unlockNextQuests();

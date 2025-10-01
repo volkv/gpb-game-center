@@ -41,10 +41,10 @@
   };
 
   const gradientClasses = {
-    electric: 'gradient-electric text-white',
-    power: 'gradient-power text-white',
-    wealth: 'gradient-wealth text-white',
-    mystery: 'gradient-mystery text-white'
+    electric: 'gradient-electric ',
+    power: 'gradient-power ',
+    wealth: 'gradient-wealth ',
+    mystery: 'gradient-mystery '
   };
 
   const sizeClasses = {

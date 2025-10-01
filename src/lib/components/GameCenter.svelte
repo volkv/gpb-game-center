@@ -76,7 +76,7 @@
 		<StatsSection ariaLabel="Статистика игрока" metrics={statsMetrics} columns={3} />
 
 		<section class="section" aria-labelledby="active-games-heading">
-			<SectionHeading eyebrow="Коллекция" title="Доступны сейчас" id="active-games-heading" />
+			<SectionHeading eyebrow="Коллекция игр" title="Доступны сейчас" id="active-games-heading" />
 			<div class="games-grid" role="list">
 				{#each activeGames as game (game.id)}
 					<div class="games-grid__item" role="listitem">

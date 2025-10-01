@@ -11,7 +11,9 @@ export const rewards: Reward[] = [
 		partner: 'Газпромбанк',
 		isAvailable: true,
 		validUntil: new Date('2025-12-31'),
-		terms: 'Подписка активируется в течение 24 часов после покупки'
+		terms: 'Подписка активируется в течение 24 часов после покупки',
+		gradient: 'linear-gradient(135deg, rgba(0, 106, 165, 0.80) 0%, rgba(31, 196, 217, 0.65) 60%, rgba(113, 229, 241, 0.50) 100%)',
+		themeColor: 'var(--color-brand-600)'
 	},
 	{
 		id: 'cashback-restaurants',
@@ -23,7 +25,9 @@ export const rewards: Reward[] = [
 		partner: 'Газпромбанк',
 		isAvailable: true,
 		validUntil: new Date('2025-12-31'),
-		terms: 'Действует 30 дней с момента активации'
+		terms: 'Действует 30 дней с момента активации',
+		gradient: 'linear-gradient(140deg, rgba(43, 180, 138, 0.75) 0%, rgba(64, 214, 230, 0.60) 50%, rgba(0, 122, 195, 0.50) 100%)',
+		themeColor: 'var(--color-state-success)'
 	},
 	{
 		id: 'ozon-premium',
@@ -35,7 +39,9 @@ export const rewards: Reward[] = [
 		partner: 'Ozon',
 		isAvailable: true,
 		validUntil: new Date('2025-12-31'),
-		terms: 'Подписка на 1 месяц, активация в личном кабинете Ozon'
+		terms: 'Подписка на 1 месяц, активация в личном кабинете Ozon',
+		gradient: 'linear-gradient(150deg, rgba(82, 173, 228, 0.70) 0%, rgba(38, 147, 212, 0.65) 55%, rgba(0, 122, 195, 0.55) 100%)',
+		themeColor: 'var(--color-brand-500)'
 	},
 	{
 		id: 'lenta-discount',
@@ -47,7 +53,9 @@ export const rewards: Reward[] = [
 		partner: 'Лента',
 		isAvailable: true,
 		validUntil: new Date('2025-12-31'),
-		terms: 'Промокод действует 30 дней с момента получения'
+		terms: 'Промокод действует 30 дней с момента получения',
+		gradient: 'linear-gradient(160deg, rgba(113, 229, 241, 0.70) 0%, rgba(31, 196, 217, 0.65) 55%, rgba(43, 180, 138, 0.60) 100%)',
+		themeColor: 'var(--color-accent-500)'
 	},
 	{
 		id: 'gazpromneft-bonus',
@@ -59,7 +67,9 @@ export const rewards: Reward[] = [
 		partner: 'Газпромнефть',
 		isAvailable: true,
 		validUntil: new Date('2025-12-31'),
-		terms: 'Активируется в мобильном приложении «АЗС Газпромнефть»'
+		terms: 'Активируется в мобильном приложении «АЗС Газпромнефть»',
+		gradient: 'linear-gradient(145deg, rgba(226, 165, 58, 0.85) 0%, rgba(215, 139, 44, 0.70) 50%, rgba(0, 90, 137, 0.55) 100%)',
+		themeColor: 'var(--color-state-warning)'
 	},
 	{
 		id: 'dodo-pizza',
@@ -71,7 +81,9 @@ export const rewards: Reward[] = [
 		partner: 'Додо Пицца',
 		isAvailable: true,
 		validUntil: new Date('2025-12-31'),
-		terms: 'Промокод действует 14 дней с момента получения'
+		terms: 'Промокод действует 14 дней с момента получения',
+		gradient: 'linear-gradient(125deg, rgba(209, 60, 106, 0.75) 0%, rgba(203, 58, 75, 0.65) 50%, rgba(0, 59, 92, 0.55) 100%)',
+		themeColor: 'var(--color-state-danger)'
 	}
 ];
 

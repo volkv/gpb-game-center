@@ -184,7 +184,7 @@
 		gap: 0.35rem;
 		padding: 0.25rem 0.65rem;
 		border-radius: var(--radius-full);
-		font-size: 0.75rem;
+		font-size: 0.65rem;
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;

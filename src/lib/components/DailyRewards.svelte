@@ -56,7 +56,6 @@
 				<span class="daily-rewards__day">День {reward.day}</span>
 				<div class="daily-rewards__icon" aria-hidden="true">{reward.icon}</div>
 				<div class="daily-rewards__amount">+{reward.reward.toLocaleString()}</div>
-				<p class="daily-rewards__description">{reward.description}</p>
 
 				{#if canClaimReward(reward.day)}
 					<button
@@ -67,9 +66,9 @@
 						Получить
 					</button>
 				{:else if isRewardClaimed(reward.day)}
-					<span class="daily-rewards__status">Получено</span>
+					<span class="daily-rewards__status">✓</span>
 				{:else if !isRewardAvailable(reward.day)}
-					<span class="daily-rewards__status daily-rewards__status--locked">Откроется позже</span>
+					<span class="daily-rewards__status daily-rewards__status--locked">🔒</span>
 				{/if}
 			</div>
 		{/each}
@@ -132,7 +131,7 @@
 	.daily-rewards__list {
 		display: flex;
 		flex-wrap: nowrap;
-		gap: 0.75rem;
+		gap: 0.5rem;
 		padding: 0.25rem 0.35rem 0.75rem;
 		margin-inline: calc(var(--layout-gutter, 0px) * -1);
 		overflow-x: auto;
@@ -154,13 +153,14 @@
 	.daily-rewards__item {
 		display: flex;
 		flex-direction: column;
-		gap: 0.45rem;
-		padding: 0.85rem 1rem;
-		flex: 0 0 min(220px, 68vw);
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.65rem 0.75rem;
+		flex: 0 0 min(140px, 45vw);
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-subtle);
 		background: var(--color-surface-card);
-		text-align: left;
+		text-align: center;
 		scroll-snap-align: start;
 		transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 	}
@@ -177,42 +177,30 @@
 	}
 
 	.daily-rewards__day {
-		font-size: 0.7rem;
+		font-size: 0.65rem;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
 		color: var(--color-fg-muted);
 	}
 
 	.daily-rewards__icon {
-		font-size: 1.5rem;
+		font-size: 1.8rem;
 	}
 
 	.daily-rewards__amount {
 		font-family: var(--font-display);
-		font-size: 1rem;
+		font-size: 0.9rem;
 		font-weight: 600;
 		color: var(--color-brand-600);
 	}
 
-	.daily-rewards__description {
-		margin: 0;
-		font-size: 0.75rem;
-		color: var(--color-fg-secondary);
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		
-		line-clamp: 2;
-	}
-
 	.daily-rewards__action {
-		margin-top: auto;
-		padding: 0.45rem 0.75rem;
+		padding: 0.4rem 0.7rem;
 		border-radius: var(--radius-full);
 		border: 1px solid transparent;
 		background: linear-gradient(135deg, var(--color-brand-600) 0%, var(--color-brand-500) 100%);
 		color: var(--color-fg-inverse);
-		font-size: 0.8rem;
+		font-size: 0.75rem;
 		font-weight: 600;
 		cursor: pointer;
 		transition: background-color 140ms ease, transform 140ms ease;
@@ -224,13 +212,15 @@
 	}
 
 	.daily-rewards__status {
-		margin-top: auto;
-		display: inline-block;
-		padding: 0.3rem 0.6rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.3rem;
+		min-width: 1.8rem;
 		border-radius: var(--radius-full);
 		background: var(--color-neutral-100);
 		color: var(--color-fg-secondary);
-		font-size: 0.75rem;
+		font-size: 0.9rem;
 		font-weight: 600;
 		text-align: center;
 	}
@@ -238,6 +228,7 @@
 	.daily-rewards__status--locked {
 		background: var(--color-neutral-50);
 		color: var(--color-fg-muted);
+		opacity: 0.6;
 	}
 
 	.daily-rewards__footer {
@@ -301,8 +292,5 @@
 		color: var(--color-brand-600);
 	}
 
-	.daily-rewards__item {
-		flex: 0 0 min(240px, 82vw);
-	}
 
 </style>

@@ -125,9 +125,9 @@
   {/snippet}
 
   <div class="space-y-6">
-    <div class="tab-container">
+    <div class="achievement-tabs">
       <button
-        class="tab-item {selectedCategory === 'all' ? 'tab-item-active' : ''}"
+        class="achievement-tab {selectedCategory === 'all' ? 'active' : ''}"
         onclick={() => handleCategoryChange('all')}
         type="button"
       >
@@ -137,7 +137,7 @@
       </button>
       {#each Object.entries(categoryNames) as [category, name]}
         <button
-          class="tab-item {selectedCategory === category ? 'tab-item-active' : ''}"
+          class="achievement-tab {selectedCategory === category ? 'active' : ''}"
           onclick={() => handleCategoryChange(category as AchievementCategory)}
           type="button"
         >
@@ -299,3 +299,57 @@
   </div>
 {/if}
 
+<style>
+  .achievement-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-neutral-50);
+    border: 1px solid var(--color-border-subtle);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .achievement-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .achievement-tab {
+    flex: 1;
+    min-width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--color-fg-muted);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .achievement-tab:hover:not(.active) {
+    background: var(--color-surface-card);
+    color: var(--color-fg-secondary);
+  }
+
+  .achievement-tab:focus-visible {
+    border-color: var(--layer-brand-150);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+  }
+
+  .achievement-tab.active {
+    background: var(--color-brand-50);
+    border-color: var(--layer-brand-150);
+    color: var(--color-brand-600);
+  }
+</style>

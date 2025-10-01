@@ -284,7 +284,7 @@
 
 	/* Banking Products */
 	.banking-products {
-		max-height: 200px;
+		max-height: 300px;
 		overflow-y: auto;
 		margin-bottom: 1rem;
 	}

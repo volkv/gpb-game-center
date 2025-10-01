@@ -408,26 +408,22 @@
       <section class="game-stage game-stage--playing" aria-live="polite">
         <header class="game-hud surface-card">
           <div class="hud-section">
-            <span class="hud-section__label">Жизни</span>
             <div class="hud-lives">
               {#each Array(3) as _, i}
-                <Heart size={20} class={`hud-heart ${i < lives ? 'hud-heart--active' : ''}`} aria-hidden="true" />
+                <Heart size={16} class={`hud-heart ${i < lives ? 'hud-heart--active' : ''}`} aria-hidden="true" />
               {/each}
             </div>
           </div>
           <div class="hud-section">
-            <span class="hud-section__label">Счёт</span>
             <Counter value={score} class="hud-counter" />
           </div>
           <div class="hud-section">
-            <span class="hud-section__label">Уровень</span>
             <span class="hud-section__value">{level}/{totalLevels}</span>
           </div>
           <div class="hud-section hud-section--timer">
-            <span class="hud-section__label">Время на ответ</span>
             <div class="timer-pill">
-              <Clock size={16} aria-hidden="true" />
-              {timeRemaining} сек
+              <Clock size={14} aria-hidden="true" />
+              {timeRemaining}с
             </div>
             <ProgressBar
               value={timeRemaining}
@@ -702,40 +698,36 @@
   }
 
   .game-hud {
-    padding: 1.25rem;
+    padding: 0.75rem 1rem;
     display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    grid-template-columns: auto 1fr auto auto;
     align-items: center;
   }
 
   .hud-section {
     display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .hud-section__label {
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-fg-muted);
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .hud-section__value {
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: var(--color-fg-primary);
   }
 
   .hud-section--timer {
     grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
 
   .hud-lives {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.3rem;
   }
 
   :global(svg.hud-heart) {
@@ -749,19 +741,20 @@
   }
 
   .hud-counter {
-    font-size: 1.35rem;
+    font-size: 1.1rem;
   }
 
   .timer-pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.75rem;
+    gap: 0.3rem;
+    padding: 0.25rem 0.6rem;
     border-radius: var(--radius-full);
     background: var(--layer-brand-050);
     color: var(--color-brand-700);
     font-weight: 600;
-    width: fit-content;
+    font-size: 0.85rem;
+    white-space: nowrap;
   }
 
   .message-panel {
@@ -1077,21 +1070,32 @@
     width: 100%;
   }
 
-  .anti-fraud-game {
-    padding: 1.25rem;
-    padding-block: 1.25rem 2rem;
-  }
+  @media (max-width: 640px) {
+    .anti-fraud-game {
+      padding: 1rem;
+      padding-block: 1rem 1.5rem;
+    }
 
-  .game-hud {
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  }
+    .game-hud {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
 
-  .decision-grid {
-    grid-template-columns: 1fr;
-  }
+    .hud-section {
+      justify-content: space-between;
+    }
 
-  .message-panel__device {
-    display: none;
+    .hud-section--timer {
+      grid-column: 1;
+    }
+
+    .decision-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .message-panel__device {
+      display: none;
+    }
   }
 
 </style>

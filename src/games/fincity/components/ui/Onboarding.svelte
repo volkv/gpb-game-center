@@ -78,20 +78,15 @@
     >
       <div class="onboarding-header">
         <div class="header-icon">
-          <Icon name="building" size="xl" />
+          <Icon name="building" size="lg" />
         </div>
-        <div>
-          <h1 id="onboarding-title" class="header-title">Добро пожаловать в ФинСити!</h1>
-          <p class="header-subtitle">Ваш финансовый город ждёт</p>
-        </div>
+        <h1 id="onboarding-title" class="header-title">Добро пожаловать в ФинСити!</h1>
       </div>
 
       <div class="onboarding-content">
         <div class="content-section">
-          <h2 class="section-title">Создайте свой финансовый мегаполис</h2>
           <p class="section-text">
-            ФинСити поможет вам изучить банковские продукты Газпромбанка через увлекательную игру.
-            Стройте здания, выполняйте квесты и развивайте финансовую грамотность!
+            Стройте здания, выполняйте квесты и изучайте банковские продукты Газпромбанка!
           </p>
         </div>
 
@@ -111,28 +106,18 @@
         </div>
 
         <div class="features-section">
-          <h3 class="features-title">Что вас ждёт:</h3>
           <div class="features-grid">
             <div class="feature-card feature-card--building">
-              <Icon name="building" size="md" />
-              <div>
-                <div class="feature-title">Строительство зданий</div>
-                <div class="feature-text">Каждое здание - банковский продукт</div>
-              </div>
+              <Icon name="building" size="sm" />
+              <div class="feature-text">Строительство зданий</div>
             </div>
             <div class="feature-card feature-card--quest">
-              <Icon name="quest" size="md" />
-              <div>
-                <div class="feature-title">Обучающие квесты</div>
-                <div class="feature-text">Изучайте финансы играя</div>
-              </div>
+              <Icon name="quest" size="sm" />
+              <div class="feature-text">Обучающие квесты</div>
             </div>
             <div class="feature-card feature-card--reward">
-              <Icon name="crystal" size="md" />
-              <div>
-                <div class="feature-title">Система наград</div>
-                <div class="feature-text">Получайте достижения и бонусы</div>
-              </div>
+              <Icon name="crystal" size="sm" />
+              <div class="feature-text">Система наград</div>
             </div>
           </div>
         </div>
@@ -182,11 +167,11 @@
 
   .onboarding-modal {
     position: relative;
-    width: min(560px, 100%);
-    max-height: calc(100vh - clamp(2rem, 6vh, 4rem));
+    width: min(480px, 100%);
+    max-height: calc(100vh - 2rem);
     display: flex;
     flex-direction: column;
-    border-radius: calc(var(--radius-xl) + 4px);
+    border-radius: var(--radius-xl);
     border: 1px solid var(--color-border-muted);
     background: color-mix(in srgb, var(--color-surface-card) 96%, white 4%);
     box-shadow: var(--shadow-hard);
@@ -196,8 +181,8 @@
   .onboarding-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: clamp(1.25rem, 2vw, 1.75rem);
+    gap: 0.75rem;
+    padding: 1rem;
     border-bottom: 1px solid var(--color-border-subtle);
     background: color-mix(in srgb, var(--color-neutral-50) 68%, white 32%);
   }
@@ -206,56 +191,41 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: var(--radius-lg);
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-md);
     background: color-mix(in srgb, var(--color-accent-100) 65%, white 35%);
     color: var(--color-accent-600);
+    flex-shrink: 0;
   }
 
   .header-title {
     font-family: var(--font-display);
-    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-size: 1.15rem;
     font-weight: 700;
     letter-spacing: -0.015em;
     color: var(--color-fg-primary);
-    margin: 0 0 0.25rem 0;
-  }
-
-  .header-subtitle {
-    font-size: 0.9rem;
-    color: var(--color-fg-secondary);
     margin: 0;
   }
 
   .onboarding-content {
     flex: 1;
     overflow-y: auto;
-    padding: clamp(1.25rem, 2vw, 1.75rem);
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: clamp(1.25rem, 2vw, 1.75rem);
+    gap: 1rem;
     background: color-mix(in srgb, var(--color-surface-card) 92%, white 8%);
   }
 
   .content-section {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .section-title {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--color-fg-primary);
-    margin: 0;
   }
 
   .section-text {
-    font-size: 0.95rem;
-    line-height: 1.6;
+    font-size: 0.875rem;
+    line-height: 1.5;
     color: var(--color-fg-secondary);
     margin: 0;
   }
@@ -263,24 +233,24 @@
   .input-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.375rem;
   }
 
   .input-label {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-fg-primary);
   }
 
   .city-input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: var(--radius-lg);
+    padding: 0.625rem 0.875rem;
+    border-radius: var(--radius-md);
     border: 1px solid var(--color-border-muted);
     background: var(--color-surface-card);
     color: var(--color-fg-primary);
     font-family: var(--font-sans);
-    font-size: 0.95rem;
+    font-size: 0.875rem;
     transition: border-color 160ms ease, box-shadow 160ms ease;
   }
 
@@ -297,28 +267,21 @@
   .features-section {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .features-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--color-fg-primary);
-    margin: 0;
   }
 
   .features-grid {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .feature-card {
+    flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.85rem;
-    padding: 1rem;
-    border-radius: var(--radius-lg);
+    gap: 0.375rem;
+    padding: 0.625rem 0.5rem;
+    border-radius: var(--radius-md);
     border: 1px solid transparent;
     transition: transform 160ms ease, box-shadow 160ms ease;
   }
@@ -341,22 +304,19 @@
     color: rgba(209, 60, 106, 0.85);
   }
 
-  .feature-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--color-fg-primary);
-  }
-
   .feature-text {
-    font-size: 0.8rem;
-    color: var(--color-fg-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-fg-primary);
+    text-align: center;
+    line-height: 1.3;
   }
 
   .button-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    padding-top: 0.5rem;
+    gap: 0.5rem;
+    padding-top: 0;
   }
 
   .button-group :global(.action-button) {
@@ -423,29 +383,52 @@
 
   @media (max-width: 480px) {
     .onboarding-overlay {
-      padding: 0.75rem;
+      padding: 0.5rem;
     }
 
     .onboarding-modal {
       width: 100%;
+      max-height: calc(100vh - 1rem);
     }
 
     .onboarding-header {
-      padding: 1rem;
+      padding: 0.875rem;
+      gap: 0.625rem;
     }
 
     .header-icon {
-      width: 3rem;
-      height: 3rem;
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .header-title {
+      font-size: 1rem;
     }
 
     .onboarding-content {
-      padding: 1rem;
-      gap: 1rem;
+      padding: 0.875rem;
+      gap: 0.875rem;
+    }
+
+    .features-grid {
+      flex-direction: column;
+      gap: 0.375rem;
+    }
+
+    .feature-card {
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: 0.5rem;
+      padding: 0.5rem 0.625rem;
+    }
+
+    .feature-text {
+      text-align: left;
     }
 
     .button-group {
       flex-direction: column;
+      gap: 0.5rem;
     }
 
     .button-group :global(.action-button) {

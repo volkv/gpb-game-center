@@ -8,10 +8,10 @@ function createTasksStore() {
 		{ day: 1, reward: 100, claimed: false, icon: '🎯', description: 'Добро пожаловать!' },
 		{ day: 2, reward: 200, claimed: false, icon: '⭐', description: 'Второй день' },
 		{ day: 3, reward: 300, claimed: false, icon: '💎', description: 'Третий день' },
-		// { day: 4, reward: 500, claimed: false, icon: '🏆', description: 'Четвертый день' },
-		// { day: 5, reward: 800, claimed: false, icon: '🔥', description: 'Пятый день' },
-		// { day: 6, reward: 1000, claimed: false, icon: '👑', description: 'Шестой день' },
-		// { day: 7, reward: 1500, claimed: false, icon: '🎊', description: 'Недельный бонус!' }
+		{ day: 4, reward: 500, claimed: false, icon: '🏆', description: 'Четвертый день' },
+		{ day: 5, reward: 800, claimed: false, icon: '🔥', description: 'Пятый день' },
+		{ day: 6, reward: 1000, claimed: false, icon: '👑', description: 'Шестой день' },
+		{ day: 7, reward: 1500, claimed: false, icon: '🎊', description: 'Недельный бонус!' }
 	];
 
 	const initialState: TasksState = {

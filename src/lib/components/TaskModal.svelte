@@ -91,8 +91,7 @@
 			<div class="task-modal-content">
 				<div class="task-header">
 					<div class="task-icon-large">{task.icon}</div>
-					<div class="task-info">
-						<h2 class="task-title">{task.title}</h2>
+					<h2 class="task-title">{task.title}</h2>
 					<div class="task-badges">
 						<span
 							class="difficulty-badge"
@@ -101,65 +100,48 @@
 							{difficultyTheme().label}
 						</span>
 						<div class="reward-badge">
-								<Star size={14} />
-								<span>+{task.reward.toLocaleString()} баллов</span>
-							</div>
+							<Star size={14} />
+							<span>+{task.reward.toLocaleString()}</span>
+						</div>
+						<div class="time-badge">
+							<Clock size={14} />
+							<span>{task.estimatedTime}</span>
 						</div>
 					</div>
 				</div>
 
 				<div class="task-body">
-					<div class="section">
-						<h3 class="section-title">Описание</h3>
-						<p class="task-description">{task.fullDescription}</p>
-					</div>
+					<p class="task-description">{task.fullDescription}</p>
 
 					{#if task.productName && task.productUrl}
-						<div class="section">
-							<h3 class="section-title">Продукт</h3>
-							<div class="product-card">
-								<div class="product-info">
+						<div class="product-card">
+							<div class="product-info">
 								<ExternalLink size={16} />
-									<span class="product-name">{task.productName}</span>
-								</div>
-								<Button
-									variant="secondary"
-									size="sm"
-									onclick={handleOpenProduct}
-								>
-									Открыть
-								</Button>
+								<span class="product-name">{task.productName}</span>
 							</div>
+							<Button
+								variant="secondary"
+								size="sm"
+								onclick={handleOpenProduct}
+							>
+								Открыть
+							</Button>
 						</div>
 					{/if}
 
-					<div class="section">
-						<h3 class="section-title">Требования для выполнения</h3>
-						<ul class="requirements-list">
-							{#each task.requirements as requirement}
-								<li class="requirement-item">
-									<CheckCircle size={16} />
-									<span>{requirement}</span>
-								</li>
-							{/each}
-						</ul>
-					</div>
-
-					<div class="task-meta-info">
-						<div class="meta-item">
-							<Clock size={16} />
-							<span>Примерное время: {task.estimatedTime}</span>
-						</div>
-						<div class="meta-item">
-							<Award size={16} />
-							<span>Награда: +{task.reward.toLocaleString()} баллов</span>
-						</div>
-					</div>
+					<ul class="requirements-list">
+						{#each task.requirements as requirement}
+							<li class="requirement-item">
+								<CheckCircle size={14} />
+								<span>{requirement}</span>
+							</li>
+						{/each}
+					</ul>
 				</div>
 
 				{#if task.status === 'completed'}
 					<div class="completion-notice">
-						<CheckCircle size={24} />
+						<CheckCircle size={20} />
 						<div>
 							<h4>Задание выполнено!</h4>
 							<p>Вы получили {task.reward.toLocaleString()} баллов</p>
@@ -170,7 +152,7 @@
 		{:else if showCompletionAnimation}
 			<div class="success-content">
 				<div class="success-icon">
-					<Award size={48} />
+					<Award size={32} />
 				</div>
 				<h2 class="success-title">Задание выполнено!</h2>
 				<p class="success-message">
@@ -195,7 +177,7 @@
 				class="btn-primary"
 				onclick={handleCompleteTask}
 			>
-				Я выполнил все условия
+				Я выполнил условия
 			</button>
 		{/if}
 	{/snippet}
@@ -205,14 +187,16 @@
 	.task-modal-content {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		gap: 1rem;
 	}
 
 	.task-header {
 		display: flex;
-		gap: 1rem;
-		align-items: flex-start;
-		padding-bottom: 1rem;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.75rem;
+		padding-bottom: 0.75rem;
 		border-bottom: 1px solid var(--color-border-subtle);
 	}
 
@@ -220,25 +204,18 @@
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		font-size: 2.4rem;
-		width: 5rem;
-		height: 5rem;
-		border-radius: var(--radius-xl);
+		font-size: 2rem;
+		width: 3.5rem;
+		height: 3.5rem;
+		border-radius: var(--radius-lg);
 		background: linear-gradient(135deg, rgba(6, 6, 152, 0.16) 0%, rgba(31, 196, 217, 0.18) 100%);
 		color: var(--color-brand-600);
-	}
-
-	.task-info {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
 	}
 
 	.task-title {
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: 1.45rem;
+		font-size: 1.25rem;
 		font-weight: 600;
 		color: var(--color-fg-primary);
 		letter-spacing: -0.01em;
@@ -246,17 +223,18 @@
 
 	.task-badges {
 		display: flex;
-		gap: 0.75rem;
+		gap: 0.5rem;
 		flex-wrap: wrap;
+		justify-content: center;
 	}
 
 	.difficulty-badge {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
-		padding: 0.3rem 0.75rem;
+		gap: 0.25rem;
+		padding: 0.25rem 0.6rem;
 		border-radius: var(--radius-full);
-		font-size: 0.75rem;
+		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.06em;
 		text-transform: uppercase;
@@ -265,64 +243,62 @@
 		border: 1px solid color-mix(in srgb, var(--difficulty-accent) 20%, transparent);
 	}
 
-	.reward-badge {
+	.reward-badge,
+	.time-badge {
 		display: inline-flex;
 		align-items: center;
-		gap: 0.35rem;
-		padding: 0.3rem 0.75rem;
+		gap: 0.25rem;
+		padding: 0.25rem 0.6rem;
 		border-radius: var(--radius-full);
 		background: var(--layer-brand-050);
 		color: var(--color-brand-600);
-		font-size: 0.78rem;
+		font-size: 0.7rem;
 		font-weight: 600;
+	}
+
+	.task-info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		align-items: center;
 	}
 
 	.task-body {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
-	}
-
-	.section {
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-
-	.section-title {
-		margin: 0;
-		font-family: var(--font-display);
-		font-size: 1rem;
-		font-weight: 600;
-		color: var(--color-fg-primary);
+		gap: 1rem;
 	}
 
 	.task-description {
 		margin: 0;
-		font-size: 0.95rem;
-		line-height: 1.6;
+		font-size: 0.875rem;
+		line-height: 1.5;
 		color: var(--color-fg-secondary);
 	}
 
 	.product-card {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
-		padding: 1rem;
+		gap: 0.75rem;
+		padding: 0.75rem;
 		border-radius: var(--radius-lg);
 		border: 1px solid var(--color-border-subtle);
 		background: var(--color-neutral-50);
 	}
 
 	.product-info {
+		flex: 1;
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
 		color: var(--color-fg-secondary);
+		font-size: 0.875rem;
 	}
 
 	.product-info :global(svg) {
 		color: var(--color-brand-500);
+		flex-shrink: 0;
 	}
 
 	.product-name {
@@ -335,48 +311,29 @@
 		list-style: none;
 		display: flex;
 		flex-direction: column;
-		gap: 0.65rem;
+		gap: 0.5rem;
 	}
 
 	.requirement-item {
 		display: inline-flex;
 		align-items: flex-start;
-		gap: 0.6rem;
+		gap: 0.5rem;
 		color: var(--color-fg-secondary);
-		font-size: 0.9rem;
+		font-size: 0.875rem;
+		line-height: 1.4;
 	}
 
 	.requirement-item :global(svg) {
 		color: var(--color-state-success);
-	}
-
-	.task-meta-info {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		padding: 1rem;
-		border-radius: var(--radius-lg);
-		border: 1px solid var(--color-border-subtle);
-		background: var(--color-neutral-50);
-	}
-
-	.meta-item {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.85rem;
-		color: var(--color-fg-muted);
-	}
-
-	.meta-item :global(svg) {
-		color: var(--color-brand-500);
+		flex-shrink: 0;
+		margin-top: 0.1rem;
 	}
 
 	.completion-notice {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 1rem;
+		gap: 0.625rem;
+		padding: 0.75rem;
 		border-radius: var(--radius-lg);
 		border: 1px solid color-mix(in srgb, var(--color-state-success) 28%, transparent);
 		background: color-mix(in srgb, var(--color-state-success) 18%, white 82%);
@@ -384,14 +341,14 @@
 	}
 
 	.completion-notice h4 {
-		margin: 0 0 0.25rem;
-		font-size: 1rem;
+		margin: 0 0 0.125rem;
+		font-size: 0.9rem;
 		font-weight: 600;
 	}
 
 	.completion-notice p {
 		margin: 0;
-		font-size: 0.85rem;
+		font-size: 0.8rem;
 		color: color-mix(in srgb, var(--color-state-success) 70%, white 30%);
 	}
 
@@ -399,14 +356,14 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 0.75rem;
-		padding: 1.75rem 1.25rem;
+		gap: 0.625rem;
+		padding: 1.5rem 1rem;
 		text-align: center;
 	}
 
 	.success-icon {
-		width: 56px;
-		height: 56px;
+		width: 48px;
+		height: 48px;
 		border-radius: 999px;
 		display: flex;
 		align-items: center;
@@ -416,17 +373,22 @@
 		color: color-mix(in srgb, var(--color-state-success) 72%, var(--color-fg-primary) 28%);
 	}
 
+	.success-icon :global(svg) {
+		width: 28px;
+		height: 28px;
+	}
+
 	.success-title {
 		margin: 0;
 		font-family: var(--font-display);
-		font-size: 1.25rem;
+		font-size: 1.125rem;
 		font-weight: 600;
 		color: color-mix(in srgb, var(--color-state-success) 70%, var(--color-fg-primary) 30%);
 	}
 
 	.success-message {
 		margin: 0;
-		font-size: 0.95rem;
+		font-size: 0.875rem;
 		color: var(--color-fg-secondary);
 	}
 
@@ -460,23 +422,5 @@
 		to {
 			transform: scaleX(0);
 		}
-	}
-
-	.task-header {
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.task-info {
-		align-items: center;
-		text-align: center;
-	}
-
-	.task-meta-info {
-		gap: 0.75rem;
-	}
-
-	.meta-item {
-		justify-content: center;
 	}
 </style>

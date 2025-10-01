@@ -18,20 +18,13 @@
 
   let selectedTab = $state<'active' | 'completed' | 'main' | 'side'>('active');
 
-  const questsByTab = $derived(() => {
-    switch (selectedTab) {
-      case 'active':
-        return $activeQuests;
-      case 'completed':
-        return $completedQuests;
-      case 'main':
-        return $mainQuests;
-      case 'side':
-        return $sideQuests;
-      default:
-        return [];
-    }
-  });
+  const questsByTab = $derived(
+    selectedTab === 'active' ? $activeQuests :
+    selectedTab === 'completed' ? $completedQuests :
+    selectedTab === 'main' ? $mainQuests :
+    selectedTab === 'side' ? $sideQuests :
+    []
+  );
 
   function getQuestTypeIcon(type: string): IconName {
     switch (type) {
@@ -136,10 +129,11 @@
   {/snippet}
 
   <div class="space-y-6">
-    <div class="tab-container">
+    <div class="quest-tabs">
       <button
-        class="tab-item {selectedTab === 'active' ? 'tab-item-active' : ''}"
+        class="quest-tab {selectedTab === 'active' ? 'active' : ''}"
         onclick={() => selectedTab = 'active'}
+        type="button"
       >
         <Icon name="quest" size="sm" />
         <span>Активные</span>
@@ -147,24 +141,27 @@
       </button>
 
       <button
-        class="tab-item {selectedTab === 'main' ? 'tab-item-active' : ''}"
+        class="quest-tab {selectedTab === 'main' ? 'active' : ''}"
         onclick={() => selectedTab = 'main'}
+        type="button"
       >
         <Icon name="star" size="sm" />
         <span>Основные</span>
       </button>
 
       <button
-        class="tab-item {selectedTab === 'side' ? 'tab-item-active' : ''}"
+        class="quest-tab {selectedTab === 'side' ? 'active' : ''}"
         onclick={() => selectedTab = 'side'}
+        type="button"
       >
         <Icon name="building" size="sm" />
         <span>Дополнительные</span>
       </button>
 
       <button
-        class="tab-item {selectedTab === 'completed' ? 'tab-item-active' : ''}"
+        class="quest-tab {selectedTab === 'completed' ? 'active' : ''}"
         onclick={() => selectedTab = 'completed'}
+        type="button"
       >
         <Icon name="check" size="sm" />
         <span>Завершенные</span>
@@ -194,7 +191,7 @@
       </Card>
     {:else}
       <div class="space-y-4">
-        {#each questsByTab() as questTyped, index (questTyped.id)}
+        {#each questsByTab as questTyped, index (questTyped.id)}
           {@const progress = getQuestProgress(questTyped)}
           {@const isCompleted = questTyped.status === QuestStatus.COMPLETED}
           {@const isLocked = questTyped.status === QuestStatus.LOCKED}
@@ -203,7 +200,7 @@
           <Card
             gradient={isCompleted ? 'wealth' : isLocked ? null : 'electric'}
             decorative={!isLocked}
-            class="stagger-item text-white {isCompleted ? '' : isLocked ? 'opacity-60' : ''}"
+            class="stagger-item {isCompleted ? '' : isLocked ? 'opacity-60' : ''}"
             style="animation-delay: {index * 0.1}s"
           >
             <div class="flex items-start gap-4 mb-4">
@@ -295,3 +292,57 @@
   </div>
 </Modal>
 
+<style>
+  .quest-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-neutral-50);
+    border: 1px solid var(--color-border-subtle);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .quest-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .quest-tab {
+    flex: 1;
+    min-width: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--color-fg-muted);
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .quest-tab:hover:not(.active) {
+    background: var(--color-surface-card);
+    color: var(--color-fg-secondary);
+  }
+
+  .quest-tab:focus-visible {
+    border-color: var(--layer-brand-150);
+    box-shadow: var(--shadow-focus);
+    outline: none;
+  }
+
+  .quest-tab.active {
+    background: var(--color-brand-50);
+    border-color: var(--layer-brand-150);
+    color: var(--color-brand-600);
+  }
+</style>

@@ -56,7 +56,7 @@ export class CameraManager {
     this.camera = {
       x: 0,
       y: 0,
-      zoom: 1.0,
+      zoom: 2.0,
       bounds: {
         minX: -this.config.boundsMargin,
         maxX: worldWidth + this.config.boundsMargin,

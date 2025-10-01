@@ -2,6 +2,7 @@
   import type { NovellaGameState, Scene, DialogueStep } from '../types';
   import { SpeakerType, ContinueAction } from '../types';
   import { scenes } from '../data/scenario';
+  import { CircleHelp } from 'lucide-svelte';
 
   interface Props {
     gameState: NovellaGameState;
@@ -18,6 +19,7 @@
   let characterImage = $state('');
   let speakerName = $state('');
   let isNarrator = $state(false);
+  let isFraudster = $state(false);
 
   $effect(() => {
     currentScene = scenes.find(scene => scene.id === gameState.currentSceneId);
@@ -38,6 +40,7 @@
     backgroundImage = currentDialogueStep?.backgroundImage || currentScene?.backgroundImage || '';
     characterImage = '/games/code-to-success/avatar.png';
     isNarrator = currentDialogueStep?.speaker === SpeakerType.NARRATOR;
+    isFraudster = currentDialogueStep?.speaker === SpeakerType.FRAUDSTER;
 
     if (!currentDialogueStep) {
       speakerName = '';
@@ -155,15 +158,21 @@
   {#if currentDialogueStep && !isNarrator && speakerName}
     <div class="character-bubble">
       <div class="character-avatar">
-        <img
-          src={characterImage}
-          alt={speakerName}
-          class="character-image"
-          onerror={(event) => {
-            const image = event.currentTarget as HTMLImageElement;
-            image.style.display = 'none';
-          }}
-        />
+        {#if isFraudster}
+          <div class="character-icon">
+            <CircleHelp size={48} strokeWidth={2} />
+          </div>
+        {:else}
+          <img
+            src={characterImage}
+            alt={speakerName}
+            class="character-image"
+            onerror={(event) => {
+              const image = event.currentTarget as HTMLImageElement;
+              image.style.display = 'none';
+            }}
+          />
+        {/if}
       </div>
       <div class="speech-indicator" aria-hidden="true">💬</div>
     </div>
@@ -284,6 +293,15 @@
     height: 100%;
     object-fit: cover;
     border-radius: var(--radius-full);
+  }
+
+  .character-icon {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-brand-600);
   }
 
   .speech-indicator {
