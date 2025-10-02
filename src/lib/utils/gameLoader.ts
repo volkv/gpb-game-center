@@ -86,38 +86,20 @@ class GameLoaderService {
 	}
 
 	private async dynamicImport(path: string): Promise<{ default: any }> {
-		try {
-			// Используем динамический импорт на основе полного пути
-			const module = await import(`../..${path}`);
-			if (!module.default) {
-				throw new Error(`Game component ${path} does not have a default export`);
-			}
-			return module;
-		} catch (error) {
-			// Fallback к старому методу для совместимости
-			if (import.meta.env.DEV) {
-				console.warn(`Dynamic import failed for ${path}, falling back to switch statement:`, error);
-			}
+		// Vite can analyze this pattern and create separate chunks for each game.
+		// The path must be relative to the current file.
+		const modules = import.meta.glob('../../games/**/*.svelte');
+		const modulePath = `../../${path.substring(1)}`;
 
-			switch (path) {
-				case '/games/quiz-shield-ruble/QuizGame.svelte':
-					return import('../../games/quiz-shield-ruble/QuizGame.svelte');
-				case '/games/match3-golden-reserve/Match3Game.svelte':
-					return import('../../games/match3-golden-reserve/Match3Game.svelte');
-				case '/games/crossword-financial/CrosswordDemo.svelte':
-					return import('../../games/crossword-financial/CrosswordDemo.svelte');
-				case '/games/fincity/FincityGame.svelte':
-					return import('../../games/fincity/FincityGame.svelte');
-				case '/games/anti-fraud-hunter/AntiFraudGame.svelte':
-					return import('../../games/anti-fraud-hunter/AntiFraudGame.svelte');
-				case '/games/code-to-success/CodeToSuccessGame.svelte':
-					return import('../../games/code-to-success/CodeToSuccessGame.svelte');
-				case '/games/asset-guardian/AssetGuardianGame.svelte':
-					return import('../../games/asset-guardian/AssetGuardianGame.svelte');
-				default:
-					throw new Error(`Unknown game component path: ${path}`);
-			}
+		if (!modules[modulePath]) {
+			throw new Error(`Unknown game component path: ${path}`);
 		}
+
+		const module = await modules[modulePath]();
+		if (!('default' in module)) {
+			throw new Error(`Game component ${path} does not have a default export`);
+		}
+		return module as { default: any };
 	}
 
 	private handleLoadError(gameId: string, error: Error): void {
