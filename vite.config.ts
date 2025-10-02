@@ -8,18 +8,45 @@ export default defineConfig({
 	build: {
 		target: 'es2020',
 		reportCompressedSize: false,
-		chunkSizeWarningLimit: 500,
+		chunkSizeWarningLimit: 1000, // Увеличиваем лимит для игровых приложений
 		rollupOptions: {
 			output: {
-				manualChunks: {
-					'quiz-game': ['./src/games/quiz-shield-ruble/QuizGame.svelte'],
-					'match3-game': ['./src/games/match3-golden-reserve/Match3Game.svelte'],
-					'crossword-game': ['./src/games/crossword-financial/CrosswordDemo.svelte'],
-					'fincity-game': ['./src/games/fincity/FincityGame.svelte'],
-					'anti-fraud-game': ['./src/games/anti-fraud-hunter/AntiFraudGame.svelte'],
-					'novella-game': ['./src/games/code-to-success/CodeToSuccessGame.svelte'],
-					'asset-guardian-game': ['./src/games/asset-guardian/AssetGuardianGame.svelte'],
-					'vendor-svelte': ['svelte', 'svelte/store', 'svelte/transition', 'svelte/motion']
+				manualChunks: (id) => {
+					// Разделяем большие библиотеки на отдельные чанки
+					if (id.includes('pixi.js')) {
+						return 'pixi-vendor';
+					}
+					if (id.includes('matter-js')) {
+						return 'matter-vendor';
+					}
+					if (id.includes('howler')) {
+						return 'howler-vendor';
+					}
+					if (id.includes('node_modules')) {
+						return 'vendor';
+					}
+					// Игровые модули
+					if (id.includes('quiz-shield-ruble')) {
+						return 'quiz-game';
+					}
+					if (id.includes('match3-golden-reserve')) {
+						return 'match3-game';
+					}
+					if (id.includes('crossword-financial')) {
+						return 'crossword-game';
+					}
+					if (id.includes('fincity')) {
+						return 'fincity-game';
+					}
+					if (id.includes('anti-fraud-hunter')) {
+						return 'anti-fraud-game';
+					}
+					if (id.includes('code-to-success')) {
+						return 'novella-game';
+					}
+					if (id.includes('asset-guardian')) {
+						return 'asset-guardian-game';
+					}
 				}
 			}
 		}

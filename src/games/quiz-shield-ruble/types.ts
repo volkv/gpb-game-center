@@ -3,32 +3,74 @@ import type { ComponentType } from 'svelte';
 import type { ReminderRecord } from './notifications';
 
 // Define types locally to avoid component confusion
-export interface QuestionEvidence {
-  type: string;
-  sender?: string;
-  caller?: string;
-  phone?: string;
-  url?: string;
-  location?: string;
-  status?: string;
-  title?: string;
-  prompt?: string;
-  actions?: string[];
-  platform?: string;
-  contact?: string;
-  timestamp?: string;
-  message?: string[];
+export type EvidenceType = 'sms' | 'call' | 'website' | 'atm' | 'app' | 'social';
+
+export interface SmsEvidence {
+  type: 'sms';
+  sender: string;
+  timestamp: string;
+  message: string[];
   link?: string;
-  riskNote?: string;
-  script?: string[];
-  isSecure?: boolean;
-  prompts?: string[];
-  warning?: string;
-  anomalies?: string[];
-  messages?: Array<{ text: string; highlight?: boolean; fromBank?: boolean }>;
   caption?: string;
   ariaLabel?: string;
 }
+
+export interface CallEvidence {
+  type: 'call';
+  caller: string;
+  phone: string;
+  riskNote: string;
+  script: string[];
+  caption?: string;
+  ariaLabel?: string;
+}
+
+export interface WebsiteEvidence {
+  type: 'website';
+  url: string;
+  isSecure: boolean;
+  title: string;
+  prompts: string[];
+  warning: string;
+  caption?: string;
+  ariaLabel?: string;
+}
+
+export interface AtmEvidence {
+  type: 'atm';
+  location: string;
+  anomalies: string[];
+  status: string;
+  caption?: string;
+  ariaLabel?: string;
+}
+
+export interface AppEvidence {
+  type: 'app';
+  title: string;
+  prompt: string;
+  actions: string[];
+  warning: string;
+  caption?: string;
+  ariaLabel?: string;
+}
+
+export interface SocialEvidence {
+  type: 'social';
+  contact: string;
+  platform: string;
+  messages: Array<{ fromBank?: boolean; text: string; highlight?: boolean }>;
+  caption?: string;
+  ariaLabel?: string;
+}
+
+export type QuestionEvidence =
+  | SmsEvidence
+  | CallEvidence
+  | WebsiteEvidence
+  | AtmEvidence
+  | AppEvidence
+  | SocialEvidence;
 
 export interface ProductSpotlightData {
   id: string;
@@ -43,7 +85,7 @@ export interface ProductSpotlightData {
   cta?: {
     text?: string;
     action?: string;
-    label?: string;
+    label: string;
     href?: string;
     external?: boolean;
   };
