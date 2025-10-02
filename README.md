@@ -14,6 +14,8 @@
 
 ### Экосистема финансовой грамотности через геймификацию
 
+**Команда Wine Coding Team**
+
 [![Telegram Mini App](https://img.shields.io/badge/Telegram-Mini_App-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/GPBGameCenterBot/play)
 [![Web App](https://img.shields.io/badge/Web-App-006ba5?style=for-the-badge&logo=vercel&logoColor=white)](https://gpb-game-center.vercel.app/)
 
@@ -281,6 +283,35 @@ telegramStore     // Интеграция с Telegram WebApp
 - 📱 **Telegram интеграция** — демонстрация WebView возможностей
 - 🌀 **Гироскоп управление** — уникальная техническая инновация
 - 📊 **Масштабируемость** — легкое добавление новых игр и продуктов
+
+---
+
+## 👥 Команда
+
+<div align="center">
+
+<img src="static/wct.png" width="150" alt="Wine Coding Team">
+
+### Wine Coding Team
+
+<table>
+<tr>
+<td align="center" width="33%">
+<b>Павел Волков</b><br>
+<i>Капитан • Fullstack</i>
+</td>
+<td align="center" width="33%">
+<b>Роман Науменко</b><br>
+<i>Fullstack • Design</i>
+</td>
+<td align="center" width="33%">
+<b>Николай Иртуганов</b><br>
+<i>Fullstack • Game Design</i>
+</td>
+</tr>
+</table>
+
+</div>
 
 ---
 
