@@ -1,6 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import type { PointsState, PurchaseTransaction, PointsHistory } from '$lib/types/Points';
 import { getStoreValue } from '$lib/utils/storeHelpers';
+import { generateId } from '$lib/utils/id';
 
 function createPointsStore() {
 	const initialState: PointsState = {
@@ -27,7 +28,7 @@ function createPointsStore() {
 
 		addPoints: (amount: number, description: string, gameId?: string) => {
 			const transaction: PointsHistory = {
-				id: `earn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+				id: generateId('earn'),
 				type: 'earned',
 				amount,
 				description,
@@ -54,7 +55,7 @@ function createPointsStore() {
 			}
 
 			const transaction: PurchaseTransaction = {
-				id: `purchase_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+				id: generateId('purchase'),
 				rewardId,
 				rewardTitle,
 				pointsSpent: amount,
@@ -63,7 +64,7 @@ function createPointsStore() {
 			};
 
 			const historyTransaction: PointsHistory = {
-				id: `spend_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+				id: generateId('spend'),
 				type: 'spent',
 				amount,
 				description: `Покупка: ${rewardTitle}`,

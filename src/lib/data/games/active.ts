@@ -18,6 +18,10 @@ export const ACTIVE_GAMES: Game[] = [
 		},
 		gradient: 'linear-gradient(125deg, rgba(43, 180, 138, 0.85) 0%, rgba(64, 214, 230, 0.70) 50%, rgba(0, 122, 195, 0.60) 100%)',
 		themeColor: 'var(--color-state-success)',
+		badge: {
+			label: 'Гироскоп',
+			variant: 'outline'
+		},
 
 		metrics: {
 			averagePlayTime: 300,
@@ -77,6 +81,10 @@ export const ACTIVE_GAMES: Game[] = [
 		},
 		gradient: 'linear-gradient(155deg, rgba(11, 15, 33, 0.92) 0%, rgba(0, 59, 92, 0.85) 50%, rgba(0, 106, 165, 0.70) 100%)',
 		themeColor: 'var(--color-brand-600)',
+		badge: {
+			label: 'Популярная',
+			variant: 'default'
+		},
 
 		metrics: {
 			averagePlayTime: 180,
@@ -127,6 +135,10 @@ export const ACTIVE_GAMES: Game[] = [
 		},
 		gradient: 'linear-gradient(140deg, rgba(0, 106, 165, 0.80) 0%, rgba(31, 196, 217, 0.65) 60%, rgba(113, 229, 241, 0.50) 100%)',
 		themeColor: 'var(--color-accent-500)',
+		badge: {
+			label: 'Стратегия',
+			variant: 'default'
+		},
 
 		metrics: {
 			averagePlayTime: 1200,
@@ -184,6 +196,10 @@ export const ACTIVE_GAMES: Game[] = [
 		},
 		gradient: 'linear-gradient(135deg, rgba(119, 129, 152, 0.75) 0%, rgba(0, 90, 137, 0.70) 45%, rgba(226, 165, 58, 0.65) 100%)',
 		themeColor: 'var(--color-brand-600)',
+		badge: {
+			label: 'В фокусе',
+			variant: 'default'
+		},
 
 		metrics: {
 			averagePlayTime: 300,
@@ -227,6 +243,10 @@ export const ACTIVE_GAMES: Game[] = [
 		},
 		gradient: 'linear-gradient(130deg, rgba(226, 165, 58, 0.90) 0%, rgba(215, 139, 44, 0.75) 50%, rgba(0, 90, 137, 0.60) 100%)',
 		themeColor: 'var(--color-state-warning)',
+		badge: {
+			label: 'Новое',
+			variant: 'outline'
+		},
 
 		metrics: {
 			averagePlayTime: 480,
@@ -270,6 +290,10 @@ export const ACTIVE_GAMES: Game[] = [
 		},
 		gradient: 'linear-gradient(165deg, rgba(113, 229, 241, 0.75) 0%, rgba(31, 196, 217, 0.70) 55%, rgba(43, 180, 138, 0.65) 100%)',
 		themeColor: 'var(--color-brand-500)',
+		badge: {
+			label: 'Ежедневная',
+			variant: 'outline'
+		},
 
 		metrics: {
 			averagePlayTime: 360,
@@ -313,6 +337,10 @@ export const ACTIVE_GAMES: Game[] = [
 		},
 		gradient: 'linear-gradient(145deg, rgba(209, 60, 106, 0.85) 0%, rgba(203, 58, 75, 0.70) 50%, rgba(0, 59, 92, 0.60) 100%)',
 		themeColor: 'var(--color-state-danger)',
+		badge: {
+			label: 'Реакция',
+			variant: 'outline'
+		},
 
 		metrics: {
 			averagePlayTime: 240,

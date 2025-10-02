@@ -79,7 +79,8 @@ export function enableFullscreen(): void {
     if (webApp.expand) {
       webApp.expand();
     }
-  } catch (error) {
+  } catch {
+    // Игнорируем ошибки fullscreen - не все платформы поддерживают
   }
 }
 
@@ -96,7 +97,8 @@ export function triggerHapticFeedback(): void {
   if (webApp?.HapticFeedback?.impactOccurred) {
     try {
       webApp.HapticFeedback.impactOccurred('heavy');
-    } catch (error) {
+    } catch {
+      // Игнорируем ошибки вибрации - не критично для работы
     }
   }
 }
@@ -111,7 +113,8 @@ export function lockOrientation(): void {
     if (webApp.lockOrientation) {
       webApp.lockOrientation();
     }
-  } catch (error) {
+  } catch {
+    // Игнорируем ошибки блокировки ориентации - не все устройства поддерживают
   }
 }
 
@@ -125,7 +128,8 @@ export function unlockOrientation(): void {
     if (webApp.unlockOrientation) {
       webApp.unlockOrientation();
     }
-  } catch (error) {
+  } catch {
+    // Игнорируем ошибки разблокировки ориентации
   }
 }
 

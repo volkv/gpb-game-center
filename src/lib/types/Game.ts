@@ -40,6 +40,10 @@ export interface Game {
   backgroundImage?: GameImage;
   gradient?: string;
   themeColor: string;
+  badge?: {
+    label: string;
+    variant: 'default' | 'outline' | 'muted';
+  };
 
   // Игровые данные
   metrics: GameMetrics;

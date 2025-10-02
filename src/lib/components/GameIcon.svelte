@@ -58,12 +58,8 @@
 		</div>
 		{#if isComingSoon}
 			<span class="game-card__badge game-card__badge--muted">Скоро</span>
-		{:else if game.name === 'Щит и Рубль'}
-			<span class="game-card__badge">В фокусе</span>
-		{:else if game.name === 'Золотой Запас'}
-			<span class="game-card__badge game-card__badge--outline">Новое</span>
-		{:else}
-			<!-- <span class="game-card__badge game-card__badge--outline">Новое</span> -->
+		{:else if game.badge}
+			<span class="game-card__badge game-card__badge--{game.badge.variant}">{game.badge.label}</span>
 		{/if}
 	</div>
 

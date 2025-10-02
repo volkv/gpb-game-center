@@ -1,4 +1,5 @@
 import { writable, derived } from 'svelte/store';
+import { generateId } from '$lib/utils/id';
 
 interface ToastMessage {
   id: string;
@@ -72,7 +73,7 @@ export function showToast(
   duration: number = 4000
 ) {
   const toast: ToastMessage = {
-    id: `toast_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: generateId('toast'),
     type,
     title,
     message,

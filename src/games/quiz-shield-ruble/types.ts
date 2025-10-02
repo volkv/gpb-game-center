@@ -164,8 +164,10 @@ export interface StoredProgress {
   totalCorrect: number;
   totalQuestions: number;
   bestScore: number;
-bestAccuracy: number;
+  bestAccuracy: number;
   bestDefense: number;
+  currentStreak?: number;
+  bestStreak?: number;
   levelXp: number;
   currentLevelId: string;
   categoryStats: Record<string, StoredCategoryStats>;
@@ -235,7 +237,7 @@ export interface AchievementView {
 export interface FavoriteCategory {
   id: string;
   name: string;
-  icon: ComponentType;
+  icon: ComponentType | null;
   totalQuestions: number;
   correctAnswers: number;
   accuracy: number;

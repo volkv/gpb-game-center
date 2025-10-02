@@ -124,7 +124,8 @@ function createTelegramStore() {
           version: userInfo.version,
           colorScheme: userInfo.colorScheme
         }));
-      } catch (error) {
+      } catch {
+        // Игнорируем ошибки при обновлении информации пользователя
       }
     },
 
@@ -151,7 +152,8 @@ function loadActivityStats(): ActivityStats {
     if (saved) {
       return JSON.parse(saved);
     }
-  } catch (error) {
+  } catch {
+    // Игнорируем ошибки чтения из localStorage
   }
 
   return {
@@ -166,7 +168,8 @@ function saveActivityStats(stats: ActivityStats): void {
 
   try {
     localStorage.setItem('telegram_activity_stats', JSON.stringify(stats));
-  } catch (error) {
+  } catch {
+    // Игнорируем ошибки записи в localStorage
   }
 }
 

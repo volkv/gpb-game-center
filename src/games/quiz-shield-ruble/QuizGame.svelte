@@ -229,8 +229,8 @@
       bestDefense: state.bestDefense,
       totalCorrect: state.totalCorrect,
       totalQuestions: state.totalQuestions,
-      currentStreak: 0, // TODO: Add current streak calculation
-      bestStreak: 0 // TODO: Add best streak calculation
+      currentStreak: state.currentStreak || 0,
+      bestStreak: state.bestStreak || 0
     };
   }
 
@@ -240,7 +240,7 @@
       .map(([name, stats]) => ({
         id: name,
         name,
-        icon: null as any, // TODO: Add proper icon mapping
+        icon: null,
         totalQuestions: stats.total,
         correctAnswers: stats.correct,
         accuracy: Math.round((stats.correct / stats.total) * 100),

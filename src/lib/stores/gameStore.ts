@@ -2,6 +2,7 @@ import { writable, derived } from 'svelte/store';
 import type { Game, GameStatus } from '$lib/types/Game';
 import type { GameState, GameSessionStatus, LoadingState } from '$lib/types/GameState';
 import { getStoreValue } from '$lib/utils/storeHelpers';
+import { generateId } from '$lib/utils/id';
 
 export interface GameCenterState {
 	games: Game[];
@@ -198,7 +199,7 @@ function createInitialGameState(gameId: string): GameState {
 }
 
 function generateSessionId(): string {
-	return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+	return generateId('session');
 }
 
 export const gameStore = createGameStore();

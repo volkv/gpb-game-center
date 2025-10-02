@@ -5,6 +5,7 @@ import { playerData, spendResources, addResources, checkLevelUp } from './player
 import { playBuildingUpgradeEffects, updateBuildingLabelText } from './gameState';
 import { checkAchievements } from './achievements';
 import { confettiEffects } from '$lib/utils/confetti';
+import { generateId } from '$lib/utils/id';
 
 export const buildings = derived(playerData, $playerData => $playerData.buildings);
 
@@ -149,7 +150,7 @@ export function addBuilding(type: BuildingType, x: number, y: number): boolean {
   spendResources(config.basePrice);
 
   const newBuilding: Building = {
-    id: `${type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: generateId(type),
     type,
     x,
     y,
