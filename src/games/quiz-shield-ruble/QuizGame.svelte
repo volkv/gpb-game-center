@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount } from 'svelte';
   import { gameStore, currentGameState } from '$lib/stores/gameStore';
   import { GameLayout } from '$lib';
   import { Star, ShieldCheck } from 'lucide-svelte';

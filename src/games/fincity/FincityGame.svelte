@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { telegramStore } from '$lib/stores/telegramStore';
+	import { cleanupFincity } from './stores/index';
 	import App from './App.svelte';
 
 	interface Props {
@@ -31,6 +32,8 @@
 
 	function performCleanup() {
 		try {
+			cleanupFincity();
+
 			if (gameInstance?.destroy) {
 				gameInstance.destroy();
 			}
