@@ -6,7 +6,12 @@ export enum NotificationType {
 	POINTS_MILESTONE = 'points_milestone',
 	NEW_GAME = 'new_game',
 	WEEKLY_STATS = 'weekly_stats',
-	GAME_RECOMMENDATION = 'game_recommendation'
+	GAME_RECOMMENDATION = 'game_recommendation',
+	RETURN_AFTER_INACTIVITY = 'return_after_inactivity',
+	ALMOST_LEVEL_UP = 'almost_level_up',
+	NEW_BANK_PRODUCT = 'new_bank_product',
+	WIN_STREAK = 'win_streak',
+	BREAK_REMINDER = 'break_reminder'
 }
 
 export interface PlayerContext {
@@ -135,6 +140,57 @@ function generateWeeklyStatsNotification(ctx: PlayerContext): NotificationConten
 	};
 }
 
+function generateReturnAfterInactivityNotification(ctx: PlayerContext): NotificationContent {
+	return {
+		type: NotificationType.RETURN_AFTER_INACTIVITY,
+		priority: 8,
+		emoji: '🎮',
+		title: 'Скучно без вас!',
+		message: `<b>${ctx.userName}</b>, игры грустят в одиночестве!\n\nВернитесь и покажите им, кто тут босс! Ждем вас в Игровом Центре 😎`
+	};
+}
+
+function generateAlmostLevelUpNotification(ctx: PlayerContext): NotificationContent {
+	const pointsToNext = 100;
+	return {
+		type: NotificationType.ALMOST_LEVEL_UP,
+		priority: 9,
+		emoji: '🎯',
+		title: 'Вы так близко к цели!',
+		message: `Осталось всего <b>${pointsToNext} очков</b> до следующего уровня!\n\nЭто буквально одна игра. Не дайте победе ускользнуть ⚡`
+	};
+}
+
+function generateNewBankProductNotification(): NotificationContent {
+	return {
+		type: NotificationType.NEW_BANK_PRODUCT,
+		priority: 6,
+		emoji: '🆕',
+		title: 'Изучите новые возможности!',
+		message: `Открыт новый банковский продукт!\n\nТолько для игроков Игрового Центра — первый доступ к изучению в интерактивной форме 📚`
+	};
+}
+
+function generateWinStreakNotification(): NotificationContent {
+	return {
+		type: NotificationType.WIN_STREAK,
+		priority: 7,
+		emoji: '🔥',
+		title: 'Вы в ударе!',
+		message: `<b>5 побед подряд!</b> Кто-то сегодня проснулся чемпионом!\n\nПопробуйте новую игру и продолжите победную серию ⚡`
+	};
+}
+
+function generateBreakReminderNotification(): NotificationContent {
+	return {
+		type: NotificationType.BREAK_REMINDER,
+		priority: 4,
+		emoji: '☕',
+		title: 'Время сделать перерыв',
+		message: `Вы играете уже <b>45 минут</b>. Отличная игровая сессия!\n\nСохраните прогресс и возвращайтесь позже 😊`
+	};
+}
+
 export function getDemoNotificationMessage(
 	userName: string,
 	context?: Partial<PlayerContext>
@@ -159,7 +215,12 @@ export function getDemoNotificationMessage(
 		generateTaskProgressNotification(ctx),
 		generatePointsMilestoneNotification(ctx),
 		generateAchievementNotification(ctx),
-		generateGameRecommendationNotification(ctx)
+		generateGameRecommendationNotification(ctx),
+		generateReturnAfterInactivityNotification(ctx),
+		generateAlmostLevelUpNotification(ctx),
+		generateNewBankProductNotification(),
+		generateWinStreakNotification(),
+		generateBreakReminderNotification()
 	];
 
 	notifications.sort((a, b) => b.priority - a.priority);
@@ -167,7 +228,11 @@ export function getDemoNotificationMessage(
 	const primary = notifications[0];
 	const rest = notifications.slice(1);
 
-	let message = `<b>${primary.emoji} ${primary.title}</b>\n\n${primary.message}\n\n`;
+	let message = `🔔 <b>Демонстрация Системы Push-Уведомлений</b>\n`;
+	message += `<i>Игровой Центр Газпромбанка</i>\n\n`;
+	message += `<b>━━━━━━━━━━━━━━━━</b>\n\n`;
+
+	message += `<b>${primary.emoji} ${primary.title}</b>\n\n${primary.message}\n\n`;
 
 	message += `<b>━━━━━━━━━━━━━━━━</b>\n\n`;
 
@@ -176,6 +241,17 @@ export function getDemoNotificationMessage(
 	});
 
 	message += `<b>━━━━━━━━━━━━━━━━</b>\n\n`;
+	message += `📋 <b>Типы уведомлений в системе:</b>\n`;
+	message += `• Ежедневные награды и стрики\n`;
+	message += `• Напоминания о заданиях\n`;
+	message += `• Достижения и прогресс\n`;
+	message += `• Игровые триггеры (победы, почти-уровни)\n`;
+	message += `• Новые продукты банка\n`;
+	message += `• Напоминания о перерывах\n\n`;
+	message += `⚙️ <b>Персонализация:</b>\n`;
+	message += `• Адаптация времени под активность\n`;
+	message += `• Максимум 3 уведомления в день\n`;
+	message += `• Тихие часы: 23:00-8:00\n\n`;
 	message += `💡 <i>Играй, учись и зарабатывай баллы!</i>\n`;
 	message += `🎮 <b>Игровой Центр Газпромбанка</b>`;
 

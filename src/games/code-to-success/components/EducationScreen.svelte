@@ -92,16 +92,17 @@
     </div>
 
     {#if educationData().productIntegration}
+      {@const productIntegration = educationData().productIntegration!}
       <div
         class="product-section surface-card"
         role="region"
         aria-labelledby="product-heading"
       >
         <h2 class="section-title" id="product-heading">
-          {educationData().productIntegration.title}
+          {productIntegration.title}
         </h2>
         <p class="product-description">
-          {educationData().productIntegration.description}
+          {productIntegration.description}
         </p>
 
         <button
@@ -109,13 +110,13 @@
           class="btn-secondary learn-more-btn"
           onclick={handleLearnMore}
           onkeydown={(e) => handleKeydown(e, handleLearnMore)}
-          disabled={!educationData().productIntegration.isActive}
+          disabled={!productIntegration.isActive}
           aria-describedby="product-heading"
-          aria-label={educationData().productIntegration.isActive
-            ? `${educationData().productIntegration.buttonText} - узнать больше о продукте`
-            : `${educationData().productIntegration.buttonText} - функция пока недоступна`}
+          aria-label={productIntegration.isActive
+            ? `${productIntegration.buttonText} - узнать больше о продукте`
+            : `${productIntegration.buttonText} - функция пока недоступна`}
         >
-          {educationData().productIntegration.buttonText}
+          {productIntegration.buttonText}
         </button>
       </div>
     {/if}

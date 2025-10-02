@@ -1,4 +1,4 @@
-import { Engine, World, Bodies, Body, Events, Vector, Pair, Sleeping } from 'matter-js';
+import { Engine, World, Bodies, Body, Events, Pair, Sleeping } from 'matter-js';
 import type { Position, CellType, LevelConfig, CollisionResult } from './types';
 import {
 	GAME_CONFIG,

@@ -242,11 +242,9 @@
 <GameLayout gameName="Золотой Резерв" background="gradient-wealth" showScore={true}>
 	<Accessibility {announcements} {gameState} />
 
-	<div
+	<main
 		class="match3-container"
-		role="application"
 		aria-label="Игра Золотой Резерв. Используйте стрелки для навигации, Enter для выбора, Escape для отмены"
-		onkeydown={handleKeyNavigation}
 	>
 		<div class="game-header p-4">
 			<GameHeader score={gameState.score} moves={gameState.moves} targetScore={gameState.targetScore} />
@@ -274,7 +272,7 @@
 			canUseBooster={selectors.canUseBooster}
 			status={gameState.status}
 		/>
-	</div>
+	</main>
 
 	<DemoHint
 		visible={selectors.showingDemoHint}

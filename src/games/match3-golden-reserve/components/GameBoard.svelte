@@ -106,6 +106,7 @@
 		aria-label="Игровое поле 8 на 8 клеток"
 		aria-rowcount="8"
 		aria-colcount="8"
+		tabindex="-1"
 		onkeydown={onKeyNavigation}
 	>
 		{#each field as row, rowIndex}
