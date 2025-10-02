@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, Point } from 'pixi.js';
+import { Application, Container, Point, Graphics } from 'pixi.js';
 import { CameraManager } from './CameraManager';
 import { TerrainManager } from './TerrainManager';
 import type { ResourceManager } from './ResourceManager';

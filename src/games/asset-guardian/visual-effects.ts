@@ -85,14 +85,14 @@ export class HighlightRenderer {
 		const offsetX = lightDirection.x * this.config.offsetMultiplier;
 		const offsetY = lightDirection.y * this.config.offsetMultiplier;
 
-		const pulse = Math.sin(this.time * this.config.pulseSpeed) * 0.1 + 0.9;
-		const tiltIntensity = 1 - Math.min(Math.sqrt(tilt.x * tilt.x + tilt.y * tilt.y), 1) * 0.3;
+		const pulse = Math.sin(this.time * this.config.pulseSpeed) * 0.05 + 0.95;
+		const tiltIntensity = 1 - Math.min(Math.sqrt(tilt.x * tilt.x + tilt.y * tilt.y), 1) * 0.2;
 		const intensity = this.config.baseIntensity * pulse * tiltIntensity;
 
 		return {
 			offsetX,
 			offsetY,
-			intensity: Math.max(0.3, intensity)
+			intensity: Math.max(0.5, intensity)
 		};
 	}
 
@@ -131,6 +131,11 @@ export class ParallaxController {
 	}) {}
 
 	initializeLayers(container: HTMLElement): void {
+		if (typeof window === 'undefined') return;
+
+		const isMobile = window.innerWidth < 768;
+		if (isMobile) return;
+
 		this.config.layers.forEach((layerConfig, index) => {
 			const layer = document.createElement('div');
 			layer.className = `parallax-layer parallax-layer-${index}`;

@@ -3,6 +3,7 @@ import type { Building, BuildingConfig } from '../../types/Building';
 import { BuildingType } from '../../types/Building';
 import type { GridPosition } from '../../types/Game';
 import type { ResourceManager } from './ResourceManager';
+import { openModal } from '../../stores/ui';
 
 export interface BuildingVisual {
   container: Container;
@@ -410,10 +411,7 @@ export class BuildingRenderer {
 
   private onBuildingClick(building: Building): void {
     console.log(`Building clicked: ${building.id} (${building.type})`);
-
-    import('../../stores/ui').then(({ openModal }) => {
-      openModal('building_upgrade', { buildingId: building.id });
-    });
+    openModal('building_upgrade', { buildingId: building.id });
   }
 
   private updatePreviewAppearance(isValid: boolean): void {

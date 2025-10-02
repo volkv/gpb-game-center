@@ -1,4 +1,4 @@
-import { Engine, World, Bodies, Body, Events, Pair, Sleeping } from 'matter-js';
+import { Engine, World, Bodies, Body, Events, Sleeping, Pair } from 'matter-js';
 import type { Position, CellType, LevelConfig, CollisionResult } from './types';
 import {
 	GAME_CONFIG,
@@ -291,9 +291,11 @@ export class PhysicsEngine {
 	update(deltaTime: number): void {
 		if (!this.isRunning) return;
 
-		// Use a fixed delta time for stability, running multiple updates if needed
-		const delta = PHYSICS_CONFIG.PHYSICS_STEP * 1000;
-		Engine.update(this.engine, delta);
+		const fixedDelta = PHYSICS_CONFIG.PHYSICS_STEP * 1000;
+		const maxDelta = fixedDelta * 2;
+		const clampedDelta = Math.min(deltaTime, maxDelta);
+
+		Engine.update(this.engine, fixedDelta);
 
 		if (this.ballBody) {
 			this.updateBallState();

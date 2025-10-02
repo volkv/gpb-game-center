@@ -4,7 +4,7 @@ import { SceneManager } from './SceneManager';
 import { buildingConfigs, addBuilding, hasBuildingOfType } from '../../stores/buildings';
 import { gameState } from '../../stores/gameState';
 import { playerData } from '../../stores/playerData';
-import { showToast } from '../../stores/ui';
+import { showToast, openModal } from '../../stores/ui';
 import { get } from 'svelte/store';
 import type { Building, BuildingConfig } from '../../types/Building';
 import { BuildingType } from '../../types/Building';
@@ -361,9 +361,7 @@ export class BuildingSystem {
   }
 
   private openBuildingInfo(building: Building): void {
-    import('../../stores/ui').then(({ openModal }) => {
-      openModal('building_upgrade', { buildingId: building.id });
-    });
+    openModal('building_upgrade', { buildingId: building.id });
   }
 
   getGridManager(): GridManager {

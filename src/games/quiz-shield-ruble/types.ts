@@ -1,8 +1,53 @@
 
 import type { ComponentType } from 'svelte';
-import type { QuestionEvidence } from './components/EvidencePreview.svelte';
-import type { ProductSpotlightData } from './components/ProductSpotlight.svelte';
 import type { ReminderRecord } from './notifications';
+
+// Define types locally to avoid component confusion
+export interface QuestionEvidence {
+  type: string;
+  sender?: string;
+  caller?: string;
+  phone?: string;
+  url?: string;
+  location?: string;
+  status?: string;
+  title?: string;
+  prompt?: string;
+  actions?: string[];
+  platform?: string;
+  contact?: string;
+  timestamp?: string;
+  message?: string[];
+  link?: string;
+  riskNote?: string;
+  script?: string[];
+  isSecure?: boolean;
+  prompts?: string[];
+  warning?: string;
+  anomalies?: string[];
+  messages?: Array<{ text: string; highlight?: boolean; fromBank?: boolean }>;
+  caption?: string;
+  ariaLabel?: string;
+}
+
+export interface ProductSpotlightData {
+  id: string;
+  name: string;
+  tagline: string;
+  description: string;
+  features: string[];
+  bonusLabel: string;
+  bonusValue: number;
+  icon: any;
+  contextLabel: string;
+  cta?: {
+    text?: string;
+    action?: string;
+    label?: string;
+    href?: string;
+    external?: boolean;
+  };
+}
 
 export interface Props {
   onexit?: () => void;

@@ -1,4 +1,4 @@
-import { Application, Container, Graphics, Text, TextStyle } from 'pixi.js';
+import { Application, Container, Graphics } from 'pixi.js';
 import { PhysicsEngine } from './physics';
 import type { Position, LevelConfig, CellType, VisualEffects } from './types';
 import {
@@ -41,6 +41,7 @@ export class AssetGuardianGameEngine {
 	private effectsManager: EffectsManager;
 	private currentTilt: { x: number; y: number } = { x: 0, y: 0 };
 	private targetTilt: { x: number; y: number } = { x: 0, y: 0 };
+	private highlightOffset: { x: number; y: number } = { x: 0, y: 0 };
 
 	constructor(private config: GameEngineConfig) {
 		this.app = new Application();
@@ -59,6 +60,8 @@ export class AssetGuardianGameEngine {
 		if (this.isInitialized) return;
 
 		try {
+			const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
 			await this.app.init({
 				canvas,
 				width: this.config.width,
@@ -66,7 +69,11 @@ export class AssetGuardianGameEngine {
 				backgroundColor: this.config.backgroundColor,
 				antialias: this.config.antialias,
 				resolution: this.config.resolution,
-				autoDensity: true
+				autoDensity: true,
+				preference: 'webgl',
+				clearBeforeRender: true,
+				preserveDrawingBuffer: isMobile,
+				powerPreference: 'high-performance'
 			});
 
 			this.setupContainers();
@@ -475,8 +482,6 @@ export class AssetGuardianGameEngine {
 		const effects = this.visualEffectsManager.updateEffects(this.currentTilt, deltaTime);
 
 		this.updatePerspective(effects.perspective);
-		this.updateBallShadow(effects.shadow);
-		this.updateBallHighlight(effects.ballHighlight);
 	}
 
 	private updatePerspective(perspective: VisualEffects['perspective']): void {
@@ -484,6 +489,11 @@ export class AssetGuardianGameEngine {
 		const containerElement = canvasElement?.parentElement;
 
 		if (containerElement && containerElement.classList.contains('game-canvas-container')) {
+			if (typeof window !== 'undefined' && window.innerWidth < 768) {
+				containerElement.style.transform = 'none';
+				return;
+			}
+
 			const rotateX = perspective.y * VISUAL_EFFECTS.MAX_TILT_ANGLE;
 			const rotateY = -perspective.x * VISUAL_EFFECTS.MAX_TILT_ANGLE;
 
@@ -502,8 +512,12 @@ export class AssetGuardianGameEngine {
 	}
 
 	private updateBallHighlight(highlight: VisualEffects['ballHighlight']): void {
-		this.ballHighlightGraphics.x = this.ballGraphics.x + highlight.offsetX;
-		this.ballHighlightGraphics.y = this.ballGraphics.y + highlight.offsetY;
+		const smoothFactor = 0.15;
+		this.highlightOffset.x += (highlight.offsetX - this.highlightOffset.x) * smoothFactor;
+		this.highlightOffset.y += (highlight.offsetY - this.highlightOffset.y) * smoothFactor;
+
+		this.ballHighlightGraphics.x = this.ballGraphics.x + this.highlightOffset.x;
+		this.ballHighlightGraphics.y = this.ballGraphics.y + this.highlightOffset.y;
 		this.ballHighlightGraphics.alpha = highlight.intensity;
 	}
 
@@ -633,6 +647,12 @@ export class AssetGuardianGameEngine {
 	private gameLoop = (): void => {
 		const currentTime = performance.now();
 		const deltaTime = currentTime - this.lastTime;
+
+		if (deltaTime < 16.67) {
+			this.animationFrameId = requestAnimationFrame(this.gameLoop);
+			return;
+		}
+
 		this.lastTime = currentTime;
 
 		this.physics.update(deltaTime);
@@ -646,8 +666,11 @@ export class AssetGuardianGameEngine {
 		if (ballPosition) {
 			this.ballGraphics.x = ballPosition.x;
 			this.ballGraphics.y = ballPosition.y;
-			this.ballHighlightGraphics.x = ballPosition.x;
-			this.ballHighlightGraphics.y = ballPosition.y;
+
+			const effects = this.visualEffectsManager.updateEffects(this.currentTilt, 16);
+
+			this.updateBallShadow(effects.shadow);
+			this.updateBallHighlight(effects.ballHighlight);
 		}
 	}
 

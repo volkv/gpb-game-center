@@ -1,4 +1,4 @@
-import { Assets, Texture, Graphics, Spritesheet } from 'pixi.js';
+import { Assets, Texture, Spritesheet, Graphics } from 'pixi.js';
 
 export interface AssetManifest {
   textures: Record<string, string>;

@@ -104,10 +104,18 @@
 		}
 	});
 
+	let lastVisualUpdate = 0;
+	const visualUpdateInterval = 33;
+
 	$effect(() => {
 		if (gameEngine && gameEngineReady && selectors.currentGravity) {
 			assetGuardianStore.updateGameEngineGravity(gameEngine, selectors.currentGravity);
-			gameEngine.updateVisualEffects(selectors.currentGravity);
+
+			const now = performance.now();
+			if (now - lastVisualUpdate >= visualUpdateInterval) {
+				gameEngine.updateVisualEffects(selectors.currentGravity);
+				lastVisualUpdate = now;
+			}
 		}
 	});
 
@@ -451,7 +459,7 @@
 					class="game-canvas"
 					width={canvasSize.width}
 					height={canvasSize.height}
-					style="touch-action: none; user-select: none; max-width: 100%; max-height: 100%; object-fit: contain;"
+					style="touch-action: none; user-select: none; max-width: 100%; max-height: 100%; object-fit: contain; transform: translateZ(0); contain: layout style paint;"
 				></canvas>
 			</div>
 
@@ -502,6 +510,8 @@
 		perspective-origin: center center;
 		min-height: 0;
 		overflow: hidden;
+		contain: layout style;
+		isolation: isolate;
 	}
 
 	.game-canvas-container {
@@ -511,29 +521,40 @@
 		justify-content: center;
 		max-width: 100%;
 		max-height: 100%;
-		background:
-			radial-gradient(ellipse at center,
-				rgba(15, 169, 194, 0.1) 0%,
-				rgba(0, 107, 165, 0.2) 30%,
-				rgba(44, 62, 80, 0.4) 60%,
-				rgba(44, 62, 80, 0.8) 100%),
-			linear-gradient(135deg,
-				rgba(44, 62, 80, 0.9) 0%,
-				rgba(52, 73, 94, 0.9) 25%,
-				rgba(44, 62, 80, 0.9) 50%,
-				rgba(52, 73, 94, 0.9) 75%,
-				rgba(44, 62, 80, 0.9) 100%);
+		background: rgba(44, 62, 80, 0.9);
 		border-radius: 1rem;
 		padding: 1.5rem;
-		backdrop-filter: blur(12px);
 		border: 2px solid rgba(243, 156, 18, 0.3);
-		box-shadow:
-			0 0 30px rgba(243, 156, 18, 0.2),
-			inset 0 0 20px rgba(243, 156, 18, 0.1),
-			0 8px 32px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 		transform-style: preserve-3d;
 		transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 		overflow: hidden;
+		will-change: transform;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+		contain: layout style paint;
+		isolation: isolate;
+	}
+
+	@media (min-width: 768px) {
+		.game-canvas-container {
+			background:
+				radial-gradient(ellipse at center,
+					rgba(15, 169, 194, 0.1) 0%,
+					rgba(0, 107, 165, 0.2) 30%,
+					rgba(44, 62, 80, 0.4) 60%,
+					rgba(44, 62, 80, 0.8) 100%),
+				linear-gradient(135deg,
+					rgba(44, 62, 80, 0.9) 0%,
+					rgba(52, 73, 94, 0.9) 25%,
+					rgba(44, 62, 80, 0.9) 50%,
+					rgba(52, 73, 94, 0.9) 75%,
+					rgba(44, 62, 80, 0.9) 100%);
+			box-shadow:
+				0 0 30px rgba(243, 156, 18, 0.2),
+				inset 0 0 20px rgba(243, 156, 18, 0.1),
+				0 8px 32px rgba(0, 0, 0, 0.3);
+		}
 	}
 
 	.game-ui-layer {
@@ -547,27 +568,29 @@
 		/* UI moved to AssetGuardianModal */
 	}
 
-	.game-canvas-container::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background:
-			repeating-linear-gradient(45deg,
-				transparent,
-				transparent 2px,
-				rgba(255,255,255,0.03) 2px,
-				rgba(255,255,255,0.03) 4px),
-			repeating-linear-gradient(-45deg,
-				transparent,
-				transparent 8px,
-				rgba(26, 188, 156, 0.05) 8px,
-				rgba(26, 188, 156, 0.05) 10px);
-		border-radius: 1rem;
-		pointer-events: none;
-		z-index: 1;
+	@media (min-width: 768px) {
+		.game-canvas-container::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background:
+				repeating-linear-gradient(45deg,
+					transparent,
+					transparent 2px,
+					rgba(255,255,255,0.03) 2px,
+					rgba(255,255,255,0.03) 4px),
+				repeating-linear-gradient(-45deg,
+					transparent,
+					transparent 8px,
+					rgba(26, 188, 156, 0.05) 8px,
+					rgba(26, 188, 156, 0.05) 10px);
+			border-radius: 1rem;
+			pointer-events: none;
+			z-index: 1;
+		}
 	}
 
 	.game-canvas {
@@ -578,24 +601,32 @@
 		width: auto;
 		height: auto;
 		object-fit: contain;
-		background:
-			radial-gradient(circle at 30% 30%,
-				rgba(26, 188, 156, 0.15) 0%,
-				rgba(52, 152, 219, 0.1) 30%,
-				rgba(44, 62, 80, 1) 60%,
-				rgba(52, 73, 94, 1) 100%),
-			linear-gradient(45deg,
-				rgba(255,255,255,0.05) 0%,
-				transparent 50%,
-				rgba(0,0,0,0.1) 100%);
-		box-shadow:
-			inset 0 0 30px rgba(0, 0, 0, 0.5),
-			inset 0 4px 15px rgba(26, 188, 156, 0.1),
-			0 0 20px rgba(26, 188, 156, 0.1);
 		border: 1px solid rgba(26, 188, 156, 0.2);
 		transform: translateZ(10px);
 		position: relative;
 		z-index: 2;
+		will-change: contents;
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+	}
+
+	@media (min-width: 768px) {
+		.game-canvas {
+			background:
+				radial-gradient(circle at 30% 30%,
+					rgba(26, 188, 156, 0.15) 0%,
+					rgba(52, 152, 219, 0.1) 30%,
+					rgba(44, 62, 80, 1) 60%,
+					rgba(52, 73, 94, 1) 100%),
+				linear-gradient(45deg,
+					rgba(255,255,255,0.05) 0%,
+					transparent 50%,
+					rgba(0,0,0,0.1) 100%);
+			box-shadow:
+				inset 0 0 30px rgba(0, 0, 0, 0.5),
+				inset 0 4px 15px rgba(26, 188, 156, 0.1),
+				0 0 20px rgba(26, 188, 156, 0.1);
+		}
 	}
 
 	/* Game overlay styles moved to AssetGuardianModal.svelte */
@@ -616,8 +647,10 @@
 		transform-style: preserve-3d;
 	}
 
-	.bank-vault-glow {
-		animation: vault-pulse 3s ease-in-out infinite;
+	@media (min-width: 768px) {
+		.bank-vault-glow {
+			animation: vault-pulse 3s ease-in-out infinite;
+		}
 	}
 
 	@keyframes vault-pulse {

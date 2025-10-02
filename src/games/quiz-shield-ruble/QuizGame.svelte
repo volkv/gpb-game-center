@@ -528,8 +528,7 @@
     statsComponentError = null;
 
     try {
-      const module = await import('./components/StatsDashboard.svelte');
-      StatsDashboardComponent = module.default;
+      StatsDashboardComponent = StatsDashboard;
       trackEvent('stats_component_loaded');
     } catch (error) {
       statsComponentError = 'Не удалось загрузить статистику';

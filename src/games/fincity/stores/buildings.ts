@@ -1,7 +1,10 @@
 import { derived, get } from 'svelte/store';
 import type { Building, BuildingConfig } from '../types/Building';
 import { BuildingType } from '../types/Building';
-import { playerData, spendResources, addResources } from './playerData';
+import { playerData, spendResources, addResources, checkLevelUp } from './playerData';
+import { playBuildingUpgradeEffects, updateBuildingLabelText } from './gameState';
+import { checkAchievements } from './achievements';
+import { confettiEffects } from '$lib/utils/confetti';
 
 export const buildings = derived(playerData, $playerData => $playerData.buildings);
 
@@ -161,10 +164,7 @@ export function addBuilding(type: BuildingType, x: number, y: number): boolean {
   }));
 
   addResources({ experience: 10 });
-
-  import('./playerData').then(({ checkLevelUp }) => {
-    checkLevelUp();
-  });
+  checkLevelUp();
 
   return true;
 }
@@ -368,21 +368,14 @@ export function completeBuildingUpgrade(buildingId: string): void {
   }));
 
   addResources({ experience: 15 });
+  checkLevelUp();
 
-  import('./playerData').then(({ checkLevelUp }) => {
-    checkLevelUp();
-  });
+  playBuildingUpgradeEffects(buildingId);
+  if (config) {
+    updateBuildingLabelText(buildingId, config.name, newLevel);
+  }
 
-  import('./gameState').then(({ playBuildingUpgradeEffects, updateBuildingLabelText }) => {
-    playBuildingUpgradeEffects(buildingId);
-    if (config) {
-      updateBuildingLabelText(buildingId, config.name, newLevel);
-    }
-  });
-
-  import('$lib/utils/confetti').then(({ confettiEffects }) => {
-    confettiEffects.simpleSuccess();
-  });
+  confettiEffects.simpleSuccess();
 }
 
 export function cancelBuildingUpgrade(buildingId: string): boolean {
@@ -497,16 +490,11 @@ export function startPassiveIncome() {
 
   passiveIncomeInterval = window.setInterval(() => {
     collectPassiveIncome();
-
-    import('./playerData').then(({ checkLevelUp }) => {
-      checkLevelUp();
-    });
+    checkLevelUp();
 
     achievementCheckCounter++;
     if (achievementCheckCounter >= 10) {
-      import('./achievements').then(({ checkAchievements }) => {
-        checkAchievements();
-      });
+      checkAchievements();
       achievementCheckCounter = 0;
     }
   }, 1000);

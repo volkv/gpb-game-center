@@ -5,6 +5,7 @@ import { resetQuests } from '../stores/quests';
 import { resetAchievements } from '../stores/achievements';
 import { resetUIState } from '../stores/ui';
 import { savePlayerData, saveGameState, loadPlayerData, loadGameState } from './storage';
+import { collectOfflineIncome } from '../stores/buildings';
 
 const AUTO_SAVE_INTERVAL = 30000;
 
@@ -46,12 +47,10 @@ function loadSavedData() {
     playerData.set(savedPlayerData);
     console.log('✅ [AUTOSAVE] Player data loaded from storage');
 
-    import('../stores/buildings').then(({ collectOfflineIncome }) => {
-      const offlineReward = collectOfflineIncome();
-      if (offlineReward.coins > 0 || offlineReward.crystals > 0) {
-        console.log('💰 [OFFLINE] Collected offline income:', offlineReward);
-      }
-    });
+    const offlineReward = collectOfflineIncome();
+    if (offlineReward.coins > 0 || offlineReward.crystals > 0) {
+      console.log('💰 [OFFLINE] Collected offline income:', offlineReward);
+    }
   } else {
     console.log('❌ [AUTOSAVE] No saved player data found');
   }

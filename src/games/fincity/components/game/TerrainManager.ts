@@ -1,4 +1,5 @@
 import { Container, Sprite, Graphics } from 'pixi.js';
+import type { Graphics as PIXIGraphics } from 'pixi.js';
 import type { ResourceManager } from './ResourceManager';
 import { MapConfigManager, type IsometricMapConfiguration } from './MapConfig';
 
@@ -16,7 +17,7 @@ export class TerrainManager {
   private resourceManager: ResourceManager | null = null;
   private mapConfigManager: MapConfigManager;
   private tiles: Map<string, Sprite> = new Map();
-  private currentHighlights: Graphics[] = [];
+  private currentHighlights: PIXIGraphics[] = [];
   private mapOrigin = { x: 0, y: 0 };
   private layoutBounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
   private worldBounds = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
@@ -60,7 +61,7 @@ export class TerrainManager {
   createVoidBackground(): void {
     this.voidContainer.removeChildren();
 
-    const voidBackground = new Graphics();
+    const voidBackground = new Graphics() as PIXIGraphics;
     const mapBounds = this.layoutBounds;
     const voidConfig = this.mapConfigManager.getVoidConfig();
 
@@ -189,7 +190,7 @@ export class TerrainManager {
     const tilePos = this.getTilePosition(gridX, gridY);
     if (!tilePos) return;
 
-    const highlight = new Graphics();
+    const highlight = new Graphics() as PIXIGraphics;
     const config = this.mapConfigManager.getConfig();
 
     const halfWidth = config.tile.width / 2;

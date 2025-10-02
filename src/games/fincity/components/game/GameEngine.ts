@@ -1,4 +1,5 @@
 import { Application } from 'pixi.js';
+import type { Application as PIXIApplication } from 'pixi.js';
 import { SceneManager } from './SceneManager';
 import { ResourceManager } from './ResourceManager';
 import { BuildingSystem } from './BuildingSystem';
@@ -13,14 +14,14 @@ export interface GameEngineConfig {
 }
 
 export class GameEngine {
-  private app: Application;
+  private app: PIXIApplication;
   private sceneManager: SceneManager;
   private resourceManager: ResourceManager;
   private buildingSystem: BuildingSystem | null = null;
   private isInitialized = false;
 
   constructor(private config: GameEngineConfig) {
-    this.app = new Application();
+    this.app = new Application() as PIXIApplication;
     this.resourceManager = new ResourceManager();
     this.sceneManager = new SceneManager(this.app, this.resourceManager);
   }
@@ -91,7 +92,7 @@ export class GameEngine {
     }
   }
 
-  get pixiApp(): Application {
+  get pixiApp(): PIXIApplication {
     return this.app;
   }
 
