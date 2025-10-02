@@ -86,9 +86,22 @@ class GameLoaderService {
 	}
 
 	private async dynamicImport(path: string): Promise<{ default: any }> {
-		// Vite can analyze this pattern and create separate chunks for each game.
-		// The path must be relative to the current file.
-		const module = await import(`../../${path.substring(1)}.svelte`);
+		const gameImports: Record<string, () => Promise<{ default: any }>> = {
+			'/games/asset-guardian/AssetGuardianGame': () => import('../../games/asset-guardian/AssetGuardianGame.svelte'),
+			'/games/code-to-success/CodeToSuccessGame': () => import('../../games/code-to-success/CodeToSuccessGame.svelte'),
+			'/games/fincity/FincityGame': () => import('../../games/fincity/FincityGame.svelte'),
+			'/games/quiz-shield-ruble/QuizGame': () => import('../../games/quiz-shield-ruble/QuizGame.svelte'),
+			'/games/match3-golden-reserve/Match3Game': () => import('../../games/match3-golden-reserve/Match3Game.svelte'),
+			'/games/crossword-financial/CrosswordDemo': () => import('../../games/crossword-financial/CrosswordDemo.svelte'),
+			'/games/anti-fraud-hunter/AntiFraudGame': () => import('../../games/anti-fraud-hunter/AntiFraudGame.svelte'),
+		};
+
+		const importFn = gameImports[path];
+		if (!importFn) {
+			throw new Error(`Unknown game path: ${path}`);
+		}
+
+		const module = await importFn();
 
 		if (!('default' in module)) {
 			throw new Error(`Game component ${path} does not have a default export`);
