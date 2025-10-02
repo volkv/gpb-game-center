@@ -184,7 +184,12 @@
 	function handleTouchMove(event: TouchEvent) {
 		if (!touchStartPos || !touchStartCell) return;
 
-		if (event.cancelable) {
+		const touch = event.touches[0];
+		const dx = touch.clientX - touchStartPos.x;
+		const dy = touch.clientY - touchStartPos.y;
+		const distance = Math.max(Math.abs(dx), Math.abs(dy));
+
+		if (distance >= MIN_SWIPE_DISTANCE && event.cancelable) {
 			event.preventDefault();
 		}
 	}
@@ -198,8 +203,9 @@
 
 		const absDx = Math.abs(dx);
 		const absDy = Math.abs(dy);
+		const distance = Math.max(absDx, absDy);
 
-		if (Math.max(absDx, absDy) < MIN_SWIPE_DISTANCE) {
+		if (distance < MIN_SWIPE_DISTANCE) {
 			handleCellClick(touchStartCell.row, touchStartCell.col);
 			touchStartPos = null;
 			touchStartCell = null;
@@ -229,7 +235,11 @@
 		}
 
 		if (targetCell && targetCell.row >= 0 && targetCell.row < 8 && targetCell.col >= 0 && targetCell.col < 8) {
+			if (gameState.selectedCell) {
+				match3Store.selectCell(null);
+			}
 			match3Store.attemptSwap(touchStartCell, targetCell);
+			announceToScreenReader('Обмен фишек свайпом');
 		}
 
 		touchStartPos = null;

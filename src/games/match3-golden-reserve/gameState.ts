@@ -98,7 +98,10 @@ function createMatch3Store() {
 
 		selectCell: (position: Position | null) => {
 			update(state => {
-				const newState = { ...state, selectedCell: position };
+				const newField = position
+					? highlightCell(state.field, position)
+					: clearCellSelection(state.field);
+				const newState = { ...state, selectedCell: position, field: newField };
 				syncWithMainStore(newState);
 				return newState;
 			});
