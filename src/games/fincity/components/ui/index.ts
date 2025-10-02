@@ -7,7 +7,6 @@ export { default as IconTest } from './IconTest.svelte';
 export { default as Bubble } from './Bubble.svelte';
 export { default as ProgressBar } from './ProgressBar.svelte';
 export { default as GameCanvas } from './GameCanvas.svelte';
-export { default as LoadingScreen } from './LoadingScreen.svelte';
 export { default as ResourcesBar } from './ResourcesBar.svelte';
 export { default as ActionButtons } from './ActionButtons.svelte';
 export { default as BuildMenu } from './BuildMenu.svelte';

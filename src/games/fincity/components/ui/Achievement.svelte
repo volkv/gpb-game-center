@@ -174,66 +174,69 @@
             class="stagger-item {isUnlocked ? 'text-white' : 'bg-white border-2'} {isLocked ? 'opacity-50 border-gpb-gray-200' : isUnlocked ? '' : 'border-gpb-violet'}"
             style="animation-delay: {index * 0.1}s"
           >
-            <div class="flex items-center gap-3">
-              <div class="p-2 rounded-xl flex-shrink-0 {isUnlocked ? 'bg-black/20' : isLocked ? 'bg-gpb-gray-200' : 'bg-gpb-violet/10'}">
-                <Icon
-                  name={(achievement.icon as IconName) || 'crown'}
-                  size="md"
-                  class={isUnlocked ? 'text-gpb-gold' : isLocked ? 'text-gpb-gray-500' : 'text-gpb-violet'}
-                />
-              </div>
+            <div class="achievement-card-layout">
+              <div class="achievement-card-header">
+                <div class="p-2 rounded-xl flex-shrink-0 {isUnlocked ? 'bg-black/20' : isLocked ? 'bg-gpb-gray-200' : 'bg-gpb-violet/10'}">
+                  <Icon
+                    name={(achievement.icon as IconName) || 'crown'}
+                    size="md"
+                    class={isUnlocked ? 'text-gpb-gold' : isLocked ? 'text-gpb-gray-500' : 'text-gpb-violet'}
+                  />
+                </div>
 
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                  <h3 class="font-card-title text-sm truncate">{achievement.title}</h3>
-                  <Badge variant={rarityVariants[achievement.rarity]} size="sm" class="flex-shrink-0">
+                <div class="achievement-card-title-section">
+                  <h3 class="font-card-title text-sm">{achievement.title}</h3>
+                  <Badge variant={rarityVariants[achievement.rarity]} size="sm">
                     {getRarityName(achievement.rarity)}
                   </Badge>
                 </div>
-
-                <p class="font-ui-secondary text-xs line-clamp-1 {isUnlocked ? 'opacity-90' : 'text-gpb-gray-600'}">
-                  {achievement.description}
-                </p>
               </div>
 
-              <div class="flex items-center gap-3 flex-shrink-0">
+              <div class="achievement-card-body">
+                <p class="font-ui-secondary text-xs {isUnlocked ? 'opacity-90' : 'text-gpb-gray-600'}">
+                  {achievement.description}
+                </p>
+
                 {#if achievement.progress && !isUnlocked}
-                  <div class="flex items-center gap-1 px-2 py-1 rounded-lg {isUnlocked ? 'glass-effect' : 'bg-gpb-gray-50'}">
-                    <span class="font-ui-primary {isUnlocked ? 'opacity-90' : 'text-gpb-gray-700'} text-xs whitespace-nowrap">
-                      {achievement.progress}/{achievement.maxProgress}
+                  <div class="achievement-card-progress">
+                    <span class="font-ui-primary {isUnlocked ? 'opacity-90' : 'text-gpb-gray-700'} text-xs font-medium">
+                      Прогресс: {achievement.progress}/{achievement.maxProgress}
                     </span>
                   </div>
                 {/if}
+              </div>
 
-                {#if achievement.rewards?.coins || achievement.rewards?.crystals}
-                  <div class="flex items-center gap-2 text-xs">
-                    {#if achievement.rewards.coins}
-                      <div class="flex items-center gap-1">
-                        <Icon name="coin" size="sm" class="text-gpb-gold" />
-                        <span class="font-ui-primary font-semibold">{Math.floor(achievement.rewards.coins)}</span>
-                      </div>
-                    {/if}
-                    {#if achievement.rewards.crystals}
-                      <div class="flex items-center gap-1">
-                        <Icon name="crystal" size="sm" class="text-gpb-violet" />
-                        <span class="font-ui-primary font-semibold">{Math.floor(achievement.rewards.crystals)}</span>
-                      </div>
-                    {/if}
-                  </div>
-                {/if}
+              <div class="achievement-card-footer">
+                <div class="achievement-card-rewards">
+                  {#if achievement.rewards?.coins}
+                    <div class="achievement-reward-item">
+                      <Icon name="coin" size="sm" class="text-gpb-gold" />
+                      <span class="font-ui-primary font-semibold text-sm">{Math.floor(achievement.rewards.coins)}</span>
+                    </div>
+                  {/if}
+                  {#if achievement.rewards?.crystals}
+                    <div class="achievement-reward-item">
+                      <Icon name="crystal" size="sm" class="text-gpb-violet" />
+                      <span class="font-ui-primary font-semibold text-sm">{Math.floor(achievement.rewards.crystals)}</span>
+                    </div>
+                  {/if}
+                </div>
 
-                <div class="flex-shrink-0">
+                <div class="achievement-card-status">
                   {#if isUnlocked}
-                    <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                    <div class="achievement-status-badge achievement-status-unlocked">
                       <Icon name="check" color="white" size="sm" />
+                      <span>Получено</span>
                     </div>
                   {:else if isLocked}
-                    <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
+                    <div class="achievement-status-badge achievement-status-locked">
                       <Icon name="shield" color="white" size="sm" />
+                      <span>Заблокировано</span>
                     </div>
                   {:else}
-                    <div class="w-8 h-8 rounded-full bg-gpb-raspberry flex items-center justify-center pulse-border">
+                    <div class="achievement-status-badge achievement-status-progress">
                       <Icon name="crown" color="white" size="sm" />
+                      <span>В процессе</span>
                     </div>
                   {/if}
                 </div>
@@ -316,5 +319,131 @@
     background: var(--color-brand-50);
     border-color: var(--layer-brand-150);
     color: var(--color-brand-600);
+  }
+
+  .achievement-card-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    width: 100%;
+  }
+
+  .achievement-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .achievement-card-title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .achievement-card-title-section h3 {
+    word-break: break-word;
+    line-height: 1.4;
+  }
+
+  .achievement-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 2.75rem;
+  }
+
+  @media (max-width: 640px) {
+    .achievement-card-body {
+      padding-left: 0;
+    }
+  }
+
+  .achievement-card-body p {
+    line-height: 1.5;
+  }
+
+  .achievement-card-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-neutral-50);
+    width: fit-content;
+  }
+
+  .achievement-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (max-width: 640px) {
+    .achievement-card-footer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.875rem;
+    }
+  }
+
+  .achievement-card-rewards {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .achievement-reward-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-neutral-50);
+  }
+
+  .achievement-card-status {
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+
+  @media (max-width: 640px) {
+    .achievement-card-status {
+      min-width: 100%;
+    }
+  }
+
+  .achievement-status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .achievement-status-unlocked {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+
+  .achievement-status-locked {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    color: white;
+  }
+
+  .achievement-status-progress {
+    background: linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-brand-600) 100%);
+    color: white;
   }
 </style>

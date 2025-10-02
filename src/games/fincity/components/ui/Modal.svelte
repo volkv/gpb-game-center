@@ -157,7 +157,7 @@
 		gap: clamp(0.75rem, 1.5vw, 1.25rem);
 		padding: clamp(1.1rem, 1.8vw, 1.6rem) clamp(1.25rem, 2vw, 1.8rem);
 		border-bottom: 1px solid var(--color-border-subtle);
-		background-color: color-mix(in srgb, var(--color-neutral-50) 68%, white 32%);
+
 	}
 
 	.modal-title-game {

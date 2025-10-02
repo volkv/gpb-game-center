@@ -428,7 +428,7 @@
 	}
 </script>
 
-<GameLayout gameName="Хранитель Активов" background="gradient-electric" showScore={true}>
+<GameLayout gameName="Хранитель Активов" background="gradient-electric" showScore={true}   noPadding={true}>
 	<div class="asset-guardian-container">
 		<GameHeader
 			{selectors}

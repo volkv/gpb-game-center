@@ -59,6 +59,58 @@ export const ACTIVE_GAMES: Game[] = [
 		locale: 'ru'
 	},
 
+	
+
+	{
+		id: GAME_TYPES.CODE_TO_SUCCESS,
+		name: 'Код Безопасности',
+		description: 'Проживите историю Анны: принимайте решения в реальных ситуациях с мошенниками. Ваши выборы — ваши последствия.',
+		shortDescription: 'Визуальная новелла',
+		category: GAME_CATEGORIES.VISUAL_NOVEL,
+		status: GAME_STATUS.ACTIVE,
+
+		icon: {
+			url: '/logos/code-to-success.png',
+			alt: 'Иконка Код Безопасности',
+			width: 64,
+			height: 64
+		},
+		gradient: 'linear-gradient(155deg, rgba(11, 15, 33, 0.92) 0%, rgba(0, 59, 92, 0.85) 50%, rgba(0, 106, 165, 0.70) 100%)',
+		themeColor: 'var(--color-brand-600)',
+
+		metrics: {
+			averagePlayTime: 180,
+			completionRate: 0.88,
+			difficulty: 'easy',
+			maxScore: 100,
+			averageScore: 75
+		},
+		estimatedDuration: 3,
+
+		relatedProducts: [
+			{
+				id: 'fraud-protection',
+				name: 'Защита от мошенничества',
+				description: 'Комплексная система защиты ваших средств от мошенников',
+				url: '/products/fraud-protection',
+				category: 'service'
+			},
+			{
+				id: 'secure-sms',
+				name: 'Безопасные уведомления',
+				description: 'Система верификации SMS-сообщений от банка',
+				url: '/products/secure-sms',
+				category: 'service'
+			}
+		],
+
+		version: '1.0.0',
+		createdAt: new Date('2024-09-26'),
+		updatedAt: new Date('2024-09-26'),
+		componentPath: '/games/code-to-success/CodeToSuccessGame.svelte',
+		locale: 'ru'
+	},
+
 	{
 		id: GAME_TYPES.FINCITY,
 		name: 'ФинСити',
@@ -113,56 +165,6 @@ export const ACTIVE_GAMES: Game[] = [
 		createdAt: new Date('2024-02-10'),
 		updatedAt: new Date('2024-02-10'),
 		componentPath: '/games/fincity/FincityGame.svelte',
-		locale: 'ru'
-	},
-
-	{
-		id: GAME_TYPES.CODE_TO_SUCCESS,
-		name: 'Код Безопасности',
-		description: 'Проживите историю Анны: принимайте решения в реальных ситуациях с мошенниками. Ваши выборы — ваши последствия.',
-		shortDescription: 'Визуальная новелла',
-		category: GAME_CATEGORIES.VISUAL_NOVEL,
-		status: GAME_STATUS.ACTIVE,
-
-		icon: {
-			url: '/logos/code-to-success.png',
-			alt: 'Иконка Код Безопасности',
-			width: 64,
-			height: 64
-		},
-		gradient: 'linear-gradient(155deg, rgba(11, 15, 33, 0.92) 0%, rgba(0, 59, 92, 0.85) 50%, rgba(0, 106, 165, 0.70) 100%)',
-		themeColor: 'var(--color-brand-600)',
-
-		metrics: {
-			averagePlayTime: 180,
-			completionRate: 0.88,
-			difficulty: 'easy',
-			maxScore: 100,
-			averageScore: 75
-		},
-		estimatedDuration: 3,
-
-		relatedProducts: [
-			{
-				id: 'fraud-protection',
-				name: 'Защита от мошенничества',
-				description: 'Комплексная система защиты ваших средств от мошенников',
-				url: '/products/fraud-protection',
-				category: 'service'
-			},
-			{
-				id: 'secure-sms',
-				name: 'Безопасные уведомления',
-				description: 'Система верификации SMS-сообщений от банка',
-				url: '/products/secure-sms',
-				category: 'service'
-			}
-		],
-
-		version: '1.0.0',
-		createdAt: new Date('2024-09-26'),
-		updatedAt: new Date('2024-09-26'),
-		componentPath: '/games/code-to-success/CodeToSuccessGame.svelte',
 		locale: 'ru'
 	},
 

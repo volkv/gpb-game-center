@@ -139,6 +139,10 @@
 					</p>
 					{#each Object.values(BANKING_PRODUCTS) as product}
 						{@const isActive = selectors.activeBonuses.some((b: { id: string }) => b.id === product.id)}
+						{@const bonusLabel = product.gameBonus.type === 'shield' ? 'Защита от ловушек' :
+							product.gameBonus.type === 'multiplier' ? 'Очки x2' :
+							product.gameBonus.type === 'extra_life' ? '+1 жизнь' :
+							product.gameBonus.type === 'slow_time' ? 'Замедление времени' : 'Бонус'}
 						<button
 							class="product-card interactive-product {isActive ? 'product-active' : ''}"
 							disabled={isActive}
@@ -148,23 +152,16 @@
 								<span class="product-icon">{product.icon}</span>
 								<div class="product-info">
 									<h4 class="product-name">{product.name}</h4>
-									<p class="product-bonus">
-										{product.gameBonus.type === 'shield' ? '🛡️ Защита от ловушек' :
-										 product.gameBonus.type === 'multiplier' ? '📈 Очки x2' :
-										 product.gameBonus.type === 'extra_life' ? '❤️ +1 жизнь' :
-										 product.gameBonus.type === 'slow_time' ? '⏰ Замедление времени' : 'Бонус'}
-									</p>
-									<p class="product-duration">
-										{product.gameBonus.duration > 0 ? `${product.gameBonus.duration / 1000}с` : 'Мгновенно'}
-									</p>
-								</div>
-								<div class="activation-status">
-									{#if isActive}
-										<span class="status-active">✅ Активен</span>
-									{:else}
-										<span class="status-inactive">👆 Активировать</span>
+									<p class="product-bonus">{bonusLabel}</p>
+									{#if product.gameBonus.duration > 0}
+										<p class="product-duration">{product.gameBonus.duration / 1000}с</p>
 									{/if}
 								</div>
+								{#if isActive}
+									<span class="status-badge status-active">Активен</span>
+								{:else}
+									<span class="status-badge status-inactive">Тап</span>
+								{/if}
 							</div>
 						</button>
 					{/each}
@@ -284,7 +281,7 @@
 
 	/* Banking Products */
 	.banking-products {
-		max-height: 300px;
+		max-height: 420px;
 		overflow-y: auto;
 		margin-bottom: 1rem;
 	}
@@ -299,32 +296,31 @@
 	.interactive-product {
 		background: var(--color-surface-muted);
 		border: 1px solid var(--color-border-muted);
-		border-radius: 0.5rem;
-		padding: 0.5rem;
-		margin-bottom: 0.25rem;
+		border-radius: 0.75rem;
+		padding: 0.75rem;
+		margin-bottom: 0.5rem;
 		width: 100%;
 		cursor: pointer;
-		transition: all 0.3s ease;
+		transition: all 0.2s ease;
 		text-align: left;
 	}
 
 	.interactive-product:hover:not(:disabled) {
 		background: var(--layer-brand-050);
 		border-color: var(--color-brand-400);
-		transform: translateY(-2px);
-		box-shadow: var(--shadow-soft);
+		transform: translateY(-1px);
+		box-shadow: 0 4px 12px rgba(0, 122, 195, 0.15);
 	}
 
 	.interactive-product:active:not(:disabled) {
 		transform: translateY(0);
-		box-shadow: 0 2px 8px rgba(0, 122, 195, 0.2);
 	}
 
 	.product-active {
-		background: color-mix(in srgb, var(--color-state-success) 15%, var(--color-surface-muted) 85%);
+		background: color-mix(in srgb, var(--color-state-success) 12%, var(--color-surface-muted) 88%);
 		border-color: var(--color-state-success);
 		cursor: not-allowed;
-		opacity: 0.7;
+		opacity: 0.65;
 	}
 
 	.product-content {
@@ -334,11 +330,14 @@
 	}
 
 	.product-icon {
-		font-size: 1.5rem;
+		font-size: 2rem;
+		flex-shrink: 0;
+		line-height: 1;
 	}
 
 	.product-info {
 		flex: 1;
+		min-width: 0;
 	}
 
 	.product-name {
@@ -346,33 +345,40 @@
 		color: var(--color-fg-primary);
 		font-size: 0.875rem;
 		margin-bottom: 0.25rem;
+		line-height: 1.2;
 	}
 
 	.product-bonus {
 		color: var(--color-fg-muted);
 		font-size: 0.75rem;
-		margin-bottom: 0.125rem;
+		line-height: 1.3;
 	}
 
 	.product-duration {
-		color: var(--color-fg-muted);
-		font-size: 0.75rem;
+		color: var(--color-accent-400);
+		font-size: 0.7rem;
+		margin-top: 0.125rem;
+		font-weight: 500;
 	}
 
-	.activation-status {
-		display: flex;
-		align-items: center;
+	.status-badge {
 		flex-shrink: 0;
+		font-size: 0.7rem;
+		font-weight: 600;
+		padding: 0.25rem 0.5rem;
+		border-radius: 0.375rem;
+		white-space: nowrap;
+		line-height: 1;
 	}
 
 	.status-active {
-		color: var(--color-state-success);
-		font-size: 0.75rem;
+		background: var(--color-state-success);
+		color: white;
 	}
 
 	.status-inactive {
-		color: var(--color-accent-400);
-		font-size: 0.75rem;
+		background: var(--color-accent-400);
+		color: white;
 	}
 
 	@media (max-width: 480px) {
@@ -382,6 +388,47 @@
 
 		.modal-title {
 			font-size: 1.25rem;
+		}
+
+		.banking-products {
+			max-height: 320px;
+		}
+
+		.products-title {
+			font-size: 0.7rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.interactive-product {
+			padding: 0.625rem;
+			margin-bottom: 0.375rem;
+			border-radius: 0.625rem;
+		}
+
+		.product-content {
+			gap: 0.625rem;
+		}
+
+		.product-icon {
+			font-size: 1.75rem;
+		}
+
+		.product-name {
+			font-size: 0.8125rem;
+			margin-bottom: 0.1875rem;
+		}
+
+		.product-bonus {
+			font-size: 0.6875rem;
+		}
+
+		.product-duration {
+			font-size: 0.65rem;
+		}
+
+		.status-badge {
+			font-size: 0.65rem;
+			padding: 0.1875rem 0.4375rem;
 		}
 	}
 </style>

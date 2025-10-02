@@ -170,9 +170,9 @@
     </div>
 
     {#if questsByTab.length === 0}
-      <Card class="text-center py-12">
+      <Card class="text-center py-12 quest-empty-state">
         <div class="flex flex-col items-center gap-4">
-          <div class="p-4 rounded-full bg-gpb-gray-100">
+          <div class="p-4 rounded-full bg-gpb-gray-100 quest-empty-icon">
             <Icon name="quest" size="xl" class="text-gpb-gray-400" />
           </div>
           <div>
@@ -201,92 +201,95 @@
           <Card
             gradient={isCompleted ? 'wealth' : null}
             decorative={isCompleted}
-            class="stagger-item {isCompleted ? 'text-white' : 'bg-white border-2'} {isLocked ? 'opacity-50 border-gpb-gray-200' : isCompleted ? '' : isActive ? 'border-gpb-blue' : 'border-gpb-violet'}"
+            class="stagger-item quest-card {isCompleted ? 'text-white' : 'bg-white border-2'} {isLocked ? 'opacity-50 border-gpb-gray-200' : isCompleted ? '' : isActive ? 'border-gpb-blue' : 'border-gpb-violet'}"
             style="animation-delay: {index * 0.1}s"
           >
-            <div class="flex items-center gap-3">
-              <div class="p-2 rounded-xl flex-shrink-0 {isCompleted ? 'bg-black/20' : isLocked ? 'bg-gpb-gray-200' : isActive ? 'bg-gpb-blue/10' : 'bg-gpb-violet/10'}">
-                <Icon
-                  name={getQuestTypeIcon(questTyped.type)}
-                  size="md"
-                  class={isCompleted ? 'text-gpb-gold' : isLocked ? 'text-gpb-gray-500' : isActive ? 'text-gpb-blue' : 'text-gpb-violet'}
-                />
-              </div>
-
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 mb-1">
-                  <h3 class="font-card-title text-sm truncate">{questTyped.title}</h3>
-                  {#if questTyped.isMainQuest}
-                    <Badge variant="hot" size="sm" class="flex-shrink-0">Основной</Badge>
-                  {/if}
+            <div class="quest-card-layout">
+              <div class="quest-card-header">
+                <div class="p-2 rounded-xl flex-shrink-0 {isCompleted ? 'bg-black/20' : isLocked ? 'bg-gpb-gray-200' : isActive ? 'bg-gpb-blue/10' : 'bg-gpb-violet/10'}">
+                  <Icon
+                    name={getQuestTypeIcon(questTyped.type)}
+                    size="md"
+                    class={isCompleted ? 'text-gpb-gold' : isLocked ? 'text-gpb-gray-500' : isActive ? 'text-gpb-blue' : 'text-gpb-violet'}
+                  />
                 </div>
 
-                <p class="font-ui-secondary text-xs line-clamp-1 {isCompleted ? 'opacity-90' : 'text-gpb-gray-600'}">
-                  {getRequirementText(questTyped)}
-                </p>
+                <div class="quest-card-title-section">
+                  <h3 class="font-card-title text-sm">{questTyped.title}</h3>
+                  {#if questTyped.isMainQuest}
+                    <Badge variant="hot" size="sm">Основной</Badge>
+                  {/if}
+                </div>
               </div>
 
-              <div class="flex items-center gap-3 flex-shrink-0">
+              <div class="quest-card-body">
+                <p class="font-ui-secondary text-xs {isCompleted ? 'opacity-90' : 'text-gpb-gray-600'}">
+                  {getRequirementText(questTyped)}
+                </p>
+
                 {#if !isCompleted && !isLocked}
-                  <div class="flex items-center gap-1 px-2 py-1 rounded-lg {isCompleted ? 'glass-effect' : 'bg-gpb-gray-50'}">
-                    <span class="font-ui-primary {isCompleted ? 'opacity-90' : 'text-gpb-gray-700'} text-xs whitespace-nowrap">
-                      {Math.round(progress)}%
+                  <div class="quest-card-progress">
+                    <span class="font-ui-primary {isCompleted ? 'opacity-90' : 'text-gpb-gray-700'} text-xs font-medium">
+                      Прогресс: {Math.round(progress)}%
                     </span>
                   </div>
                 {/if}
+              </div>
 
-                {#if questTyped.rewards.coins || questTyped.rewards.crystals}
-                  <div class="flex items-center gap-2 text-xs">
-                    {#if questTyped.rewards.coins}
-                      <div class="flex items-center gap-1">
-                        <Icon name="coin" size="sm" class="text-gpb-gold" />
-                        <span class="font-ui-primary font-semibold">{Math.floor(questTyped.rewards.coins)}</span>
-                      </div>
-                    {/if}
-                    {#if questTyped.rewards.crystals}
-                      <div class="flex items-center gap-1">
-                        <Icon name="crystal" size="sm" class="text-gpb-violet" />
-                        <span class="font-ui-primary font-semibold">{Math.floor(questTyped.rewards.crystals)}</span>
-                      </div>
-                    {/if}
-                  </div>
-                {/if}
+              <div class="quest-card-footer">
+                <div class="quest-card-rewards">
+                  {#if questTyped.rewards.coins}
+                    <div class="quest-reward-item">
+                      <Icon name="coin" size="sm" class="text-gpb-gold" />
+                      <span class="font-ui-primary font-semibold text-sm">{Math.floor(questTyped.rewards.coins)}</span>
+                    </div>
+                  {/if}
+                  {#if questTyped.rewards.crystals}
+                    <div class="quest-reward-item">
+                      <Icon name="crystal" size="sm" class="text-gpb-violet" />
+                      <span class="font-ui-primary font-semibold text-sm">{Math.floor(questTyped.rewards.crystals)}</span>
+                    </div>
+                  {/if}
+                </div>
 
-                {#if canStart}
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onclick={() => handleStartQuest(questTyped)}
-                    class="hover-lift flex-shrink-0"
-                  >
-                    Начать
-                  </Button>
-                {:else if isActive && progress === 100}
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onclick={() => completeQuest(questTyped.id)}
-                    class="hover-lift animate-pulse-glow flex-shrink-0"
-                  >
-                    Завершить
-                  </Button>
-                {:else}
-                  <div class="flex-shrink-0">
+                <div class="quest-card-action">
+                  {#if canStart}
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onclick={() => handleStartQuest(questTyped)}
+                      class="hover-lift w-full"
+                    >
+                      Начать
+                    </Button>
+                  {:else if isActive && progress === 100}
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      onclick={() => completeQuest(questTyped.id)}
+                      class="hover-lift animate-pulse-glow w-full"
+                    >
+                      Завершить
+                    </Button>
+                  {:else}
                     {#if isCompleted}
-                      <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                      <div class="quest-status-badge quest-status-completed">
                         <Icon name="check" color="white" size="sm" />
+                        <span>Завершено</span>
                       </div>
                     {:else if isLocked}
-                      <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center">
+                      <div class="quest-status-badge quest-status-locked">
                         <Icon name="shield" color="white" size="sm" />
+                        <span>Заблокировано</span>
                       </div>
                     {:else}
-                      <div class="w-8 h-8 rounded-full bg-gpb-blue flex items-center justify-center pulse-border">
+                      <div class="quest-status-badge quest-status-active">
                         <Icon name="quest" color="white" size="sm" />
+                        <span>Активно</span>
                       </div>
                     {/if}
-                  </div>
-                {/if}
+                  {/if}
+                </div>
               </div>
             </div>
           </Card>
@@ -348,5 +351,131 @@
     background: var(--color-brand-50);
     border-color: var(--layer-brand-150);
     color: var(--color-brand-600);
+  }
+
+  .quest-card-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    width: 100%;
+  }
+
+  .quest-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .quest-card-title-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .quest-card-title-section h3 {
+    word-break: break-word;
+    line-height: 1.4;
+  }
+
+  .quest-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-left: 2.75rem;
+  }
+
+  @media (max-width: 640px) {
+    .quest-card-body {
+      padding-left: 0;
+    }
+  }
+
+  .quest-card-body p {
+    line-height: 1.5;
+  }
+
+  .quest-card-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-neutral-50);
+    width: fit-content;
+  }
+
+  .quest-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  @media (max-width: 640px) {
+    .quest-card-footer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.875rem;
+    }
+  }
+
+  .quest-card-rewards {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .quest-reward-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-lg);
+    background: var(--color-neutral-50);
+  }
+
+  .quest-card-action {
+    flex: 0 0 auto;
+    min-width: 120px;
+  }
+
+  @media (max-width: 640px) {
+    .quest-card-action {
+      min-width: 100%;
+    }
+  }
+
+  .quest-status-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius-lg);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .quest-status-completed {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+  }
+
+  .quest-status-locked {
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    color: white;
+  }
+
+  .quest-status-active {
+    background: linear-gradient(135deg, var(--color-brand-500) 0%, var(--color-brand-600) 100%);
+    color: white;
   }
 </style>

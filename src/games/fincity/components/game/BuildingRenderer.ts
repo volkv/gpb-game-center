@@ -10,6 +10,7 @@ export interface BuildingVisual {
   sprite: Sprite | null;
   graphics?: Graphics;
   nameText?: Text;
+  levelBadge?: Container;
   isGhost: boolean;
 }
 
@@ -68,10 +69,13 @@ export class BuildingRenderer {
       spriteContainer.addChild(graphics);
     }
 
-    const nameText = this.createBuildingLabel(config.name, building.level, false);
+    const nameText = this.createBuildingLabel(config.name, false);
     nameText.x = 0;
-    nameText.y = -20;
+    nameText.y = 10;
     textContainer.addChild(nameText);
+
+    const levelBadge = this.createLevelBadge(building.level, config);
+    textContainer.addChild(levelBadge);
 
     container.addChild(spriteContainer);
     container.addChild(textContainer);
@@ -86,6 +90,7 @@ export class BuildingRenderer {
       building,
       sprite,
       nameText,
+      levelBadge,
       isGhost: false
     };
 
@@ -138,9 +143,9 @@ export class BuildingRenderer {
       spriteContainer.addChild(graphics);
     }
 
-    const nameText = this.createBuildingLabel(config.name, 1, true);
+    const nameText = this.createBuildingLabel(config.name, true);
     nameText.x = 0;
-    nameText.y = -20;
+    nameText.y = 10;
     textContainer.addChild(nameText);
 
     container.addChild(spriteContainer);
@@ -285,18 +290,27 @@ export class BuildingRenderer {
     return graphics;
   }
 
-  private createBuildingLabel(name: string, level: number, isPreview: boolean = false): Text {
+  private createBuildingLabel(name: string, isPreview: boolean = false): Text {
     const style = new TextStyle({
       fontFamily: 'Gazprombank Sans, sans-serif',
-      fontSize: isPreview ? 55 : 55,
+      fontSize: isPreview ? 45 : 45,
       fontWeight: 'bold',
-      fill: isPreview ? 0xffffff : 0x333333,
-      stroke: isPreview ? { color: 0x000000, width: 2 } : { color: 0xffffff, width: 2 },
-      align: 'center'
+      fill: 0xffffff,
+      stroke: { color: 0x000000, width: 5, alpha: 0.8 },
+      dropShadow: {
+        color: 0x000000,
+        blur: 4,
+        angle: Math.PI / 4,
+        distance: 2,
+        alpha: 0.6
+      },
+      align: 'center',
+      wordWrap: true,
+      wordWrapWidth: 280,
+      breakWords: false
     });
 
-    const displayText = `${name} Ур.${level}`;
-    const text = new Text({ text: displayText, style });
+    const text = new Text({ text: name, style });
     text.anchor.set(0.5, 1);
 
     if (isPreview) {
@@ -304,6 +318,45 @@ export class BuildingRenderer {
     }
 
     return text;
+  }
+
+  private createLevelBadge(level: number, config: BuildingConfig): Container {
+    const badge = new Container();
+
+    const tileSize = this.getBuildingTileSize();
+    const buildingWidth = config.size.width * tileSize.width;
+    const buildingHeight = config.size.height * tileSize.height;
+
+    const badgeSize = 50;
+    const padding = 6;
+
+    const background = new Graphics();
+    background.roundRect(0, 0, badgeSize, badgeSize, 8);
+    background.fill({ color: 0x0066cc, alpha: 0.95 });
+    background.stroke({ color: 0xffffff, width: 2 });
+
+    const levelText = new Text({
+      text: `${level}`,
+      style: new TextStyle({
+        fontFamily: 'Gazprombank Sans, sans-serif',
+        fontSize: 28,
+        fontWeight: 'bold',
+        fill: 0xffffff,
+        align: 'center'
+      })
+    });
+
+    levelText.anchor.set(0.5, 0.5);
+    levelText.x = badgeSize / 2;
+    levelText.y = badgeSize / 2;
+
+    badge.addChild(background);
+    badge.addChild(levelText);
+
+    badge.x = 80;
+    badge.y = -360;
+
+    return badge;
   }
 
   private addBuildingDetails(graphics: Graphics, config: BuildingConfig, width: number, height: number, alpha: number): void {
@@ -608,9 +661,20 @@ export class BuildingRenderer {
 
   updateBuildingLabel(buildingId: string, name: string, level: number): void {
     const visual = this.buildings.get(buildingId);
-    if (!visual || !visual.nameText) return;
+    if (!visual) return;
 
-    visual.nameText.text = `${name} Ур.${level}`;
+    if (visual.nameText) {
+      visual.nameText.text = name;
+    }
+
+    if (visual.levelBadge) {
+      const levelText = visual.levelBadge.children.find(
+        (child) => child instanceof Text
+      ) as Text | undefined;
+      if (levelText) {
+        levelText.text = `${level}`;
+      }
+    }
   }
 
   playUpgradeEffects(buildingId: string): void {
