@@ -8,8 +8,8 @@
   import FinalSceneDisplay from './components/FinalSceneDisplay.svelte';
   import EducationScreen from './components/EducationScreen.svelte';
   import GameResultsModal from './components/GameResultsModal.svelte';
-  import { codeToSuccessScenario, scenes } from './data/scenario';
-  import type { Character, NovellaGameState, ChoiceOption, ChoiceHistoryEntry } from './types';
+  import { codeToSuccessScenario, annaScenes, maximScenes } from './data/scenario';
+  import type { Character, NovellaGameState, ChoiceOption, ChoiceHistoryEntry, Scene } from './types';
   import { NovellaScreen, CompletionPath, ChoiceConsequence } from './types';
   import { fade, fly } from 'svelte/transition';
   import { cubicOut } from 'svelte/easing';
@@ -47,6 +47,7 @@
 
   let gameStarted = $state(false);
   let showResultsModal = $state(false);
+  let currentScenes = $state<Scene[]>([]);
 
   $effect(() => {
     if (!gameStarted) {
@@ -56,7 +57,7 @@
   });
 
   const updateGameProgress = () => {
-    const totalScenes = scenes.length;
+    const totalScenes = currentScenes.length || 1;
     const currentProgress = Math.min(100, Math.round((gameState.visitedScenes.length / totalScenes) * 100));
 
     gameStore.updateGameState(state => ({
@@ -76,7 +77,7 @@
     const lastChoice = choiceHistory[choiceHistory.length - 1];
     if (!lastChoice) return CompletionPath.INCOMPLETE;
 
-    const choice = scenes
+    const choice = currentScenes
       .flatMap(scene => scene.choices || [])
       .find(choice => choice.id === lastChoice.choiceId);
 
@@ -91,7 +92,18 @@
   const handleCharacterSelect = (character: Character) => {
     gameState.selectedCharacter = character;
     gameState.currentScreen = NovellaScreen.DIALOGUE;
-    gameState.currentSceneId = 'intro';
+
+    if (character.id === 'anna') {
+      currentScenes = annaScenes;
+      gameState.currentSceneId = 'intro';
+    } else if (character.id === 'maxim') {
+      currentScenes = maximScenes;
+      gameState.currentSceneId = 'maxim-intro';
+    } else {
+      currentScenes = annaScenes;
+      gameState.currentSceneId = 'intro';
+    }
+
     gameState.currentDialogueStepId = undefined;
     updateGameProgress();
   };
@@ -102,11 +114,11 @@
   };
 
   const handleDialogueComplete = () => {
-    const currentScene = scenes.find(scene => scene.id === gameState.currentSceneId);
+    const currentScene = currentScenes.find(scene => scene.id === gameState.currentSceneId);
 
     if (currentScene?.choices && currentScene.choices.length > 0) {
       gameState.currentScreen = NovellaScreen.CHOICE;
-    } else if (currentScene?.id === 'good-ending' || currentScene?.id === 'bad-ending') {
+    } else if (currentScene?.id.includes('ending')) {
       gameState.currentScreen = NovellaScreen.FINAL_SCENE;
     } else {
       gameState.currentScreen = NovellaScreen.CHOICE;
@@ -120,8 +132,9 @@
   };
 
   const handleChoiceSelect = (choiceOption: ChoiceOption) => {
+    const choiceId = gameState.selectedCharacter?.id === 'anna' ? 'main-choice' : 'maxim-main-choice';
     const choiceHistoryEntry: ChoiceHistoryEntry = {
-      choiceId: 'main-choice',
+      choiceId,
       optionId: choiceOption.id,
       timestamp: new Date()
     };
@@ -130,7 +143,7 @@
     gameState.finalScore += choiceOption.points || 0;
     gameState.completionPath = determineCompletionPath(gameState.choiceHistory);
 
-    const nextScene = scenes.find(scene => scene.id === choiceOption.nextSceneId);
+    const nextScene = currentScenes.find(scene => scene.id === choiceOption.nextSceneId);
     if (nextScene) {
       gameState.currentSceneId = nextScene.id;
       gameState.currentDialogueStepId = undefined;
@@ -161,6 +174,7 @@
 
   const handleRestartGame = () => {
     showResultsModal = false;
+    currentScenes = [];
     gameState = {
       currentScreen: NovellaScreen.CHARACTER_SELECTION,
       currentSceneId: 'intro',
@@ -190,6 +204,7 @@
   background="gradient-mystery"
   showScore={false}
   showBackButton={true}
+  noPadding={true}
 >
   {#if gameState.currentScreen === NovellaScreen.CHARACTER_SELECTION}
     <div class="screen-wrapper" in:screenEnter out:screenExit>
@@ -199,6 +214,7 @@
     <div class="screen-wrapper" in:screenEnter out:screenExit>
       <DialogueInterface
         gameState={gameState}
+        scenes={currentScenes}
         onStateUpdate={handleGameStateUpdate}
         onDialogueComplete={handleDialogueComplete}
       />
@@ -207,13 +223,14 @@
     <div class="screen-wrapper" in:screenEnter out:screenExit>
       <ChoiceInterface
         gameState={gameState}
+        scenes={currentScenes}
         onChoiceSelect={handleChoiceSelect}
       />
     </div>
   {:else if gameState.currentScreen === NovellaScreen.FINAL_SCENE}
     {#key gameState.currentSceneId}
       <FinalSceneDisplay
-        backgroundImage={scenes.find(s => s.id === gameState.currentSceneId)?.backgroundImage || ''}
+        backgroundImage={currentScenes.find(s => s.id === gameState.currentSceneId)?.backgroundImage || ''}
         onComplete={handleFinalSceneComplete}
       />
     {/key}

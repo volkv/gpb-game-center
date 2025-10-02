@@ -210,6 +210,7 @@
     height: 100%;
     object-fit: cover;
     transition: opacity 0.2s ease;
+    border-radius: 50%;
   }
 
   .character-card__placeholder {

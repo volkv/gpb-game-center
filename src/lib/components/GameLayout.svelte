@@ -10,6 +10,7 @@
 		background?: 'gradient-power' | 'gradient-electric' | 'gradient-wealth' | 'gradient-mystery' | 'custom';
 		customBackground?: string;
 		class?: string;
+		noPadding?: boolean;
 	}
 
 	let {
@@ -19,7 +20,8 @@
 		showBackButton = true,
 		background = 'gradient-electric',
 		customBackground,
-		class: className = ''
+		class: className = '',
+		noPadding = false
 	}: Props = $props();
 
 	onMount(() => {
@@ -39,7 +41,7 @@
 </script>
 
 <div class="game-layout {backgroundClass} {className}" style={backgroundStyle}>
-	<div class="game-content">
+	<div class="game-content" class:no-padding={noPadding}>
 		{@render children?.()}
 	</div>
 </div>
@@ -76,6 +78,10 @@
 
 	.game-content {
 		padding: 0.75rem;
+	}
+
+	.game-content.no-padding {
+		padding: 0;
 	}
 
 

@@ -1,13 +1,13 @@
 <script lang="ts">
 import type { NovellaGameState, Choice, ChoiceOption, Scene } from '../types';
-  import { scenes } from '../data/scenario';
 
   interface Props {
     gameState: NovellaGameState;
+    scenes: Scene[];
     onChoiceSelect: (choiceOption: ChoiceOption) => void;
   }
 
-  let { gameState, onChoiceSelect }: Props = $props();
+  let { gameState, scenes, onChoiceSelect }: Props = $props();
 
   let currentScene = $state<Scene | undefined>(undefined);
   let currentChoice = $state<Choice | null>(null);

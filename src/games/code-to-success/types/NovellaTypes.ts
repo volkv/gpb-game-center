@@ -10,6 +10,7 @@ export enum NovellaScreen {
 
 export enum SpeakerType {
   ANNA = 'anna',
+  MAXIM = 'maxim',
   MIKHAIL = 'mikhail',
   FRAUDSTER = 'fraudster',
   NARRATOR = 'narrator',

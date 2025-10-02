@@ -1,7 +1,14 @@
 <script lang="ts">
   import type { NovellaGameState, EducationScreen as EducationScreenData } from '../types';
   import { CompletionPath } from '../types';
-  import { scenes, goodEducationScreen, badEducationScreen } from '../data/scenario';
+  import {
+    annaScenes,
+    maximScenes,
+    goodEducationScreen,
+    badEducationScreen,
+    maximGoodEducationScreen,
+    maximBadEducationScreen
+  } from '../data/scenario';
 
   interface Props {
     gameState: NovellaGameState;
@@ -11,13 +18,21 @@
 
   let { gameState, onRewardClaim, onExit }: Props = $props();
 
-  const educationData = $derived(
-    gameState.completionPath === CompletionPath.GOOD
+  const isMaximScenario = $derived(gameState.selectedCharacter?.id === 'maxim');
+
+  const educationData = $derived(() => {
+    if (isMaximScenario) {
+      return gameState.completionPath === CompletionPath.GOOD
+        ? maximGoodEducationScreen
+        : maximBadEducationScreen;
+    }
+    return gameState.completionPath === CompletionPath.GOOD
       ? goodEducationScreen
-      : badEducationScreen
-  );
+      : badEducationScreen;
+  });
 
   const finalScene = $derived(() => {
+    const scenes = isMaximScenario ? maximScenes : annaScenes;
     return scenes.find(scene => scene.id === gameState.currentSceneId);
   });
 
@@ -47,7 +62,7 @@
     <div class="success-badge" role="banner">
       <div class="badge-icon" aria-hidden="true">🛡️</div>
       <h1 class="success-title" id="education-title">
-        {educationData.title}
+        {educationData().title}
       </h1>
       <div class="sr-only">
         Поздравляем! Вы успешно завершили сценарий и получили образовательную информацию.
@@ -56,12 +71,12 @@
 
     <div class="summary-section surface-card" role="region" aria-labelledby="summary-heading">
       <h2 class="section-title" id="summary-heading">Что произошло?</h2>
-      <p class="summary-text">{educationData.summary}</p>
+      <p class="summary-text">{educationData().summary}</p>
     </div>
 
     <div class="decision-section surface-card" role="region" aria-labelledby="decision-heading">
       <h2 class="section-title" id="decision-heading">Правильное решение</h2>
-      <p class="decision-text">{educationData.correctDecision}</p>
+      <p class="decision-text">{educationData().correctDecision}</p>
     </div>
 
     <div class="reward-section surface-card" role="region" aria-labelledby="reward-heading">
@@ -76,17 +91,17 @@
       </div>
     </div>
 
-    {#if educationData.productIntegration}
+    {#if educationData().productIntegration}
       <div
         class="product-section surface-card"
         role="region"
         aria-labelledby="product-heading"
       >
         <h2 class="section-title" id="product-heading">
-          {educationData.productIntegration.title}
+          {educationData().productIntegration.title}
         </h2>
         <p class="product-description">
-          {educationData.productIntegration.description}
+          {educationData().productIntegration.description}
         </p>
 
         <button
@@ -94,13 +109,13 @@
           class="btn-secondary learn-more-btn"
           onclick={handleLearnMore}
           onkeydown={(e) => handleKeydown(e, handleLearnMore)}
-          disabled={!educationData.productIntegration.isActive}
+          disabled={!educationData().productIntegration.isActive}
           aria-describedby="product-heading"
-          aria-label={educationData.productIntegration.isActive
-            ? `${educationData.productIntegration.buttonText} - узнать больше о продукте`
-            : `${educationData.productIntegration.buttonText} - функция пока недоступна`}
+          aria-label={educationData().productIntegration.isActive
+            ? `${educationData().productIntegration.buttonText} - узнать больше о продукте`
+            : `${educationData().productIntegration.buttonText} - функция пока недоступна`}
         >
-          {educationData.productIntegration.buttonText}
+          {educationData().productIntegration.buttonText}
         </button>
       </div>
     {/if}

@@ -1,16 +1,16 @@
 <script lang="ts">
   import type { NovellaGameState, Scene, DialogueStep } from '../types';
   import { SpeakerType, ContinueAction } from '../types';
-  import { scenes } from '../data/scenario';
   import { CircleHelp } from 'lucide-svelte';
 
   interface Props {
     gameState: NovellaGameState;
+    scenes: Scene[];
     onStateUpdate: (state: NovellaGameState) => void;
     onDialogueComplete: () => void;
   }
 
-  let { gameState, onStateUpdate, onDialogueComplete }: Props = $props();
+  let { gameState, scenes, onStateUpdate, onDialogueComplete }: Props = $props();
 
   let currentScene = $state<Scene | undefined>(undefined);
   let currentDialogueStep = $state<DialogueStep | null>(null);
@@ -20,6 +20,7 @@
   let speakerName = $state('');
   let isNarrator = $state(false);
   let isFraudster = $state(false);
+  let isPhone = $state(false);
 
   $effect(() => {
     currentScene = scenes.find(scene => scene.id === gameState.currentSceneId);
@@ -38,31 +39,41 @@
 
   $effect(() => {
     backgroundImage = currentDialogueStep?.backgroundImage || currentScene?.backgroundImage || '';
-    characterImage = '/games/code-to-success/avatar.png';
     isNarrator = currentDialogueStep?.speaker === SpeakerType.NARRATOR;
     isFraudster = currentDialogueStep?.speaker === SpeakerType.FRAUDSTER;
+    isPhone = currentDialogueStep?.speaker === SpeakerType.PHONE;
 
     if (!currentDialogueStep) {
       speakerName = '';
+      characterImage = '';
       return;
     }
 
     switch (currentDialogueStep.speaker) {
       case SpeakerType.ANNA:
         speakerName = 'Анна';
+        characterImage = currentDialogueStep.characterImage || '/games/code-to-success/avatar.png';
+        break;
+      case SpeakerType.MAXIM:
+        speakerName = 'Максим';
+        characterImage = currentDialogueStep.characterImage || '/games/code-to-success/2/maxim-avatar.png';
         break;
       case SpeakerType.MIKHAIL:
         speakerName = 'Михаил';
+        characterImage = currentDialogueStep.characterImage || '/games/code-to-success/avatar2.png';
         break;
       case SpeakerType.FRAUDSTER:
         speakerName = 'Звонящий';
+        characterImage = '';
         break;
       case SpeakerType.PHONE:
         speakerName = 'Телефон';
+        characterImage = '';
         break;
       case SpeakerType.NARRATOR:
       default:
         speakerName = '';
+        characterImage = '';
         break;
     }
   });
@@ -155,7 +166,7 @@
     </div>
   {/if}
 
-  {#if currentDialogueStep && !isNarrator && speakerName}
+  {#if currentDialogueStep && !isNarrator && !isPhone && speakerName}
     <div class="character-bubble">
       <div class="character-avatar">
         {#if isFraudster}
@@ -180,7 +191,7 @@
 
   {#if currentDialogueStep}
     <div class="dialogue-window" class:dialogue-window--narrator={isNarrator}>
-      {#if !isNarrator && speakerName}
+      {#if !isNarrator && !isPhone && speakerName}
         <div class="dialogue-speaker">
           {speakerName}
         </div>
@@ -230,7 +241,7 @@
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
+    bottom: 234px;
     z-index: 1;
   }
 
@@ -324,6 +335,7 @@
     bottom: 0;
     left: 0;
     right: 0;
+    height: 250px;
     z-index: 3;
     background: linear-gradient(
       180deg,
@@ -337,6 +349,7 @@
     box-shadow: var(--shadow-hard);
     border-top: 2px solid var(--color-border-subtle);
     animation: dialogueFadeIn 0.4s ease-out;
+    overflow-y: auto;
   }
 
   .dialogue-window--narrator {
@@ -428,11 +441,11 @@
   @keyframes characterFadeIn {
     from {
       opacity: 0;
-      transform: translateY(-50%) translateX(20px);
+      transform: translateX(20px);
     }
     to {
       opacity: 1;
-      transform: translateY(-50%) translateX(0);
+      transform: translateX(0);
     }
   }
 
