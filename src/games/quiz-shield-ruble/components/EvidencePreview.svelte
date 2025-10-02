@@ -1,68 +1,7 @@
 <script lang="ts">
   import { Maximize2 } from 'lucide-svelte';
   import { Modal } from '$lib';
-
-  type EvidenceType = 'sms' | 'call' | 'website' | 'atm' | 'app' | 'social';
-
-  interface EvidenceBase {
-    caption?: string;
-    ariaLabel?: string;
-  }
-
-  export interface SmsEvidence extends EvidenceBase {
-    type: 'sms';
-    sender: string;
-    timestamp: string;
-    message: string[];
-    link?: string;
-  }
-
-  export interface CallEvidence extends EvidenceBase {
-    type: 'call';
-    caller: string;
-    phone: string;
-    riskNote: string;
-    script: string[];
-  }
-
-  export interface WebsiteEvidence extends EvidenceBase {
-    type: 'website';
-    url: string;
-    isSecure: boolean;
-    title: string;
-    prompts: string[];
-    warning: string;
-  }
-
-  export interface AtmEvidence extends EvidenceBase {
-    type: 'atm';
-    location: string;
-    anomalies: string[];
-    status: string;
-  }
-
-  export interface AppEvidence extends EvidenceBase {
-    type: 'app';
-    title: string;
-    prompt: string;
-    actions: string[];
-    warning: string;
-  }
-
-  export interface SocialEvidence extends EvidenceBase {
-    type: 'social';
-    contact: string;
-    platform: string;
-    messages: Array<{ fromBank?: boolean; text: string; highlight?: boolean }>;
-  }
-
-  export type QuestionEvidence =
-    | SmsEvidence
-    | CallEvidence
-    | WebsiteEvidence
-    | AtmEvidence
-    | AppEvidence
-    | SocialEvidence;
+  import type { QuestionEvidence, EvidenceType } from '../types';
 
   interface Props {
     evidence: QuestionEvidence;

@@ -86,23 +86,37 @@ class GameLoaderService {
 	}
 
 	private async dynamicImport(path: string): Promise<{ default: any }> {
-		switch (path) {
-			case '/games/quiz-shield-ruble/QuizGame.svelte':
-				return import('../../games/quiz-shield-ruble/QuizGame.svelte');
-			case '/games/match3-golden-reserve/Match3Game.svelte':
-				return import('../../games/match3-golden-reserve/Match3Game.svelte');
-			case '/games/crossword-financial/CrosswordDemo.svelte':
-				return import('../../games/crossword-financial/CrosswordDemo.svelte');
-			case '/games/fincity/FincityGame.svelte':
-				return import('../../games/fincity/FincityGame.svelte');
-			case '/games/anti-fraud-hunter/AntiFraudGame.svelte':
-				return import('../../games/anti-fraud-hunter/AntiFraudGame.svelte');
-			case '/games/code-to-success/CodeToSuccessGame.svelte':
-				return import('../../games/code-to-success/CodeToSuccessGame.svelte');
-			case '/games/asset-guardian/AssetGuardianGame.svelte':
-				return import('../../games/asset-guardian/AssetGuardianGame.svelte');
-			default:
-				throw new Error(`Unknown game component path: ${path}`);
+		try {
+			// Используем динамический импорт на основе полного пути
+			const module = await import(`../..${path}`);
+			if (!module.default) {
+				throw new Error(`Game component ${path} does not have a default export`);
+			}
+			return module;
+		} catch (error) {
+			// Fallback к старому методу для совместимости
+			if (import.meta.env.DEV) {
+				console.warn(`Dynamic import failed for ${path}, falling back to switch statement:`, error);
+			}
+
+			switch (path) {
+				case '/games/quiz-shield-ruble/QuizGame.svelte':
+					return import('../../games/quiz-shield-ruble/QuizGame.svelte');
+				case '/games/match3-golden-reserve/Match3Game.svelte':
+					return import('../../games/match3-golden-reserve/Match3Game.svelte');
+				case '/games/crossword-financial/CrosswordDemo.svelte':
+					return import('../../games/crossword-financial/CrosswordDemo.svelte');
+				case '/games/fincity/FincityGame.svelte':
+					return import('../../games/fincity/FincityGame.svelte');
+				case '/games/anti-fraud-hunter/AntiFraudGame.svelte':
+					return import('../../games/anti-fraud-hunter/AntiFraudGame.svelte');
+				case '/games/code-to-success/CodeToSuccessGame.svelte':
+					return import('../../games/code-to-success/CodeToSuccessGame.svelte');
+				case '/games/asset-guardian/AssetGuardianGame.svelte':
+					return import('../../games/asset-guardian/AssetGuardianGame.svelte');
+				default:
+					throw new Error(`Unknown game component path: ${path}`);
+			}
 		}
 	}
 

@@ -40,7 +40,7 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     income: { coins: 50, crystals: 5, interval: 60000 },
     maxLevel: 10,
     size: { width: 2, height: 3 },
-    unlockLevel: 5,
+    unlockLevel: 999,
     bankProduct: 'Инвестиционное страхование жизни'
   },
   [BuildingType.LONGEVITY_PARK]: {
@@ -51,7 +51,7 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     income: { coins: 20, crystals: 3, interval: 120000 },
     maxLevel: 1,
     size: { width: 4, height: 3 },
-    unlockLevel: 8,
+    unlockLevel: 999,
     bankProduct: 'Долгосрочные сбережения'
   },
   [BuildingType.PARTNER_MALL]: {
@@ -62,7 +62,7 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     income: { coins: 30, crystals: 4, interval: 90000 },
     maxLevel: 5,
     size: { width: 3, height: 3 },
-    unlockLevel: 4,
+    unlockLevel: 999,
     bankProduct: 'Кэшбэк программы'
   },
   [BuildingType.RESEARCH_INSTITUTE]: {
@@ -73,7 +73,7 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     income: { coins: 0, crystals: 0, interval: 0 },
     maxLevel: 3,
     size: { width: 2, height: 2 },
-    unlockLevel: 3,
+    unlockLevel: 999,
     bankProduct: 'Финансовая грамотность'
   },
   [BuildingType.CREDIT_OFFICE]: {
@@ -84,7 +84,7 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     income: { coins: 35, crystals: 3, interval: 70000 },
     maxLevel: 7,
     size: { width: 2, height: 2 },
-    unlockLevel: 3,
+    unlockLevel: 999,
     requiresBuilding: BuildingType.CENTRAL_BANK,
     bankProduct: 'Кредит наличными'
   },
@@ -96,7 +96,7 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     income: { coins: 45, crystals: 4, interval: 80000 },
     maxLevel: 6,
     size: { width: 3, height: 2 },
-    unlockLevel: 5,
+    unlockLevel: 999,
     requiresBuilding: BuildingType.CREDIT_OFFICE,
     bankProduct: 'Автокредит'
   },
@@ -108,7 +108,7 @@ export const buildingConfigs: Record<BuildingType, BuildingConfig> = {
     income: { coins: 60, crystals: 6, interval: 100000 },
     maxLevel: 8,
     size: { width: 3, height: 3 },
-    unlockLevel: 6,
+    unlockLevel: 999,
     requiresBuilding: BuildingType.CREDIT_OFFICE,
     bankProduct: 'Ипотека'
   }
