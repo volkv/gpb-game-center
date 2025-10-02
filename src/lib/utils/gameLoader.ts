@@ -88,14 +88,8 @@ class GameLoaderService {
 	private async dynamicImport(path: string): Promise<{ default: any }> {
 		// Vite can analyze this pattern and create separate chunks for each game.
 		// The path must be relative to the current file.
-		const modules = import.meta.glob('../../games/**/*.svelte');
-		const modulePath = `../../${path.substring(1)}`;
+		const module = await import(`../../${path.substring(1)}.svelte`);
 
-		if (!modules[modulePath]) {
-			throw new Error(`Unknown game component path: ${path}`);
-		}
-
-		const module = await modules[modulePath]();
 		if (!('default' in module)) {
 			throw new Error(`Game component ${path} does not have a default export`);
 		}

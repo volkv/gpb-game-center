@@ -59,7 +59,7 @@ export const ACTIVE_GAMES: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-09-28'),
 		updatedAt: new Date('2024-09-28'),
-		componentPath: '/games/asset-guardian/AssetGuardianGame.svelte',
+		componentPath: '/games/asset-guardian/AssetGuardianGame',
 		locale: 'ru'
 	},
 
@@ -115,7 +115,7 @@ export const ACTIVE_GAMES: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-09-26'),
 		updatedAt: new Date('2024-09-26'),
-		componentPath: '/games/code-to-success/CodeToSuccessGame.svelte',
+		componentPath: '/games/code-to-success/CodeToSuccessGame',
 		locale: 'ru'
 	},
 
@@ -176,7 +176,7 @@ export const ACTIVE_GAMES: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-02-10'),
 		updatedAt: new Date('2024-02-10'),
-		componentPath: '/games/fincity/FincityGame.svelte',
+		componentPath: '/games/fincity/FincityGame',
 		locale: 'ru'
 	},
 
@@ -223,7 +223,7 @@ export const ACTIVE_GAMES: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-01-15'),
 		updatedAt: new Date('2024-01-20'),
-		componentPath: '/games/quiz-shield-ruble/QuizGame.svelte',
+		componentPath: '/games/quiz-shield-ruble/QuizGame',
 		locale: 'ru'
 	},
 
@@ -270,7 +270,7 @@ export const ACTIVE_GAMES: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-01-10'),
 		updatedAt: new Date('2024-01-18'),
-		componentPath: '/games/match3-golden-reserve/Match3Game.svelte',
+		componentPath: '/games/match3-golden-reserve/Match3Game',
 		locale: 'ru'
 	},
 
@@ -317,7 +317,7 @@ export const ACTIVE_GAMES: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-01-12'),
 		updatedAt: new Date('2024-01-22'),
-		componentPath: '/games/crossword-financial/CrosswordDemo.svelte',
+		componentPath: '/games/crossword-financial/CrosswordDemo',
 		locale: 'ru'
 	},
 
@@ -378,7 +378,7 @@ export const ACTIVE_GAMES: Game[] = [
 		version: '1.0.0',
 		createdAt: new Date('2024-09-26'),
 		updatedAt: new Date('2024-09-26'),
-		componentPath: '/games/anti-fraud-hunter/AntiFraudGame.svelte',
+		componentPath: '/games/anti-fraud-hunter/AntiFraudGame',
 		locale: 'ru'
 	}
 ];
