@@ -70,11 +70,14 @@ export class PhysicsEngine {
 		const isWallCollision = bodyType === 'wall' || bodyType === 'boundary';
 
 		if (phase === 'start') {
+			const collisionPoint = pair.collision.supports[0] || ballBody.position;
+
 			const result: CollisionResult = {
 				type: this.getCollisionType(bodyType),
-				position: { x: otherBody.position.x, y: otherBody.position.y },
+				position: { x: collisionPoint.x, y: collisionPoint.y },
 				value: this.getCollisionValue(bodyType),
-				effect: this.getCollisionEffect(bodyType)
+				effect: this.getCollisionEffect(bodyType),
+				objectId: bodyId
 			};
 
 			const handler = this.collisionHandlers.get(bodyType);

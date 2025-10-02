@@ -648,9 +648,8 @@ function createAssetGuardianStore() {
 
 				const collisionResult = collisionHandler!.processCollision(result, context);
 
-				if (collisionResult.shouldRemoveObject && gameEngine) {
-					const objectId = `cell-${Math.floor(result.position.y / 40)}-${Math.floor(result.position.x / 40)}`;
-					gameEngine.markObjectForRemoval(objectId);
+				if (collisionResult.shouldRemoveObject && gameEngine && result.objectId) {
+					gameEngine.markObjectForRemoval(result.objectId);
 				}
 
 				const newScore = Math.max(0, state.progress.score + collisionResult.scoreChange);
@@ -713,6 +712,7 @@ function createAssetGuardianStore() {
 				initializeCollisionHandler();
 			}
 			collisionHandler?.setGameEngine(gameEngine);
+			collisionHandler?.setSoundManager(gameEngine.getSoundManager());
 		},
 
 		getCollisionStats: () => {

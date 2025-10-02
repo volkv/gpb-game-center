@@ -197,3 +197,33 @@ export function getPlayerStats() {
     tutorialCompleted: $playerData.tutorialCompleted
   }));
 }
+
+let energyRegenerationInterval: number | null = null;
+
+export function startEnergyRegeneration() {
+  if (energyRegenerationInterval) {
+    return;
+  }
+
+  energyRegenerationInterval = window.setInterval(() => {
+    playerData.update(data => {
+      if (data.resources.energy < data.resources.maxEnergy) {
+        return {
+          ...data,
+          resources: {
+            ...data.resources,
+            energy: Math.min(data.resources.energy + 1, data.resources.maxEnergy)
+          }
+        };
+      }
+      return data;
+    });
+  }, 1000);
+}
+
+export function stopEnergyRegeneration() {
+  if (energyRegenerationInterval) {
+    clearInterval(energyRegenerationInterval);
+    energyRegenerationInterval = null;
+  }
+}

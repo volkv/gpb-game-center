@@ -14,6 +14,8 @@ import type { VisualEffectsManager } from './visual-effects';
 import { createEffectsManager } from './effects';
 import type { EffectsManager } from './effects';
 import { triggerHapticFeedback } from '$lib/telegram/integration';
+import { createSoundManager } from './soundManager';
+import type { SoundManager } from './soundManager';
 
 export interface GameEngineConfig {
 	width: number;
@@ -39,6 +41,7 @@ export class AssetGuardianGameEngine {
 	private currentLevel: LevelConfig | null = null;
 	private visualEffectsManager: VisualEffectsManager;
 	private effectsManager: EffectsManager;
+	private soundManager: SoundManager;
 	private currentTilt: { x: number; y: number } = { x: 0, y: 0 };
 	private targetTilt: { x: number; y: number } = { x: 0, y: 0 };
 	private highlightOffset: { x: number; y: number } = { x: 0, y: 0 };
@@ -54,6 +57,7 @@ export class AssetGuardianGameEngine {
 		this.ballHighlightGraphics = new Graphics();
 		this.visualEffectsManager = createVisualEffectsManager();
 		this.effectsManager = createEffectsManager();
+		this.soundManager = createSoundManager();
 	}
 
 	async initialize(canvas: HTMLCanvasElement): Promise<void> {
@@ -79,6 +83,7 @@ export class AssetGuardianGameEngine {
 			this.setupContainers();
 			this.setupPhysics();
 			this.createBallGraphics();
+			this.soundManager.initialize();
 
 			this.app.stage.addChild(this.gameContainer);
 			this.isInitialized = true;
@@ -114,12 +119,10 @@ export class AssetGuardianGameEngine {
 
 		this.physics.addCollisionHandler('wall', (result) => {
 			triggerHapticFeedback();
-			this.createWallHitEffect(result.position);
 		});
 
 		this.physics.addCollisionHandler('boundary', (result) => {
 			triggerHapticFeedback();
-			this.createWallHitEffect(result.position);
 		});
 
 		this.physics.addCollisionHandler('cashback', (result) => {
@@ -489,17 +492,26 @@ export class AssetGuardianGameEngine {
 		const containerElement = canvasElement?.parentElement;
 
 		if (containerElement && containerElement.classList.contains('game-canvas-container')) {
-			if (typeof window !== 'undefined' && window.innerWidth < 768) {
-				containerElement.style.transform = 'none';
-				return;
-			}
-
 			const rotateX = perspective.y * VISUAL_EFFECTS.MAX_TILT_ANGLE;
 			const rotateY = -perspective.x * VISUAL_EFFECTS.MAX_TILT_ANGLE;
+			const tiltMagnitude = Math.sqrt(perspective.x * perspective.x + perspective.y * perspective.y);
+			const translateZ = tiltMagnitude * VISUAL_EFFECTS.TRANSLATE_Z_INTENSITY;
+
+			const shadowOffsetX = -perspective.x * 50;
+			const shadowOffsetY = -perspective.y * 50;
+			const shadowBlur = 40 + tiltMagnitude * 60;
+			const shadowSpread = 10 + tiltMagnitude * 15;
+			const shadowOpacity = 0.35 + tiltMagnitude * 0.3;
 
 			containerElement.style.transform =
 				`perspective(${perspective.intensity}px) ` +
-				`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+				`rotateX(${rotateX}deg) rotateY(${rotateY}deg) ` +
+				`translateZ(${translateZ}px) ` +
+				`scale(${1 + tiltMagnitude * 0.05})`;
+
+			containerElement.style.boxShadow =
+				`${shadowOffsetX}px ${shadowOffsetY}px ${shadowBlur}px ${shadowSpread}px rgba(0, 0, 0, ${shadowOpacity}), ` +
+				`0 30px 80px rgba(0, 0, 0, 0.3)`;
 
 		}
 	}
@@ -657,6 +669,7 @@ export class AssetGuardianGameEngine {
 
 		this.physics.update(deltaTime);
 		this.updateBallGraphics();
+		this.processRemovedObjects();
 
 		this.animationFrameId = requestAnimationFrame(this.gameLoop);
 	};
@@ -807,11 +820,16 @@ export class AssetGuardianGameEngine {
 		});
 	}
 
+	getSoundManager(): SoundManager {
+		return this.soundManager;
+	}
+
 	destroy(): void {
 		this.stop();
 		this.cellSprites.clear();
 		this.visualEffectsManager.destroy();
 		this.effectsManager.destroy();
+		this.soundManager.destroy();
 
 		if (this.app) {
 			this.app.destroy(true, { children: true, texture: true });

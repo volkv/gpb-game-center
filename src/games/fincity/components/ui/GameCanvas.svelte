@@ -4,6 +4,7 @@
   import { ZoomControls } from '.';
   import type { InteractionEvent, LoadingProgressHandler } from '../../types/Game';
   import type { LoadingStageInfo } from '../game/ResourceManager';
+  import { setGameEngine } from '../../stores/gameState';
 
   interface Props {
     backgroundColor?: number;
@@ -46,6 +47,8 @@
       gameEngine = new GameEngine(config);
       await gameEngine.initialize(canvasElement);
 
+      setGameEngine(gameEngine);
+
       setupInteractionHandlers();
       setupKeyboardHandlers();
       setupResizeObserver();
@@ -68,6 +71,7 @@
     if (gameEngine) {
       gameEngine.destroy();
       gameEngine = null;
+      setGameEngine(null);
     }
   });
 

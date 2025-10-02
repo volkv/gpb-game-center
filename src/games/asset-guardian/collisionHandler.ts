@@ -3,6 +3,7 @@ import { SCORE_VALUES, HAPTIC_PATTERNS, BANKING_PRODUCTS, type BankingProductsRe
 import { triggerHapticFeedback } from '$lib/telegram/integration';
 import { getTelegramWebApp } from '$lib/telegram/integration';
 import type { AssetGuardianGameEngine } from './gameEngine';
+import type { SoundManager } from './soundManager';
 
 export interface CollisionEffectResult {
 	scoreChange: number;
@@ -42,9 +43,14 @@ export class CollisionHandler {
 	private lastCollisionTime = 0;
 	private collectionHistory: Array<{ type: string; time: number }> = [];
 	private gameEngine: AssetGuardianGameEngine | null = null;
+	private soundManager: SoundManager | null = null;
 
 	setGameEngine(gameEngine: AssetGuardianGameEngine): void {
 		this.gameEngine = gameEngine;
+	}
+
+	setSoundManager(soundManager: SoundManager): void {
+		this.soundManager = soundManager;
 	}
 
 	processCollision(
@@ -56,6 +62,7 @@ export class CollisionHandler {
 
 		this.updateComboSystem(result, timeSinceLastCollision);
 		this.triggerHaptics(result);
+		this.triggerSounds(result, context);
 		this.addToHistory(result, now);
 
 		this.lastCollisionTime = now;
@@ -193,10 +200,6 @@ export class CollisionHandler {
 		result: CollisionResult,
 		context: CollisionContext
 	): CollisionEffectResult {
-		if (this.gameEngine && result.position) {
-			this.gameEngine.createWallHitEffect(result.position);
-		}
-
 		return {
 			scoreChange: 0,
 			livesChange: 0,
@@ -277,6 +280,49 @@ export class CollisionHandler {
 			}
 		}
 		return 'unknown';
+	}
+
+	private triggerSounds(result: CollisionResult, context: CollisionContext): void {
+		if (!this.soundManager) return;
+
+		try {
+			switch (result.type) {
+				case 'bonus':
+					const comboMultiplier = this.getComboMultiplier();
+					if (comboMultiplier > 1) {
+						this.soundManager.play({
+							type: 'combo',
+							volume: 1,
+							pitch: Math.min(comboMultiplier * 0.5, 1.5)
+						});
+					} else {
+						const bonusType = this.getBonusType(result);
+						if (bonusType === 'bonus_cashback') {
+							this.soundManager.play({ type: 'bonus_cashback', volume: 1 });
+						} else if (bonusType === 'bonus_deposit') {
+							this.soundManager.play({ type: 'bonus_deposit', volume: 1 });
+						} else {
+							this.soundManager.play({ type: 'bonus_collect', volume: 1 });
+						}
+					}
+					break;
+				case 'trap':
+					if (context.hasActiveShield) {
+						this.soundManager.play({ type: 'shield', volume: 1 });
+					} else {
+						this.soundManager.play({ type: 'trap_hit', volume: 1 });
+					}
+					break;
+				case 'finish':
+					this.soundManager.play({ type: 'finish', volume: 1 });
+					break;
+				case 'wall':
+					this.soundManager.play({ type: 'wall_bounce', volume: 0.6 });
+					break;
+			}
+		} catch (error) {
+			console.warn('🎮 [COLLISION] Failed to trigger sound:', error);
+		}
 	}
 
 	private triggerHaptics(result: CollisionResult): void {

@@ -4,6 +4,7 @@ import { BuildingType } from '../../types/Building';
 import type { GridPosition } from '../../types/Game';
 import type { ResourceManager } from './ResourceManager';
 import { openModal } from '../../stores/ui';
+import { buildingConfigs } from '../../stores/buildings';
 
 export interface BuildingVisual {
   container: Container;
@@ -661,6 +662,8 @@ export class BuildingRenderer {
     const visual = this.buildings.get(buildingId);
     if (!visual) return;
 
+    visual.building = { ...visual.building, level };
+
     if (visual.nameText) {
       visual.nameText.text = name;
     }
@@ -669,6 +672,7 @@ export class BuildingRenderer {
       const levelText = visual.levelBadge.children.find(
         (child) => child instanceof Text
       ) as Text | undefined;
+
       if (levelText) {
         levelText.text = `${level}`;
       }

@@ -507,9 +507,9 @@
 		padding: 1rem;
 		position: relative;
 		perspective: 800px;
-		perspective-origin: center center;
+		perspective-origin: 50% 50%;
 		min-height: 0;
-		overflow: hidden;
+		overflow: visible;
 		contain: layout style;
 		isolation: isolate;
 	}
@@ -525,9 +525,13 @@
 		border-radius: 1rem;
 		padding: 1.5rem;
 		border: 2px solid rgba(243, 156, 18, 0.3);
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+		box-shadow:
+			0 8px 32px rgba(0, 0, 0, 0.3),
+			0 20px 60px rgba(0, 0, 0, 0.2);
 		transform-style: preserve-3d;
-		transition: transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+		transition:
+			transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+			box-shadow 0.2s ease-out;
 		overflow: hidden;
 		will-change: transform;
 		backface-visibility: hidden;

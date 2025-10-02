@@ -72,6 +72,7 @@ export interface CollisionResult {
 	position: Position;
 	value: number;
 	effect: 'score' | 'life' | 'time' | 'complete';
+	objectId?: string;
 }
 
 export interface VisualEffects {

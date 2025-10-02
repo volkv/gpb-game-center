@@ -15,6 +15,7 @@
 	import type { GameEngine } from './components/game/GameEngine';
 	import { initializeAutoSave, stopAutoSave } from './lib/autoSave';
 	import { startPassiveIncome, stopPassiveIncome } from './stores/buildings';
+	import { startEnergyRegeneration, stopEnergyRegeneration } from './stores/playerData';
 
 	interface Props {
 		onexit?: () => void;
@@ -27,6 +28,7 @@
 	onMount(() => {
 		initializeAutoSave();
 		startPassiveIncome();
+		startEnergyRegeneration();
 
 		gameStatusStore.show({
 			gameName: 'ФинСити',
@@ -38,6 +40,7 @@
 	onDestroy(() => {
 		stopPassiveIncome();
 		stopAutoSave();
+		stopEnergyRegeneration();
 		gameStatusStore.hide();
 	});
 
