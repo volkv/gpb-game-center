@@ -25,6 +25,16 @@
 
 ---
 
+## 📺 Материалы Проекта
+
+### Презентация и Демонстрация
+
+[![Презентация](https://img.shields.io/badge/📊_Презентация-PDF-red?style=for-the-badge)](https://github.com/volkv/gpb-game-center/blob/main/presentation.pdf)
+[![Питч](https://img.shields.io/badge/🎤_Питч_презентация-PDF-orange?style=for-the-badge)](https://github.com/volkv/gpb-game-center/blob/main/presentation_pitch.pdf)
+[![Видео](https://img.shields.io/badge/🎥_Видео_демонстрация-Google_Drive-4285F4?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1nhLNuojfc2pSYThB2FmBKTDHCKhSIKdF/view?usp=sharing)
+
+---
+
 ## 🚀 Быстрый Старт
 
 ### Telegram Mini App (Рекомендуется)
